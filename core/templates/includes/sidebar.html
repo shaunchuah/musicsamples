@@ -1,0 +1,31 @@
+
+
+    <div class="sidebar">
+      <div class="sidebar-wrapper">
+        
+        <div class="logo">
+          <a class="simple-text logo-mini">
+          </a>
+          <a class="simple-text logo-normal">
+            MUSIC Samples
+          </a>
+        </div>
+
+        {% if user.is_authenticated %}
+        <ul class="nav">
+          <li class="active ">
+            <a href="/">
+              <i class="tim-icons icon-atom"></i>
+              <p>Dashboard</p>
+            </a>
+          </li>
+          <li>
+            <a href="/add">
+              <i class="tim-icons icon-bell-55"></i>
+              <p>Add New Sample</p>
+            </a>
+          </li>
+        </ul>
+        {% endif %}        
+      </div>
+    </div>

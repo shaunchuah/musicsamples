@@ -1,0 +1,78 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Login {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+        <div class="row">
+          <div class="col-md-8">
+            <div class="card">
+
+              <form role="form" method="post" action="">
+              
+                {% csrf_token %} 
+
+                <div class="card-header">
+                  <h3 class="title">Login</h3>
+
+                  <h6 class="card-category">
+                      {% if msg %}
+                      <div class="row">
+                        <div class="col-md-3">
+                      <div class="alert alert-danger">
+                        <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+                          <i class="tim-icons icon-simple-remove"></i>
+                        </button>
+                        <span>{{ msg }}</span>
+                      </div>
+                    </div>
+                    </div>
+
+                      {% endif %}  
+                  </h6>
+                </div>
+
+                <div class="card-body mx-3">
+
+                    <div class="row">
+
+                      <div class="col-md-3 px-md-1">
+                        <div class="form-group">
+                          <label>Username</label>
+                          {{ form.username }}
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="row">
+
+                      <div class="col-md-3 px-md-1">
+                        <div class="form-group">
+                          <label>Password</label>
+                          {{ form.password }}
+                        </div>
+                      </div>
+
+                    </div>
+                    
+                </div>
+                <div class="card-footer">
+                  <button type="submit" name="login" class="btn btn-fill btn-primary">Login</button>
+                  &nbsp; &nbsp;
+                  Having trouble? <a href="mailto: ibdmusicstudy@ed.ac.uk" class="text-primary">Email Us</a>
+                </div>
+
+              </form>
+
+            </div>
+          </div>
+      </div>
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
