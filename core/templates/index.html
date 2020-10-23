@@ -98,9 +98,7 @@
           <table class="table tablesorter " id="">
             <thead class=" text-primary">
               <tr>
-                <th>
-                  Sample ID
-                </th>
+                <th>Sample ID</th>
                 <th>
                   Patient ID
                 </th>
@@ -115,6 +113,9 @@
                 </th>
                 <th>
                   Comments
+                </th>
+                <th>
+                  Last Modified By
                 </th>
                 <th>
                   Checkout
@@ -140,9 +141,12 @@
                       <td>{{ sample.sample_type }}</td>
                       <td>{{ sample.sample_datetime }}</td>
                       <td>{{ sample.sample_comments }}</td>
-                      <td><i class="tim-icons icon-cloud-upload-94"></i> Checkout</td>
+                      <td>{{ sample.last_modified_by }}</td>
                       <td>
-                        <a href="{% url 'sample_edit' pk=sample.pk %}"><i class="tim-icons icon-pencil"></i> Edit</a>
+                        <a href="{% url 'checkout' pk=sample.pk %}?next={{ request.get_full_path }}">
+                          <i class="tim-icons icon-cloud-upload-94"></i> Checkout </a></td>
+                      <td>
+                        <a href="{% url 'sample_edit' pk=sample.pk %}?next={{ request.get_full_path }}"><i class="tim-icons icon-pencil"></i> Edit</a>
                       </td>
                       <td>
                         <a href="{% url 'sample_detail' pk=sample.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
