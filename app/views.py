@@ -10,7 +10,7 @@ from django.template import loader
 from django.http import HttpResponse
 from django import template
 from .models import Sample
-from .forms import NewSampleForm, SampleForm
+from .forms import SampleForm, CheckoutForm
 from django.contrib import messages
 from django.db.models import Q
 
@@ -74,7 +74,11 @@ def sample_edit(request,pk):
             sample.last_modified_by = request.user.username
             sample.save()
             messages.success(request, 'Sample updated successfully.')
-            return redirect('/')
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('/')
     else:
         form = SampleForm(instance=sample)
     return render(request, 'sample-edit.html', {'form': form})
@@ -93,3 +97,23 @@ def search(request):
         return render(request, 'index.html', { 'query_string': query_string, 'sample_list': sample_list})
     else:
         return render(request, 'index.html', { 'query_string': 'Null' })
+
+@login_required(login_url="/login/")
+def checkout(request,pk):
+    sample = get_object_or_404(Sample, pk=pk)
+    if request.method == "POST":
+        form = CheckoutForm(request.POST, instance=sample)
+        if form.is_valid():
+            sample = form.save(commit=False)
+            sample.last_modified_by = request.user.username
+            sample.save()
+            messages.success(request, 'Sample updated successfully.')
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('/')
+    else:
+        form = CheckoutForm(instance=sample)
+    return render(request, 'sample-edit.html', {'form': form})
+
