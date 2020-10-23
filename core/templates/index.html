@@ -92,6 +92,7 @@
       </div>
       <div class="card-footer">
       <a href="/add/" class="btn btn-fill btn-success">Add New Sample</a>
+      <a href="/bulkadd/" class="btn btn-fill btn-primary">Bulk Add Samples</a>
     </div>
       <div class="card-body">
         <div class="table-responsive">
@@ -118,6 +119,10 @@
                   Last Modified By
                 </th>
                 <th>
+                  Last Modified
+                </th>
+               
+                <th>
                   Checkout
                 </th>
                 <th>
@@ -142,6 +147,8 @@
                       <td>{{ sample.sample_datetime }}</td>
                       <td>{{ sample.sample_comments }}</td>
                       <td>{{ sample.last_modified_by }}</td>
+                      <td>{{ sample.last_modified }}</td>
+                      
                       <td>
                         <a href="{% url 'checkout' pk=sample.pk %}?next={{ request.get_full_path }}">
                           <i class="tim-icons icon-cloud-upload-94"></i> Checkout </a></td>
