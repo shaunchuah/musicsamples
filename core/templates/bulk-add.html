@@ -1,0 +1,236 @@
+{% extends "layouts/base.html" %} {% block title %} Dashboard {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %} 
+
+{% block content %} 
+
+{% if messages %} 
+{% for message in messages %} 
+
+{% if message.tags == 'success' %}
+<div class="row">
+  <div class="col-md-5">
+    <div class="alert alert-success">
+      <button
+        type="button"
+        aria-hidden="true"
+        class="close"
+        data-dismiss="alert"
+        aria-label="Close"
+      >
+        <i class="tim-icons icon-simple-remove"></i>
+      </button>
+      <span><b> Success - </b> {{ message }}</span>
+    </div>
+  </div>
+</div>
+
+{% elif message.tags == 'error' %}
+<div class="row">
+  <div class="col-md-5">
+    <div class="alert alert-danger">
+      <button
+        type="button"
+        aria-hidden="true"
+        class="close"
+        data-dismiss="alert"
+        aria-label="Close"
+      >
+        <i class="tim-icons icon-simple-remove"></i>
+      </button>
+      <span><b> Error - </b> {{ message }}</span>
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="row">
+  <div class="col-md-5">
+    <div class="alert">
+      <button
+        type="button"
+        aria-hidden="true"
+        class="close"
+        data-dismiss="alert"
+        aria-label="Close"
+      >
+        <i class="tim-icons icon-simple-remove"></i>
+      </button>
+      <span>{{ message }}</span>
+    </div>
+  </div>
+</div>
+{% endif %} 
+{% endfor %} 
+{% endif %} 
+
+
+
+
+
+{% if form.errors %} 
+{% for field in form %} 
+{% for error in field.errors %}
+<div class="row">
+  <div class="col-md-5">
+    <div class="alert alert-danger">
+      <button
+        type="button"
+        aria-hidden="true"
+        class="close"
+        data-dismiss="alert"
+        aria-label="Close"
+      >
+        <i class="tim-icons icon-simple-remove"></i>
+      </button>
+      <span>{{field.label}}: {{ error|escape }}</span>
+    </div>
+  </div>
+</div>
+{% endfor %} 
+{% endfor %} 
+{% endif %}
+
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Add Multiple Samples</h3>
+        <h5 class="card-subtitle">This form allows more efficient processing but please note if you add a row you can't remove it</h5>
+      </div>
+      <div class="card-footer">
+        <button id="addformrow" class="btn btn-fill btn-primary">Add Another Sample</button>
+        <!--<button id="deletelastrow" class="btn btn-fill btn-primary">Delete Last Row</button>-->
+        <a href='/bulkadd' class="btn btn-fill btn-danger float-right">Reset All</a>
+      </div>
+      <div class="card-body">
+        <form action="/bulkadd/" method="POST">
+          {% csrf_token %} 
+          {{formset.management_form}} 
+          {% load widget_tweaks %}
+
+
+          <div id="sample-form">
+            {% for form in formset %}
+
+            {% if form.errors %}
+            <div class="row">
+              <div class="col-md-5">
+                <div class="alert alert-danger">
+                  <button
+                    type="button"
+                    aria-hidden="true"
+                    class="close"
+                    data-dismiss="alert"
+                    aria-label="Close"
+                  >
+                    <i class="tim-icons icon-simple-remove"></i>
+                  </button>
+                  <span>{{ form.errors.as_text }}</span>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+
+              
+
+
+
+
+
+              <div class="row form-row">
+              {% for hidden_field in form.hidden_fields %} 
+              {{ hidden_field }} 
+              {% endfor %}              
+                {% for field in form.visible_fields %}
+                <div class="col">
+                  <div class="form-group">
+                    {{ field.label_tag }} 
+                    {% render_field field class="form-control" %} 
+                    {% if field.help_text %}
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+
+              <div id="added-forms">
+
+              </div>
+            
+            {% endfor %}
+          </div>
+
+
+
+          
+          <div class="card-footer">
+            <button
+              type="submit"
+              value="submit"
+              class="btn btn-fill btn-success"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+<script>
+$(document).ready(function() {
+    // Watch for the 'add another book' click
+    $('#addformrow').click(function(e) {
+        e.preventDefault();
+            
+        // create a clone of the existing form elements, but with blank fields.
+        $('div.form-row:last').clone().each(function(i) {
+            $(this).find('input,select').each(function(i) {
+                    
+                // Remove any existing values 
+                $(this).val('');
+
+                // update the id attributes, incrementing the form number, e.g.: "id_form-1-field_name"
+                parts = $(this).attr('id').split('-', 3); 
+                num = parseInt(parts[1]) + 1;
+                $(this).attr('id', parts[0] + '-' +num + '-' +parts[2]);
+
+                // Update the name attribute, e.g.: form-1-field_name
+                parts = $(this).attr('name').split('-', 3); 
+                num = parseInt(parts[1] + 1); 
+                $(this).attr('name', parts[0] + '-' +num + '-' +parts[2]);
+
+            }); 
+                
+            // Update the "for" attribute for all labels 
+            $(this).find('label').each(function(i) {
+                parts = $(this).attr('for').split('-', 3); 
+                num = parseInt(parts[1]) + 1;
+                $(this).attr('for', parts[0] + '-' +num + '-' +parts[2]);
+            }); 
+
+        }).appendTo('div#added-forms');
+            
+        // Increment the TOTAL_FORMS
+        $('#id_form-TOTAL_FORMS').val(parseInt($('#id_form-TOTAL_FORMS').val()) + 1); 
+    }); 
+
+    $('#deletelastrow').click(function(e) {
+        e.preventDefault();
+
+        $('div#added-forms .form-row:last').remove();
+        $('#id_form-TOTAL_FORMS').val(parseInt($('#id_form-TOTAL_FORMS').val()) - 1); 
+    });
+});
+</script>
+
+{% endblock javascripts %}

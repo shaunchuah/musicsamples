@@ -1,6 +1,6 @@
 from django import forms
 from django.utils import timezone
-from django.forms import ModelForm
+from django.forms import ModelForm, modelformset_factory, formset_factory
 from .models import Sample
 
 class DateTimeInput(forms.DateTimeInput):
@@ -14,7 +14,7 @@ class SampleForm(ModelForm):
     sample_datetime = forms.DateTimeField(label="Sample Created Datetime", widget=DateTimeInput(), initial=timezone.localtime(timezone.now()))
     class Meta:
         model = Sample
-        fields = ['musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments']
+        fields = ['musicsampleid', 'sample_type', 'patientid', 'sample_location', 'sample_comments', 'sample_datetime']
         widgets = {
             'sample_datetime': DateTimeInput(),
         }
@@ -32,3 +32,5 @@ class CheckoutForm(ModelForm):
         fields = ['sample_location']
         labels = { 'sample_location': "Sample Location" }
 
+#SampleFormSet = modelformset_factory(Sample, fields=('musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments'), extra=2)
+SampleFormSet = formset_factory(SampleForm, extra=1)

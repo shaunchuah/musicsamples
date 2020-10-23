@@ -10,13 +10,14 @@ from django.template import loader
 from django.http import HttpResponse
 from django import template
 from .models import Sample
-from .forms import SampleForm, CheckoutForm
+from .forms import SampleForm, CheckoutForm, SampleFormSet
 from django.contrib import messages
 from django.db.models import Q
+from django.forms import formset_factory
 
 @login_required(login_url="/login/")
 def index(request):
-    sample_list = Sample.objects.all()
+    sample_list = Sample.objects.all().order_by('-last_modified')
     context = {'sample_list': sample_list}
     return render(request, "index.html", context)
 
@@ -117,3 +118,22 @@ def checkout(request,pk):
         form = CheckoutForm(instance=sample)
     return render(request, 'sample-edit.html', {'form': form})
 
+
+
+
+def bulkadd(request):
+    if request.method == "POST":
+        formset = SampleFormSet(request.POST)
+        if formset.is_valid():
+            for form in formset:
+                sample = form.save(commit=False)
+                sample.created_by = request.user.username
+                sample.last_modified_by = request.user.username
+                sample.save()
+            messages.success(request, 'All samples registered successfully.')
+            return redirect('/')
+        else:
+            messages.error(request, 'Form is not valid.')
+    else:
+        formset = SampleFormSet()
+    return render(request, "bulk-add.html", {'formset': formset})
