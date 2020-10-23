@@ -79,9 +79,9 @@ def sample_edit(request,pk):
         form = SampleForm(instance=sample)
     return render(request, 'sample-edit.html', {'form': form})
 
+@login_required(login_url="/login/")
 def search(request):
     query_string=''
-    found_samples = None
     if ('q' in request.GET) and request.GET['q'].strip():
         query_string = request.GET.get('q')
         sample_list = Sample.objects.filter(

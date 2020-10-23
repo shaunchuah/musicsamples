@@ -74,7 +74,7 @@
           <input type="text" name="q" class="form-control">
         </div>
         <div class="card-footer">
-          <button type="submit" class="btn btn-fill btn-primary">Search</button>
+          <button type="submit" class="btn btn-fill btn-success">Search</button>
           <a href="{% url 'home' %}" class="btn btn-fill btn-secondary">Clear</a>
         </div>
       </form>
@@ -91,7 +91,7 @@
         <h3 class="card-title">All Samples</h3>
       </div>
       <div class="card-footer">
-      <a href="/add/" class="btn btn-fill btn-primary">Add New Sample</a>
+      <a href="/add/" class="btn btn-fill btn-success">Add New Sample</a>
     </div>
       <div class="card-body">
         <div class="table-responsive">
@@ -120,7 +120,10 @@
                   Checkout
                 </th>
                 <th>
-                  Details/Edit
+                  Edit
+                </th>
+                <th>
+                  View
                 </th>
               </tr>
             </thead>
@@ -137,10 +140,12 @@
                       <td>{{ sample.sample_type }}</td>
                       <td>{{ sample.sample_datetime }}</td>
                       <td>{{ sample.sample_comments }}</td>
-                      <td>Checkout Sample</td>
+                      <td><i class="tim-icons icon-cloud-upload-94"></i> Checkout</td>
                       <td>
-                        <a href="{% url 'sample_detail' pk=sample.pk %}">View</a>
-                        <a href="{% url 'sample_edit' pk=sample.pk %}">Edit</a>
+                        <a href="{% url 'sample_edit' pk=sample.pk %}"><i class="tim-icons icon-pencil"></i> Edit</a>
+                      </td>
+                      <td>
+                        <a href="{% url 'sample_detail' pk=sample.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -255,8 +260,7 @@
     $(document).ready(function() {
       // Javascript method's body can be found in assets/js/demos.js
       demo.initDashboardPageCharts();
-
-    });
+    });    
   </script>
 
 {% endblock javascripts %}
