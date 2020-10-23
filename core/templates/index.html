@@ -23,19 +23,62 @@
   </div>
 </div>-->
 
+
+{% if messages %}
+  {% for message in messages %}  
+      {% if message.tags == 'success' %}
+    <div class="row">
+      <div class="col">
+      <div class="alert alert-success">
+        <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+          <i class="tim-icons icon-simple-remove"></i>
+        </button>
+        <span><b> Success - </b> {{ message }}</span>
+      </div>
+    </div>
+  </div>
+
+      {% elif message.tags == 'error' %}
+      <div class="row">
+        <div class="col">
+      <div class="alert alert-danger">
+        <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+          <i class="tim-icons icon-simple-remove"></i>
+        </button>
+        <span><b> Error - </b> {{ message }}</span>
+      </div>
+    </div>
+  </div>
+      {% else %}
+      <div class="row">
+        <div class="col">
+        <div class="alert">
+          <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+            <i class="tim-icons icon-simple-remove"></i>
+          </button>
+          <span>{{ message }}</span>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
 <div class="row">
   <div class="col">
     <div class="card">
     <div class="card-header"><h3 class="card-title">Search Samples</h3></div>
     <div class=card-body>
-      <form>
+      <form id="searchform" action="{% url 'search' %}" method="GET">
         <div class="form-group">
-          <input type="text" class="form-control">
+          <input type="text" name="q" class="form-control">
         </div>
         <div class="card-footer">
           <button type="submit" class="btn btn-fill btn-primary">Search</button>
+          <a href="{% url 'home' %}" class="btn btn-fill btn-secondary">Clear</a>
         </div>
       </form>
+      
     </div>
     </div>
   </div>
@@ -47,6 +90,9 @@
       <div class="card-header">
         <h3 class="card-title">All Samples</h3>
       </div>
+      <div class="card-footer">
+      <a href="/add/" class="btn btn-fill btn-primary">Add New Sample</a>
+    </div>
       <div class="card-body">
         <div class="table-responsive">
           <table class="table tablesorter " id="">
@@ -92,11 +138,14 @@
                       <td>{{ sample.sample_datetime }}</td>
                       <td>{{ sample.sample_comments }}</td>
                       <td>Checkout Sample</td>
-                      <td>Details/Edit</td>
+                      <td>
+                        <a href="{% url 'sample_detail' pk=sample.pk %}">View</a>
+                        <a href="{% url 'sample_edit' pk=sample.pk %}">Edit</a>
+                      </td>
                     </tr>
                   {% endfor %}
               {% else %}
-                  <tr><td colspan="8" align="center">No samples yet.</td></tr>
+                  <tr><td colspan="8" align="center">No samples found.</td></tr>
               {% endif %}
               
             </tbody>

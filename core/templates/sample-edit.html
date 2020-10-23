@@ -1,0 +1,113 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
+{% if messages %}
+  {% for message in messages %}  
+      {% if message.tags == 'success' %}
+    <div class="row">
+      <div class="col-md-5">
+      <div class="alert alert-success">
+        <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+          <i class="tim-icons icon-simple-remove"></i>
+        </button>
+        <span><b> Success - </b> {{ message }}</span>
+      </div>
+    </div>
+  </div>
+
+      {% elif message.tags == 'error' %}
+      <div class="row">
+        <div class="col-md-5">
+      <div class="alert alert-danger">
+        <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+          <i class="tim-icons icon-simple-remove"></i>
+        </button>
+        <span><b> Error - </b> {{ message }}</span>
+      </div>
+    </div>
+  </div>
+      {% else %}
+      <div class="row">
+        <div class="col-md-5">
+        <div class="alert">
+          <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+            <i class="tim-icons icon-simple-remove"></i>
+          </button>
+          <span>{{ message }}</span>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% if form.errors %}
+  {% for field in form %}
+    {% for error in field.errors %}
+<div class="row">
+  <div class="col-md-5">
+  <div class="alert alert-danger">
+    <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="tim-icons icon-simple-remove"></i>
+    </button>
+    <span>{{field.label}}: {{ error|escape }}</span>
+  </div>
+</div>
+</div>
+    {% endfor %} 
+  {% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">Update Sample</h3></div>
+        <div class=card-body>
+          <form method="POST">
+            {% csrf_token %}
+            {% load widget_tweaks %}
+            {% for hidden_field in form.hidden_fields %}
+              {{ hidden_field }}
+            {% endfor %}
+
+            {% for field in form.visible_fields %}
+              <div class="form-group">
+                {{ field.label_tag }}
+                {% render_field field class="form-control" %}
+                {% if field.help_text %}
+                  <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+              </div>
+            {% endfor %}
+
+            <div class="card-footer">
+              <button type="submit" value="submit" class="btn btn-fill btn-primary">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+  <script>
+    $(document).ready(function() {
+      // Javascript method's body can be found in assets/js/demos.js
+      demo.initDashboardPageCharts();
+
+    });
+  </script>
+
+{% endblock javascripts %}
