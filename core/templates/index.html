@@ -115,12 +115,12 @@
                 <th>
                   Comments
                 </th>
-                <th>
+                <!--<th>
                   Last Modified By
                 </th>
                 <th>
                   Last Modified
-                </th>
+                </th>-->
                
                 <th>
                   Checkout
@@ -149,8 +149,8 @@
                       <td>{{ sample.sample_type }}</td>
                       <td>{{ sample.sample_datetime }}</td>
                       <td>{{ sample.sample_comments }}</td>
-                      <td>{{ sample.last_modified_by }}</td>
-                      <td>{{ sample.last_modified }}</td>
+                      <!--<td>{{ sample.last_modified_by }}</td>
+                      <td>{{ sample.last_modified }}</td>-->
                       
                       <td>
                         <a href="{% url 'checkout' pk=sample.pk %}?next={{ request.get_full_path }}">

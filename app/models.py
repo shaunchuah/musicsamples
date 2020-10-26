@@ -23,3 +23,6 @@ class Sample(models.Model):
     data_first_created = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
     history = HistoricalRecords()
+
+    def clean(self):
+        self.musicsampleid = self.musicsampleid.upper()
