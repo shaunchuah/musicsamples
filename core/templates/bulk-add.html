@@ -93,15 +93,18 @@
 {% endif %}
 
 <div class="row">
-  <div class="col">
+  <div class="col-md-10">
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Add Multiple Samples</h3>
-        <h5 class="card-subtitle">This form allows more efficient processing but please note if you add a row you can't remove it</h5>
+        
+      </div>
+      <div class="card-body">
+        <p class="card-subtitle">This form allows more efficient processing. Please check the form carefully before submission to avoid errors.</p>
       </div>
       <div class="card-footer">
         <button id="addformrow" class="btn btn-fill btn-primary">Add Another Sample</button>
-        <!--<button id="deletelastrow" class="btn btn-fill btn-primary">Delete Last Row</button>-->
+        <button id="deletelastrow" class="btn btn-fill btn-primary">Delete Last Row</button>
         <a href='/bulkadd' class="btn btn-fill btn-danger float-right">Reset All</a>
       </div>
       <div class="card-body">
@@ -116,7 +119,7 @@
 
             {% if form.errors %}
             <div class="row">
-              <div class="col-md-5">
+              <div class="col">
                 <div class="alert alert-danger">
                   <button
                     type="button"
@@ -228,7 +231,10 @@ $(document).ready(function() {
         e.preventDefault();
 
         $('div#added-forms .form-row:last').remove();
-        $('#id_form-TOTAL_FORMS').val(parseInt($('#id_form-TOTAL_FORMS').val()) - 1); 
+
+        if (parseInt($('#id_form-TOTAL_FORMS').val()) > 1) {
+        $('#id_form-TOTAL_FORMS').val(parseInt($('#id_form-TOTAL_FORMS').val()) - 1);
+        };
     });
 });
 </script>

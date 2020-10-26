@@ -11,8 +11,23 @@
   <div class="col-md-5">
     <div class="card">
       <div class="card-header">
-        <h3 class="title">Edit Profile</h3>
+        <h3 class="title">Profile</h3>
       </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 pr-md-1 text-secondary">
+          Username: </div>
+          <div class="col text-success">{{ request.user.username }}</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 pr-md-1 text-secondary">
+          Email:</div>
+          <div class="col text-success"> {{ request.user.email }}</div>
+        </div>
+      </div>
+      <!--
       <div class="card-body">
         <form>
           <div class="row">
@@ -31,7 +46,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+         <div class="row">
             <div class="col-md-3 pr-md-1">
               <div class="form-group">
                 <label>First Name</label>
@@ -47,18 +62,11 @@
               </div>
             </div>
           </div>
-          <div class="row">
-            <div class="col-md-3 pr-md-1">
-              <div class="form-group">
-                <label>New Password</label>
-                <input type="password" class="form-control">
-              </div>
-            </div>
-          </div>
         </form>
-      </div>
+      </div>-->
       <div class="card-footer">
-        <button type="submit" class="btn btn-fill btn-primary">Save</button>
+        <!--<button type="submit" class="btn btn-fill btn-primary">Save</button>-->
+        <a href="/password_reset" class="btn btn-fill btn-success">Change Password</a>
       </div>
     </div>
   </div>
