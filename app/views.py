@@ -54,18 +54,13 @@ def pages(request):
     # All resource paths end in .html.
     # Pick out the html file name from the url. And load that template.
     try:
-        
         load_template = request.path.split('/')[-1]
         html_template = loader.get_template( load_template )
         return HttpResponse(html_template.render(context, request))
-        
     except template.TemplateDoesNotExist:
-
         html_template = loader.get_template( 'error-404.html' )
         return HttpResponse(html_template.render(context, request))
-
     except:
-    
         html_template = loader.get_template( 'error-500.html' )
         return HttpResponse(html_template.render(context, request))
 
@@ -217,6 +212,7 @@ def bulkadd(request):
         formset = SampleFormSet()
     return render(request, "bulk-add.html", {'formset': formset})
 
+#Export entire database to CSV for backup
 @login_required(login_url="/login/")
 def export_csv(request):
     response = HttpResponse(content_type='text/csv')
