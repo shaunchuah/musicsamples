@@ -74,30 +74,16 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-#PRODUCTION SETTINGS
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'musicsamples',
-#         'USER': 'samples',
-#         'PASSWORD': 'password123',
-#         'HOST': 'localhost',
-#         'PORT': '',
-#     }
-# }
-
-#DEVELOPMENT SETTINGS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'musicsamples',
-        'USER': 'samples',
-        'PASSWORD': 'password123',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
     }
 }
-
 
 
 # Password validation
@@ -149,11 +135,10 @@ STATICFILES_DIRS = (
 #############################################################
 #############################################################
 
-SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
-
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = 'apikey' # this is exactly the value 'apikey'
-EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+EMAIL_HOST_PASSWORD = config('SENDGRID_API_KEY')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'MUSIC Samples <noreply@musicstudy.uk>'
+
