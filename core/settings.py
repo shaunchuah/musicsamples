@@ -20,7 +20,7 @@ SECRET_KEY = config('SECRET_KEY', default='S#perS3crEt_1122')
 DEBUG = config('DEBUG', default=False)
 
 # load production server from .env
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', config('SERVER', default='127.0.0.1')]
+ALLOWED_HOSTS = [config('SERVER', default='127.0.0.1')]
 
 # Application definition
 
@@ -76,10 +76,13 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'musicsamples',
+        'USER': 'samples',
+        'PASSWORD': 'password123',
+        'HOST': 'localhost',
+        'PORT': '',
     }
-    
 }
 
 # Password validation
@@ -130,4 +133,12 @@ STATICFILES_DIRS = (
 )
 #############################################################
 #############################################################
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'apikey' # this is exactly the value 'apikey'
+EMAIL_HOST_PASSWORD = SENDGRID_API_KEY
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'MUSIC Samples <noreply@musicstudy.uk>'
