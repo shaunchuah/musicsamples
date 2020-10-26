@@ -39,6 +39,10 @@ def analytics(request):
     return render(request, "analytics.html")
 
 @login_required(login_url="/login/")
+def reference(request):
+    return render(request, "reference.html")
+
+@login_required(login_url="/login/")
 def archive(request):
     sample_list = Sample.objects.all().filter(is_deleted=True).order_by('-last_modified')
     context = {'sample_list': sample_list}
