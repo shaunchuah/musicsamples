@@ -66,7 +66,7 @@
 {% endif %}
 
 <div class="row">
-    <div class="col-md-5">
+    <div class="col-md-6">
       <div class="card">
         <h3 class="card-header card-title">View Sample</h3>
         <div class=card-body>
@@ -109,7 +109,7 @@
       </div>
     </div>
 
-    <div class="col-md-3">
+    <div class="col-md-5">
       <div class="card">
         <h3 class="card-title card-header">History</h3>
         <div class="card-body">
@@ -134,7 +134,55 @@
                   <td>{{ sample.last_modified_by }}</td>
                 </tr>
               </tbody>
-            </table>
+            </table>  
+            
+            <p></p>
+            <p></p>
+
+            <table class="table">
+              <thead>              
+                <tr>               
+                  <th>date/time</th>              
+                  <th>change made</th>              
+                  <th>responsible</th>              
+              </tr>              
+              </thead>
+              
+              <tbody>
+
+              {% for change in changes %}
+              <tr>
+                <td>{{ change.new_record.history_date|date:"D j M Y, H:i"}}</td>
+                <td>
+                  
+                    {% if change.changed_fields|length > 0 %}
+                      {% for change_by_id in change.changes %}
+                        <b>{{ change_by_id.field|title }}</b>
+                        from
+                        {% if change_by_id.old %}
+                        <b>{{ change_by_id.old }}</b>
+                      {% else %}
+                        <b>blank field</b>
+                        {% endif %}
+                        to
+                        <b>{{ change_by_id.new }}</b>
+                        <br>
+                      {% endfor %}
+                    {% else %}
+                    -
+                    {% endif %}
+                  </td>
+                <td>{{ change.new_record.history_user }}</td>
+              </tr>
+              
+              {% endfor %}
+              <tr>
+                <td>{{ first.history_date|date:"D j M Y, H:i"}}</td>
+                <td>First Created</td>
+                <td>{{first.history_user}}</td>
+              </tr>
+              </tbody>
+              </table>
             </div>
           </div>
         </div>

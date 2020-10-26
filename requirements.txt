@@ -11,3 +11,4 @@ gunicorn
 whitenoise
 django-widget-tweaks
 psycopg2
+django-simple-history

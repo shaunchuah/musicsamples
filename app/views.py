@@ -16,11 +16,20 @@ from django.db.models import Q
 from django.forms import formset_factory
 import csv
 import datetime
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @login_required(login_url="/login/")
 def index(request):
     sample_list = Sample.objects.all().filter(is_deleted=False).order_by('-last_modified')
-    context = {'sample_list': sample_list}
+    page = request.GET.get('page', 1)
+    paginator = Paginator(sample_list, 50)
+    try:
+        samples = paginator.page(page)
+    except PageNotAnInteger:
+        samples = paginator.page(1)
+    except EmptyPage:
+        samples = paginator.page(paginator.num_pages)
+    context = {'sample_list': samples}
     return render(request, "index.html", context)
 
 @login_required(login_url="/login/")
@@ -74,10 +83,26 @@ def add(request):
         form = SampleForm()
     return render(request, "add.html", {'form': form})
 
+
+def historical_changes(query):
+    changes = []
+    if query is not None:
+        last = query.first()
+        for all_changes in range(query.count()):
+            new_record, old_record = last, last.prev_record
+            if old_record is not None:
+                delta = new_record.diff_against(old_record)
+                changes.append(delta)
+                last = old_record
+        return changes
+
 @login_required(login_url="/login/")
 def sample_detail(request, pk):
     sample = get_object_or_404(Sample, pk=pk)
-    return render(request, "sample-detail.html", {'sample': sample})
+    sample_history = sample.history.filter(id=pk)
+    changes = historical_changes(sample_history)
+    first_change = sample_history.first()
+    return render(request, "sample-detail.html", {'sample': sample, 'changes': changes, 'first': first_change})
     
 @login_required(login_url="/login/")
 def sample_edit(request,pk):

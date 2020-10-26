@@ -6,6 +6,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 from django.db import models
 from django.contrib.auth.models import User
+from simple_history.models import HistoricalRecords
 
 # Create your models here.
 class Sample(models.Model):
@@ -21,3 +22,4 @@ class Sample(models.Model):
     last_modified_by = models.CharField(max_length=200)
     data_first_created = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
+    history = HistoricalRecords()
