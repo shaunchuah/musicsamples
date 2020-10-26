@@ -14,12 +14,20 @@ from .forms import SampleForm, CheckoutForm, SampleFormSet
 from django.contrib import messages
 from django.db.models import Q
 from django.forms import formset_factory
+import csv
+import datetime
 
 @login_required(login_url="/login/")
 def index(request):
     sample_list = Sample.objects.all().order_by('-last_modified')
     context = {'sample_list': sample_list}
     return render(request, "index.html", context)
+
+@login_required(login_url="/login/")
+def analytics(request):
+    #sample_list = Sample.objects.all().order_by('-last_modified')
+    #context = {'sample_list': sample_list}
+    return render(request, "analytics.html")
 
 @login_required(login_url="/login/")
 def pages(request):
@@ -118,9 +126,7 @@ def checkout(request,pk):
         form = CheckoutForm(instance=sample)
     return render(request, 'sample-edit.html', {'form': form})
 
-
-
-
+@login_required(login_url="/login/")
 def bulkadd(request):
     if request.method == "POST":
         formset = SampleFormSet(request.POST)
@@ -137,3 +143,17 @@ def bulkadd(request):
     else:
         formset = SampleFormSet()
     return render(request, "bulk-add.html", {'formset': formset})
+
+@login_required(login_url="/login/")
+def export_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="music_samples_%s.csv"' % datetime.datetime.now().strftime("%Y-%m-%d")
+
+    writer = csv.writer(response)
+    writer.writerow(['MUSIC Sample ID','Patient ID', 'Sample Location', 'Sample Type', 'Sample Datetime', 'Sample Comments', 'Created By', 'Date First Created', 'Last Modified By', 'Last Modified'])
+
+    samples = Sample.objects.all().values_list('musicsampleid','patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments', 'created_by', 'data_first_created', 'last_modified_by',  'last_modified')
+    for sample in samples:
+        writer.writerow(sample)
+    return response
+
