@@ -64,36 +64,13 @@
   {% endfor %}
 {% endif %}
 
-<div class="row">
-  <div class="col">
-    <div class="card">
-    <div class="card-header"><h3 class="card-title">Search Samples</h3></div>
-    <div class=card-body>
-      <form id="searchform" action="{% url 'search' %}" method="GET">
-        <div class="form-group">
-          <input type="text" name="q" class="form-control">
-        </div>
-        <div class="card-footer">
-          <button type="submit" class="btn btn-fill btn-success">Search</button>
-          <a href="{% url 'home' %}" class="btn btn-fill btn-secondary">Clear</a>
-        </div>
-      </form>
-      
-    </div>
-    </div>
-  </div>
-</div>
 
 <div class="row">
   <div class="col-md-12">
     <div class="card ">
       <div class="card-header">
-        <h3 class="card-title">All Samples</h3>
+        <h3 class="card-title">Deleted Samples</h3>
       </div>
-      <div class="card-footer">
-      <a href="/add/" class="btn btn-fill btn-success">Add New Sample</a>
-      <a href="/bulkadd/" class="btn btn-fill btn-primary">Bulk Add Samples</a>
-    </div>
       <div class="card-body">
         <div class="table-responsive">
           <table class="table tablesorter " id="">
@@ -132,7 +109,7 @@
                   View
                 </th>
                 <th>
-                  Delete
+                  Restore
                 </th>
               </tr>
             </thead>
@@ -162,7 +139,7 @@
                         <a href="{% url 'sample_detail' pk=sample.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
                       </td>
                       <td>
-                        <a href="{% url 'delete' pk=sample.pk %}"><i class="tim-icons icon-trash-simple"></i> Delete</a>
+                        <a href="{% url 'restore' pk=sample.pk %}"><i class="tim-icons icon-upload"></i> Restore</a>
                       </td>
                     </tr>
                   {% endfor %}

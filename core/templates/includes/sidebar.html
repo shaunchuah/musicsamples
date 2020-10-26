@@ -26,30 +26,42 @@
             </a>
           </li>
           <li>
-            <a href="/">
-              <i class="tim-icons icon-notes"></i>
-              <p>Archive</p>
-            </a>
-          </li>
-          <li>
             <a href="/analytics">
               <i class="tim-icons icon-chart-bar-32"></i>
               <p>Analytics</p>
             </a>
           </li>
+                   
           <li>
             <a href="/">
               <i class="tim-icons icon-single-copy-04"></i>
               <p>Reference</p>
             </a>
           </li>
+          
+        </ul>
+
+        <hr />
+
+        <div class="mt-auto">
+          <ul class="nav">
+            <li>
+              <a href="/archive">
+                <i class="tim-icons icon-notes"></i>
+                <p>Deleted Samples</p>
+              </a>
+            </li> 
+            {% if request.user.is_superuser %}
           <li>
             <a href="/admin">
               <i class="tim-icons icon-settings-gear-63"></i>
               <p>Admin</p>
             </a>
           </li>
-        </ul>
+          {% endif %}  
+          </ul>
+
+        </div>
         {% endif %}        
       </div>
     </div>
