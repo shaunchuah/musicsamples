@@ -10,7 +10,7 @@ from django.template import loader
 from django.http import HttpResponse
 from django import template
 from .models import Sample
-from .forms import SampleForm, CheckoutForm, SampleFormSet
+from .forms import SampleForm, CheckoutForm, SampleFormSet, DeleteForm, RestoreForm
 from django.contrib import messages
 from django.db.models import Q
 from django.forms import formset_factory
@@ -19,7 +19,7 @@ import datetime
 
 @login_required(login_url="/login/")
 def index(request):
-    sample_list = Sample.objects.all().order_by('-last_modified')
+    sample_list = Sample.objects.all().filter(is_deleted=False).order_by('-last_modified')
     context = {'sample_list': sample_list}
     return render(request, "index.html", context)
 
@@ -28,6 +28,12 @@ def analytics(request):
     #sample_list = Sample.objects.all().order_by('-last_modified')
     #context = {'sample_list': sample_list}
     return render(request, "analytics.html")
+
+@login_required(login_url="/login/")
+def archive(request):
+    sample_list = Sample.objects.all().filter(is_deleted=True).order_by('-last_modified')
+    context = {'sample_list': sample_list}
+    return render(request, "archive.html", context)
 
 @login_required(login_url="/login/")
 def pages(request):
@@ -127,6 +133,44 @@ def checkout(request,pk):
     return render(request, 'sample-edit.html', {'form': form})
 
 @login_required(login_url="/login/")
+def delete(request,pk):
+    sample = get_object_or_404(Sample, pk=pk)
+    if request.method == "POST":
+        form = DeleteForm(request.POST, instance=sample)
+        if form.is_valid():
+            sample = form.save(commit=False)
+            sample.last_modified_by = request.user.username
+            sample.save()
+            messages.success(request, 'Sample deleted.')
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('/')
+    else:
+        form = DeleteForm(instance=sample)
+    return render(request, 'sample-delete.html', {'form': form})
+
+@login_required(login_url="/login/")
+def restore(request,pk):
+    sample = get_object_or_404(Sample, pk=pk)
+    if request.method == "POST":
+        form = RestoreForm(request.POST, instance=sample)
+        if form.is_valid():
+            sample = form.save(commit=False)
+            sample.last_modified_by = request.user.username
+            sample.save()
+            messages.success(request, 'Sample restored.')
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('/')
+    else:
+        form = RestoreForm(instance=sample)
+    return render(request, 'sample-restore.html', {'form': form})
+
+@login_required(login_url="/login/")
 def bulkadd(request):
     if request.method == "POST":
         formset = SampleFormSet(request.POST)
@@ -152,7 +196,7 @@ def export_csv(request):
     writer = csv.writer(response)
     writer.writerow(['MUSIC Sample ID','Patient ID', 'Sample Location', 'Sample Type', 'Sample Datetime', 'Sample Comments', 'Created By', 'Date First Created', 'Last Modified By', 'Last Modified'])
 
-    samples = Sample.objects.all().values_list('musicsampleid','patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments', 'created_by', 'data_first_created', 'last_modified_by',  'last_modified')
+    samples = Sample.objects.all().filter(is_deleted=False).values_list('musicsampleid','patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments', 'created_by', 'data_first_created', 'last_modified_by',  'last_modified')
     for sample in samples:
         writer.writerow(sample)
     return response

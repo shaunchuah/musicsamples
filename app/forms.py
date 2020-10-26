@@ -32,5 +32,17 @@ class CheckoutForm(ModelForm):
         fields = ['sample_location']
         labels = { 'sample_location': "Sample Location" }
 
+class DeleteForm(ModelForm):
+    class Meta:
+        model = Sample
+        fields = ['is_deleted']
+        labels = { 'is_deleted': "Confirm Delete?" }
+
+class RestoreForm(ModelForm):
+    class Meta:
+        model = Sample
+        fields = ['is_deleted']
+        labels = { 'is_deleted': "Uncheck to Restore" }
+
 #SampleFormSet = modelformset_factory(Sample, fields=('musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments'), extra=2)
 SampleFormSet = formset_factory(SampleForm, extra=1)
