@@ -177,9 +177,9 @@
               
               {% endfor %}
               <tr>
-                <td>{{ first.history_date|date:"D j M Y, H:i"}}</td>
+                <td>{{ sample.data_first_created }}</td>
                 <td>First Created</td>
-                <td>{{first.history_user}}</td>
+                <td>{{ sample.created_by }}</td>
               </tr>
               </tbody>
               </table>
