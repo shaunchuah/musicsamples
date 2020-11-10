@@ -22,7 +22,7 @@
           <div class="collapse navbar-collapse" id="navigation">
 
             {% if user.is_authenticated %}
-           
+          
             <ul class="navbar-nav ml-auto">
                <!--
               <li class="search-bar input-group">
@@ -48,12 +48,16 @@
                   </ul>
                 </li>
               -->
+              
               <li class="dropdown nav-item">
                 <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-                  <div class="photo">
-                    <img src="{% static 'assets/img/avatar.jpg' %}" alt="Profile Photo">
-                  </div>
-                  <b class="caret d-none d-lg-block d-xl-block"></b>
+                  
+                  
+                  {{ user.username }}
+                  <i class="tim-icons icon-settings-gear-63"></i>
+                  
+                  
+                  
                   <p class="d-lg-none">
                     Log out
                   </p>

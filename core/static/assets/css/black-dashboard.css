@@ -13210,14 +13210,14 @@ fieldset[disabled] .btn-primary.active {
 }
 
 .btn-success {
-  background: #00f2c3;
-  background-image: -webkit-linear-gradient(to bottom left, #00f2c3, #0098f0, #00f2c3);
-  background-image: -o-linear-gradient(to bottom left, #00f2c3, #0098f0, #00f2c3);
-  background-image: -moz-linear-gradient(to bottom left, #00f2c3, #0098f0, #00f2c3);
-  background-image: linear-gradient(to bottom left, #00f2c3, #0098f0, #00f2c3);
+  background: #3055bb;
+  background-image: -webkit-linear-gradient(to bottom left, #3055bb, #0098f0, #3055bb);
+  background-image: -o-linear-gradient(to bottom left, #3055bb, #0098f0, #3055bb);
+  background-image: -moz-linear-gradient(to bottom left, #3055bb, #0098f0, #3055bb);
+  background-image: linear-gradient(to bottom left, #3055bb, #0098f0, #3055bb);
   background-size: 210% 210%;
   background-position: top right;
-  background-color: #00f2c3;
+  background-color: #3055bb;
   transition: all 0.15s ease;
   box-shadow: none;
   color: #ffffff;
@@ -13236,11 +13236,11 @@ fieldset[disabled] .btn-primary.active {
 .btn-success:active:hover,
 .btn-success.active:focus,
 .btn-success.active:hover {
-  background-color: #0098f0 !important;
-  background-image: linear-gradient(to bottom left, #00f2c3, #0098f0, #00f2c3) !important;
-  background-image: -webkit-linear-gradient(to bottom left, #00f2c3, #0098f0, #00f2c3) !important;
-  background-image: -o-linear-gradient(to bottom left, #00f2c3, #0098f0, #00f2c3) !important;
-  background-image: -moz-linear-gradient(to bottom left, #00f2c3, #0098f0, #00f2c3) !important;
+  background-color: #3055bb !important;
+  background-image: linear-gradient(to bottom left, #3055bb, #0098f0, #3055bb) !important;
+  background-image: -webkit-linear-gradient(to bottom left, #3055bb, #0098f0, #3055bb) !important;
+  background-image: -o-linear-gradient(to bottom left, #3055bb, #0098f0, #3055bb) !important;
+  background-image: -moz-linear-gradient(to bottom left, #3055bb, #0098f0, #3055bb) !important;
   color: #ffffff;
   box-shadow: none;
 }
@@ -16496,8 +16496,8 @@ h6 {
 }
 
 a {
-  color: #00f2c2;
-  font-weight: 300;
+  color: #3055bb;
+  font-weight: 400;
 }
 
 a:hover,
@@ -17701,13 +17701,15 @@ table.tablesorter thead tr .headerSortDown {
   height: 60px;
 }
 
+/* original 3358f4, 1d8cf8 */
+
 .sidebar[data="blue"],
 .off-canvas-sidebar[data="blue"] {
-  background: #3358f4;
-  background: -webkit-linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);
-  background: -o-linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);
-  background: -moz-linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);
-  background: linear-gradient(0deg, #3358f4 0%, #1d8cf8 100%);
+  background: #3055bb;
+  background: -webkit-linear-gradient(0deg, #3055bb 0%, #3055bb 100%);
+  background: -o-linear-gradient(0deg, #3055bb 0%, #3055bb 100%);
+  background: -moz-linear-gradient(0deg, #3055bb 0%, #3055bb 100%);
+  background: linear-gradient(0deg, #3055bb 0%, #3055bb 100%);
 }
 
 .sidebar[data="green"],
@@ -17805,7 +17807,7 @@ table.tablesorter thead tr .headerSortDown {
   float: right;
   width: 100%;
   min-height: 100vh;
-  border-top: 2px solid #e14eca;
+  /*border-top: 2px solid #e14eca; removed top border*/
   background: linear-gradient(#1e1e2f, #1e1e24);
   -webkit-transition: all 0.5s cubic-bezier(0.685, 0.0473, 0.346, 1);
   -moz-transition: all 0.5s cubic-bezier(0.685, 0.0473, 0.346, 1);
@@ -17813,7 +17815,7 @@ table.tablesorter thead tr .headerSortDown {
   -ms-transition: all 0.5s cubic-bezier(0.685, 0.0473, 0.346, 1);
   transition: all 0.5s cubic-bezier(0.685, 0.0473, 0.346, 1);
 }
-
+/* remove the top line border
 .main-panel[data="blue"] {
   border-top: 2px solid #1d8cf8;
 }
@@ -17824,7 +17826,7 @@ table.tablesorter thead tr .headerSortDown {
 
 .main-panel[data="primary"] {
   border-top: 2px solid #e14eca;
-}
+} */
 
 .main-panel>.content {
   padding: 78px 30px 30px 280px;
@@ -19981,7 +19983,7 @@ Copyright (c) 2015 Daniel Eden
 
 .card .card-header .card-title {
   color: #ffffff;
-  font-weight: 100;
+  font-weight: 400;
 }
 
 .card .card-header .card-category {
