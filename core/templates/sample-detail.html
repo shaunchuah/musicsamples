@@ -118,12 +118,27 @@
                   </tr>
                   <tr>
                     <td>Time Between Sampling and Processing</td>
-                    <td>{{ processing_time }} minutes</td>
+                    <td>
+                      {% if processing_time is None %}
+                      N/A
+                      {% else %}
+                      {{ processing_time }} minutes
+                      {% endif %}
+                      </td>
                   </tr>
                   
                   <tr>
                     <td>Sample Volume Remaining</td>
-                    <td>{{ sample.sample_volume }} {{ sample.sample_volume_units }} </td>
+                    <td>
+                      {% if sample.sample_volume is None %}
+                      N/A
+                      {% else %}
+                      {{ sample.sample_volume }} {{ sample.sample_volume_units }}
+                      {% endif %}
+                    
+                    
+                    
+                    </td>
                   </tr>
                   <tr>
                     <td>Freeze Thaw Count</td>

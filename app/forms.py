@@ -20,7 +20,44 @@ class SampleForm(ModelForm):
             ('ml', 'ml'),
             ('ul', 'ul'),
         )
+        SAMPLE_TYPE_CHOICES = (
+            ('', 'Select type'),
+            ('Standard EDTA tube',(
+                ('Standard EDTA tube', 'Standard EDTA tube'),
+                ('EDTA plasma child aliquot', 'EDTA plasma child aliquot'),
+            )),
+            ('PaxGene ccfDNA tube',(
+                ('PaxGene ccfDNA tube', 'PaxGene ccfDNA tube'),
+                ('PaxGene ccfDNA plasma child aliquot', 'PaxGene ccfDNA plasma child aliquot'),
+            )),
+            ('PaxGene RNA tube', (
+                ('PaxGene RNA tube', 'PaxGene RNA tube'),
+                ('PaxGene RNA child aliquot', 'PaxGene RNA child aliquot'),
+            )),
+            ('Standard Gel/Serum tube', (
+                ('Standard gel tube', 'Standard gel tube'),
+                ('Serum child aliquot', 'Serum child aliquot'),
+            )),
+            ('Tissue/Biopsy', (
+                ('Formalin biopsy', 'Formalin biopsy'),
+                ('RNAlater biopsy', 'RNAlater biopsy'),
+                ('Paraffin tissue block', 'Paraffin tissue block'),
+            )),
+            ('Stool', (
+                ('Calprotectin', 'Calprotectin'),
+                ('FIT', 'FIT'),
+                ('OmniGut', 'Omnigut'),
+                ('Stool supernatant', 'Stool supernatant'),
+            )),
+            ('Saliva', (
+                ('Saliva', 'Saliva'),
+            )),
+            ('Other', (
+                ('Other', 'Other please specify in comments'),
+            )),
+        )
         widgets = {
+            'sample_type': forms.Select(choices=SAMPLE_TYPE_CHOICES),
             'sample_datetime': DateTimeInput(),
             'sample_volume_units': forms.Select(choices=SAMPLE_VOLUME_UNIT_CHOICES, attrs={'class': 'form-control'}),
             'processing_datetime': DateTimeInput(),
@@ -33,7 +70,7 @@ class SampleForm(ModelForm):
             'sample_datetime': "Sample Taken Datetime",
             'sample_comments': "Comments",
             'processing_datetime': "Processing Datetime",
-            'sample_volume': "Sample Volume",
+            'sample_volume': "Sample Volume Remaining (est.)",
             'sample_volume_units': "Sample Volume Units",
             'freeze_thaw_count': "Number of Freeze-Thaw Cycles",            
         }
