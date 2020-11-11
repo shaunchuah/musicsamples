@@ -66,12 +66,12 @@
 {% endif %}
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-7">
       <div class="card">
-        <h3 class="card-header card-title">View Sample</h3>
+        <h3 class="card-header card-title">Sample Details</h3>
         <div class=card-body>
           <div class="table-responsive">
-            <table class="table" id="">
+              <table class="table" id="">
   
                 <tbody>
                   <tr>
@@ -102,9 +102,41 @@
               </table>
               </div>
 
-          <div class="card-footer">
-            <a href="{% url 'sample_edit' pk=sample.pk %}" class="btn btn-fill btn-success">Edit</a>
-          </div>
+              
+
+          
+        </div>
+        <h3 class="card-header card-title">Sample Processing</h3>
+        <div class=card-body>
+          <div class="table-responsive">
+              <table class="table" id="">
+  
+                <tbody>
+                  <tr>
+                    <td>Sample Processing Datetime</td>
+                    <td>{{ sample.processing_datetime }}</td>
+                  </tr>
+                  <tr>
+                    <td>Time Between Sampling and Processing</td>
+                    <td>{{ processing_time }} minutes</td>
+                  </tr>
+                  
+                  <tr>
+                    <td>Sample Volume Remaining</td>
+                    <td>{{ sample.sample_volume }} {{ sample.sample_volume_units }} </td>
+                  </tr>
+                  <tr>
+                    <td>Freeze Thaw Count</td>
+                    <td>{{ sample.freeze_thaw_count }}</td>
+                  </tr>                  
+                </tbody>
+              </table>
+              </div>
+            </div>
+
+
+        <div class="card-footer">
+          <a href="{% url 'sample_edit' pk=sample.pk %}" class="btn btn-fill btn-success">Edit</a>
         </div>
       </div>
     </div>
@@ -139,7 +171,7 @@
             <p></p>
             <p></p>
 
-            <table class="table">
+            <table class="table" id="history_table">
               <thead>              
                 <tr>               
                   <th>date/time</th>              

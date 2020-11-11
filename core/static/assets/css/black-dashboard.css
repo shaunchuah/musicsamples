@@ -15,6 +15,13 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
+
+/* My Custom CSS */
+#history_table tbody{
+  font-size:0.75em;
+}
+
+
 /*     brand Colors              */
 /* navbar color */
 :root {
