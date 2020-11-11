@@ -101,7 +101,11 @@ def sample_detail(request, pk):
     sample_history = sample.history.filter(id=pk)
     changes = historical_changes(sample_history)
     first_change = sample_history.first()
-    return render(request, "sample-detail.html", {'sample': sample, 'changes': changes, 'first': first_change})
+    processing_time = None
+    if sample.processing_datetime != None:
+        time_difference = sample.processing_datetime - sample.sample_datetime
+        processing_time = int(time_difference.total_seconds() / 60)
+    return render(request, "sample-detail.html", {'sample': sample, 'changes': changes, 'first': first_change, 'processing_time': processing_time})
     
 @login_required(login_url="/login/")
 def sample_edit(request,pk):

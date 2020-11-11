@@ -14,16 +14,28 @@ class SampleForm(ModelForm):
     sample_datetime = forms.DateTimeField(label="Sample Created Datetime", widget=DateTimeInput(), initial=timezone.localtime(timezone.now()))
     class Meta:
         model = Sample
-        fields = ['musicsampleid', 'sample_type', 'patientid', 'sample_location', 'sample_comments', 'sample_datetime']
+        fields = ['musicsampleid', 'sample_type', 'patientid', 'sample_location', 'sample_datetime', 'sample_comments', 'processing_datetime', 'sample_volume', 'sample_volume_units', 'freeze_thaw_count', ]
+        SAMPLE_VOLUME_UNIT_CHOICES = (
+            ('', 'Select unit'),
+            ('ml', 'ml'),
+            ('ul', 'ul'),
+        )
         widgets = {
             'sample_datetime': DateTimeInput(),
+            'sample_volume_units': forms.Select(choices=SAMPLE_VOLUME_UNIT_CHOICES, attrs={'class': 'form-control'}),
+            'processing_datetime': DateTimeInput(),
         }
         labels = {
             'musicsampleid': "Sample ID",
             'patientid': "Patient ID",
             'sample_location': "Sample Location",
             'sample_type': "Sample Type",
+            'sample_datetime': "Sample Taken Datetime",
             'sample_comments': "Comments",
+            'processing_datetime': "Processing Datetime",
+            'sample_volume': "Sample Volume",
+            'sample_volume_units': "Sample Volume Units",
+            'freeze_thaw_count': "Number of Freeze-Thaw Cycles",            
         }
 
 class CheckoutForm(ModelForm):
