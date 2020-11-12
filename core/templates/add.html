@@ -7,52 +7,11 @@
 
 {% block content %}
 
-
-{% if messages %}
-  {% for message in messages %}  
-      {% if message.tags == 'success' %}
-    <div class="row">
-      <div class="col-md-5">
-      <div class="alert alert-success">
-        <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-          <i class="tim-icons icon-simple-remove"></i>
-        </button>
-        <span><b> Success - </b> {{ message }}</span>
-      </div>
-    </div>
-  </div>
-
-      {% elif message.tags == 'error' %}
-      <div class="row">
-        <div class="col-md-5">
-      <div class="alert alert-danger">
-        <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-          <i class="tim-icons icon-simple-remove"></i>
-        </button>
-        <span><b> Error - </b> {{ message }}</span>
-      </div>
-    </div>
-  </div>
-      {% else %}
-      <div class="row">
-        <div class="col-md-5">
-        <div class="alert">
-          <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-            <i class="tim-icons icon-simple-remove"></i>
-          </button>
-          <span>{{ message }}</span>
-        </div>
-      </div>
-    </div>
-    {% endif %}
-  {% endfor %}
-{% endif %}
-
 {% if form.errors %}
   {% for field in form %}
     {% for error in field.errors %}
 <div class="row">
-  <div class="col-md-5">
+  <div class="col-xl-9">
   <div class="alert alert-danger">
     <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
       <i class="tim-icons icon-simple-remove"></i>
@@ -66,7 +25,7 @@
 {% endif %}
 
 <div class="row">
-    <div class="col-md-5">
+    <div class="col-xl-9">
       <div class="card">
         <div class="card-header"><h3 class="card-title">Add New Sample</h3></div>
         <div class=card-body>

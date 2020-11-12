@@ -54,7 +54,7 @@
       {% include 'includes/navigation.html' %}
 
       <div class="content">
-
+        {% include 'includes/messages.html' %}
         {% block content %}{% endblock content %}
 
       </div>
@@ -71,7 +71,16 @@
   {% include 'includes/scripts-sidebar.html' %}
 
   <!-- Specific Page JS goes HERE  -->
-  {% block javascripts %}{% endblock javascripts %}
+  {% block javascripts %}
+   
+  
+  $(document).ready(function() {
+    // get current URL path and assign 'active' class
+    var pathname = window.location.pathname;
+    $('.sidebar > .nav > li > a[href="'+pathname+'"]').parent().addClass('active');
+  })
+  
+  {% endblock javascripts %}
 
 </body>
 
