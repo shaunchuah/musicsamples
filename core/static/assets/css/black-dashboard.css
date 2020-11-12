@@ -22,8 +22,7 @@
 }
 
 .login-container {
-  width: 40%;
-  
+  min-width:400px;
   padding: 50px;
   margin-right: auto;
   margin-left: auto;
