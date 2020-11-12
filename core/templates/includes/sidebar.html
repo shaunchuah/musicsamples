@@ -1,59 +1,58 @@
 
 
-    <div class="sidebar" data="blue">
-      <div class="sidebar-wrapper">
+<div class="sidebar" data="blue">
+  <div class="sidebar-wrapper">
 
-        {% if user.is_authenticated %}
-        <ul class="nav">
-          <li class="active ">
-            <a href="/">
-              <i class="tim-icons icon-molecule-40"></i>
-              <p>Dashboard</p>
-            </a>
-          </li>
-          <li>
-            <a href="/add">
-              <i class="tim-icons icon-pencil"></i>
-              <p>Add New Sample</p>
-            </a>
-          </li>
-          <li>
-            <a href="/analytics">
-              <i class="tim-icons icon-chart-bar-32"></i>
-              <p>Analytics</p>
-            </a>
-          </li>
-                   
-          <li>
-            <a href="/reference">
-              <i class="tim-icons icon-single-copy-04"></i>
-              <p>Reference</p>
-            </a>
-          </li>
-          
-        </ul>
+    {% if user.is_authenticated %}
+    <ul class="nav">
+      <li class="{% if request.path == '/' %}active{% endif %}">
+        <a href="/">
+          <i class="tim-icons icon-molecule-40"></i>
+          <p>Dashboard</p>
+        </a>
+      </li>
+      <li class="{% if request.path == '/add/' %}active{% endif %}">
+        <a href="/add">
+          <i class="tim-icons icon-pencil"></i>
+          <p>Add New Sample</p>
+        </a>
+      </li>
+      <li class="{% if request.path == '/analytics/' %}active{% endif %}">
+        <a href="/analytics">
+          <i class="tim-icons icon-chart-bar-32"></i>
+          <p>Analytics</p>
+        </a>
+      </li>
+                
+      <li class="{% if request.path == '/reference/' %}active{% endif %}">
+        <a href="/reference">
+          <i class="tim-icons icon-single-copy-04"></i>
+          <p>Reference</p>
+        </a>
+      </li>
+      
+    </ul>
 
-        <hr />
 
-        <div class="mt-auto">
-          <ul class="nav">
-            <li>
-              <a href="/archive">
-                <i class="tim-icons icon-notes"></i>
-                <p>Deleted Samples</p>
-              </a>
-            </li> 
-            {% if request.user.is_superuser %}
-          <li>
-            <a href="/admin">
-              <i class="tim-icons icon-settings-gear-63"></i>
-              <p>Admin</p>
-            </a>
-          </li>
-          {% endif %}  
-          </ul>
+    <div class="mt-5">
+      <ul class="nav">
+        <li class="{% if request.path == '/archive/' %}active{% endif %}">
+          <a href="/archive">
+            <i class="tim-icons icon-notes"></i>
+            <p>Deleted Samples</p>
+          </a>
+        </li> 
+        {% if request.user.is_superuser %}
+      <li>
+        <a href="/admin">
+          <i class="tim-icons icon-settings-gear-63"></i>
+          <p>Admin</p>
+        </a>
+      </li>
+      {% endif %}  
+      </ul>
 
-        </div>
-        {% endif %}        
-      </div>
     </div>
+    {% endif %}        
+  </div>
+</div>

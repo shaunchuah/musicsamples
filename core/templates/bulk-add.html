@@ -6,68 +6,6 @@
 
 {% block content %} 
 
-{% if messages %} 
-{% for message in messages %} 
-
-{% if message.tags == 'success' %}
-<div class="row">
-  <div class="col-md-5">
-    <div class="alert alert-success">
-      <button
-        type="button"
-        aria-hidden="true"
-        class="close"
-        data-dismiss="alert"
-        aria-label="Close"
-      >
-        <i class="tim-icons icon-simple-remove"></i>
-      </button>
-      <span><b> Success - </b> {{ message }}</span>
-    </div>
-  </div>
-</div>
-
-{% elif message.tags == 'error' %}
-<div class="row">
-  <div class="col-md-5">
-    <div class="alert alert-danger">
-      <button
-        type="button"
-        aria-hidden="true"
-        class="close"
-        data-dismiss="alert"
-        aria-label="Close"
-      >
-        <i class="tim-icons icon-simple-remove"></i>
-      </button>
-      <span><b> Error - </b> {{ message }}</span>
-    </div>
-  </div>
-</div>
-{% else %}
-<div class="row">
-  <div class="col-md-5">
-    <div class="alert">
-      <button
-        type="button"
-        aria-hidden="true"
-        class="close"
-        data-dismiss="alert"
-        aria-label="Close"
-      >
-        <i class="tim-icons icon-simple-remove"></i>
-      </button>
-      <span>{{ message }}</span>
-    </div>
-  </div>
-</div>
-{% endif %} 
-{% endfor %} 
-{% endif %} 
-
-
-
-
 
 {% if form.errors %} 
 {% for field in form %} 
@@ -93,7 +31,7 @@
 {% endif %}
 
 <div class="row">
-  <div class="col-md-10">
+  <div class="col">
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Add Multiple Samples</h3>
@@ -107,6 +45,8 @@
         <button id="deletelastrow" class="btn btn-fill btn-secondary">Delete Last Row</button>
         <a href='/bulkadd' class="btn btn-fill btn-danger float-right">Reset All</a>
       </div>
+
+
       <div class="card-body">
         <form action="/bulkadd/" method="POST">
           {% csrf_token %} 
@@ -134,15 +74,8 @@
                 </div>
               </div>
             </div>
-            {% endif %}
-
-              
-
-
-
-
-
-              <div class="row form-row">
+            {% endif %}      
+              <div class="row form-row mb-5">
               {% for hidden_field in form.hidden_fields %} 
               {{ hidden_field }} 
               {% endfor %}              
@@ -156,10 +89,12 @@
                     {% endif %}
                   </div>
                 </div>
+                
                 {% endfor %}
+                
               </div>
 
-              <div id="added-forms">
+              <div id="added-forms" class="">
 
               </div>
             
