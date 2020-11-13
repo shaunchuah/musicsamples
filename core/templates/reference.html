@@ -1,135 +1,41 @@
-{% extends "layouts/base.html" %}
-
-{% block title %} Dashboard {% endblock %} 
+{% extends "layouts/base.html" %} {% block title %} Dashboard {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
 
-{% block content %}
-<!--<div class="row">
-  <div class="col">
-    <div class="alert alert-success">
-      <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-        <i class="tim-icons icon-simple-remove"></i>
-      </button>
-      <span><b> Success - </b> This is a regular notification made with ".alert-success"</span>
-    </div>
-    <div class="alert alert-danger">
-      <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-        <i class="tim-icons icon-simple-remove"></i>
-      </button>
-      <span><b> Danger - </b> This is a regular notification made with ".alert-danger"</span>
-    </div>
-  </div>
-</div>-->
-
-
-{% if messages %}
-  {% for message in messages %}  
-      {% if message.tags == 'success' %}
-    <div class="row">
-      <div class="col">
-      <div class="alert alert-success">
-        <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-          <i class="tim-icons icon-simple-remove"></i>
-        </button>
-        <span><b> Success - </b> {{ message }}</span>
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="tim-icons icon-notes"></i> Reference Documents
+        </h3>
+      </div>
+      <div class="card-body">
+        <h4>place to upload reference files for viewing</h4>
       </div>
     </div>
   </div>
 
-      {% elif message.tags == 'error' %}
-      <div class="row">
-        <div class="col">
-      <div class="alert alert-danger">
-        <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-          <i class="tim-icons icon-simple-remove"></i>
-        </button>
-        <span><b> Error - </b> {{ message }}</span>
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="tim-icons icon-cloud-download-93"></i> Downloads
+        </h3>
+      </div>
+      <div class="card-body">
+        <p>place to upload reference files for viewing</p>
       </div>
     </div>
   </div>
-      {% else %}
-      <div class="row">
-        <div class="col">
-        <div class="alert">
-          <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-            <i class="tim-icons icon-simple-remove"></i>
-          </button>
-          <span>{{ message }}</span>
-        </div>
-      </div>
-    </div>
-    {% endif %}
-  {% endfor %}
-{% endif %}
-<!--
-    <div class="row">
-      <div class="col-lg-4">
-        <div class="card card-chart">
-          <div class="card-header">
-            <h5 class="card-category">Total Samples</h5>
-            <h3 class="card-title"><i class="tim-icons icon-bell-55 text-primary"></i> 763,215</h3>
-          </div>
-          <div class="card-body">
-            <div class="chart-area">
-              <canvas id="chartLinePurple"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4">
-        <div class="card card-chart">
-          <div class="card-header">
-            <h5 class="card-category">Daily Sales</h5>
-            <h3 class="card-title"><i class="tim-icons icon-delivery-fast text-info"></i> 3,500€</h3>
-          </div>
-          <div class="card-body">
-            <div class="chart-area">
-              <canvas id="CountryChart"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4">
-        <div class="card card-chart">
-          <div class="card-header">
-            <h5 class="card-category">Completed Tasks</h5>
-            <h3 class="card-title"><i class="tim-icons icon-send text-success"></i> 12,100K</h3>
-          </div>
-          <div class="card-body">
-            <div class="chart-area">
-              <canvas id="chartLineGreen"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  -->
-    <div class="row">
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">Reference Sample Management Documents</div>
-          </div>
-          <div class="card-body">
-            <p>place to upload reference files for viewing</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
+</div>
 
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 
-  <script>
-    $(document).ready(function() {
-      // Javascript method's body can be found in assets/js/demos.js
-      demo.initDashboardPageCharts();
-    });    
-  </script>
+<script></script>
 
 {% endblock javascripts %}

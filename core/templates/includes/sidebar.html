@@ -1,8 +1,5 @@
-
-
 <div class="sidebar" data="blue">
   <div class="sidebar-wrapper">
-
     {% if user.is_authenticated %}
     <ul class="nav">
       <li class="{% if request.path == '/' %}active{% endif %}">
@@ -23,36 +20,33 @@
           <p>Analytics</p>
         </a>
       </li>
-                
+
       <li class="{% if request.path == '/reference/' %}active{% endif %}">
         <a href="/reference">
           <i class="tim-icons icon-single-copy-04"></i>
           <p>Reference</p>
         </a>
       </li>
-      
     </ul>
-
 
     <div class="mt-5">
       <ul class="nav">
         <li class="{% if request.path == '/archive/' %}active{% endif %}">
           <a href="/archive">
-            <i class="tim-icons icon-notes"></i>
+            <i class="tim-icons icon-trash-simple"></i>
             <p>Deleted Samples</p>
           </a>
-        </li> 
+        </li>
         {% if request.user.is_superuser %}
-      <li>
-        <a href="/admin">
-          <i class="tim-icons icon-settings-gear-63"></i>
-          <p>Admin</p>
-        </a>
-      </li>
-      {% endif %}  
+        <li>
+          <a href="/admin">
+            <i class="tim-icons icon-settings-gear-63"></i>
+            <p>Admin</p>
+          </a>
+        </li>
+        {% endif %}
       </ul>
-
     </div>
-    {% endif %}        
+    {% endif %}
   </div>
 </div>
