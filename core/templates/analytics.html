@@ -6,94 +6,53 @@
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
-<!--<div class="row">
-  <div class="col">
-    <div class="alert alert-success">
-      <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-        <i class="tim-icons icon-simple-remove"></i>
-      </button>
-      <span><b> Success - </b> This is a regular notification made with ".alert-success"</span>
-    </div>
-    <div class="alert alert-danger">
-      <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-        <i class="tim-icons icon-simple-remove"></i>
-      </button>
-      <span><b> Danger - </b> This is a regular notification made with ".alert-danger"</span>
-    </div>
-  </div>
-</div>-->
-
-
-{% if messages %}
-  {% for message in messages %}  
-      {% if message.tags == 'success' %}
     <div class="row">
-      <div class="col">
-      <div class="alert alert-success">
-        <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-          <i class="tim-icons icon-simple-remove"></i>
-        </button>
-        <span><b> Success - </b> {{ message }}</span>
-      </div>
-    </div>
-  </div>
-
-      {% elif message.tags == 'error' %}
-      <div class="row">
-        <div class="col">
-      <div class="alert alert-danger">
-        <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-          <i class="tim-icons icon-simple-remove"></i>
-        </button>
-        <span><b> Error - </b> {{ message }}</span>
-      </div>
-    </div>
-  </div>
-      {% else %}
-      <div class="row">
-        <div class="col">
-        <div class="alert">
-          <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-            <i class="tim-icons icon-simple-remove"></i>
-          </button>
-          <span>{{ message }}</span>
-        </div>
-      </div>
-    </div>
-    {% endif %}
-  {% endfor %}
-{% endif %}
-
-    <div class="row">
-      <div class="col-lg-6 col-xl-4">
+      <div class="col-lg-4">
         <div class="card card-chart">
           <div class="card-header">
             <h5 class="card-category">Total Samples</h5>
-            <h3 class="card-title"><i class="tim-icons icon-bell-55 text-primary"></i> {{ total_samples }} </h3>
+            <h3 class="card-title"><i class="tim-icons icon-atom"></i> {{ total_samples }} </h3>
           </div>
-          <div class="card-body">
-            <div class="chart-area">
-              <canvas id="chartLinePurple"></canvas>
-            </div>
-          </div>
+
+          
+          
+
         </div>
       </div>
-    </div>
-  
-    <div class="row">
-      <div class="col-lg-6 col-xl-4">
+
+      <div class="col-lg-4">
+        <div class="card card-chart">
+          <div class="card-header">
+            <h5 class="card-category">Monthly Samples Count</h5>
+            
+          </div>
+        <div class="chart-area">          
+          <canvas id="monthlysamples"></canvas>
+        </div>
+      </div>
+      </div>
+
+      <div class="col-lg-4">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Sample Database Export</h3>
+            <h3 class="card-title">Sample Database Backup</h3>
           </div>
           <div class="card-body">
-            <p>Exports all samples in the database to an excel file.</p>
-            <p>Please let me know if you want any custom exports.</p>
+            <p>Exports all samples to an excel file. <br /> For custom exports, search and export from the dashboard page.</p>
+            
+          </div>
+          <div class="card-footer">
             <a href="/export_excel_all" class="btn btn-fill btn-success">Export Excel</a>
           </div>
         </div>
       </div>
+
     </div>
+    
+    <div class="row">
+      
+    </div>
+
 
 
 {% endblock content %}
@@ -103,8 +62,64 @@
 
   <script>
     $(document).ready(function() {
-      // Javascript method's body can be found in assets/js/demos.js
-      demo.initDashboardPageCharts();
+      var ctx = document.getElementById('monthlysamples').getContext('2d');
+      var chart = new Chart(ctx, {
+          // The type of chart we want to create
+          type: 'line',
+
+          // The data for our dataset
+          data: {
+              labels: [
+              {% for s in samples_by_month %}
+                '{{ s.sample_month|date:'M Y' }}',
+              {% endfor %}
+              ],
+              datasets: [{
+                  label: 'Monthly Sample Count',
+                  fill: false,
+                  backgroundColor: 'rgb(0,0,0,0)',
+                  borderColor: 'rgb(48, 85, 187)',
+                  data: [
+                    {% for s in samples_by_month %}
+                      {{s.sample_count}},
+                    {% endfor %}
+                  ]
+              }]
+          },
+
+          // Configuration options go here
+          options: {
+            responsive: true,
+            //aspectRatio: 5,
+            maintainAspectRatio: false,
+            scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero: true
+                  },
+                  gridLines: {
+                    display:false
+                  },
+              }],
+              xAxes: [{
+                  gridLines: {
+                    display:false
+                  },
+              }]
+            },
+            legend: {
+              display: false,
+            },
+            layout: {
+              padding: {
+                left: 20,
+                right: 40,
+                top: 30,
+                bottom: 10,
+              },
+            },
+          }
+      });
     });    
   </script>
 
