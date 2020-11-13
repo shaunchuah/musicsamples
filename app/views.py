@@ -108,7 +108,7 @@ def sample_detail(request, pk):
     return render(request, "sample-detail.html", {'sample': sample, 'changes': changes, 'first': first_change, 'processing_time': processing_time})
     
 @login_required(login_url="/login/")
-def sample_edit(request,pk):
+def sample_edit(request, pk):
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
         form = SampleForm(request.POST, instance=sample)
@@ -234,6 +234,7 @@ def export_csv(request):
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 
+@login_required(login_url="/login/")
 def export_excel_all(request):
     samples_queryset = Sample.objects.all().filter(is_deleted=False)
 
