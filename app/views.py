@@ -312,7 +312,7 @@ def export_excel(request):
         samples_queryset = Sample.objects.all().filter(is_deleted=False)
 
     response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="all_samples_%s.xlsx"' % datetime.datetime.now().strftime("%Y-%m-%d")
+    response['Content-Disposition'] = 'attachment; filename="samples_search_export_%s.xlsx"' % datetime.datetime.now().strftime("%Y-%m-%d")
 
     workbook = Workbook()
     #Get active worksheet
