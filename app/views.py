@@ -17,6 +17,8 @@ from django.forms import formset_factory
 import csv
 import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Count
+from django.db.models.functions import Trunc
 
 @login_required(login_url="/login/")
 def index(request):
@@ -35,7 +37,11 @@ def index(request):
 @login_required(login_url="/login/")
 def analytics(request):
     total_samples = Sample.objects.all().filter(is_deleted=False).count()
-    context = {'total_samples': total_samples}
+    samples_by_month = Sample.objects.all().filter(is_deleted=False).annotate(sample_month=Trunc('sample_datetime', 'month')).values('sample_month').annotate(sample_count=Count('id'))
+    context = {
+        'total_samples': total_samples,
+        'samples_by_month': samples_by_month
+    }
     return render(request, "analytics.html", context)
 
 @login_required(login_url="/login/")
