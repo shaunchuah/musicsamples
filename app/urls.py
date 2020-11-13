@@ -25,4 +25,5 @@ urlpatterns = [
     path('search/', views.search, name="search"),
     path('bulkadd/', views.bulkadd, name='bulkadd'),
     path('export_csv/', views.export_csv, name='export_csv'),
+    path('export_excel/', views.export_excel_all, name='export_excel'),
 ]

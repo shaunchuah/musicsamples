@@ -120,6 +120,8 @@
             </tbody>
           </table>
 
+          
+
           {% if sample_list.has_other_pages %}
           <div class="row">
             <div class="col">
@@ -145,6 +147,12 @@
                 </div>
                 </div> 
                 {% endif %}
+
+                <div class="row">
+                  <div class="col">
+                    Total Samples: {{ sample_list|length }}
+                  </div>
+                </div>
               
         </div>
       </div>
