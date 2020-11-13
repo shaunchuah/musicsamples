@@ -1,67 +1,112 @@
-{% extends "layouts/base.html" %}
-
-{% block title %} Dashboard {% endblock %} 
+{% extends "layouts/base.html" %} {% block title %} Dashboard {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
-
-{% block content %}
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+<div class="row">
+  <div class="col-xl-4">
     <div class="row">
-      <div class="col-lg-4">
+      <div class="col">
         <div class="card card-chart">
           <div class="card-header">
             <h5 class="card-category">Total Samples</h5>
-            <h3 class="card-title"><i class="tim-icons icon-atom"></i> {{ total_samples }} </h3>
+            <h3 class="card-title">
+              <i class="tim-icons icon-atom"></i> {{ total_samples }}
+            </h3>
           </div>
-
-          
-          
-
         </div>
       </div>
+    </div>
 
-      <div class="col-lg-4">
-        <div class="card card-chart">
-          <div class="card-header">
-            <h5 class="card-category">Monthly Samples Count</h5>
-            
-          </div>
-        <div class="chart-area">          
-          <canvas id="monthlysamples"></canvas>
-        </div>
-      </div>
-      </div>
-
-      <div class="col-lg-4">
+    <div class="row">
+      <div class="col">
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">Sample Database Backup</h3>
           </div>
           <div class="card-body">
-            <p>Exports all samples to an excel file. <br /> For custom exports, search and export from the dashboard page.</p>
-            
+            <p>
+              Exports all samples to an excel file. <br />
+              For custom exports, search and export from the dashboard page.
+            </p>
           </div>
           <div class="card-footer">
-            <a href="/export_excel_all" class="btn btn-fill btn-success">Export Excel</a>
+            <a href="/export_excel_all" class="btn btn-fill btn-success"
+              >Export Database to Excel</a
+            >
           </div>
         </div>
       </div>
-
     </div>
-    
-    <div class="row">
-      
+  </div>
+
+  <div class="col-xl-4">
+    <div class="card card-chart">
+      <div class="card-header">
+        <h5 class="card-category">Monthly Samples Count</h5>
+      </div>
+      <div class="chart-area">
+        <canvas id="monthlysamples"></canvas>
+      </div>
     </div>
+  </div>
 
-
+  <div class="col-xl-4">
+    <div class="card card-chart">
+      <div class="card-header">
+        <h5 class="card-category">Samples by Type</h5>
+      </div>
+      <div class="chart-area">
+        <canvas id="samplestype"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
+<script src="https://d3js.org/d3-color.v1.min.js"></script>
+<script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script>
 
-  <script>
+
+
+  function calculatePoint(i, intervalSize, colorRangeInfo) {
+    var { colorStart, colorEnd, useEndAsStart } = colorRangeInfo;
+    return (useEndAsStart
+      ? (colorEnd - (i * intervalSize))
+      : (colorStart + (i * intervalSize)));
+    };
+
+  function interpolateColors(dataLength, colorScale, colorRangeInfo) {
+    var { colorStart, colorEnd } = colorRangeInfo;
+    var colorRange = colorEnd - colorStart;
+    var intervalSize = colorRange / dataLength;
+    var i, colorPoint;
+    var colorArray = [];
+
+    for (i = 0; i < dataLength; i++) {
+      colorPoint = calculatePoint(i, intervalSize, colorRangeInfo);
+      colorArray.push(colorScale(colorPoint));
+    }
+
+    return colorArray;
+    };
+
+  //Set the colours for the pie-chart here using D3 interpolate
+  const dataLength = {{ samples_by_type.count }};
+  const colorScale = d3.interpolateBlues; //options are interpolateInferno, interpolateMagma, interpolatePlasma, interpolateBlues
+  const colorRangeInfo = {
+          colorStart: 0.2,
+          colorEnd: 1,
+          useEndAsStart: false,
+        };
+  var COLORS = interpolateColors(dataLength, colorScale, colorRangeInfo);
+
     $(document).ready(function() {
+
       var ctx = document.getElementById('monthlysamples').getContext('2d');
       var chart = new Chart(ctx, {
           // The type of chart we want to create
@@ -90,7 +135,6 @@
           // Configuration options go here
           options: {
             responsive: true,
-            //aspectRatio: 5,
             maintainAspectRatio: false,
             scales: {
               yAxes: [{
@@ -120,7 +164,32 @@
             },
           }
       });
-    });    
-  </script>
+
+      var piechart = document.getElementById('samplestype').getContext('2d');
+      var mypiechart = new Chart(piechart, {
+          type: 'doughnut',
+          data: {
+              datasets: [{
+                  backgroundColor: COLORS,
+                  data: [{% for i in samples_by_type %}
+                          {{ i.sample_type_count}},
+                        {% endfor %}]
+                  }],
+               labels: [
+               {% for i in samples_by_type %}
+                '{{ i.sample_type }}',
+                {% endfor %}
+              ]
+              },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: {
+              position: 'bottom',
+            },
+          },
+      });
+    });
+</script>
 
 {% endblock javascripts %}
