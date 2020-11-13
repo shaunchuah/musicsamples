@@ -34,9 +34,9 @@ def index(request):
 
 @login_required(login_url="/login/")
 def analytics(request):
-    #sample_list = Sample.objects.all().order_by('-last_modified')
-    #context = {'sample_list': sample_list}
-    return render(request, "analytics.html")
+    total_samples = Sample.objects.all().filter(is_deleted=False).count()
+    context = {'total_samples': total_samples}
+    return render(request, "analytics.html", context)
 
 @login_required(login_url="/login/")
 def reference(request):
@@ -236,6 +236,73 @@ from openpyxl.utils import get_column_letter
 
 def export_excel_all(request):
     samples_queryset = Sample.objects.all().filter(is_deleted=False)
+
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="all_samples_%s.xlsx"' % datetime.datetime.now().strftime("%Y-%m-%d")
+
+    workbook = Workbook()
+    #Get active worksheet
+    worksheet = workbook.active
+    worksheet.title = 'All Samples'
+
+    #Define the excel column names
+    columns = ['Sample ID', 'Patient ID', 'Sample Location', 'Sample Type', 'Sampling Datetime', 'Processing Datetime', 'Sampling to Processing Time (mins)','Sample Volume', 'Sample Volume Units', 'Freeze Thaw Count', 'Sample Comments', 'Created By', 'Date Created', 'Last Modified By', 'Last Modified']
+    row_num = 1
+
+    #Write the column names in
+    for col_num, column_title in enumerate(columns, 1):
+        cell = worksheet.cell(row=row_num, column=col_num)
+        cell.value = column_title
+        #setting column width
+        column_letter = get_column_letter(col_num)
+        column_dimensions = worksheet.column_dimensions[column_letter]
+        column_dimensions.width = 20
+
+    for sample in samples_queryset:
+        processing_time = None
+        if sample.processing_datetime != None:
+            time_difference = sample.processing_datetime - sample.sample_datetime
+            processing_time = int(time_difference.total_seconds() / 60)
+        row_num += 1
+        row = [
+            sample.musicsampleid,
+            sample.patientid,
+            sample.sample_location,
+            sample.sample_type,
+            sample.sample_datetime,
+            sample.processing_datetime,
+            processing_time,
+            sample.sample_volume,
+            sample.sample_volume_units,
+            sample.freeze_thaw_count,
+            sample.sample_comments,
+            sample.created_by,
+            sample.data_first_created,
+            sample.last_modified_by,
+            sample.last_modified,
+        ]
+
+        for col_num, cell_value in enumerate(row, 1):
+            cell = worksheet.cell(row=row_num, column=col_num)
+            cell.value = cell_value
+
+    worksheet.freeze_panes = worksheet['A2']
+    workbook.save(response)
+    return response
+
+@login_required(login_url="/login/")
+def export_excel(request):
+    query_string=''
+    if ('q' in request.GET) and request.GET['q'].strip():
+        query_string = request.GET.get('q')
+        samples_queryset = Sample.objects.filter(
+            Q(musicsampleid__icontains=query_string)|
+            Q(patientid__icontains=query_string)|
+            Q(sample_location__icontains=query_string)|
+            Q(sample_type__icontains=query_string)|
+            Q(sample_comments__icontains=query_string))
+    else:
+        samples_queryset = Sample.objects.all().filter(is_deleted=False)
 
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename="all_samples_%s.xlsx"' % datetime.datetime.now().strftime("%Y-%m-%d")
