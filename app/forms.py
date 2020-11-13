@@ -14,7 +14,7 @@ class SampleForm(ModelForm):
     sample_datetime = forms.DateTimeField(label="Sample Created Datetime", widget=DateTimeInput(), initial=timezone.localtime(timezone.now()))
     class Meta:
         model = Sample
-        fields = ['musicsampleid', 'sample_type', 'patientid', 'sample_location', 'sample_datetime', 'sample_comments', 'processing_datetime', 'sample_volume', 'sample_volume_units', 'freeze_thaw_count', ]
+        fields = ['musicsampleid', 'sample_location', 'patientid', 'sample_type', 'sample_datetime', 'sample_comments', 'processing_datetime', 'sample_volume', 'sample_volume_units', 'freeze_thaw_count', ]
         SAMPLE_VOLUME_UNIT_CHOICES = (
             ('', 'Select unit'),
             ('ml', 'ml'),
