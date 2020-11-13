@@ -14,3 +14,4 @@ sqlparse==0.4.1
 toml==0.10.2
 Unipath==1.1
 whitenoise==5.2.0
+openpyxl==3.0.5
