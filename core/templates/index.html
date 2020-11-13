@@ -1,166 +1,160 @@
-{% extends "layouts/base.html" %} {% block title %} Dashboard {% endblock %}
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
 
 <div class="row">
   <div class="col">
     <div class="card">
-      <div class="card-header"><h3 class="card-title">Search Samples</h3></div>
-      <div class="card-body">
-        <form id="searchform" action="{% url 'search' %}" method="GET">
-          <div class="form-group">
-            <input type="text" name="q" class="form-control" />
-          </div>
-          <div class="card-footer">
-            <button type="submit" class="btn btn-fill btn-success">
-              Search
-            </button>
-            <a href="{% url 'home' %}" class="btn btn-fill btn-secondary"
-              >Clear</a
-            >
-          </div>
-        </form>
-      </div>
+    <div class="card-header"><h3 class="card-title">Search Samples</h3></div>
+    <div class=card-body>
+      <form id="searchform" action="{% url 'search' %}" method="GET">
+        <div class="form-group">
+          <input type="text" name="q" class="form-control">
+        </div>
+        <div class="card-footer">
+          <button type="submit" class="btn btn-fill btn-success">Search</button>
+          <a href="{% url 'home' %}" class="btn btn-fill btn-secondary">Clear</a>
+        </div>
+      </form>
+      
+    </div>
     </div>
   </div>
 </div>
 
 <div class="row">
   <div class="col-md-12">
-    <div class="card">
+    <div class="card ">
       <div class="card-header">
         <h3 class="card-title">All Samples</h3>
       </div>
       <div class="card-footer">
-        <a href="/add/" class="btn btn-fill btn-success">Add New Sample</a>
-        <a href="/bulkadd/" class="btn btn-fill btn-success"
-          >Bulk Add Samples</a
-        >
-        <a
-          href="/export_excel?q={{query_string}}"
-          class="btn btn-success float-lg-right"
-          ><i class="tim-icons icon-cloud-download-93"></i> Export Current View
-          to Excel</a
-        >
-      </div>
+      <a href="/add/" class="btn btn-fill btn-success">Add New Sample</a>
+      <a href="/bulkadd/" class="btn btn-fill btn-success">Bulk Add Samples</a>
+      <a href='/export_excel?q={{query_string}}' class="btn btn-success float-lg-right"><i class="tim-icons icon-cloud-download-93"></i> Export Current View to Excel</a>
+    </div>
       <div class="card-body">
         <div class="table-responsive">
-          <table class="table tablesorter" id="">
-            <thead class="text-primary">
+          <table class="table tablesorter " id="">
+            <thead class=" text-primary">
               <tr>
                 <th>Sample ID</th>
-                <th>Patient ID</th>
-                <th>Sample Location</th>
-                <th>Sample Type</th>
-                <th>Sample Datetime</th>
-
+                <th>
+                  Patient ID
+                </th>
+                <th>
+                  Sample Location
+                </th>
+                <th>
+                  Sample Type
+                </th>
+                <th>
+                  Sample Datetime
+                </th>
+                
                 <!--<th>
                   Last Modified By
                 </th>
                 <th>
                   Last Modified
                 </th>-->
-                <th>View</th>
-                <th>Checkout</th>
-                <th>Edit</th>
-
-                <th>Delete</th>
+                <th>
+                  View
+                </th>
+                <th>
+                  Checkout
+                </th>
+                <th>
+                  Edit
+                </th>
+                
+                <th>
+                  Delete
+                </th>
               </tr>
             </thead>
             <tbody>
-              {% if sample_list %} {% for sample in sample_list %}
-              <tr>
-                <td>{{ sample.musicsampleid }}</td>
-                <td>{{ sample.patientid }}</td>
-                <td>{{ sample.sample_location }}</td>
-                <td>{{ sample.sample_type }}</td>
-                <td>{{ sample.sample_datetime }}</td>
 
-                <!--<td>{{ sample.last_modified_by }}</td>
+
+              {% if sample_list %}
+                  
+                  {% for sample in sample_list %}
+                  <tr>
+                    
+                      <td>{{ sample.musicsampleid }}</td>
+                      <td>{{ sample.patientid }}</td>
+                      <td>{{ sample.sample_location }}</td>
+                      <td>{{ sample.sample_type }}</td>
+                      <td>{{ sample.sample_datetime }}</td>
+                      
+                      <!--<td>{{ sample.last_modified_by }}</td>
                       <td>{{ sample.last_modified }}</td>-->
-                <td>
-                  <a href="{% url 'sample_detail' pk=sample.pk %}"
-                    ><i class="tim-icons icon-zoom-split"></i> View</a
-                  >
-                </td>
-                <td>
-                  <a
-                    href="{% url 'checkout' pk=sample.pk %}?next={{ request.get_full_path }}"
-                  >
-                    <i class="tim-icons icon-cloud-upload-94"></i> Checkout
-                  </a>
-                </td>
-                <td>
-                  <a
-                    href="{% url 'sample_edit' pk=sample.pk %}?next={{ request.get_full_path }}"
-                    ><i class="tim-icons icon-pencil"></i> Edit</a
-                  >
-                </td>
+                      <td>
+                        <a href="{% url 'sample_detail' pk=sample.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
+                      </td>
+                      <td>
+                        <a href="{% url 'checkout' pk=sample.pk %}?next={{ request.get_full_path }}">
+                          <i class="tim-icons icon-cloud-upload-94"></i> Checkout </a></td>
+                      <td>
+                        <a href="{% url 'sample_edit' pk=sample.pk %}?next={{ request.get_full_path }}"><i class="tim-icons icon-pencil"></i> Edit</a>
+                      </td>
+                      
+                      <td>
+                        <a href="{% url 'delete' pk=sample.pk %}"><i class="tim-icons icon-trash-simple"></i> Delete</a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+              {% else %}
+                  <tr><td colspan="8" align="center">No samples found.</td></tr>
 
-                <td>
-                  <a href="{% url 'delete' pk=sample.pk %}"
-                    ><i class="tim-icons icon-trash-simple"></i> Delete</a
-                  >
-                </td>
-              </tr>
-              {% endfor %} {% else %}
-              <tr>
-                <td colspan="8" align="center">No samples found.</td>
-              </tr>
 
+                  
               {% endif %}
+              
+
+          
             </tbody>
           </table>
+
+          
 
           {% if sample_list.has_other_pages %}
           <div class="row">
             <div class="col">
-              <ul class="pagination">
-                {% if sample_list.has_previous %}
-                <li class="page-item">
-                  <a
-                    class="page-link"
-                    href="?page={{ sample_list.previous_page_number }}"
-                    >&laquo;</a
-                  >
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                  <span class="page-link">&laquo;</span>
-                </li>
-                {% endif %} {% for i in sample_list.paginator.page_range %} {%
-                if sample_list.number == i %}
-                <li class="page-item active">
-                  <span class="page-link"
-                    >{{ i }} <span class="sr-only">(current)</span></span
-                  >
-                </li>
-                {% else %}
-                <li class="page-item">
-                  <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                </li>
-                {% endif %} {% endfor %} {% if sample_list.has_next %}
-                <li class="page-item">
-                  <a
-                    class="page-link"
-                    href="?page={{ sample_list.next_page_number }}"
-                    >&raquo;</a
-                  >
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                  <span class="page-link">&raquo;</span>
-                </li>
+                  <ul class="pagination">
+                    {% if sample_list.has_previous %}
+                      <li class="page-item"><a class="page-link" href="?page={{ sample_list.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                      <li class="page-item disabled"><span class="page-link" >&laquo;</span></li>
+                    {% endif %}
+                    {% for i in sample_list.paginator.page_range %}
+                      {% if sample_list.number == i %}
+                        <li class="page-item active"><span class="page-link" >{{ i }} <span class="sr-only">(current)</span></span></li>
+                      {% else %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                      {% endif %}
+                    {% endfor %}
+                    {% if sample_list.has_next %}
+                      <li class="page-item"><a class="page-link" href="?page={{ sample_list.next_page_number }}">&raquo;</a></li>
+                    {% else %}
+                      <li class="page-item disabled"><span class="page-link" >&raquo;</span></li>
+                    {% endif %}
+                  </ul>
+                </div>
+                </div> 
                 {% endif %}
-              </ul>
-            </div>
-          </div>
-          {% endif %}
 
-          <div class="row">
-            <div class="col">Total Samples: {{ sample_list|length }}</div>
-          </div>
+                <div class="row">
+                  <div class="col">
+                    Total Samples: {{ sample_list|length }}
+                  </div>
+                </div>
+              
         </div>
       </div>
     </div>
@@ -170,4 +164,7 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %} {% endblock javascripts %}
+{% block javascripts %}
+
+
+{% endblock javascripts %}
