@@ -50,7 +50,7 @@
       </div>
       <div class="card-body">
         <div class="table-responsive">
-          <table class="table tablesorter" id="">
+          <table class="table tablesorter" id="mainTable">
             <thead class="text-primary">
               <tr>
                 <th>Sample ID</th>
@@ -170,6 +170,10 @@
 <script>
 $(document).ready(function(){
   $('[data-toggle="tooltip"]').tooltip();
+  $("#mainTable").tablesorter({
+    sortReset   : true,
+    headers: { 5: { sorter: false}, 6: {sorter: false}, 7: {sorter: false}, 8: {sorter: false} },
+  });
 });
 </script>
 {% endblock javascripts %}
