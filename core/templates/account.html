@@ -1,26 +1,35 @@
-{% extends "layouts/base.html" %} {% block title %} Dashboard {% endblock %}
+{% extends 'layouts/base.html' %}
+
+{% block title %} Page User {% endblock %} 
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
 
 <div class="row">
-  <div class="col">
+  <div class="col-md-5">
     <div class="card">
-      <div class="card-header"><h3 class="card-title">Search Samples</h3></div>
+      <div class="card-header">
+        <h3 class="card-title">Account</h3>
+      </div>
       <div class="card-body">
-        <form id="searchform" action="{% url 'search' %}" method="GET">
-          <div class="form-group">
-            <input type="text" name="q" class="form-control" />
-          </div>
-          <div class="card-footer">
-            <button type="submit" class="btn btn-fill btn-success">
-              Search
-            </button>
-            <a href="{% url 'home' %}" class="btn btn-fill btn-secondary"
-              >Clear</a
-            >
-          </div>
-        </form>
+        <div class="row">
+          <div class="col-md-3 pr-md-1 ">
+          Username: </div>
+          <div class="col">{{ request.user.username }}</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 pr-md-1 ">
+          Email:</div>
+          <div class="col "> {{ request.user.email }}</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <!--<button type="submit" class="btn btn-fill btn-primary">Save</button>-->
+        <a href="/password_change" class="btn btn-fill btn-success">Change Password</a>
       </div>
     </div>
   </div>
@@ -30,23 +39,7 @@
   <div class="col">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">All Samples</h3>
-      </div>
-      <div class="card-footer">
-        <a href="/add/" class="btn btn-fill btn-success">Add New Sample</a>
-        <a href="/bulkadd/" class="btn btn-fill btn-success"
-          >Bulk Add Samples</a
-        >
-        <a
-          href="/export_excel?q={{query_string}}"
-          class="btn btn-success float-lg-right"
-          data-toggle="tooltip" 
-          data-placement="bottom"
-          data-html="true" 
-          title="<strong>Tip:</strong> Customise the export by searching for the set of samples you wish to download."
-          ><i class="tim-icons icon-cloud-download-93"></i> Export Current View
-          to Excel</a
-        >
+        <h3 class="card-title">Recent Activity</h3>
       </div>
       <div class="card-body">
         <div class="table-responsive">
@@ -100,7 +93,7 @@
               {% endfor %} 
               {% else %}
               <tr>
-                <td colspan="8" align="center">No samples found.</td>
+                <td colspan="9" align="center">No samples found.</td>
               </tr>
               {% endif %}
             </tbody>
@@ -152,9 +145,6 @@
           </div>
           {% endif %}
 
-          <div class="row">
-            <div class="col">Total Samples: {{ sample_list|length }}</div>
-          </div>
         </div>
 
 
@@ -163,13 +153,8 @@
   </div>
 </div>
 
+
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}
-<script>
-$(document).ready(function(){
-  $('[data-toggle="tooltip"]').tooltip();
-});
-</script>
-{% endblock javascripts %}
+{% block javascripts %}{% endblock javascripts %}

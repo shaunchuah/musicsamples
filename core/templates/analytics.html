@@ -69,7 +69,11 @@
           <tbody>
             {% for s in samples_by_location %}
             <tr>
-            <td>{{ s.sample_location }}</td>
+            <td>
+              <a href="{% url 'search' %}?q={{ s.sample_location }}">
+                {{ s.sample_location }}
+              </a>
+            </td>
             <td>{{ s.sample_location_count }}</td>
             </tr>
             {% endfor %}
