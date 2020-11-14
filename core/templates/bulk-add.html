@@ -80,13 +80,15 @@
               {{ hidden_field }} 
               {% endfor %}              
                 {% for field in form.visible_fields %}
-                <div class="col">
+                <div class="col-md-3 col-xl-auto">
                   <div class="form-group">
-                    {{ field.label_tag }} 
-                    {% render_field field class="form-control" %} 
-                    {% if field.help_text %}
-                    <small class="form-text text-muted">{{ field.help_text }}</small>
-                    {% endif %}
+                        {{ field.label_tag }}
+
+                        {% render_field field class="form-control" %} 
+
+                        {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}                     
                   </div>
                 </div>
                 
