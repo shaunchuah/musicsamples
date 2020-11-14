@@ -8,24 +8,23 @@
 {% block content %}
 
 <div class="row">
-  <div class="col-md-5">
+  <div class="col-lg-6">
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Account</h3>
       </div>
       <div class="card-body">
         <div class="row">
-          <div class="col-md-3 pr-md-1 ">
-          Username: </div>
-          <div class="col">{{ request.user.username }}</div>
+          <div class="col-4">Username:</div>
+          <div class="col-8">{{ request.user.username }}</div>
         </div>
-      </div>
-      <div class="card-body">
         <div class="row">
-          <div class="col-md-3 pr-md-1 ">
-          Email:</div>
-          <div class="col "> {{ request.user.email }}</div>
-        </div>
+          <div class="col-4">Email:</div>
+          <div class="col-8">{{ request.user.email }}</div>
+        </div>             
+         
+        
+
       </div>
       <div class="card-footer">
         <!--<button type="submit" class="btn btn-fill btn-primary">Save</button>-->

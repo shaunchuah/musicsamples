@@ -29,6 +29,15 @@
   background-color: white;
 }
 
+ol li {
+  margin-bottom:10px;
+  padding-left:10px;
+}
+
+ol {
+  font-weight:300;
+}
+
 /*     brand Colors              */
 /* navbar color */
 :root {
@@ -174,7 +183,7 @@ blockquote {
 
 b,
 strong {
-  font-weight: bolder;
+  font-weight: 600;
 }
 
 small {
@@ -16571,7 +16580,7 @@ h6,
 
 p {
   color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 5px;
+  margin-bottom: 15px;
 }
 
 p.description {
@@ -17357,7 +17366,7 @@ table.tablesorter thead tr .headerSortDown {
   background: -moz-linear-gradient(0deg, #ba54f5 0%, #e14eca 100%);
   background: linear-gradient(0deg, #ba54f5 0%, #e14eca 100%);
   height: 100vh;
-  width: 260px;
+  width: 255px;
   position: fixed;
   top: 0;
   left: 0;
