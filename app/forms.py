@@ -11,7 +11,7 @@ class DateTimeInput(forms.DateTimeInput):
         super().__init__(**kwargs)
 
 class SampleForm(ModelForm):
-    sample_datetime = forms.DateTimeField(label="Sample Created Datetime", widget=DateTimeInput(), initial=timezone.localtime(timezone.now()))
+    sample_datetime = forms.DateTimeField(label="Sample Created Datetime*", widget=DateTimeInput(), initial=timezone.localtime(timezone.now()))
     class Meta:
         model = Sample
         fields = ['musicsampleid', 'sample_location', 'patientid', 'sample_type', 'sample_datetime', 'sample_comments', 'processing_datetime', 'sample_volume', 'sample_volume_units', 'freeze_thaw_count', ]
@@ -63,11 +63,10 @@ class SampleForm(ModelForm):
             'processing_datetime': DateTimeInput(),
         }
         labels = {
-            'musicsampleid': "Sample ID",
-            'patientid': "Patient ID",
-            'sample_location': "Sample Location",
-            'sample_type': "Sample Type",
-            'sample_datetime': "Sample Taken Datetime",
+            'musicsampleid': "Sample ID*",
+            'patientid': "Patient ID*",
+            'sample_location': "Sample Location*",
+            'sample_type': "Sample Type*",
             'sample_comments': "Comments",
             'processing_datetime': "Processing Datetime",
             'sample_volume': "Sample Volume Remaining (est.)",

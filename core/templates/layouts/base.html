@@ -2,15 +2,10 @@
 =========================================================
 * * Black Dashboard - v1.0.1
 =========================================================
-
 * Product Page: https://www.creative-tim.com/product/black-dashboard
 * Copyright 2019 Creative Tim (https://www.creative-tim.com)
-
-
 * Coded by Creative Tim
-
 =========================================================
-
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -->
 <!DOCTYPE html>
@@ -27,9 +22,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="{% static 'assets/img/favicon-32x32.png' %}">
   <link rel="icon" type="image/png" sizes="16x16" href="{% static 'assets/img/favicon-16x16.png' %}">
 
-  <title>
-    MUSIC Sample Management
-  </title>
+  <title>sampleTrek</title>
 
   <!--     Fonts and icons     -->
   <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800" rel="stylesheet" />
@@ -44,16 +37,13 @@
 
 </head>
 
-<body class="white-content"> <!--add white-content to turn on light mode-->
-  <div class="wrapper">
-
-    {% include 'includes/sidebar.html' %}
-
-    <div class="main-panel" data="blue">
-
+  <body class="white-content"> <!--add white-content to turn on light mode-->
+    <div class="wrapper">    
+    {% include 'includes/sidebar.html' %}    
+    <div class="main-panel" data="blue">      
       {% include 'includes/navigation.html' %}
-
       <div class="content">
+               
         {% include 'includes/messages.html' %}
         {% block content %}{% endblock content %}
 
@@ -72,16 +62,7 @@
 
   <!-- Specific Page JS goes HERE  -->
   {% block javascripts %}
-   
-  
-  $(document).ready(function() {
-    // get current URL path and assign 'active' class
-    var pathname = window.location.pathname;
-    $('.sidebar > .nav > li > a[href="'+pathname+'"]').parent().addClass('active');
-  })
-  
   {% endblock javascripts %}
 
-</body>
-
+  </body>
 </html>
