@@ -63,3 +63,7 @@ class TestUrls(SimpleTestCase):
     def test_export_excel_url_resolves(self):
         url = reverse('export_excel')
         self.assertEquals(resolve(url).func, export_excel)
+
+    def test_account_page_url_resolves(self):
+        url = reverse('account')
+        self.assertEquals(resolve(url).func, account)
