@@ -10,7 +10,7 @@
       <div class="card-body">
         <form id="searchform" action="{% url 'search' %}" method="GET">
           <div class="form-group">
-            <input type="text" name="q" class="form-control" />
+            <input type="text" autofocus name="q" class="form-control" />
           </div>
           <div class="card-footer">
             <button type="submit" class="btn btn-fill btn-success">
@@ -71,7 +71,7 @@
                 <td>{{ sample.patientid }}</td>
                 <td>{{ sample.sample_location }}</td>
                 <td>{{ sample.sample_type }}</td>
-                <td>{{ sample.sample_datetime }}</td>
+                <td>{{ sample.sample_datetime|date:'d M Y H:i' }}</td>
                 <td>
                   <a href="{% url 'sample_detail' pk=sample.pk %}"
                     ><i class="tim-icons icon-zoom-split"></i> View</a
@@ -172,7 +172,8 @@ $(document).ready(function(){
   $('[data-toggle="tooltip"]').tooltip();
   $("#mainTable").tablesorter({
     sortReset   : true,
-    headers: { 5: { sorter: false}, 6: {sorter: false}, 7: {sorter: false}, 8: {sorter: false} },
+    dateFormat : "ddmmyyyy",
+    headers: { 4: {sorter: 'shortDate'}, 5: { sorter: false}, 6: {sorter: false}, 7: {sorter: false}, 8: {sorter: false} },
   });
 });
 </script>
