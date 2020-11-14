@@ -28,6 +28,7 @@
   margin-left: auto;
   background-color: white;
   border-radius: 8px;
+  border: 1px solid #eee;
   box-shadow: 2px 2px 8px #ddd;
 }
 
