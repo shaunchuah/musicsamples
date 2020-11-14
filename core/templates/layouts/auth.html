@@ -23,8 +23,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="{% static 'assets/img/apple-icon.png' %}">
-  <link rel="icon" type="image/png"          href="{% static 'assets/img/favicon.png'    %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'assets/img/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'assets/img/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'assets/img/favicon-16x16.png' %}">
 
   <title>
     MUSIC Samples App
@@ -40,11 +41,25 @@
   <link href="{% static 'assets/css/black-dashboard.css' %}" rel="stylesheet" />
 
   <!-- Specific Page CSS goes HERE  -->
-  {% block stylesheets %}{% endblock stylesheets %}
+  <style type="text/css">
+    #bg {
+      height:100vh;
+      width:100vw;
+      position:fixed;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1)), url('{% static 'assets/img/bg.svg'%}');
+      background-size:cover;
+    }
+  </style>
+  {% block stylesheets %}
+  
+  {% endblock stylesheets %}
 
 </head>
 
 <body class="white-content"> <!--add white-content to turn on light mode-->
+  <div id="bg">
+    
+  </div>
   <div class="container">
     {% include 'includes/messages.html' %}
   {% block content %}{% endblock content %}

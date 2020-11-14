@@ -1,56 +1,69 @@
-{% extends "layouts/auth.html" %} 
-{% block content %}
-    <div class="row">
-      <div class="col d-flex justify-content-center align-items-center" style="height: 80vh;">
-        <div class="login-container">
-              <form role="form" method="post" action="">              
-                {% csrf_token %} 
+{% extends "layouts/auth.html" %} {% block content %}
+<div class="row">
+  <div
+    class="col d-flex justify-content-center align-items-center"
+    style="height: 80vh"
+  >
+    <div class="login-container">
+      <form role="form" method="post" action="">
+        {% csrf_token %}
 
-                  <h3 class="title">Login</h3>
-                  <h4>GI-DAMPS & MUSIC Samples Database</h4>
-                  
-                  <h6 class="">
-                      {% if msg %}
-                      <div class="row">
-                        <div class="col">
-                      <div class="alert alert-danger">
-                        <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
-                          <i class="tim-icons icon-simple-remove"></i>
-                        </button>
-                        <span>{{ msg }}</span>
-                      </div>
-                    </div>
-                    </div>
-                      {% endif %}  
-                  </h6>
-                  <div class="mt-4">
-                    <div class="row">
-                      <div class="col">
-                        <div class="form-group">
-                          <label>Email</label>
-                          {{ form.username }}
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col">
-                        <div class="form-group">
-                          <label>Password</label>
-                          {{ form.password }}
-                        </div>
-                      </div>
-                    </div>                    
-                  </div>
-                  <div class="mt-4">
-                  <button type="submit" name="login" class="btn btn-fill btn-success">Login</button>
-                  <!--Having trouble? <a href="mailto: ibdmusicstudy@ed.ac.uk" class="text-success">Email Us</a>-->
-                  <a href="/password_reset" class="">Forgot password?</a>
-                </div>
-              </form>
-              <div class="mt-4">
-                <p>Need an account?<br /> Please email <a href="mailto:cchuah@ed.ac.uk">cchuah@ed.ac.uk</a></p>
+        <h3 class="title text-center"><i class="tim-icons icon-molecule-40"></i> SampleTrek </h3>
+        <!--<h4 class="text-center">GI-DAMPS & MUSIC Samples Database</h4>-->
+
+        <h6 class="">
+          {% if msg %}
+          <div class="row">
+            <div class="col">
+              <div class="alert alert-danger">
+                <button
+                  type="button"
+                  aria-hidden="true"
+                  class="close"
+                  data-dismiss="alert"
+                  aria-label="Close"
+                >
+                  <i class="tim-icons icon-simple-remove"></i>
+                </button>
+                <span>{{ msg }}</span>
               </div>
             </div>
           </div>
+          {% endif %}
+        </h6>
+        <div class="mt-4">
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label>Email</label>
+                {{ form.username }}
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label>Password</label>
+                {{ form.password }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <button type="submit" name="login" class="btn btn-fill btn-success">
+            Login
+          </button>
+          <!--Having trouble? <a href="mailto: ibdmusicstudy@ed.ac.uk" class="text-success">Email Us</a>-->
+          <a href="/password_reset" class="">Forgot password?</a>
+        </div>
+      </form>
+      <div class="mt-4">
+        <p>
+          Need an account?<br />
+          Please email <a href="mailto:cchuah@ed.ac.uk">cchuah@ed.ac.uk</a>
+        </p>
+      </div>
     </div>
-  {% endblock content %}
+  </div>
+</div>
+{% endblock content %}

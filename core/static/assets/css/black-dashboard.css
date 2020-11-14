@@ -27,6 +27,8 @@
   margin-right: auto;
   margin-left: auto;
   background-color: white;
+  border-radius: 8px;
+  box-shadow: 2px 2px 8px #ddd;
 }
 
 ol li {
