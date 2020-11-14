@@ -69,9 +69,9 @@ class SampleForm(ModelForm):
             'sample_type': "Sample Type*",
             'sample_comments': "Comments",
             'processing_datetime': "Processing Datetime",
-            'sample_volume': "Sample Volume Remaining (est.)",
+            'sample_volume': "Volume Remaining (est.)",
             'sample_volume_units': "Sample Volume Units",
-            'freeze_thaw_count': "Number of Freeze-Thaw Cycles",            
+            'freeze_thaw_count': "No. of Freeze-Thaw Cycles",            
         }
 
 class CheckoutForm(ModelForm):

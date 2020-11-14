@@ -18,7 +18,7 @@ class Sample(models.Model):
     sample_comments = models.TextField(blank=True, null=True)
     is_deleted = models.BooleanField(default=False)
     processing_datetime = models.DateTimeField(blank=True, null=True)
-    sample_volume = models.IntegerField(blank=True, null=True)
+    sample_volume = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
     sample_volume_units = models.CharField(max_length=30, blank=True, null=True)
     freeze_thaw_count = models.IntegerField(default=0)    
     

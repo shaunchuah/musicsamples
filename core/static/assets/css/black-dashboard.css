@@ -109,10 +109,10 @@ section {
 body {
   margin: 0;
   font-family: "Poppins", sans-serif;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #525f7f;
+  color: #252b38;
   text-align: left;
   background-color: #1e1e2f;
 }
@@ -14611,7 +14611,7 @@ fieldset[disabled] .btn-link.active {
 }
 
 .footer .nav {
-  display: inline-block;
+  /*display: inline-block;*/
   float: left;
   margin-bottom: 0;
   padding-left: 30px;
@@ -17906,7 +17906,7 @@ hr {
 
 .color-swatch-header .pass-fail-item {
   float: left;
-  display: inline-block;
+  /*display: inline-block;*/
   text-align: center;
   padding: 2px;
 }
@@ -17963,7 +17963,7 @@ hr {
 }
 
 .table-colors .swatch {
-  display: inline-block;
+  /*display: inline-block;*/
   float: left;
   width: 40px;
   height: 40px;
@@ -17981,7 +17981,7 @@ hr {
   font-size: 10px;
   font-weight: 600;
   line-height: 10px;
-  display: inline-block;
+  /*display: inline-block;*/
   float: left;
   margin: 5px 10px 0 0;
   padding: 2px 4px;
@@ -18989,7 +18989,7 @@ Copyright (c) 2015 Daniel Eden
 .white-content ol li,
 .white-content ul li,
 .white-content pre {
-  color: #1d253b;
+  color: rgba(34, 42, 66, 0.9);
 }
 
 .white-content .font-icon-detail i {
@@ -19215,7 +19215,7 @@ Copyright (c) 2015 Daniel Eden
 }
 
 .white-content .table>tbody>tr>td {
-  color: rgba(34, 42, 66, 0.7) !important;
+  color: rgba(34, 42, 66, 0.8) !important;
 }
 
 .white-content .table>thead>tr>th,
