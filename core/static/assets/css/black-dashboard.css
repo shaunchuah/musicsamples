@@ -2103,7 +2103,7 @@ pre code {
   width: 100%;
   height: calc(2.25rem + 2px);
   padding: 0.5rem 0.7rem;
-  font-size: 0.875rem;
+  font-size: 1em;
   font-weight: 400;
   line-height: 1.428571;
   color: rgba(255, 255, 255, 0.8);
@@ -14611,7 +14611,7 @@ fieldset[disabled] .btn-link.active {
 }
 
 .footer .nav {
-  /*display: inline-block;*/
+  display: inline-block;
   float: left;
   margin-bottom: 0;
   padding-left: 30px;
@@ -14719,7 +14719,7 @@ fieldset[disabled] .btn-link.active {
 .form-control {
   border-color: #2b3553;
   border-radius: 0.4285rem;
-  font-size: 0.75rem;
+  font-size: 1em;
   -webkit-transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
   -moz-transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
   -o-transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
