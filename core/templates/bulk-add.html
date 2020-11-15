@@ -31,14 +31,14 @@
 {% endif %}
 
 <div class="row">
-  <div class="col">
+  <div class="col-xl-10">
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Add Multiple Samples</h3>
         
       </div>
       <div class="card-body">
-        <p class="card-subtitle">This form allows more efficient processing. Please check the form carefully before submission to avoid errors.</p>
+        <p class="card-subtitle">This form allows more efficient processing but requires a large screen to use easily. Please check the form carefully before submission to avoid errors.</p>
       </div>
       <div class="card-footer">
         <button id="addformrow" class="btn btn-fill btn-success">Add Another Sample</button>
@@ -118,6 +118,10 @@
         </form>
       </div>
     </div>
+  </div>
+
+  <div class="col-xl-2">
+    {% include 'includes/qrcodes.html' %}
   </div>
 </div>
 
