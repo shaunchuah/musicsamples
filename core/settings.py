@@ -17,7 +17,7 @@ PROJECT_DIR = Path(__file__).parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('DEBUG', cast=bool, default=False)
 
 # load production server from .env
 ALLOWED_HOSTS = ['134.209.183.11', 'localhost', '127.0.0.1', 'samples.musicstudy.uk', 'musicstudy.uk']
@@ -76,12 +76,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': config('DB_ENGINE'),
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
-        'PORT': '',
+        'PORT': config('DB_PORT', cast=int),
     }
 }
 
@@ -135,17 +135,18 @@ STATICFILES_DIRS = (
 #############################################################
 #############################################################
 
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'apikey' # this is exactly the value 'apikey'
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('SENDGRID_API_KEY')
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+
 DEFAULT_FROM_EMAIL = 'MUSIC Samples <noreply@musicstudy.uk>'
 
 ##POST SSL DEPLOYMENT SETTINGS
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_HSTS_SECONDS = 86400
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', cast=bool)
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', cast=bool)
+CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', cast=bool)
+SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', cast=int)
+SECURE_BROWSER_XSS_FILTER = config('SECURE_BROWSER_XSS_FILTER', cast=bool)
+SECURE_CONTENT_TYPE_NOSNIFF = config('SECURE_CONTENT_TYPE_NOSNIFF', cast=bool)
