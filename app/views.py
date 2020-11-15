@@ -182,7 +182,7 @@ def checkout(request,pk):
                 return redirect('/')
     else:
         form = CheckoutForm(instance=sample)
-    return render(request, 'sample-edit.html', {'form': form})
+    return render(request, 'sample-checkout.html', {'form': form})
 
 @login_required(login_url="/login/")
 def delete(request,pk):
