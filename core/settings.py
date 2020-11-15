@@ -20,11 +20,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = False
 
 # load production server from .env
-<<<<<<< HEAD
 ALLOWED_HOSTS = ['134.209.183.11', 'localhost', '127.0.0.1', 'samples.musicstudy.uk', 'musicstudy.uk']
-=======
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.1.64']
->>>>>>> f5af435a8acb032597a83655540abca1c340dd62
 
 # Application definition
 
