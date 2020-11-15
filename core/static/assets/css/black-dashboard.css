@@ -17,6 +17,21 @@
 */
 
 /* My Custom CSS */
+@media (min-width:1200px) {
+
+.qr-scroll {
+  height: 70vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+}
+
+.qrcode {
+  width:30%;
+  margin-right:15px;
+}
+
 #history_table tbody{
   font-size:0.75em;
 }
@@ -2101,7 +2116,7 @@ pre code {
 .form-control {
   display: block;
   width: 100%;
-  height: calc(2.25rem + 2px);
+  height: 2.75rem;
   padding: 0.5rem 0.7rem;
   font-size: 1em;
   font-weight: 400;
@@ -14719,7 +14734,7 @@ fieldset[disabled] .btn-link.active {
 .form-control {
   border-color: #2b3553;
   border-radius: 0.4285rem;
-  font-size: 1em;
+  font-size: 16px;
   -webkit-transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
   -moz-transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
   -o-transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
@@ -14728,7 +14743,7 @@ fieldset[disabled] .btn-link.active {
 }
 
 .form-control:focus {
-  border-color: #e14eca;
+  border-color: #3055bb;
   background-color: transparent;
   box-shadow: none;
 }
@@ -14737,7 +14752,7 @@ fieldset[disabled] .btn-link.active {
 .form-control:focus~.input-group-append .input-group-text,
 .form-control:focus+.input-group-prepend .input-group-text,
 .form-control:focus~.input-group-prepend .input-group-text {
-  border: 1px solid #e14eca;
+  border: 1px solid #3055bb;
   border-left: none;
   background-color: transparent;
 }
