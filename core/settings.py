@@ -134,7 +134,7 @@ STATICFILES_DIRS = (
 )
 #############################################################
 #############################################################
-
+EMAIL_BACKEND = config('EMAIL_BACKEND')
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('SENDGRID_API_KEY')
