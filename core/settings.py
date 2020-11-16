@@ -5,7 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 import os
-from decouple import config
+from decouple import config, Csv
 from unipath import Path
 import dj_database_url
 
@@ -20,7 +20,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', cast=bool, default=False)
 
 # load production server from .env
-ALLOWED_HOSTS = ['134.209.183.11', 'localhost', '127.0.0.1', 'samples.musicstudy.uk', 'musicstudy.uk']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 # Application definition
 
