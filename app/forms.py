@@ -10,8 +10,12 @@ class DateTimeInput(forms.DateTimeInput):
         kwargs["format"] = "%Y-%m-%dT%H:%M"
         super().__init__(**kwargs)
 
+def currentTime():
+    time = timezone.localtime(timezone.now())
+    return time
+
 class SampleForm(ModelForm):
-    sample_datetime = forms.DateTimeField(label="Sample Created Datetime*", widget=DateTimeInput(), initial=timezone.localtime(timezone.now()))
+    sample_datetime = forms.DateTimeField(label="Sample Created Datetime*", widget=DateTimeInput(), initial=currentTime)
     class Meta:
         model = Sample
         fields = ['musicsampleid', 'sample_location', 'patientid', 'sample_type', 'sample_datetime', 'sample_comments', 'processing_datetime', 'sample_volume', 'sample_volume_units', 'freeze_thaw_count', ]
@@ -58,7 +62,6 @@ class SampleForm(ModelForm):
         )
         widgets = {
             'sample_type': forms.Select(choices=SAMPLE_TYPE_CHOICES),
-            'sample_datetime': DateTimeInput(),
             'sample_volume_units': forms.Select(choices=SAMPLE_VOLUME_UNIT_CHOICES, attrs={'class': 'form-control'}),
             'processing_datetime': DateTimeInput(),
         }
