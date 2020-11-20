@@ -33,6 +33,7 @@ class SampleForm(ModelForm):
             ('PaxGene ccfDNA tube',(
                 ('PaxGene ccfDNA tube', 'PaxGene ccfDNA tube'),
                 ('PaxGene ccfDNA plasma child aliquot', 'PaxGene ccfDNA plasma child aliquot'),
+                ('PaxGene ccfDNA extracted cfDNA', 'PaxGene ccfDNA extracted cfDNA'),
             )),
             ('PaxGene RNA tube', (
                 ('PaxGene RNA tube', 'PaxGene RNA tube'),
