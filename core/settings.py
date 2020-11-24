@@ -141,7 +141,7 @@ EMAIL_HOST_PASSWORD = config('SENDGRID_API_KEY')
 EMAIL_PORT = config('EMAIL_PORT', cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 
-DEFAULT_FROM_EMAIL = 'MUSIC Samples <noreply@musicstudy.uk>'
+DEFAULT_FROM_EMAIL = 'SampleTrek <password_reset@musicstudy.uk>'
 
 ##POST SSL DEPLOYMENT SETTINGS
 SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', cast=bool)
