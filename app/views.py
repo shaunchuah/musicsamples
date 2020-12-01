@@ -10,7 +10,7 @@ from django.template import loader
 from django.http import HttpResponse
 from django import template
 from .models import Sample
-from .forms import SampleForm, CheckoutForm, SampleFormSet, DeleteForm, RestoreForm
+from .forms import SampleForm, CheckoutForm, SampleFormSet, DeleteForm, RestoreForm, ReactivateForm, FullyUsedForm
 from django.contrib import messages
 from django.db.models import Q
 from django.forms import formset_factory
@@ -22,7 +22,7 @@ from django.db.models.functions import Trunc
 
 @login_required(login_url="/login/")
 def index(request):
-    sample_list = Sample.objects.all().filter(is_deleted=False).order_by('-last_modified')
+    sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).order_by('-last_modified')
     page = request.GET.get('page', 1)
     paginator = Paginator(sample_list, 50)
     try:
@@ -39,7 +39,7 @@ def analytics(request):
     total_samples = Sample.objects.all().filter(is_deleted=False).count()
     samples_by_month = Sample.objects.all().filter(is_deleted=False).annotate(sample_month=Trunc('sample_datetime', 'month')).values('sample_month').annotate(sample_count=Count('id')).order_by('sample_month')
     samples_by_type = Sample.objects.all().filter(is_deleted=False).values('sample_type').annotate(sample_type_count=Count('id'))
-    samples_by_location = Sample.objects.all().filter(is_deleted=False).values('sample_location').annotate(sample_location_count=Count('id'))
+    samples_by_location = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).values('sample_location').annotate(sample_location_count=Count('id'))
     context = {
         'total_samples': total_samples,
         'samples_by_month': samples_by_month,
@@ -71,6 +71,12 @@ def archive(request):
     sample_list = Sample.objects.all().filter(is_deleted=True).order_by('-last_modified')
     context = {'sample_list': sample_list}
     return render(request, "archive.html", context)
+
+@login_required(login_url="/login/")
+def used_samples(request):
+    sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=True).order_by('-last_modified')
+    context = {'sample_list': sample_list}
+    return render(request, "used_samples.html", context)
 
 @login_required(login_url="/login/")
 def pages(request):
@@ -160,7 +166,7 @@ def search(request):
             Q(patientid__icontains=query_string)|
             Q(sample_location__icontains=query_string)|
             Q(sample_type__icontains=query_string)|
-            Q(sample_comments__icontains=query_string))
+            Q(sample_comments__icontains=query_string)).filter(is_fully_used=False).filter(is_deleted=False)
         return render(request, 'index.html', { 'query_string': query_string, 'sample_list': sample_list})
     else:
         return render(request, 'index.html', { 'query_string': 'Null' })
@@ -223,6 +229,44 @@ def restore(request,pk):
     return render(request, 'sample-restore.html', {'form': form})
 
 @login_required(login_url="/login/")
+def fully_used(request,pk):
+    sample = get_object_or_404(Sample, pk=pk)
+    if request.method == "POST":
+        form = FullyUsedForm(request.POST, instance=sample)
+        if form.is_valid():
+            sample = form.save(commit=False)
+            sample.last_modified_by = request.user.username
+            sample.save()
+            messages.success(request, 'Sample marked as fully used.')
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('/')
+    else:
+        form = FullyUsedForm(instance=sample)
+    return render(request, 'sample-fullyused.html', {'form': form})
+
+@login_required(login_url="/login/")
+def reactivate_sample(request,pk):
+    sample = get_object_or_404(Sample, pk=pk)
+    if request.method == "POST":
+        form = ReactivateForm(request.POST, instance=sample)
+        if form.is_valid():
+            sample = form.save(commit=False)
+            sample.last_modified_by = request.user.username
+            sample.save()
+            messages.success(request, 'Sample restored.')
+            next_url = request.GET.get('next')
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('/')
+    else:
+        form = ReactivateForm(instance=sample)
+    return render(request, 'sample-reactivate.html', {'form': form})
+
+@login_required(login_url="/login/")
 def bulkadd(request):
     if request.method == "POST":
         formset = SampleFormSet(request.POST)
@@ -240,7 +284,7 @@ def bulkadd(request):
         formset = SampleFormSet()
     return render(request, "bulk-add.html", {'formset': formset})
 
-#Export entire database to CSV for backup
+#Export entire database to CSV for backup, currently not in use
 @login_required(login_url="/login/")
 def export_csv(request):
     response = HttpResponse(content_type='text/csv')
@@ -271,7 +315,7 @@ def export_excel_all(request):
     worksheet.title = 'All Samples'
 
     #Define the excel column names
-    columns = ['Sample ID', 'Patient ID', 'Sample Location', 'Sample Type', 'Sampling Datetime', 'Processing Datetime', 'Sampling to Processing Time (mins)','Sample Volume', 'Sample Volume Units', 'Freeze Thaw Count', 'Sample Comments', 'Created By', 'Date Created', 'Last Modified By', 'Last Modified']
+    columns = ['Sample ID', 'Patient ID', 'Sample Location', 'Sample Sublocation', 'Sample Type', 'Sampling Datetime', 'Processing Datetime', 'Sampling to Processing Time (mins)','Sample Volume', 'Sample Volume Units', 'Freeze Thaw Count', 'Sample Comments', 'Sample Fully Used?', 'Created By', 'Date Created', 'Last Modified By', 'Last Modified']
     row_num = 1
 
     #Write the column names in
@@ -293,6 +337,7 @@ def export_excel_all(request):
             sample.musicsampleid,
             sample.patientid,
             sample.sample_location,
+            sample.sample_sublocation,
             sample.sample_type,
             sample.sample_datetime,
             sample.processing_datetime,
@@ -301,6 +346,7 @@ def export_excel_all(request):
             sample.sample_volume_units,
             sample.freeze_thaw_count,
             sample.sample_comments,
+            sample.is_fully_used,
             sample.created_by,
             sample.data_first_created,
             sample.last_modified_by,
@@ -338,7 +384,7 @@ def export_excel(request):
     worksheet.title = 'All Samples'
 
     #Define the excel column names
-    columns = ['Sample ID', 'Patient ID', 'Sample Location', 'Sample Type', 'Sampling Datetime', 'Processing Datetime', 'Sampling to Processing Time (mins)','Sample Volume', 'Sample Volume Units', 'Freeze Thaw Count', 'Sample Comments', 'Created By', 'Date Created', 'Last Modified By', 'Last Modified']
+    columns = ['Sample ID', 'Patient ID', 'Sample Location', 'Sample Sublocation', 'Sample Type', 'Sampling Datetime', 'Processing Datetime', 'Sampling to Processing Time (mins)','Sample Volume', 'Sample Volume Units', 'Freeze Thaw Count', 'Sample Comments', 'Sample Fully Used?', 'Created By', 'Date Created', 'Last Modified By', 'Last Modified']
     row_num = 1
 
     #Write the column names in
@@ -360,6 +406,7 @@ def export_excel(request):
             sample.musicsampleid,
             sample.patientid,
             sample.sample_location,
+            sample.sample_sublocation,
             sample.sample_type,
             sample.sample_datetime,
             sample.processing_datetime,
@@ -368,6 +415,7 @@ def export_excel(request):
             sample.sample_volume_units,
             sample.freeze_thaw_count,
             sample.sample_comments,
+            sample.is_fully_used,
             sample.created_by,
             sample.data_first_created,
             sample.last_modified_by,

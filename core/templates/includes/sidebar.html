@@ -35,6 +35,12 @@
 
     <div class="mt-5">
       <ul class="nav">
+        <li class="{% if request.path == '/used_samples/' %}active{% endif %}">
+          <a href="/used_samples">
+            <i class="tim-icons icon-send"></i>
+            <p>Used Samples</p>
+          </a>
+        </li>
         <li class="{% if request.path == '/archive/' %}active{% endif %}">
           <a href="/archive">
             <i class="tim-icons icon-trash-simple"></i>
