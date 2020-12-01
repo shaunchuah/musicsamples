@@ -165,6 +165,7 @@ def search(request):
             Q(musicsampleid__icontains=query_string)|
             Q(patientid__icontains=query_string)|
             Q(sample_location__icontains=query_string)|
+            Q(sample_sublocation__icontains=query_string)|
             Q(sample_type__icontains=query_string)|
             Q(sample_comments__icontains=query_string)).filter(is_fully_used=False).filter(is_deleted=False)
         return render(request, 'index.html', { 'query_string': query_string, 'sample_list': sample_list})
