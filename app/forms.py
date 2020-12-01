@@ -18,7 +18,7 @@ class SampleForm(ModelForm):
     sample_datetime = forms.DateTimeField(label="Sample Created Datetime*", widget=DateTimeInput(), initial=currentTime)
     class Meta:
         model = Sample
-        fields = ['musicsampleid', 'sample_location', 'patientid', 'sample_type', 'sample_datetime', 'sample_comments', 'processing_datetime', 'sample_volume', 'sample_volume_units', 'freeze_thaw_count', ]
+        fields = ['musicsampleid', 'sample_location', 'patientid', 'sample_type', 'sample_datetime', 'sample_comments', 'processing_datetime', 'sample_sublocation', 'sample_volume', 'sample_volume_units', 'freeze_thaw_count', ]
         SAMPLE_VOLUME_UNIT_CHOICES = (
             ('', 'Select unit'),
             ('ml', 'ml'),
@@ -70,31 +70,44 @@ class SampleForm(ModelForm):
             'musicsampleid': "Sample ID*",
             'patientid': "Patient ID*",
             'sample_location': "Sample Location*",
+            'sample_sublocation': "Sample Sublocation",
             'sample_type': "Sample Type*",
             'sample_comments': "Comments",
             'processing_datetime': "Processing Datetime",
             'sample_volume': "Volume Remaining (est.)",
             'sample_volume_units': "Sample Volume Units",
-            'freeze_thaw_count': "No. of Freeze-Thaw Cycles",            
+            'freeze_thaw_count': "No. of Freeze-Thaw Cycles",
         }
 
 class CheckoutForm(ModelForm):
     class Meta:
         model = Sample
-        fields = ['sample_location']
-        labels = { 'sample_location': "Sample Location" }
+        fields = ['sample_location', 'sample_sublocation']
+        labels = { 'sample_location': "Sample Location", 'sample_sublocation': "Sample Sublocation",}
 
 class DeleteForm(ModelForm):
     class Meta:
         model = Sample
         fields = ['is_deleted']
-        labels = { 'is_deleted': "Confirm Delete?" }
+        labels = { 'is_deleted': "Confirm delete?" }
 
 class RestoreForm(ModelForm):
     class Meta:
         model = Sample
         fields = ['is_deleted']
-        labels = { 'is_deleted': "Uncheck to Restore" }
+        labels = { 'is_deleted': "Uncheck to restore" }
+
+class FullyUsedForm(ModelForm):
+    class Meta:
+        model = Sample
+        fields = ['is_fully_used']
+        labels = { 'is_fully_used': "Mark sample as fully used?" }
+
+class ReactivateForm(ModelForm):
+    class Meta:
+        model = Sample
+        fields = ['is_fully_used']
+        labels = { 'is_fully_used': "Uncheck to reactivate" }
 
 #SampleFormSet = modelformset_factory(Sample, fields=('musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments'), extra=2)
 SampleFormSet = formset_factory(SampleForm, extra=1)
