@@ -11,7 +11,7 @@
   <div class="col-md-12">
     <div class="card ">
       <div class="card-header">
-        <h3 class="card-title">Deleted Samples</h3>
+        <h3 class="card-title">Used Samples</h3>
       </div>
       <div class="card-body">
         <div class="table-responsive">
@@ -38,7 +38,7 @@
                   Comments
                 </th>
                 <th>
-                  Restore
+                  Reactivate
                 </th>
               </tr>
             </thead>
@@ -62,7 +62,7 @@
                       <td>{{ sample.sample_datetime }}</td>
                       <td>{{ sample.sample_comments }}</td>                      
                       <td>
-                        <a href="{% url 'restore' pk=sample.pk %}"><i class="tim-icons icon-upload"></i> Restore</a>
+                        <a href="{% url 'reactivate_sample' pk=sample.pk %}"><i class="tim-icons icon-upload"></i> Reactivate</a>
                       </td>
                     </tr>
                   {% endfor %}
