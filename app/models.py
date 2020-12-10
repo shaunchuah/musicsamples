@@ -23,7 +23,9 @@ class Sample(models.Model):
     freeze_thaw_count = models.IntegerField(default=0)
 
     sample_sublocation = models.CharField(max_length=200, blank=True, null=True)
-    is_fully_used = models.BooleanField(default=False)    
+    is_fully_used = models.BooleanField(default=False)
+
+    haemolysis_reference = models.CharField(max_length=200, blank=True, null=True)    
     
     created_by = models.CharField(max_length=200)
     last_modified_by = models.CharField(max_length=200)

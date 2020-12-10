@@ -18,7 +18,17 @@ class SampleForm(ModelForm):
     sample_datetime = forms.DateTimeField(label="Sample Created Datetime*", widget=DateTimeInput(), initial=currentTime)
     class Meta:
         model = Sample
-        fields = ['musicsampleid', 'sample_location', 'patientid', 'sample_type', 'sample_datetime', 'sample_comments', 'processing_datetime', 'sample_sublocation', 'sample_volume', 'sample_volume_units', 'freeze_thaw_count', ]
+        fields = ['musicsampleid', 'sample_location', 'patientid', 'sample_type', 'sample_datetime', 'sample_comments', 'processing_datetime', 'sample_sublocation', 'sample_volume', 'sample_volume_units', 'freeze_thaw_count', 'haemolysis_reference', ]
+        HAEMOLYSIS_REFERENCE_CHOICES = (
+            ('', 'Select category'),
+            ('0', 'Minimal'),
+            ('20', '20 mg/dL'),
+            ('50', '50 mg/dL'),
+            ('100', '100 mg/dL (unusable)'),
+            ('250', '250 mg/dL (unusable)'),
+            ('500', '500 mg/dL (unusable)'),
+            ('1000', '1000 mg/dL (unusable)'),
+        )
         SAMPLE_VOLUME_UNIT_CHOICES = (
             ('', 'Select unit'),
             ('ml', 'ml'),
@@ -65,6 +75,7 @@ class SampleForm(ModelForm):
             'sample_type': forms.Select(choices=SAMPLE_TYPE_CHOICES),
             'sample_volume_units': forms.Select(choices=SAMPLE_VOLUME_UNIT_CHOICES, attrs={'class': 'form-control'}),
             'processing_datetime': DateTimeInput(),
+            'haemolysis_reference': forms.Select(choices=HAEMOLYSIS_REFERENCE_CHOICES),
         }
         labels = {
             'musicsampleid': "Sample ID*",
@@ -77,6 +88,7 @@ class SampleForm(ModelForm):
             'sample_volume': "Volume Remaining (est.)",
             'sample_volume_units': "Sample Volume Units",
             'freeze_thaw_count': "No. of Freeze-Thaw Cycles",
+            'haemolysis_reference': "Haemolysis Reference Palette"
         }
 
 class CheckoutForm(ModelForm):

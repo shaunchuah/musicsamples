@@ -316,7 +316,7 @@ def export_excel_all(request):
     worksheet.title = 'All Samples'
 
     #Define the excel column names
-    columns = ['Sample ID', 'Patient ID', 'Sample Location', 'Sample Sublocation', 'Sample Type', 'Sampling Datetime', 'Processing Datetime', 'Sampling to Processing Time (mins)','Sample Volume', 'Sample Volume Units', 'Freeze Thaw Count', 'Sample Comments', 'Sample Fully Used?', 'Created By', 'Date Created', 'Last Modified By', 'Last Modified']
+    columns = ['Sample ID', 'Patient ID', 'Sample Location', 'Sample Sublocation', 'Sample Type', 'Sampling Datetime', 'Processing Datetime', 'Sampling to Processing Time (mins)','Sample Volume', 'Sample Volume Units', 'Freeze Thaw Count', 'Haemolysis Reference Category (100 and above unusable)', 'Sample Comments', 'Sample Fully Used?', 'Created By', 'Date Created', 'Last Modified By', 'Last Modified']
     row_num = 1
 
     #Write the column names in
@@ -346,6 +346,7 @@ def export_excel_all(request):
             sample.sample_volume,
             sample.sample_volume_units,
             sample.freeze_thaw_count,
+            sample.haemolysis_reference,
             sample.sample_comments,
             sample.is_fully_used,
             sample.created_by,
@@ -385,7 +386,7 @@ def export_excel(request):
     worksheet.title = 'All Samples'
 
     #Define the excel column names
-    columns = ['Sample ID', 'Patient ID', 'Sample Location', 'Sample Sublocation', 'Sample Type', 'Sampling Datetime', 'Processing Datetime', 'Sampling to Processing Time (mins)','Sample Volume', 'Sample Volume Units', 'Freeze Thaw Count', 'Sample Comments', 'Sample Fully Used?', 'Created By', 'Date Created', 'Last Modified By', 'Last Modified']
+    columns = ['Sample ID', 'Patient ID', 'Sample Location', 'Sample Sublocation', 'Sample Type', 'Sampling Datetime', 'Processing Datetime', 'Sampling to Processing Time (mins)','Sample Volume', 'Sample Volume Units', 'Freeze Thaw Count', 'Haemolysis Reference Category (100 and above unusable)', 'Sample Comments', 'Sample Fully Used?', 'Created By', 'Date Created', 'Last Modified By', 'Last Modified']
     row_num = 1
 
     #Write the column names in
@@ -415,6 +416,7 @@ def export_excel(request):
             sample.sample_volume,
             sample.sample_volume_units,
             sample.freeze_thaw_count,
+            sample.haemolysis_reference,
             sample.sample_comments,
             sample.is_fully_used,
             sample.created_by,
