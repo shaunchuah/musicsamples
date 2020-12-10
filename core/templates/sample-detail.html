@@ -111,6 +111,14 @@
                   <tr>
                     <td>Freeze Thaw Count</td>
                     <td>{{ sample.freeze_thaw_count }}</td>
+                  </tr> 
+                  <tr>
+                    <td>Haemolysis Reference Category (100 and above unusable)</td>
+                    <td>{% if sample.haemolysis_reference is None %}
+                      N/A
+                      {% else %}
+                      {{ sample.haemolysis_reference }} mg/dL
+                      {% endif %}</td>
                   </tr>                  
                 </tbody>
               </table>
