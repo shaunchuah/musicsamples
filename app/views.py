@@ -132,7 +132,7 @@ def sample_detail(request, pk):
     changes = historical_changes(sample_history)
     first_change = sample_history.first()
     if sample.patientid[0:3] == "GID":
-        gid_id = sample.patientid.split("-")[1]
+        gid_id = int(sample.patientid.split("-")[1])
     else:
         gid_id = None
     processing_time = None
