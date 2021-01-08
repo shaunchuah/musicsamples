@@ -14,6 +14,7 @@ urlpatterns = [
     # The home page
     path('', views.index, name='home'),
     path('analytics/', views.analytics, name='analytics'),
+    path('analytics/gid_overview', views.gid_overview, name='gid_overview'),
     path('reference/', views.reference, name='reference'),
     path('archive/', views.archive, name='archive'),
     path('used_samples/', views.used_samples, name='used_samples'),
