@@ -40,7 +40,17 @@
                   </tr>
                   <tr>
                     <td>Patient ID</td>
-                    <td>{{ sample.patientid }}</td>
+                    <td>
+           
+                      {% if gid_id %}                        
+                        <a href="https://ecrf.igmm.ed.ac.uk/redcap_v10.0.30/DataEntry/record_home.php?pid=140&arm=1&id={{ gid_id }}" target="_blank" rel="noopener">{{ sample.patientid }} <i class="tim-icons icon-link-72"></i></a>
+                        
+                      {% else %}
+                      
+                        {{ sample.patientid }}
+
+                      {% endif %}
+                    </td>
                   </tr>
                   <tr>
                     <td>Sample Location</td>
