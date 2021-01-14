@@ -50,8 +50,8 @@ def analytics(request):
 
 @login_required(login_url="/login/")
 def gid_overview(request):
-    sample_categories = Sample.objects.values("sample_type").distinct()
-    patient_id_list = Sample.objects.order_by('patientid').values("patientid").distinct()
+    sample_categories = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).values("sample_type").distinct()
+    patient_id_list = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).order_by('patientid').values("patientid").distinct()
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False)
     context = {'sample_list': sample_list, 'sample_categories': sample_categories, 'patient_id_list': patient_id_list}
     return render(request, "gid_overview.html", context)
