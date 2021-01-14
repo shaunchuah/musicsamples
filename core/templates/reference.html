@@ -4,21 +4,10 @@
 {% block stylesheets %}{% endblock stylesheets %} {% block content %}
 
 <div class="row">
+  
   <div class="col-lg-8">
-    <div class="row">
-      <div class="col">
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">
-          <i class="tim-icons icon-notes"></i> Quick Reference
-        </h3>
-      </div>
-      <div class="card-body">
-        <h4></h4>
-      </div>
-    </div>
-  </div>
-  </div>
+    <h2><i class="tim-icons icon-notes"></i> Reference</h2>
+   
 
   <div class="row">
     <div class="col">
@@ -46,6 +35,164 @@
   </div>
   </div>
 
+
+  <div class="row">
+    <div class="col">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="tim-icons icon-pin"></i> MUSIC Blood SOPs Glasgow/Dundee
+        </h3>
+      </div>
+      <div class="card-body">
+        <h4>PAXgene Blood ccfDNA tubes: 1 per patient – 9ml blood</h4>
+        <ol>
+          <li>Collect blood according to PAXgene ccfDNA guidance and gently invert 8 times.</li>
+          <li>Label tubes with study ID and sampling date and time. Tubes can be kept at room temperature (2-27C) for up to 7 days</li>
+          <li>Within 7 days of collection, centrifuge PAXgene ccfDNA tubes at 1600 x g for 10 mins at room temperature</li>
+          <li>Assess haemolysis using the reference haemolysis chart (in the add new sample form)</li>
+          <li>Aliquot plasma into 1ml aliquots and centrifuge at 16000 x g for 10mins at room temperature</li>
+          <li>Place resulting cell free plasma in 1.5-2ml screw-top tubes and register onto G-Trac. Please fill study ID, date/time of original specimen blood collection, date/time of centrifugation (processing datetime) and haemolysis score (1-3).</li>
+          <li>Freeze cell free plasma at -80C.</li>
+
+          
+        </ol>
+
+        <h4>PAXgene Blood RNA tubes: 1 per patient – 2.5ml blood</h4>
+        <ol>
+          <li>Collect blood according to PAXgene RNA guidance, gently invert 8 times.</li>
+          <li>Label tubes with study ID and sampling date and time.</li>
+          <li>Label each tube with QR code and register sample onto G-Trac.</li>
+          <li>After 2 hours but within 24 hours freeze at -20 before subsequent transfer after 24 hours to -80C for fortnightly/monthly collection.</li>
+        </ol>
+
+        <h4>EDTA tubes: 2 per patient (if possible)</h4>
+        <ol>
+          <li>Collect blood and gently invert 8 times.</li>
+          <li>Within 2 hours, centrifuge at 1000 x g for 10mins at 4C, transfer plasma to sterile tube and centrifuge again at 3000 x g for 10mins at 4C.</li>
+          <li>Divide into 1 ml aliquots in screw-top tubes.</li>
+          <li>Label each child aliquot with QR code and register sample onto G-Trac.</li>
+          <li>Immediately freeze at -80oC for fortnightly/monthly collection.</li>
+        </ol>
+
+        <h4>Notes:</h4>
+        <ol>
+          <li>Please read guidance before taking blood with PAXgene ccfDNA tubes.</li>
+          <li>Blood filled PAXgene ccfDNA tubes must not fall below 2oC.</li>
+          <li>Blood filled PAXgene ccfDNA tubes must be spun down to plasma within 7 days of blood collection.</li>
+          <li>Gentle acceleration/deceleration – suggestion set to 5/5 respectively.</li>
+          <li>Score haemolysis by assessing colour of plasma using this chart, 1 = minimal, 3 = 50 mg/dL. Plasma with a score of 4 or higher (≤ 100 mg/dL) is not to be used for MUSIC.</li>
+          <li>Blood filled PAXgene RNA tubes are only stable for 3 days at room temperature. Please see guidance for optimum processing and freezing. Do not freeze in Styrofoam tray, please use open, plastic tray.</li>
+          <li>Screw-top tubes are required for storage in QMRI, Edinburgh, to avoid freeze/thaw cycles, please aliquot into screw-top tubes in the first instance.</li>
+        </ol>
+
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="tim-icons icon-pin"></i> Core Sample Set Reference
+        </h3>
+      </div>
+      <div class="card-body">
+        
+        <table class="table">
+          <thead class="text-primary">
+            <th>Core Sample Set</th>
+            <th>Processing/Storage</th>
+            <th>Purpose</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Blood in serum clotted tube</td>
+              <td>Local NHS laboratory</td>
+              <td>Routine sampling as part of normal IBD care. (U&E, LFT, calcium/albumin and CRP)</td>
+            </tr>
+            <tr>
+              <td>Blood in EDTA tube</td>
+              <td>Local NHS laboratory</td>
+              <td>Routine sampling as part of normal IBD care. (FBC)</td>
+            </tr>
+            <tr>
+              <td>Blood in EDTA tube x2</td>
+              <td>Plasma - 1000G for 10mins at 4C and 3000G for 10mins at 4C and stored in -80C</td>
+              <td>Mediators, biomarkers, metabolites and LC-MS</td>
+            </tr>
+            <tr>
+              <td>Blood in PaxGene RNA tube</td>
+              <td>Freeze at -20C; transfer to -80C after 24h where possible</td>
+              <td>RNA sequencing of host transcriptome</td>
+            </tr>
+            <tr>
+              <td>Blood in PaxGene ccfDNA tube</td>
+              <td>Plasma - 1600G for 10mins at room temp and 16000G for 10mins at room temp and stored in -80oC</td>
+              <td>Quantification of mitochondrial genes and sequencing of blood cfDNA</td>
+            </tr>
+            <tr>
+              <td>Saliva DNA</td>
+              <td>Posted to Wellcome Trust Genetics Core, Edinburgh</td>
+              <td>DNA extraction for Whole Genome Sequencing</td>
+            </tr>
+            <tr>
+              <td>Saliva DNA</td>
+              <td>Posted to Wellcome Trust Genetics Core, Edinburgh</td>
+              <td>DNA extraction for Whole Genome Sequencing</td>
+            </tr>
+            <tr>
+              <td>Stool samples: in OMNI gut and standard stool container</td>
+              <td>Freeze at -20°C; transfer to -
+                80°C after 24h where
+                possible
+                </td>
+              <td>Microbiome Next Generation
+                Sequencing/Calprotectin/Stool biomarkers
+                </td>
+            </tr>
+            <tr>
+              <td>Stool samples: faecal immunochemical test (FIT)</td>
+              <td>Posted to Ninewells Hospital</td>
+              <td>FIT test analysis</td>
+            </tr>
+            <tr>
+              <td>Stool samples: faecal calprotectin</td>
+              <td>???</td>
+              <td>Routine sampling as part of NHS care.</td>
+            </tr>
+            <tr>
+              <td>Ileo-colonic biopsies 
+                Formalin
+                </td>
+              <td>Pathology for paraffin-block
+                embedding
+                </td>
+              <td>Immunohistochemistry.</td>
+            </tr>
+            <tr>
+              <td>Ileo-colonic biopsies 
+                RNA later 
+                </td>
+              <td>Freeze at -20°C; transfer to -
+                80°C after 24h where
+                possible OR used directly for
+                ex vivo experiments
+                </td>
+              <td>Gene expression studies.</td>
+            </tr>
+          </tbody>
+        </table>
+
+
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- template
   <div class="row">
     <div class="col">
     <div class="card">
@@ -58,27 +205,27 @@
         <h4>place to upload reference files for viewing</h4>
       </div>
     </div>
-  </div>
+  </div>-->
   
 
 
 
 
-</div>
 
 
 
   </div>
 
   <div class="col-lg-4">
+    <h2><i class="tim-icons icon-cloud-download-93"></i> Downloads</h2>
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">
-          <i class="tim-icons icon-cloud-download-93"></i> Downloads
+           MUSIC
         </h3>
       </div>
       <div class="card-body">
-        <p>place to upload reference files for viewing</p>
+        <p>File placeholder</p>
       </div>
     </div>
   </div>
