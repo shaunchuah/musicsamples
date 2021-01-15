@@ -72,6 +72,17 @@
       var input = document.getElementById('id_sample_location');
       input.focus();
       input.select();
+      $('input#id_sample_location').autocomplete({
+        source: [
+          "QMRI CIR Freezer 10",
+          "QMRI CIR W2.20 Bain Freezer",
+          "QMRI CIR C2.25 Lab",
+          "WGH",
+          "WGH CRF",
+          "QEUH Glasgow",
+          "QMRI",
+        ]
+      });
     });
   </script>
 
