@@ -37,6 +37,7 @@ def index(request):
 @login_required(login_url="/login/")
 def analytics(request):
     total_samples = Sample.objects.all().filter(is_deleted=False).count()
+    total_active_samples = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).count()
     samples_by_month = Sample.objects.all().filter(is_deleted=False).annotate(sample_month=Trunc('sample_datetime', 'month')).values('sample_month').annotate(sample_count=Count('id')).order_by('sample_month')
     samples_by_type = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).values('sample_type').annotate(sample_type_count=Count('id'))
     samples_by_location = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).values('sample_location').annotate(sample_location_count=Count('id'))
@@ -45,6 +46,7 @@ def analytics(request):
         'samples_by_month': samples_by_month,
         'samples_by_type': samples_by_type,
         'samples_by_location': samples_by_location,
+        'total_active_samples': total_active_samples,
     }
     return render(request, "analytics.html", context)
 
