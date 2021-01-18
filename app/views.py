@@ -22,7 +22,7 @@ from django.db.models.functions import Trunc
 
 @login_required(login_url="/login/")
 def index(request):
-    sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).order_by('-sample_datetime')
+    sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).order_by('sample_datetime')
     page = request.GET.get('page', 1)
     paginator = Paginator(sample_list, 50)
     try:
