@@ -38,6 +38,9 @@
                   Comments
                 </th>
                 <th>
+                  View
+                </th>
+                <th>
                   Reactivate
                 </th>
               </tr>
@@ -60,7 +63,12 @@
                       </td>
                       <td>{{ sample.sample_type }}</td>
                       <td>{{ sample.sample_datetime }}</td>
-                      <td>{{ sample.sample_comments }}</td>                      
+                      <td>{{ sample.sample_comments }}</td>
+                      <td>
+                        <a href="{% url 'sample_detail' pk=sample.pk %}"
+                          ><i class="tim-icons icon-zoom-split"></i> View</a
+                        >
+                      </td>                      
                       <td>
                         <a href="{% url 'reactivate_sample' pk=sample.pk %}"><i class="tim-icons icon-upload"></i> Reactivate</a>
                       </td>
