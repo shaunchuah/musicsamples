@@ -1,0 +1,28 @@
+
+
+.notes .card-header {
+    padding:30px;
+    padding-bottom: 0px;
+}
+
+.notes .card-body {
+    padding: 30px;
+}
+
+.notes .card-footer{
+    padding: 30px;
+    padding-top: 0px;
+}
+
+.notes .card-header a {
+    color: rgba(25,25,25);
+}
+
+.notes .card-subtitle {
+    color: rgba(34, 42, 66, 0.705);
+}
+
+.notes p {
+    font-size: 1rem;
+    font-weight: 400;
+}

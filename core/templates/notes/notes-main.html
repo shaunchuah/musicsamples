@@ -2,7 +2,7 @@
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %} {% block content %}
-<h2><i class="tim-icons icon-notes"></i> Published Notes</h2>
+<h2><i class="tim-icons icon-notes"></i> {{ page_title }}</h2>
 <div class="row">
   <div class="col mb-4">
     <a href="/notes/add/" class="btn btn-fill btn-success">Add New Note</a>
@@ -14,22 +14,31 @@
     {% for note in notes %}
     <div class="row">
       <div class="col">
-        <div class="card">
+        <div class="card notes">
           <div class="card-header">
-            <h3 class="card-title"><a href="{% url 'note_detail' pk=note.pk %}">{{ note.title }}</a> | {{note.published_date }}</h3>
-            <h4>{{ note.author.first_name }} {{ note.author.last_name }} | <a href="mailto:{{ note.author.email }}">{{note.author.email }}</a> </h4>
+            <h1 class="card-title"><a href="{% url 'note_detail' pk=note.pk %}">{{ note.title }}</a></h1>
+            <h4 class="card-subtitle">{{note.published_date|date:"j F Y" }} | {{ note.author.first_name }} {{ note.author.last_name }} | <a href="mailto:{{ note.author.email }}">{{note.author.email }}</a> </h4>
           </div>
+          <hr />
           <div class="card-body">
+            <!--<p>{{ note.content|striptags|slice:":400"}}...<a href="{% url 'note_detail' pk=note.pk %}">View More</a></p>-->
             {{ note.content|safe }}
+            
           </div>
-          <div class="footer">
-            <p>Tags: </p>
-            <p>
+          <hr />
+          <div class="card-footer">
+            <small>#Tags: |
+              
               Sample Tags:
               {% for sample in note.sample_tags.all %}
               <a href="{% url 'sample_detail' pk=sample.pk %}">{{ sample }}</a>
               {% endfor %}
-            </p>
+            </small>
+            {% if request.user.id == note.author.id %}
+            <div class="float-right">
+            <small><a href="{% url 'note_edit' pk=note.pk %}">Edit</a> | <a href="{% url 'note_delete' pk=note.pk %}">Delete</a></small>
+            </div>
+            {% endif %}
           </div>
 
         </div>
