@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.forms import ModelForm, modelformset_factory, formset_factory
 from .models import Sample, Note
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
+from taggit.forms import TagWidget
 
 class DateTimeInput(forms.DateTimeInput):
     input_type = "datetime-local"
@@ -128,9 +129,16 @@ SampleFormSet = formset_factory(SampleForm, extra=1)
 class NoteForm(ModelForm):   
     class Meta:
         model = Note
-        fields = ['title', 'content', 'sample_tags', 'is_public']
+        fields = ['title', 'content', 'sample_tags', 'tags', 'is_public']
         widgets = {
-            'content': forms.CharField(widget=CKEditorUploadingWidget())
+            'content': forms.CharField(widget=CKEditorUploadingWidget()),
+            #'tags': forms.TextInput(attrs={'data-role': 'tagsinput'})
+            'tags': TagWidget(attrs={'data-role': 'tagsinput'}),
+            'is_public': forms.Select(choices=((False, 'Private'), (True, 'Shared')))
+        }
+        labels = {
+            'is_public': "Share settings:",
+            'content': "",
         }
         
 class NoteDeleteForm(ModelForm):

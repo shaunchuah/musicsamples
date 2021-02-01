@@ -27,7 +27,12 @@
           </div>
           <hr />
           <div class="card-footer">
-            <small>#Tags: |
+            <small>Tags: 
+              {% for tag in note.tags.all %}
+              <a href="{% url 'note_tags' slug=tag %}"><span class="tag badge badge-info">{{tag}}</span></a>
+              {% endfor %}
+              
+              |
               
               Sample Tags:
               {% for sample in note.sample_tags.all %}
@@ -60,11 +65,21 @@
       <div class="card-header">
         <h3 class="card-title">Tags</h3>
       </div>
+      <div class="card-body">
+        {% for tag in all_tags %}
+        <a href="{% url 'note_tags' slug=tag %}"><span class="large-tag badge badge-info">{{tag}}</span></a>
+        {% endfor %}
+      </div>
     </div>
       
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Author</h3>
+        <h3 class="card-title">Authors</h3>
+      </div>
+      <div class="card-body">
+        {% for user in users %}
+        <a href="{% url 'note_authors' pk=user.pk %}"><span class="large-tag badge badge-secondary">{{user.first_name}} {{user.last_name}}</span></a>
+        {% endfor %}
       </div>
     </div>
 
