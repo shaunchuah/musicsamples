@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'simple_history',
     'ckeditor_uploader',
     'ckeditor',
-    'taggit',
+    'taggit',    
     'app'  # Enable the inner app 
 ]
 
