@@ -31,5 +31,6 @@ urlpatterns = [
     path('export_csv/', views.export_csv, name='export_csv'),
     path('export_excel_all/', views.export_excel_all, name='export_excel_all'),
     path('export_excel/', views.export_excel, name='export_excel'),
-    path('account/', views.account, name='account')
+    path('account/', views.account, name='account'),
+    path('notes/', views.notes, name='notes')
 ]

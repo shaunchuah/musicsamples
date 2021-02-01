@@ -7,6 +7,7 @@ Copyright (c) 2019 - present AppSeed.us
 from django.db import models
 from django.contrib.auth.models import User
 from simple_history.models import HistoricalRecords
+from ckeditor_uploader.fields import RichTextUploadingField
 
 # Create your models here.
 class Sample(models.Model):
@@ -35,3 +36,23 @@ class Sample(models.Model):
 
     def clean(self):
         self.musicsampleid = self.musicsampleid.upper()
+
+    def __str__(self):
+        return self.musicsampleid
+
+class Note(models.Model):
+    title = models.CharField(max_length=200, unique=True)
+    content = RichTextUploadingField(blank=True, null=True)
+    sample_tags = models.ManyToManyField(Sample, blank=True)
+    is_public = models.BooleanField(default=True)
+
+    author = models.ForeignKey(User, on_delete= models.CASCADE, related_name='notes')
+    published_date = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
+    history = HistoricalRecords()
+
+    class Meta:
+        ordering = ['-published_date']
+
+    def __str__(self):
+        return self.title

@@ -446,3 +446,23 @@ def export_excel(request):
     worksheet.freeze_panes = worksheet['A2']
     workbook.save(response)
     return response
+
+##############################################################################################
+### NOTES SECTION ############################################################################
+##############################################################################################
+
+from .models import Note
+
+@login_required(login_url="/login/")
+def notes(request):
+    notes = Note.objects.all().filter(is_public=True)
+    page = request.GET.get('page', 1)
+    paginator = Paginator(notes, 10)
+    try:
+        notes = paginator.page(page)
+    except PageNotAnInteger:
+        notes = paginator.page(1)
+    except EmptyPage:
+        notes = paginator.page(paginator.num_pages)
+    context = {'notes': notes}
+    return render(request, "notes.html", context)

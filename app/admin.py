@@ -5,8 +5,9 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 from django.contrib import admin
-from .models import Sample
+from .models import Sample, Note
 from simple_history.admin import SimpleHistoryAdmin
 # Register your models here.
 
 admin.site.register(Sample, SimpleHistoryAdmin)
+admin.site.register(Note, SimpleHistoryAdmin)

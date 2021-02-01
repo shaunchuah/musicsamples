@@ -31,6 +31,13 @@
           <p>Reference</p>
         </a>
       </li>
+
+      <li class="{% if request.path == '/notes/' %}active{% endif %}">
+        <a href="/notes">
+          <i class="tim-icons icon-single-copy-04"></i>
+          <p>Lab Notes</p>
+        </a>
+      </li>
     </ul>
 
     <div class="mt-5">
