@@ -1,0 +1,79 @@
+{% extends "layouts/base.html" %} {% block title %} Dashboard {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+<h2><i class="tim-icons icon-notes"></i> Published Notes</h2>
+<div class="row">
+  <div class="col mb-4">
+    <a href="/notes/add/" class="btn btn-fill btn-success">Add New Note</a>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-8">
+
+    {% for note in notes %}
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title"><a href="{% url 'note_detail' pk=note.pk %}">{{ note.title }}</a> | {{note.published_date }}</h3>
+            <h4>{{ note.author.first_name }} {{ note.author.last_name }} | <a href="mailto:{{ note.author.email }}">{{note.author.email }}</a> </h4>
+          </div>
+          <div class="card-body">
+            {{ note.content|safe }}
+          </div>
+          <div class="footer">
+            <p>Tags: </p>
+            <p>
+              Sample Tags:
+              {% for sample in note.sample_tags.all %}
+              <a href="{% url 'sample_detail' pk=sample.pk %}">{{ sample }}</a>
+              {% endfor %}
+            </p>
+          </div>
+
+        </div>
+
+
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Search</h3>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Tags</h3>
+      </div>
+    </div>
+      
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Author</h3>
+      </div>
+    </div>
+
+  </div>
+
+
+</div>
+
+
+
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script>
+  $(document).ready(function () {
+  });
+</script>
+{% endblock javascripts %}

@@ -1,0 +1,129 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+{% if form.errors %}
+{% for field in form %}
+{% for error in field.errors %}
+<div class="row">
+  <div class="col-md-5">
+    <div class="alert alert-danger">
+      <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+        <i class="tim-icons icon-simple-remove"></i>
+      </button>
+      <span>{{field.label}}: {{ error|escape }}</span>
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endfor %}
+{% endif %}
+
+
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <h3 class="card-header card-title">{{ note.title }}</h3>
+      <div class=card-body>
+        {{ note.content|safe }}
+      </div>
+
+
+      <!--<div class="card-footer">
+        <a href=" url 'sample_edit' pk=sample.pk ?next={{ request.get_full_path "
+          class="btn btn-fill btn-success">Edit</a>
+      </div>-->
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <h3 class="card-title card-header">History</h3>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table" id="">
+            <tbody>
+              <tr>
+                <td>First Registered</td>
+                <td>{{ note.published_date }}</td>
+              </tr>
+              <tr>
+                <td>Created By</td>
+                <td>{{ note.author }}</td>
+              </tr>
+              <tr>
+                <td>Last Modified</td>
+                <td>{{ note.last_modified }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class="table" id="history_table">
+            <thead>
+              <tr>
+                <th>date/time</th>
+                <th>change made</th>
+                <th>responsible</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              {% for change in changes %}
+              <tr>
+                <td>{{ change.new_record.history_date|date:"D j M Y, H:i"}}</td>
+                <td>
+
+                  {% if change.changed_fields|length > 0 %}
+                  {% for change_by_id in change.changes %}
+                  <b>{{ change_by_id.field|title }}</b>
+                  from
+                  {% if change_by_id.old %}
+                  <b>{{ change_by_id.old }}</b>
+                  {% else %}
+                  <b>blank field</b>
+                  {% endif %}
+                  to
+                  <b>{{ change_by_id.new }}</b>
+                  <br>
+                  {% endfor %}
+                  {% else %}
+                  -
+                  {% endif %}
+                </td>
+                <td>{{ change.new_record.history_user }}</td>
+              </tr>
+
+              {% endfor %}
+              <tr>
+                <td>{{ note.published_date }}</td>
+                <td>First Created</td>
+                <td>{{ note.author.first_name }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+<script>
+  $(document).ready(function () {
+  });
+</script>
+
+{% endblock javascripts %}
