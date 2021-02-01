@@ -1,7 +1,8 @@
 from django import forms
 from django.utils import timezone
 from django.forms import ModelForm, modelformset_factory, formset_factory
-from .models import Sample
+from .models import Sample, Note
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 class DateTimeInput(forms.DateTimeInput):
     input_type = "datetime-local"
@@ -123,3 +124,12 @@ class ReactivateForm(ModelForm):
 
 #SampleFormSet = modelformset_factory(Sample, fields=('musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments'), extra=2)
 SampleFormSet = formset_factory(SampleForm, extra=1)
+
+class NoteForm(ModelForm):   
+    class Meta:
+        model = Note
+        fields = ['title', 'content', 'sample_tags', 'is_public']
+        widgets = {
+            'content': forms.CharField(widget=CKEditorUploadingWidget())
+        }
+        

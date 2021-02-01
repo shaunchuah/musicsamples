@@ -452,6 +452,7 @@ def export_excel(request):
 ##############################################################################################
 
 from .models import Note
+from .forms import NoteForm
 
 @login_required(login_url="/login/")
 def notes(request):
@@ -465,4 +466,29 @@ def notes(request):
     except EmptyPage:
         notes = paginator.page(paginator.num_pages)
     context = {'notes': notes}
-    return render(request, "notes.html", context)
+    return render(request, "notes/notes-main.html", context)
+
+@login_required(login_url="/login/")
+def note_detail(request, pk):
+    note = get_object_or_404(Note, pk=pk)
+    note_history = note.history.filter(id=pk)
+    changes = historical_changes(note_history)
+    context = {'note': note, 'changes': changes}
+    return render(request, "notes/notes-detail.html", context)
+
+
+@login_required(login_url="/login/")
+def note_add(request):
+    if request.method == "POST":
+        form = NoteForm(request.POST)
+        if form.is_valid():
+            note = form.save(commit=False)
+            note.author = request.user
+            note.save()
+            messages.success(request, 'Note saved successfully.')
+            return redirect('/notes/')
+        else:
+            messages.error(request, 'There are some errors.')
+    else:
+        form = NoteForm()
+    return render(request, "notes/notes-add.html", {'form': form})

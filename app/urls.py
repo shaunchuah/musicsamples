@@ -32,5 +32,7 @@ urlpatterns = [
     path('export_excel_all/', views.export_excel_all, name='export_excel_all'),
     path('export_excel/', views.export_excel, name='export_excel'),
     path('account/', views.account, name='account'),
-    path('notes/', views.notes, name='notes')
+    path('notes/', views.notes, name='notes'),
+    path('notes/<int:pk>/', views.note_detail, name='note_detail'),
+    path('notes/add/', views.note_add, name='new_note'),
 ]
