@@ -30,7 +30,7 @@
       <div class="card">
         <div class="card-header"><h3 class="card-title">Update Sample</h3></div>
         <div class=card-body>
-          <form method="POST">
+          <form method="POST" autocomplete=False>
             {% csrf_token %}
             {% load widget_tweaks %}
             {% for hidden_field in form.hidden_fields %}
@@ -73,16 +73,7 @@
       input.focus();
       input.select();
       $('input#id_sample_location').autocomplete({
-        source: [
-          "QMRI CIR Freezer 10",
-          "QMRI CIR W2.20 Bain Freezer",
-          "QMRI CIR C2.25 Lab",
-          "QMRI CIR E2.26 Lab",
-          "WGH",
-          "WGH CRF",
-          "QEUH Glasgow",
-          "QMRI",
-        ]
+        source: '{% url 'autocomplete_locations' %}'
       });
     });
   </script>
