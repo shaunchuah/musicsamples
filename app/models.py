@@ -8,6 +8,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from simple_history.models import HistoricalRecords
 from ckeditor_uploader.fields import RichTextUploadingField
+from taggit.managers import TaggableManager
 
 # Create your models here.
 class Sample(models.Model):
@@ -46,6 +47,7 @@ class Note(models.Model):
     sample_tags = models.ManyToManyField(Sample, blank=True)
     is_public = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
+    tags = TaggableManager()
 
     author = models.ForeignKey(User, on_delete= models.CASCADE, related_name='notes')
     published_date = models.DateTimeField(auto_now_add=True)

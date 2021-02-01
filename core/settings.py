@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'simple_history',
     'ckeditor_uploader',
     'ckeditor',
+    'taggit',
     'app'  # Enable the inner app 
 ]
 
@@ -174,3 +175,11 @@ SECURE_CONTENT_TYPE_NOSNIFF = config('SECURE_CONTENT_TYPE_NOSNIFF', cast=bool)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/uploads/'
 CKEDITOR_UPLOAD_PATH =  ''
+TAGGIT_CASE_INSENSITIVE = True
+
+CKEDITOR_CONFIGS = {
+    'default': {   
+        'width': '100%',
+        'height': '500px',
+    }
+}

@@ -19,6 +19,9 @@ import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count
 from django.db.models.functions import Trunc
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 @login_required(login_url="/login/")
 def index(request):
@@ -453,6 +456,7 @@ def export_excel(request):
 
 from .models import Note
 from .forms import NoteForm, NoteDeleteForm
+from taggit.models import Tag
 
 @login_required(login_url="/login/")
 def notes(request):
@@ -465,7 +469,9 @@ def notes(request):
         notes = paginator.page(1)
     except EmptyPage:
         notes = paginator.page(paginator.num_pages)
-    context = {'notes': notes, 'page_title': 'Shared Notes'}
+    all_tags = Note.tags.all()
+    users = User.objects.all()
+    context = {'notes': notes, 'page_title': 'Shared Notes', 'all_tags': all_tags, 'users': users}
     return render(request, "notes/notes-main.html", context)
 
 @login_required(login_url="/login/")
@@ -479,7 +485,43 @@ def notes_personal(request):
         notes = paginator.page(1)
     except EmptyPage:
         notes = paginator.page(paginator.num_pages)
-    context = {'notes': notes, 'page_title': 'My Notebook'}
+    all_tags = Note.tags.all()
+    users = User.objects.all()
+    context = {'notes': notes, 'page_title': 'My Notebook', 'all_tags': all_tags, 'users': users}
+    return render(request, "notes/notes-main.html", context)
+
+@login_required(login_url="/login/")
+def note_tags(request, slug):
+    tag = get_object_or_404(Tag, slug=slug)
+    notes = Note.objects.filter(is_public=True).filter(is_deleted=False).filter(tags=tag)
+    page = request.GET.get('page', 1)
+    paginator = Paginator(notes, 10)
+    try:
+        notes = paginator.page(page)
+    except PageNotAnInteger:
+        notes = paginator.page(1)
+    except EmptyPage:
+        notes = paginator.page(paginator.num_pages)
+    all_tags = Note.tags.all()
+    users = User.objects.all()
+    context = {'notes': notes, 'page_title': 'Tag Results: #' + slug, 'all_tags': all_tags, 'users': users}
+    return render(request, "notes/notes-main.html", context)
+
+@login_required(login_url="/login/")
+def note_authors(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    notes = Note.objects.filter(is_public=True).filter(is_deleted=False).filter(author=pk)
+    page = request.GET.get('page', 1)
+    paginator = Paginator(notes, 10)
+    try:
+        notes = paginator.page(page)
+    except PageNotAnInteger:
+        notes = paginator.page(1)
+    except EmptyPage:
+        notes = paginator.page(paginator.num_pages)
+    all_tags = Note.tags.all()
+    users = User.objects.all()
+    context = {'notes': notes, 'page_title': 'Notes by ' + user.first_name + ' ' + user.last_name, 'all_tags': all_tags, 'users': users}
     return render(request, "notes/notes-main.html", context)
 
 @login_required(login_url="/login/")
@@ -499,6 +541,7 @@ def note_add(request):
             note = form.save(commit=False)
             note.author = request.user
             note.save()
+            form.save_m2m()
             messages.success(request, 'Note saved successfully.')
             return redirect('/notes/')
         else:
@@ -529,6 +572,7 @@ def note_delete(request, pk):
         form = NoteDeleteForm(request.POST, instance=note)
         if form.is_valid() and request.user.id == note.author.id:
             form.save()
+            form.save_m2m()
             messages.success(request, 'Note deleted successfully.')
             return redirect('/notes/')
         else:

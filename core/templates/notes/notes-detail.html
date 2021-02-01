@@ -41,7 +41,12 @@
       </div>
       <hr />
       <div class="card-footer">
-        <small>#Tags: |
+        <small>Tags: 
+          {% for tag in note.tags.all %}
+          <a href="{% url 'note_tags' slug=tag %}"><span class="tag badge badge-info">{{tag}}</span></a>
+          {% endfor %}
+          
+          |
           
           Sample Tags:
           {% for sample in note.sample_tags.all %}
