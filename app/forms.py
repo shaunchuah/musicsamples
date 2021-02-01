@@ -132,9 +132,10 @@ class NoteForm(ModelForm):
         fields = ['title', 'content', 'sample_tags', 'tags', 'is_public']
         widgets = {
             'content': forms.CharField(widget=CKEditorUploadingWidget()),
-            #'tags': forms.TextInput(attrs={'data-role': 'tagsinput'})
+            
             'tags': TagWidget(attrs={'data-role': 'tagsinput'}),
-            'is_public': forms.Select(choices=((False, 'Private'), (True, 'Shared')))
+            'is_public': forms.Select(choices=((False, 'Private'), (True, 'Shared'))),
+            #'sample_tags': autocomplete.ModelSelect2('sample_autocomplete'),
         }
         labels = {
             'is_public': "Share settings:",

@@ -457,6 +457,7 @@ def export_excel(request):
 from .models import Note
 from .forms import NoteForm, NoteDeleteForm
 from taggit.models import Tag
+from django.urls import reverse 
 
 @login_required(login_url="/login/")
 def notes(request):
@@ -487,7 +488,7 @@ def notes_personal(request):
         notes = paginator.page(paginator.num_pages)
     all_tags = Note.tags.all()
     users = User.objects.all()
-    context = {'notes': notes, 'page_title': 'My Notebook', 'all_tags': all_tags, 'users': users}
+    context = {'notes': notes, 'page_title': 'My Notebook', 'all_tags': all_tags, 'users': users, 'next_url': reverse('note_personal')}
     return render(request, "notes/notes-main.html", context)
 
 @login_required(login_url="/login/")
@@ -558,7 +559,11 @@ def note_edit(request, pk):
         if form.is_valid() and request.user.id == note.author.id:
             form.save()
             messages.success(request, 'Note updated successfully.')
-            return redirect('/notes/')
+            next_url = request.GET.get('next_url')
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('/notes/')
         else:
             messages.error(request, 'Unable to edit note.')
     else:
@@ -572,11 +577,19 @@ def note_delete(request, pk):
         form = NoteDeleteForm(request.POST, instance=note)
         if form.is_valid() and request.user.id == note.author.id:
             form.save()
-            form.save_m2m()
             messages.success(request, 'Note deleted successfully.')
-            return redirect('/notes/')
+            next_url = request.GET.get('next_url')
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('/notes/')
         else:
             messages.error(request, 'Unable to delete note.')
     else:
         form = NoteDeleteForm(instance=note)
     return render(request, "notes/notes-delete.html", {'form': form, 'note': note})
+
+##############################################################################################
+### AUTOCOMPLETE/AJAX SECTION ################################################################
+##############################################################################################
+
