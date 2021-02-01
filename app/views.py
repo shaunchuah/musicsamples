@@ -592,4 +592,24 @@ def note_delete(request, pk):
 ##############################################################################################
 ### AUTOCOMPLETE/AJAX SECTION ################################################################
 ##############################################################################################
+from django.http import JsonResponse
 
+def autocomplete_locations(request):
+    if 'term' in request.GET:
+        qs = Sample.objects.filter(is_deleted=False).filter(sample_location__istartswith=request.GET.get('term')).values('sample_location').distinct()
+        locations = list()
+        for sample in qs:
+            locations.append(sample['sample_location'])
+        return JsonResponse(locations, safe=False)
+    else:
+        qs = Sample.objects.filter(is_deleted=False).values('sample_location').distinct()
+        for sample in qs:
+            locations.append(sample['sample_location'])
+        return JsonResponse(locations, safe=False)
+
+def autocomplete_tags(request):
+    tag_list = list()
+    tags = Tag.objects.values('name').distinct()
+    for tag in tags:
+        tag_list.append(tag['name'])
+    return JsonResponse(tag_list, safe=False)

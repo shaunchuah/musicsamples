@@ -68,25 +68,12 @@
 {% block javascripts %}
 
   <script>
+    $(document).ready(function () {
     
 
-    $(document).ready(function() {
-      // Javascript method's body can be found in assets/js/demos.js
-      $('input#id_musicsampleid').focus();
-      $('input#id_sample_location').autocomplete({
-        source: [
-          "QMRI CIR Freezer 10",
-          "QMRI CIR W2.20 Bain Freezer",
-          "QMRI CIR C2.25 Lab",
-          "QMRI CIR E2.26 Lab",
-          "WGH",
-          "WGH CRF",
-          "QEUH Glasgow",
-          "QMRI",
-        ]
-      });
 
-    });
+
+  });
   </script>
 
 {% endblock javascripts %}
