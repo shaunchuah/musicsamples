@@ -452,11 +452,11 @@ def export_excel(request):
 ##############################################################################################
 
 from .models import Note
-from .forms import NoteForm
+from .forms import NoteForm, NoteDeleteForm
 
 @login_required(login_url="/login/")
 def notes(request):
-    notes = Note.objects.all().filter(is_public=True)
+    notes = Note.objects.all().filter(is_public=True).filter(is_deleted=False)
     page = request.GET.get('page', 1)
     paginator = Paginator(notes, 10)
     try:
@@ -465,7 +465,21 @@ def notes(request):
         notes = paginator.page(1)
     except EmptyPage:
         notes = paginator.page(paginator.num_pages)
-    context = {'notes': notes}
+    context = {'notes': notes, 'page_title': 'Shared Notes'}
+    return render(request, "notes/notes-main.html", context)
+
+@login_required(login_url="/login/")
+def notes_personal(request):
+    notes = Note.objects.all().filter(is_deleted=False).filter(author=request.user)
+    page = request.GET.get('page', 1)
+    paginator = Paginator(notes, 10)
+    try:
+        notes = paginator.page(page)
+    except PageNotAnInteger:
+        notes = paginator.page(1)
+    except EmptyPage:
+        notes = paginator.page(paginator.num_pages)
+    context = {'notes': notes, 'page_title': 'My Notebook'}
     return render(request, "notes/notes-main.html", context)
 
 @login_required(login_url="/login/")
@@ -492,3 +506,33 @@ def note_add(request):
     else:
         form = NoteForm()
     return render(request, "notes/notes-add.html", {'form': form})
+
+@login_required(login_url="/login/")
+def note_edit(request, pk):
+    note = get_object_or_404(Note, pk=pk)
+    if request.method == "POST":
+        form = NoteForm(request.POST, instance=note)
+        if form.is_valid() and request.user.id == note.author.id:
+            form.save()
+            messages.success(request, 'Note updated successfully.')
+            return redirect('/notes/')
+        else:
+            messages.error(request, 'Unable to edit note.')
+    else:
+        form = NoteForm(instance=note)
+    return render(request, "notes/notes-edit.html", {'form': form, 'note': note})
+
+@login_required(login_url="/login/")
+def note_delete(request, pk):
+    note = get_object_or_404(Note, pk=pk)
+    if request.method == "POST":
+        form = NoteDeleteForm(request.POST, instance=note)
+        if form.is_valid() and request.user.id == note.author.id:
+            form.save()
+            messages.success(request, 'Note deleted successfully.')
+            return redirect('/notes/')
+        else:
+            messages.error(request, 'Unable to delete note.')
+    else:
+        form = NoteDeleteForm(instance=note)
+    return render(request, "notes/notes-delete.html", {'form': form, 'note': note})

@@ -1,0 +1,96 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+{% if form.errors %}
+  {% for field in form %}
+    {% for error in field.errors %}
+<div class="row">
+  <div class="col-xl-9">
+  <div class="alert alert-danger">
+    <button type="button" aria-hidden="true" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="tim-icons icon-simple-remove"></i>
+    </button>
+    <span>{{field.label}}: {{ error|escape }}</span>
+  </div>
+</div>
+</div>
+    {% endfor %} 
+  {% endfor %}
+{% endif %}
+
+<div class="row">
+    <div class="col-xl-9">
+      <h2><i class="tim-icons icon-pencil"></i> Delete Note</h2>
+      <div class="card">
+        <div class=card-body>
+          {% if request.user.id == note.author.id %}
+          <form method="POST">
+            {% csrf_token %}
+            {% load widget_tweaks %}
+            {% for hidden_field in form.hidden_fields %}
+              {{ hidden_field }}
+            {% endfor %}
+
+            {% for field in form.visible_fields %}
+              <div class="form-group">
+                {{ field.label_tag }}
+                {% render_field field class="form-control" %}
+                {% if field.help_text %}
+                  <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+              </div>
+            {% endfor %}
+        
+            {{ form.media }}
+            
+
+            <div class="card-footer">
+              <button type="submit" value="submit" class="btn btn-fill btn-success">Delete</button>
+            </div>
+          </form>
+          {% else %}
+          <p>You cannot edit/delete somebody else's post.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3">
+      
+    </div>
+  </div>
+
+  
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+  <script>
+    
+
+    $(document).ready(function() {
+      // Javascript method's body can be found in assets/js/demos.js
+      $('input#id_musicsampleid').focus();
+      $('input#id_sample_location').autocomplete({
+        source: [
+          "QMRI CIR Freezer 10",
+          "QMRI CIR W2.20 Bain Freezer",
+          "QMRI CIR C2.25 Lab",
+          "QMRI CIR E2.26 Lab",
+          "WGH",
+          "WGH CRF",
+          "QEUH Glasgow",
+          "QMRI",
+        ]
+      });
+
+    });
+  </script>
+
+{% endblock javascripts %}

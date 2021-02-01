@@ -28,17 +28,33 @@
 
 <div class="row">
   <div class="col-md-8">
-    <div class="card">
-      <h3 class="card-header card-title">{{ note.title }}</h3>
-      <div class=card-body>
+    <div class="notes card">
+      <div class="card-header">
+        <h1 class="card-title"><a href="{% url 'note_detail' pk=note.pk %}">{{ note.title }}</a></h1>
+        <h4 class="card-subtitle">{{note.published_date|date:"j F Y" }} | {{ note.author.first_name }} {{ note.author.last_name }} | <a href="mailto:{{ note.author.email }}">{{note.author.email }}</a> </h4>
+      </div>
+      <hr />
+      <div class="card-body">
+        <!--<p>{{ note.content|striptags|slice:":400"}}...<a href="{% url 'note_detail' pk=note.pk %}">View More</a></p>-->
         {{ note.content|safe }}
+        
+      </div>
+      <hr />
+      <div class="card-footer">
+        <small>#Tags: |
+          
+          Sample Tags:
+          {% for sample in note.sample_tags.all %}
+          <a href="{% url 'sample_detail' pk=sample.pk %}">{{ sample }}</a>
+          {% endfor %}
+        </small>
+        {% if request.user.id == note.author.id %}
+        <div class="float-right">
+        <small><a href="{% url 'note_edit' pk=note.pk %}">Edit</a> | <a href="{% url 'note_delete' pk=note.pk %}">Delete</a></small>
+        </div>
+        {% endif %}
       </div>
 
-
-      <!--<div class="card-footer">
-        <a href=" url 'sample_edit' pk=sample.pk ?next={{ request.get_full_path "
-          class="btn btn-fill btn-success">Edit</a>
-      </div>-->
     </div>
   </div>
 

@@ -133,3 +133,8 @@ class NoteForm(ModelForm):
             'content': forms.CharField(widget=CKEditorUploadingWidget())
         }
         
+class NoteDeleteForm(ModelForm):
+    class Meta:
+        model = Note
+        fields = ['is_deleted']
+        labels = { 'is_deleted': "Confirm delete?" }
