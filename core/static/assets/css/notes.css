@@ -20,9 +20,23 @@
 
 .notes .card-subtitle {
     color: rgba(34, 42, 66, 0.705);
+    margin-top: 15px;
 }
 
 .notes p {
     font-size: 1rem;
     font-weight: 400;
 }
+
+.large-tag {
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.tag {
+    font-weight: 400;
+}
+
+.django-ckeditor-widget{
+    width: 100%;
+  }
