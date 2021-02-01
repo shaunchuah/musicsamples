@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'widget_tweaks',
     'simple_history',
+    'ckeditor_uploader',
+    'ckeditor',
     'app'  # Enable the inner app 
 ]
 
@@ -166,3 +168,9 @@ CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', cast=bool)
 SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', cast=int)
 SECURE_BROWSER_XSS_FILTER = config('SECURE_BROWSER_XSS_FILTER', cast=bool)
 SECURE_CONTENT_TYPE_NOSNIFF = config('SECURE_CONTENT_TYPE_NOSNIFF', cast=bool)
+
+##CKEDITOR AND MEDIA UPLOADS
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/uploads/'
+CKEDITOR_UPLOAD_PATH =  ''
