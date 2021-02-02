@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'simple_history',
     'ckeditor_uploader',
     'ckeditor',
-    'taggit',    
+    'taggit',
+    'django_select2',    
     'app'  # Enable the inner app 
 ]
 
