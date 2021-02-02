@@ -41,5 +41,6 @@ urlpatterns = [
     path('notes/tag/<slug>', views.note_tags, name='note_tags'),
     path('notes/authors/<int:pk>', views.note_authors, name='note_authors'),
     path('autocomplete/locations/', views.autocomplete_locations, name='autocomplete_locations'),
-    path('autocomplete/tags/', views.autocomplete_tags, name='autocomplete_tags')
+    path('autocomplete/tags/', views.autocomplete_tags, name='autocomplete_tags'),
+    path('notes/search/', views.search_notes, name='search_notes'),
 ]

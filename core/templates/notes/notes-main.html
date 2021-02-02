@@ -10,7 +10,7 @@
 </div>
 <div class="row">
   <div class="col-md-8">
-
+    {% if notes %}
     {% for note in notes %}
     <div class="row">
       <div class="col">
@@ -30,7 +30,6 @@
           </div>
           <hr />
           <div class="card-body">
-            <!--<p>{{ note.content|striptags|slice:":400"}}...<a href="{% url 'note_detail' pk=note.pk %}">View More</a></p>-->
             {{ note.content|safe }}
             
           </div>
@@ -38,14 +37,14 @@
           <div class="card-footer">
             <small>Tags: 
               {% for tag in note.tags.all %}
-              <a href="{% url 'note_tags' slug=tag %}"><span class="tag badge badge-info">{{tag}}</span></a>
+              <a href="{% url 'note_tags' slug=tag.slug %}"><span class="tag badge badge-info">{{tag.slug}}</span></a>
               {% endfor %}
               
               |
               
               Sample Tags:
               {% for sample in note.sample_tags.all %}
-              <a href="{% url 'sample_detail' pk=sample.pk %}">{{ sample }}</a>
+              <a href="{% url 'sample_detail' pk=sample.pk %}"><span class="tag badge badge-secondary">{{ sample }}</span></a>
               {% endfor %}
             </small>
             {% if request.user.id == note.author.id %}
@@ -61,13 +60,45 @@
       </div>
     </div>
     {% endfor %}
+    {% elif '/notes/search/' in request.path %}
+    <div class="notes card">
+      <div class="card-header">
+        <h1 class="card-title">No search results available.</h1>
+        <h4 class="card-subtitle"></h4>
+      </div>
+      <div class="card-footer"></div>
+
+    </div>
+    {% else %}
+    <div class="notes card">
+      <div class="card-header">
+        <h1 class="card-title">No results available.</h1>
+        <h4 class="card-subtitle">The contents listed under this filter have either been deleted or are private.</h4>
+      </div>
+      <div class="card-footer"></div>
+
+    </div>
+
+    {% endif %}
   </div>
   
   <div class="col-md-4">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Search</h3>
+        <h3 class="card-title">Search Notes</h3>
       </div>
+      
+      <div class="card-body">
+        <form action="/notes/search/" method="GET">
+        <div class="form-group">          
+          <input type="text" class="form-control" name="q" placeholder="Search title, content and sample ID" />
+        </div>
+        <div class="card-footer">
+          <button type="submit" class="btn btn-fill btn-success">Search</button>
+        </div>
+        </form>
+      </div>     
+    
     </div>
 
     <div class="card">
@@ -76,7 +107,7 @@
       </div>
       <div class="card-body">
         {% for tag in all_tags %}
-        <a href="{% url 'note_tags' slug=tag %}"><span class="large-tag badge badge-info">{{tag}}</span></a>
+        <a href="{% url 'note_tags' slug=tag.slug %}"><span class="large-tag badge badge-info">{{tag.slug}}</span></a>
         {% endfor %}
       </div>
     </div>
