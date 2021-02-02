@@ -30,6 +30,13 @@
   <div class="col-md-8">
     <div class="notes card">
       <div class="card-header">
+        <div class="float-right">
+          {% if note.is_public %}
+          <span class="tag badge badge-dark">Shared</span>
+          {% else %}
+          <span class="tag badge badge-light">Private</span>
+          {% endif %}
+        </div>
         <h1 class="card-title"><a href="{% url 'note_detail' pk=note.pk %}">{{ note.title }}</a></h1>
         <h4 class="card-subtitle">{{note.published_date|date:"j F Y" }} | {{ note.author.first_name }} {{ note.author.last_name }} | <a href="mailto:{{ note.author.email }}">{{note.author.email }}</a> </h4>
       </div>
