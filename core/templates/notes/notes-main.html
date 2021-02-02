@@ -2,7 +2,13 @@
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %} {% block content %}
-<h2><i class="tim-icons icon-notes"></i> {{ page_title }}</h2>
+<h2>
+  {% if page_title == 'My Notebook' %} <i class="tim-icons icon-single-02"></i> 
+  {% else %} <i class="tim-icons icon-calendar-60"></i>
+  {% endif %}
+
+  {{ page_title }}
+</h2>
 <div class="row">
   <div class="col mb-4">
     <a href="/notes/add/" class="btn btn-fill btn-success">Add New Note</a>
