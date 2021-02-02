@@ -126,6 +126,17 @@ class ReactivateForm(ModelForm):
 #SampleFormSet = modelformset_factory(Sample, fields=('musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments'), extra=2)
 SampleFormSet = formset_factory(SampleForm, extra=1)
 
+########################################################################################################################################################
+######  NOTEFORMS  #####################################################################################################################################
+########################################################################################################################################################
+####SELECT2#####
+
+from django_select2 import forms as s2forms
+
+
+    
+
+
 class NoteForm(ModelForm):   
     class Meta:
         model = Note
@@ -135,7 +146,7 @@ class NoteForm(ModelForm):
             
             'tags': TagWidget(attrs={'data-role': 'tagsinput'}),
             'is_public': forms.Select(choices=((False, 'Private'), (True, 'Shared'))),
-            #'sample_tags': autocomplete.ModelSelect2('sample_autocomplete'),
+            'sample_tags': s2forms.ModelSelect2MultipleWidget(model=Sample, search_fields=['musicsampleid__icontains']),
         }
         labels = {
             'is_public': "Share settings:",
@@ -147,3 +158,5 @@ class NoteDeleteForm(ModelForm):
         model = Note
         fields = ['is_deleted']
         labels = { 'is_deleted': "Confirm delete?" }
+
+
