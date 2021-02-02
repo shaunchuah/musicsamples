@@ -144,6 +144,8 @@ def sample_detail(request, pk):
     sample_history = sample.history.filter(id=pk)
     changes = historical_changes(sample_history)
     first_change = sample_history.first()
+    related_notes = sample.note_set.filter(is_public=True)
+    private_notes = sample.note_set.filter(is_public=False).filter(author=request.user)
     if sample.patientid[0:3] == "GID":
         gid_id = int(sample.patientid.split("-")[1])
     else:
@@ -152,7 +154,7 @@ def sample_detail(request, pk):
     if sample.processing_datetime != None:
         time_difference = sample.processing_datetime - sample.sample_datetime
         processing_time = int(time_difference.total_seconds() / 60)
-    return render(request, "sample-detail.html", {'sample': sample, 'changes': changes, 'first': first_change, 'processing_time': processing_time, 'gid_id': gid_id})
+    return render(request, "sample-detail.html", {'sample': sample, 'changes': changes, 'first': first_change, 'processing_time': processing_time, 'gid_id': gid_id, 'related_notes': related_notes, 'private_notes': private_notes})
     
 @login_required(login_url="/login/")
 def sample_edit(request, pk):
@@ -530,9 +532,17 @@ def note_authors(request, pk):
 @login_required(login_url="/login/")
 def note_detail(request, pk):
     note = get_object_or_404(Note, pk=pk)
+    if note.is_public == True:
+        secured_note = note
+    else:
+        if request.user.id == note.author.id:
+            secured_note = note
+        else:
+            messages.error(request, 'This note is private. Access denied')
+            return redirect('/notes/personal')
     note_history = note.history.filter(id=pk)
     changes = historical_changes(note_history)
-    context = {'note': note, 'changes': changes}
+    context = {'note': secured_note, 'changes': changes}
     return render(request, "notes/notes-detail.html", context)
 
 
