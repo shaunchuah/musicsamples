@@ -2,8 +2,7 @@ from django import forms
 from django.utils import timezone
 from django.forms import ModelForm, modelformset_factory, formset_factory
 from .models import Sample, Note
-from ckeditor_uploader.widgets import CKEditorUploadingWidget
-from taggit.forms import TagWidget
+
 
 class DateTimeInput(forms.DateTimeInput):
     input_type = "datetime-local"
@@ -131,10 +130,10 @@ SampleFormSet = formset_factory(SampleForm, extra=1)
 ########################################################################################################################################################
 ####SELECT2#####
 
-from django_select2 import forms as s2forms
-
-
-    
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
+from taggit.forms import TagWidget
+from taggit.models import Tag
+from django_select2.forms import ModelSelect2TagWidget, ModelSelect2MultipleWidget
 
 
 class NoteForm(ModelForm):   
@@ -143,10 +142,10 @@ class NoteForm(ModelForm):
         fields = ['title', 'content', 'sample_tags', 'tags', 'is_public']
         widgets = {
             'content': forms.CharField(widget=CKEditorUploadingWidget()),
-            
             'tags': TagWidget(attrs={'data-role': 'tagsinput'}),
+            
             'is_public': forms.Select(choices=((False, 'Private'), (True, 'Shared'))),
-            'sample_tags': s2forms.ModelSelect2MultipleWidget(model=Sample, search_fields=['musicsampleid__icontains']),
+            'sample_tags': ModelSelect2MultipleWidget(model=Sample, search_fields=['musicsampleid__icontains']),
         }
         labels = {
             'is_public': "Share settings:",
