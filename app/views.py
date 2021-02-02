@@ -494,7 +494,9 @@ def notes_personal(request):
 @login_required(login_url="/login/")
 def note_tags(request, slug):
     tag = get_object_or_404(Tag, slug=slug)
-    notes = Note.objects.filter(is_public=True).filter(is_deleted=False).filter(tags=tag)
+    public_notes = Note.objects.filter(is_public=True).filter(is_deleted=False).filter(tags=tag)
+    private_notes = Note.objects.filter(is_public=False).filter(is_deleted=False).filter(author__id=request.user.id).filter(tags=tag)
+    notes = public_notes | private_notes
     page = request.GET.get('page', 1)
     paginator = Paginator(notes, 10)
     try:
@@ -588,6 +590,22 @@ def note_delete(request, pk):
     else:
         form = NoteDeleteForm(instance=note)
     return render(request, "notes/notes-delete.html", {'form': form, 'note': note})
+
+@login_required(login_url="/login/")
+def search_notes(request):
+    all_tags = Note.tags.all()
+    users = User.objects.all()
+    query_string=''
+    if ('q' in request.GET) and request.GET['q'].strip():
+        query_string = request.GET.get('q')
+        notes = Note.objects.filter(Q(title__icontains=query_string)|Q(sample_tags__musicsampleid__icontains=query_string)|Q(content__icontains=query_string)).filter(is_deleted=False)       
+        context = {'notes': notes, 'page_title': 'Search Results for: ' + query_string, 'all_tags': all_tags, 'users': users}
+        return render(request, 'notes/notes-main.html', context)
+    else:
+        notes = None
+        context = {'notes': notes, 'page_title': 'Search Results for: ' + query_string, 'all_tags': all_tags, 'users': users}
+        return render(request, 'notes/notes-main.html', context)
+
 
 ##############################################################################################
 ### AUTOCOMPLETE/AJAX SECTION ################################################################
