@@ -75,6 +75,9 @@
       $('input#id_sample_location').autocomplete({
         source: '{% url 'autocomplete_locations' %}'
       });
+      $('input#id_patientid').autocomplete({
+        source: '{% url 'autocomplete_patients' %}'
+      });
 
     });
   </script>

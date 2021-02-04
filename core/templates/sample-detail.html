@@ -129,6 +129,22 @@
                       {% else %}
                       {{ sample.haemolysis_reference }} mg/dL
                       {% endif %}</td>
+                  </tr>
+                  <tr>
+                    <td>Biopsy Location</td>
+                    <td>{% if sample.biopsy_location is None %}
+                      N/A
+                      {% else %}
+                      {{ sample.biopsy_location }}
+                      {% endif %}</td>
+                  </tr>
+                  <tr>
+                    <td>Biopsy Inflamed Status</td>
+                    <td>{% if sample.biopsy_inflamed_status is None %}
+                      N/A
+                      {% else %}
+                      {{ sample.biopsy_inflamed_status }}
+                      {% endif %}</td>
                   </tr>                  
                 </tbody>
               </table>
