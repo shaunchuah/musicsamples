@@ -655,3 +655,23 @@ def autocomplete_tags(request):
     for tag in tags:
         tag_list.append(tag['name'])
     return JsonResponse(tag_list, safe=False)
+
+
+##############################################################################################
+### REST FRAMEWORK/BARCODE APIS ##############################################################
+##############################################################################################
+
+
+from rest_framework import viewsets, filters, permissions
+from .serializers import SampleSerializer
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+class SampleViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows samples to be viewed and edited
+    """
+    queryset = Sample.objects.filter(is_deleted=False)
+    serializer_class = SampleSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'musicsampleid'
