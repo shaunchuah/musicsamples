@@ -1,11 +1,11 @@
-# -*- encoding: utf-8 -*-
-"""
-License: MIT
-Copyright (c) 2019 - present AppSeed.us
-"""
-
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from app import views
+from rest_framework import routers, serializers, viewsets
+from .views import SampleViewSet
+
+router = routers.DefaultRouter()
+router.register(r'samples', SampleViewSet)
+
 
 urlpatterns = [
     # Matches any html file 
@@ -44,4 +44,5 @@ urlpatterns = [
     path('autocomplete/patients/', views.autocomplete_patient_id, name='autocomplete_patients'),
     path('autocomplete/tags/', views.autocomplete_tags, name='autocomplete_tags'),
     path('notes/search/', views.search_notes, name='search_notes'),
+    path('api/', include(router.urls)),
 ]
