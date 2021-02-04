@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'ckeditor',
     'taggit',
-    'django_select2',    
+    'django_select2', 
+    'rest_framework',   
     'app'  # Enable the inner app 
 ]
 
@@ -192,4 +193,11 @@ CKEDITOR_CONFIGS = {
             ['Source', 'Print'],
         ],
     }
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }

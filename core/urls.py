@@ -15,6 +15,7 @@ urlpatterns = [
     path('', include("app.urls")),
     path('uploads/', include('ckeditor_uploader.urls')),
     path('select2/', include('django_select2.urls')),
+    path('api-auth/', include('rest_framework.urls')),
 ]
 
 if settings.DEBUG:
