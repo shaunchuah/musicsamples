@@ -45,4 +45,5 @@ urlpatterns = [
     path('autocomplete/tags/', views.autocomplete_tags, name='autocomplete_tags'),
     path('notes/search/', views.search_notes, name='search_notes'),
     path('api/', include(router.urls)),
+    path('barcode/', views.barcode, name='barcode'),
 ]

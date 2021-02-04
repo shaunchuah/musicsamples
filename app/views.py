@@ -649,6 +649,7 @@ def autocomplete_patient_id(request):
             patients.append(sample['patientid'])
         return JsonResponse(patients, safe=False)
 
+@login_required(login_url="/login/")
 def autocomplete_tags(request):
     tag_list = list()
     tags = Tag.objects.values('name').distinct()
@@ -675,3 +676,7 @@ class SampleViewSet(viewsets.ModelViewSet):
     serializer_class = SampleSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'musicsampleid'
+
+@login_required(login_url="/login/")
+def barcode(request):
+    return render(request, "barcode.html")
