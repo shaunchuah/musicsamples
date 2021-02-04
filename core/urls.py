@@ -15,4 +15,7 @@ urlpatterns = [
     path('', include("app.urls")),
     path('uploads/', include('ckeditor_uploader.urls')),
     path('select2/', include('django_select2.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
