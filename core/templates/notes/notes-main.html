@@ -30,7 +30,7 @@
               {% endif %}
             </div>
             <h1 class="card-title"><a href="{% url 'note_detail' pk=note.pk %}">{{ note.title }}</a></h1>
-            <h4 class="card-subtitle">{{note.published_date|date:"j F Y" }} | {{ note.author.first_name }} {{ note.author.last_name }} | <a href="mailto:{{ note.author.email }}">{{note.author.email }}</a> </h4>
+            <h4 class="card-subtitle">{{note.published_date|date:"j F Y" }} | {{ note.author.first_name }} {{ note.author.last_name }} | <a target="_blank" rel="noopener noreferrer" href="mailto:{{ note.author.email }}">{{note.author.email }}</a> </h4>
           
             
           </div>
