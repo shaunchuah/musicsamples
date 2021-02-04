@@ -47,7 +47,7 @@ class Note(models.Model):
     sample_tags = models.ManyToManyField(Sample, blank=True)
     is_public = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
 
     author = models.ForeignKey(User, on_delete= models.CASCADE, related_name='notes')
     published_date = models.DateTimeField(auto_now_add=True)
