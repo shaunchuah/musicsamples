@@ -182,5 +182,14 @@ CKEDITOR_CONFIGS = {
     'default': {   
         'width': '100%',
         'height': '500px',
+        'toolbar': [
+            ['Format', 'FontSize'],
+            [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript',],
+            [ 'NumberedList', 'BulletedList', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-',],
+            [ 'Link', 'Unlink',],
+            [ 'Image', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar'],
+            ['Undo', 'Redo'],
+            ['Source', 'Print'],
+        ],
     }
 }
