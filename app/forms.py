@@ -43,7 +43,7 @@ class SampleForm(ModelForm):
             ('Left colon', 'Left colon'),
         )
         BIOPSY_INFLAMED_STATUS_CHOICES = (
-            ('', ''),
+            ('', 'Select inflamed status'),
             ('inflamed', 'Inflamed'),
             ('uninflamed', 'Uninflamed'),
         )

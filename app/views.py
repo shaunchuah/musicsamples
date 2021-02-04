@@ -1,9 +1,3 @@
-# -*- encoding: utf-8 -*-
-"""
-License: MIT
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template import loader
@@ -335,7 +329,7 @@ def export_excel_all(request):
     worksheet.title = 'All Samples'
 
     #Define the excel column names
-    columns = ['Sample ID', 'Patient ID', 'Sample Location', 'Sample Sublocation', 'Sample Type', 'Sampling Datetime', 'Processing Datetime', 'Sampling to Processing Time (mins)','Sample Volume', 'Sample Volume Units', 'Freeze Thaw Count', 'Haemolysis Reference Category (100 and above unusable)', 'Sample Comments', 'Sample Fully Used?', 'Created By', 'Date Created', 'Last Modified By', 'Last Modified']
+    columns = ['Sample ID', 'Patient ID', 'Sample Location', 'Sample Sublocation', 'Sample Type', 'Sampling Datetime', 'Processing Datetime', 'Sampling to Processing Time (mins)','Sample Volume', 'Sample Volume Units', 'Freeze Thaw Count', 'Haemolysis Reference Category (100 and above unusable)', 'Biopsy Location', 'Biopsy Inflamed Status', 'Sample Comments', 'Sample Fully Used?', 'Created By', 'Date Created', 'Last Modified By', 'Last Modified']
     row_num = 1
 
     #Write the column names in
@@ -366,6 +360,8 @@ def export_excel_all(request):
             sample.sample_volume_units,
             sample.freeze_thaw_count,
             sample.haemolysis_reference,
+            sample.biopsy_location,
+            sample.biopsy_inflamed_status,
             sample.sample_comments,
             sample.is_fully_used,
             sample.created_by,
@@ -405,7 +401,7 @@ def export_excel(request):
     worksheet.title = 'All Samples'
 
     #Define the excel column names
-    columns = ['Sample ID', 'Patient ID', 'Sample Location', 'Sample Sublocation', 'Sample Type', 'Sampling Datetime', 'Processing Datetime', 'Sampling to Processing Time (mins)','Sample Volume', 'Sample Volume Units', 'Freeze Thaw Count', 'Haemolysis Reference Category (100 and above unusable)', 'Sample Comments', 'Sample Fully Used?', 'Created By', 'Date Created', 'Last Modified By', 'Last Modified']
+    columns = ['Sample ID', 'Patient ID', 'Sample Location', 'Sample Sublocation', 'Sample Type', 'Sampling Datetime', 'Processing Datetime', 'Sampling to Processing Time (mins)','Sample Volume', 'Sample Volume Units', 'Freeze Thaw Count', 'Haemolysis Reference Category (100 and above unusable)', 'Biopsy Location', 'Biopsy Inflamed Status', 'Sample Comments', 'Sample Fully Used?', 'Created By', 'Date Created', 'Last Modified By', 'Last Modified']
     row_num = 1
 
     #Write the column names in
@@ -436,6 +432,8 @@ def export_excel(request):
             sample.sample_volume_units,
             sample.freeze_thaw_count,
             sample.haemolysis_reference,
+            sample.biopsy_location,
+            sample.biopsy_inflamed_status,
             sample.sample_comments,
             sample.is_fully_used,
             sample.created_by,
@@ -622,6 +620,7 @@ def search_notes(request):
 ##############################################################################################
 from django.http import JsonResponse
 
+@login_required(login_url="/login/")
 def autocomplete_locations(request):
     if 'term' in request.GET:
         qs = Sample.objects.filter(is_deleted=False).filter(sample_location__istartswith=request.GET.get('term')).values('sample_location').distinct()
@@ -634,6 +633,21 @@ def autocomplete_locations(request):
         for sample in qs:
             locations.append(sample['sample_location'])
         return JsonResponse(locations, safe=False)
+
+@login_required(login_url="/login/")
+def autocomplete_patient_id(request):
+    if 'term' in request.GET:
+        qs = Sample.objects.filter(is_deleted=False).filter(patientid__istartswith=request.GET.get('term')).values('patientid').distinct()
+        patients = list()
+        for sample in qs:
+            patients.append(sample['patientid'])
+        return JsonResponse(patients, safe=False)
+    else:
+        qs = Sample.objects.filter(is_deleted=False).values('patientid').distinct()
+        patients = list()
+        for sample in qs:
+            patients.append(sample['patientid'])
+        return JsonResponse(patients, safe=False)
 
 def autocomplete_tags(request):
     tag_list = list()
