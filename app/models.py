@@ -27,7 +27,9 @@ class Sample(models.Model):
     sample_sublocation = models.CharField(max_length=200, blank=True, null=True)
     is_fully_used = models.BooleanField(default=False)
 
-    haemolysis_reference = models.CharField(max_length=200, blank=True, null=True)    
+    haemolysis_reference = models.CharField(max_length=200, blank=True, null=True)
+    biopsy_location = models.CharField(max_length=100, blank=True, null=True)
+    biopsy_inflamed_status = models.CharField(max_length=100, blank=True, null=True)    
     
     created_by = models.CharField(max_length=200)
     last_modified_by = models.CharField(max_length=200)

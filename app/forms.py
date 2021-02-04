@@ -19,7 +19,7 @@ class SampleForm(ModelForm):
     sample_datetime = forms.DateTimeField(label="Sample Created Datetime*", widget=DateTimeInput(), initial=currentTime)
     class Meta:
         model = Sample
-        fields = ['musicsampleid', 'sample_location', 'patientid', 'sample_type', 'sample_datetime', 'sample_comments', 'processing_datetime', 'sample_sublocation', 'sample_volume', 'sample_volume_units', 'freeze_thaw_count', 'haemolysis_reference', ]
+        fields = ['musicsampleid', 'sample_location', 'patientid', 'sample_type', 'sample_datetime', 'sample_comments', 'processing_datetime', 'sample_sublocation', 'sample_volume', 'sample_volume_units', 'freeze_thaw_count', 'haemolysis_reference', 'biopsy_location', 'biopsy_inflamed_status']
         HAEMOLYSIS_REFERENCE_CHOICES = (
             ('', 'Select category'),
             ('0', 'Minimal'),
@@ -29,6 +29,23 @@ class SampleForm(ModelForm):
             ('250', '250 mg/dL (unusable)'),
             ('500', '500 mg/dL (unusable)'),
             ('1000', '1000 mg/dL (unusable)'),
+        )
+        BIOPSY_LOCATION_CHOICES = (
+            ('', 'Select biopsy location'),
+            ('Terminal ileum', 'Terminal ileum'),
+            ('Caecum', 'Caecum'),
+            ('Ascending colon', 'Ascending colon'),
+            ('Transverse colon', 'Transverse colon'),
+            ('Descending colon', 'Descending colon'),
+            ('Sigmoid colon', 'Sigmoid colon'),
+            ('Rectum', 'Rectum'),
+            ('Right colon', 'Right colon'),
+            ('Left colon', 'Left colon'),
+        )
+        BIOPSY_INFLAMED_STATUS_CHOICES = (
+            ('', ''),
+            ('inflamed', 'Inflamed'),
+            ('uninflamed', 'Uninflamed'),
         )
         SAMPLE_VOLUME_UNIT_CHOICES = (
             ('', 'Select unit'),
@@ -77,6 +94,8 @@ class SampleForm(ModelForm):
             'sample_volume_units': forms.Select(choices=SAMPLE_VOLUME_UNIT_CHOICES, attrs={'class': 'form-control'}),
             'processing_datetime': DateTimeInput(),
             'haemolysis_reference': forms.Select(choices=HAEMOLYSIS_REFERENCE_CHOICES),
+            'biopsy_location': forms.Select(choices=BIOPSY_LOCATION_CHOICES),
+            'biopsy_inflamed_status': forms.Select(choices=BIOPSY_INFLAMED_STATUS_CHOICES),
         }
         labels = {
             'musicsampleid': "Sample ID*",
@@ -89,7 +108,9 @@ class SampleForm(ModelForm):
             'sample_volume': "Volume Remaining (est.)",
             'sample_volume_units': "Sample Volume Units",
             'freeze_thaw_count': "No. of Freeze-Thaw Cycles",
-            'haemolysis_reference': "Haemolysis Reference Palette"
+            'haemolysis_reference': "Haemolysis Reference Palette",
+            'biopsy_location': "Biopsy Location",
+            'biopsy_inflamed_status': "Biopsy Inflamed Status",
         }
 
 class CheckoutForm(ModelForm):
