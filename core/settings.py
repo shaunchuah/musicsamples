@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'ckeditor',
     'taggit',
     'django_select2', 
-    'rest_framework',   
+    'rest_framework',
+    'storages',   
     'app'  # Enable the inner app 
 ]
 
@@ -172,10 +173,8 @@ SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', cast=int)
 SECURE_BROWSER_XSS_FILTER = config('SECURE_BROWSER_XSS_FILTER', cast=bool)
 SECURE_CONTENT_TYPE_NOSNIFF = config('SECURE_CONTENT_TYPE_NOSNIFF', cast=bool)
 
-##CKEDITOR AND MEDIA UPLOADS
+##CKEDITOR CONFIG
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/uploads/'
 CKEDITOR_UPLOAD_PATH =  ''
 TAGGIT_CASE_INSENSITIVE = True
 
@@ -201,3 +200,19 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
+
+
+## MEDIA UPLOADS USING S3
+
+if config('USE_S3', cast=bool) == True:
+    AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+    AWS_DEFAULT_ACL = None
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.eu-west-2.amazonaws.com'
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+    PUBLIC_MEDIA_LOCATION = 'media'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
+    DEFAULT_FILE_STORAGE = 'core.storage_backends.PublicMediaStorage'
+    AWS_QUERYSTRING_AUTH = False
+else:
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    MEDIA_URL = '/uploads/'
