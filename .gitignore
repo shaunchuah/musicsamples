@@ -23,6 +23,7 @@ package-lock.json
 
 staticfiles/*
 !staticfiles/.gitkeep 
+media/*
 
 .env
 .env.dev
