@@ -46,6 +46,7 @@ class SampleForm(ModelForm):
             ('', 'Select inflamed status'),
             ('inflamed', 'Inflamed'),
             ('uninflamed', 'Uninflamed'),
+            ('healthy', 'Healthy'),
         )
         SAMPLE_VOLUME_UNIT_CHOICES = (
             ('', 'Select unit'),
