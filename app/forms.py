@@ -144,8 +144,6 @@ class ReactivateForm(ModelForm):
         fields = ['is_fully_used']
         labels = { 'is_fully_used': "Uncheck to reactivate" }
 
-#SampleFormSet = modelformset_factory(Sample, fields=('musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments'), extra=2)
-SampleFormSet = formset_factory(SampleForm, extra=1)
 
 ########################################################################################################################################################
 ######  NOTEFORMS  #####################################################################################################################################
