@@ -2,6 +2,10 @@
 
 Open source lab sample inventory tracking system and electronic lab notebook created with Django (Python web framework) to support clinical research in Scotland.
 
+## Goals
+
+Help lab researchers improve time to discovery and reduce time spent on logistics by providing tooling to manage a large amount of samples
+
 <!-- TABLE OF CONTENTS -->
 <details open="open">
   <summary><h2 style="display: inline-block">Table of Contents</h2></summary>
@@ -19,6 +23,7 @@ Open source lab sample inventory tracking system and electronic lab notebook cre
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
+    <li><a href="#deployment">Deployment</a></li>
     <li><a href="#usage">Usage</a></li>
     <!--<li><a href="#roadmap">Roadmap</a></li>-->
     <li><a href="#customisation">Customisation</a></li>
@@ -59,9 +64,7 @@ This requires a level of comfort and familiarity with python/django/linux/postgr
 ### Prerequisites
 
 * Python > 3.7.2
-  ```sh
-  npm install npm@latest -g
-  ```
+* Pip
 
 ### Installation
 
@@ -72,13 +75,14 @@ This requires a level of comfort and familiarity with python/django/linux/postgr
 2. Django setup
    ```sh
    pip install -r requirements.txt
-   python manage.py makemigrations
    python manage.py migrate
    python manage.py createsuperuser
    python manage.py runserver
    ```
 
-### Suggested Production Configuration
+## Deployment
+
+Suggested production deployment:
 
 1. Ubuntu VPS instance (DigitalOcean, Linode, Lightsail etc. many options)
 2. Install python, postgres and django into your VPS and set it up (alternatively managed database services might make life simpler)
@@ -91,15 +95,10 @@ This requires a level of comfort and familiarity with python/django/linux/postgr
     python manage.py migrate
     python manage.py collectstatic
     ```
-6. Start up all of the above
+6. **Edit .env file to a production configuration**
+7. Start up the whole stack
 
-## Project Architecture Overview
 
-* app: main application logic
-* authentication: all authentication handling/views here
-* core: settings.py and templates/css/js lives here
-* media: local media folder for development
-* staticfiles: local staticfiles folder
 
 
 
@@ -109,13 +108,27 @@ This requires a level of comfort and familiarity with python/django/linux/postgr
 Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
 
+
 <!-- Customisation -->
 ## Customisation
+
+### Project Architecture Overview
+
+* app: main application logic
+* authentication: all authentication handling/views here
+* core: settings.py and templates/css/js lives here
+* media: local media folder for development
+* staticfiles: local staticfiles folder
+
+### Customisation Tips 
 
 Here are some tips for customising this to suit your workflow:
 * The main logic sits in the app folder
 * Modify the main model in app/models.py - add fields that you want to QC on - think of it like an excel spreadsheet with column headers that you specify here
-* If you do alter the model - alter 1. SampleForm in app/forms.py and 2. export_excel function in views.py
+* If you do alter the model - you may wish to alter: 
+1. SampleForm in app/forms.py
+2. export_excel function in views.py
+3. sample-detail.html in core/templates
 * Dropdown select fields are configured in app/forms.py
 * Most of the view logic is in app/views.py. I have written this mostly in function based views to make it explicit and easy to identify where you wish to alter the workflow rather than class based views. I appreciated this means the views.py file is more verbose but hopefully this helps you customise this to fit what you're trying to achieve.
 * The templates are found in core/templates. Most functions are using a single template for a single view so you can customise particular aspects as you desire
@@ -138,7 +151,17 @@ Contributions are what make the open source community such an amazing place to b
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+### Possible areas of development
 
+1. Make deployment easier for beginners/non-technical users - perhaps Docker? (I'm afraid I don't have time to learn that)
+2. Improving testing coverage
+3. Perhaps simplifying the dependency list
+4. Improving the note writing interface
+5. Clean up CSS and javascript static files while allowing easy customisation
+
+## Code of Conduct
+
+Code of conduct available [here].(docs/code_of_conduct.md) taken from [https://www.contributor-covenant.org/](https://www.contributor-covenant.org/).
 
 <!-- LICENSE -->
 ## License
@@ -203,7 +226,7 @@ Project Link: [https://github.com/shaunchuah/sampletrek](https://github.com/shau
 
 ## Disclaimer
 
-This was written over 2-3 weeks with the aim of rapid deployment so there are imperfections eg no unit testing. Testing was done in real life as this was not mission critical and a degree of failure can be tolerated and fixed.
+This was written over 2-3 weeks with the aim of rapid deployment so there are imperfections eg no unit testing. Testing was done in real life as this was not mission critical and a degree of failure could be tolerated and fixed.
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
