@@ -99,6 +99,8 @@ Suggested production deployment:
     ```
 6. **Edit .env file to a production configuration**
 7. Start up the whole stack and it should hopefully be working!
+8. Now that it's working - setup SSL encryption on your server using letsencrypt
+9. Harden your production .env file
 
 
 
@@ -208,6 +210,7 @@ SOFTWARE.
 * [Django Simple History](https://django-simple-history.readthedocs.io/en/latest/)
 * [Django Widget Tweaks](https://pypi.org/project/django-widget-tweaks/)
 * [Open Pyxl](https://openpyxl.readthedocs.io/en/stable/)
+* [D3.js](https://d3js.org/)
 
 <!-- CONTACT -->
 ## Author

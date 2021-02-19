@@ -1,12 +1,3 @@
-# -*- encoding: utf-8 -*-
-"""
-License: MIT
-Copyright (c) 2019 - present AppSeed.us
-"""
-
-from django.shortcuts import render
-
-# Create your views here.
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
@@ -36,27 +27,28 @@ def login_view(request):
 
     return render(request, "accounts/login.html", {"form": form, "msg" : msg})
 
-def register_user(request):
+# Public access to registration is disabled. Uncomment to re-enable - you will need to activate the registration url in authentication/urls.py
+# def register_user(request):
 
-    msg     = None
-    success = False
+#     msg     = None
+#     success = False
 
-    if request.method == "POST":
-        form = SignUpForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get("username")
-            raw_password = form.cleaned_data.get("password1")
-            user = authenticate(username=username, password=raw_password)
+#     if request.method == "POST":
+#         form = SignUpForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             username = form.cleaned_data.get("username")
+#             raw_password = form.cleaned_data.get("password1")
+#             user = authenticate(username=username, password=raw_password)
 
-            msg     = 'User created.'
-            success = True
+#             msg     = 'User created.'
+#             success = True
             
-            #return redirect("/login/")
+#             return redirect("/login/")
 
-        else:
-            msg = 'Form is not valid'    
-    else:
-        form = SignUpForm()
+#         else:
+#             msg = 'Form is not valid'    
+#     else:
+#         form = SignUpForm()
 
-    return render(request, "accounts/register.html", {"form": form, "msg" : msg, "success" : success })
+#     return render(request, "accounts/register.html", {"form": form, "msg" : msg, "success" : success })
