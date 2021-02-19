@@ -21,6 +21,7 @@ Open source lab sample inventory tracking system and electronic lab notebook cre
     </li>
     <li><a href="#usage">Usage</a></li>
     <!--<li><a href="#roadmap">Roadmap</a></li>-->
+    <li><a href="#customisation">Customisation</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -33,7 +34,7 @@ Open source lab sample inventory tracking system and electronic lab notebook cre
 ## About The Project
 
 ### Tracking of 30,000 research samples across multiple sites and labs
-SampleTrek was developed to solve the problem of tracking 30,000 research samples across multiple study sites with multiple laboratory endpoints. In our use we deployed it on a single droplet/virtual private server hosted by DigitalOcean and used Amazon Web Services for handling email and database backups. Code was deployed using github and this allowed rapid deployment of new features as the need arose.
+SampleTrek was developed to solve the problem of tracking 30,000 research samples across multiple study sites with multiple laboratory endpoints. In our use we deployed it on a single droplet/virtual private server hosted by DigitalOcean and used Amazon Web Services for handling email and database backups. Code was deployed using github and this allowed rapid deployment of new features as the need arose. Check out the study here: [MUSIC IBD Study](https://www.musicstudy.uk)
 
 ### QR code labelling
 Cryogenic QR code labels were bulk printed from a label printing company and research samples were tagged at the point of collection and registered onto SampleTrek. At specified receiving entrypoints to various lab workflows the samples were scanned in bulk to update their location (alternatively a status could be set into the location).
@@ -108,7 +109,16 @@ This requires a level of comfort and familiarity with python/django/linux/postgr
 Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
 
+<!-- Customisation -->
+## Customisation
 
+Here are some tips for customising this to suit your workflow:
+* The main logic sits in the app folder
+* Modify the main model in app/models.py - add fields that you want to QC on - think of it like an excel spreadsheet with column headers that you specify here
+* If you do alter the model - alter 1. SampleForm in app/forms.py and 2. export_excel function in views.py
+* Dropdown select fields are configured in app/forms.py
+* Most of the view logic is in app/views.py. I have written this mostly in function based views to make it explicit and easy to identify where you wish to alter the workflow rather than class based views. I appreciated this means the views.py file is more verbose but hopefully this helps you customise this to fit what you're trying to achieve.
+* The templates are found in core/templates. Most functions are using a single template for a single view so you can customise particular aspects as you desire
 
 <!-- ROADMAP 
 ## Roadmap
