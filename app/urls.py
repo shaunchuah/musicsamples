@@ -6,12 +6,10 @@ from .views import SampleViewSet
 router = routers.DefaultRouter()
 router.register(r'samples', SampleViewSet)
 
-
 urlpatterns = [
     # Matches any html file 
     re_path(r'^.*\.html', views.pages, name='pages'),
 
-    # The home page
     path('', views.index, name='home'),
     path('analytics/', views.analytics, name='analytics'),
     path('analytics/gid_overview', views.gid_overview, name='gid_overview'),

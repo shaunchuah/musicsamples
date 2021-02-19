@@ -1,21 +1,15 @@
-# -*- encoding: utf-8 -*-
-"""
-License: MIT
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 from django.urls import path, include
-from .views import login_view, register_user
+from .views import login_view #, register_user
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth import views as auth_views
 
 #sentry debug intentional error
-def trigger_error(request):
-    division_by_zero = 1/0
+#def trigger_error(request):
+#    division_by_zero = 1/0
 
 urlpatterns = [
     path('login/', login_view, name="login"),
-    #path('register/', register_user, name="register"),
+    #path('register/', register_user, name="register"), Accounts are provisioned by the superuser through the django admin interface
     path('logout/', LogoutView.as_view(), name="logout"),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='accounts/password_reset_done.html'), name='password_reset_done'),
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name="accounts/password_reset_confirm.html"), name='password_reset_confirm'),
