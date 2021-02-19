@@ -29,30 +29,31 @@ Open source lab sample inventory tracking system and electronic lab notebook cre
   </ol>
 </details>
 
-
-
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
+### Tracking of 30,000 research samples across multiple sites and labs
 SampleTrek was developed to solve the problem of tracking 30,000 research samples across multiple study sites with multiple laboratory endpoints. In our use we deployed it on a single droplet/virtual private server hosted by DigitalOcean and used Amazon Web Services for handling email and database backups. Code was deployed using github and this allowed rapid deployment of new features as the need arose.
 
+### QR code labelling
 Cryogenic QR code labels were bulk printed from a label printing company and research samples were tagged at the point of collection and registered onto SampleTrek. At specified receiving entrypoints to various lab workflows the samples were scanned in bulk to update their location (alternatively a status could be set into the location).
 
+### Electronic lab notebook with sample tagging
 A mini electronic lab notebook was created which allows tagging of samples used in order for collaboration and to allow easy finding of relevant data pertaining to experiments carried out on the samples.
-
-This does require a level of comfort and familiarity with python/django/linux/postgres web deployment. You could consider hiring a django full stack developer to help. Certainly our team had a hard look at available commercial LIMS systems and due to various reasons they were not suitable (data not located in UK, pricey, hard to customise and adapt to changing experimental workflows).
 
 
 ### Built With
 
-* [Django]()
-* [Postgres]()
-* [UI kit from Creative Tim - includes Bootstrap/JQuery]()
+* [Django](https://www.djangoproject.com/)
+* [Postgres](https://www.postgresql.org/)
+* [UI kit from Creative Tim - includes Bootstrap/JQuery](https://www.creative-tim.com/product/black-dashboard-django)
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
 To get a local copy up and running follow these simple steps. The default .env file will set up Django to run using sqlite as the backend.
+
+This requires a level of comfort and familiarity with python/django/linux/postgres web deployment. If you run into difficulty, you could consider hiring a django full stack developer to help. Certainly our team had a hard look at available commercial LIMS systems and due to various reasons they were not suitable (data not located in UK, pricey, hard to customise and adapt to changing experimental workflows).
 
 ### Prerequisites
 
@@ -160,18 +161,18 @@ SOFTWARE.
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
 
-* [Creative Tim for the initial UI template]()
-* [Django]()
-* [Postgres]()
-* [Django Ckeditor]()
-* [Django Storages]()
-* [Django Rest Framework]()
-* [Django Taggit]()
-* [Django Select2]()
-* [Django Filter]()
-* [Django Simple History]()
-* [Django Widget Tweaks]()
-
+* [Creative Tim for the initial UI template](https://www.creative-tim.com/product/black-dashboard-django)
+* [Django](https://www.djangoproject.com/)
+* [Postgres](https://www.postgresql.org/)
+* [Django Ckeditor](https://github.com/django-ckeditor/django-ckeditor)
+* [Django Storages](https://django-storages.readthedocs.io/en/latest/)
+* [Django Rest Framework](https://www.django-rest-framework.org/)
+* [Django Taggit](https://django-taggit.readthedocs.io/en/latest/)
+* [Django Select2](https://django-select2.readthedocs.io/en/latest/)
+* [Django Filter](https://django-filter.readthedocs.io/en/master/)
+* [Django Simple History](https://django-simple-history.readthedocs.io/en/latest/)
+* [Django Widget Tweaks](https://pypi.org/project/django-widget-tweaks/)
+* [Open Pyxl](https://openpyxl.readthedocs.io/en/stable/)
 
 <!-- CONTACT -->
 ## Author
@@ -184,6 +185,8 @@ University of Edinburgh
 
 ## Contact
 
+If you've used this to create something cool let me know about it!
+
 Twitter: [@chershiong](https://twitter.com/chershiong) <br />
 Email: cchuah@ed.ac.uk <br />
 Project Link: [https://github.com/shaunchuah/sampletrek](https://github.com/shaunchuah/sampletrek)
@@ -195,15 +198,13 @@ This was written over 2-3 weeks with the aim of rapid deployment so there are im
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/github_username/repo.svg?style=for-the-badge
-[contributors-url]: https://github.com/github_username/repo/graphs/contributors
+[contributors-shield]: https://img.shields.io/github/contributors/shaunchuah/repo.svg?style=for-the-badge
+[contributors-url]: https://github.com/shaunchuah/repo/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/github_username/repo.svg?style=for-the-badge
-[forks-url]: https://github.com/github_username/repo/network/members
+[forks-url]: https://github.com/shaunchuah/repo/network/members
 [stars-shield]: https://img.shields.io/github/stars/github_username/repo.svg?style=for-the-badge
-[stars-url]: https://github.com/github_username/repo/stargazers
+[stars-url]: https://github.com/shaunchuah/repo/stargazers
 [issues-shield]: https://img.shields.io/github/issues/github_username/repo.svg?style=for-the-badge
-[issues-url]: https://github.com/github_username/repo/issues
+[issues-url]: https://github.com/shaunchuah/repo/issues
 [license-shield]: https://img.shields.io/github/license/github_username/repo.svg?style=for-the-badge
-[license-url]: https://github.com/github_username/repo/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/github_username
+[license-url]: https://github.com/shaunchuah/repo/blob/master/LICENSE.txt

@@ -4,7 +4,7 @@ from django.template import loader
 from django.http import HttpResponse
 from django import template
 from .models import Sample
-from .forms import SampleForm, CheckoutForm, SampleFormSet, DeleteForm, RestoreForm, ReactivateForm, FullyUsedForm
+from .forms import SampleForm, CheckoutForm, DeleteForm, RestoreForm, ReactivateForm, FullyUsedForm
 from django.contrib import messages
 from django.db.models import Q
 from django.forms import formset_factory
@@ -17,6 +17,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+# Home Page
 @login_required(login_url="/login/")
 def index(request):
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).order_by('-sample_datetime')
@@ -31,6 +32,7 @@ def index(request):
     context = {'sample_list': samples}
     return render(request, "index.html", context)
 
+# Analytics Page
 @login_required(login_url="/login/")
 def analytics(request):
     total_samples = Sample.objects.all().filter(is_deleted=False).count()
@@ -47,6 +49,7 @@ def analytics(request):
     }
     return render(request, "analytics.html", context)
 
+# Analytics --> Sample Overview Table Page
 @login_required(login_url="/login/")
 def gid_overview(request):
     sample_categories = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).values("sample_type").distinct()
@@ -55,10 +58,12 @@ def gid_overview(request):
     context = {'sample_list': sample_list, 'sample_categories': sample_categories, 'patient_id_list': patient_id_list}
     return render(request, "gid_overview.html", context)
 
+# Reference static page for publishing lab protocols
 @login_required(login_url="/login/")
 def reference(request):
     return render(request, "reference.html")
 
+# User account page showing recently accessed samples
 @login_required(login_url="/login/")
 def account(request):
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(last_modified_by=request.user.username).order_by('-last_modified')[:20]
@@ -73,18 +78,21 @@ def account(request):
     context = {'sample_list': samples}
     return render(request, "account.html", context)
 
+# Deleted samples page for samples which have been soft deleted
 @login_required(login_url="/login/")
 def archive(request):
     sample_list = Sample.objects.all().filter(is_deleted=True).order_by('-last_modified')
     context = {'sample_list': sample_list}
     return render(request, "archive.html", context)
 
+# Used samples page for samples marked as being fully used
 @login_required(login_url="/login/")
 def used_samples(request):
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=True).order_by('-last_modified')
     context = {'sample_list': sample_list}
     return render(request, "used_samples.html", context)
 
+# Allows static .html pages to be easily added - this was from Creative-Tim's original template
 @login_required(login_url="/login/")
 def pages(request):
     context = {}
@@ -101,7 +109,7 @@ def pages(request):
         html_template = loader.get_template( 'error-500.html' )
         return HttpResponse(html_template.render(context, request))
 
-
+# Add mew sample page
 @login_required(login_url="/login/")
 def add(request):
     if request.method == "POST":
@@ -119,7 +127,7 @@ def add(request):
         form = SampleForm()
     return render(request, "add.html", {'form': form})
 
-
+# Historical changes function to integrate simple history into the sample detail page
 def historical_changes(query):
     changes = []
     if query is not None:
@@ -132,6 +140,7 @@ def historical_changes(query):
                 last = old_record
         return changes
 
+# Sample Detail Page - retrieves sample history and also linked notes both public and private
 @login_required(login_url="/login/")
 def sample_detail(request, pk):
     sample = get_object_or_404(Sample, pk=pk)
@@ -149,7 +158,8 @@ def sample_detail(request, pk):
         time_difference = sample.processing_datetime - sample.sample_datetime
         processing_time = int(time_difference.total_seconds() / 60)
     return render(request, "sample-detail.html", {'sample': sample, 'changes': changes, 'first': first_change, 'processing_time': processing_time, 'gid_id': gid_id, 'related_notes': related_notes, 'private_notes': private_notes})
-    
+
+# Sample Edit Page    
 @login_required(login_url="/login/")
 def sample_edit(request, pk):
     sample = get_object_or_404(Sample, pk=pk)
@@ -169,6 +179,7 @@ def sample_edit(request, pk):
         form = SampleForm(instance=sample)
     return render(request, 'sample-edit.html', {'form': form})
 
+# Sample search in home page
 @login_required(login_url="/login/")
 def search(request):
     query_string=''
@@ -185,6 +196,7 @@ def search(request):
     else:
         return render(request, 'index.html', { 'query_string': 'Null' })
 
+# Sample Checkout - Quick update of sample location from home page
 @login_required(login_url="/login/")
 def checkout(request,pk):
     sample = get_object_or_404(Sample, pk=pk)
@@ -204,6 +216,7 @@ def checkout(request,pk):
         form = CheckoutForm(instance=sample)
     return render(request, 'sample-checkout.html', {'form': form})
 
+# Soft deletion method for samples
 @login_required(login_url="/login/")
 def delete(request,pk):
     sample = get_object_or_404(Sample, pk=pk)
@@ -223,6 +236,7 @@ def delete(request,pk):
         form = DeleteForm(instance=sample)
     return render(request, 'sample-delete.html', {'form': form})
 
+# Restore soft-deleted sample
 @login_required(login_url="/login/")
 def restore(request,pk):
     sample = get_object_or_404(Sample, pk=pk)
@@ -242,6 +256,7 @@ def restore(request,pk):
         form = RestoreForm(instance=sample)
     return render(request, 'sample-restore.html', {'form': form})
 
+# Mark sample as fully used
 @login_required(login_url="/login/")
 def fully_used(request,pk):
     sample = get_object_or_404(Sample, pk=pk)
@@ -261,6 +276,7 @@ def fully_used(request,pk):
         form = FullyUsedForm(instance=sample)
     return render(request, 'sample-fullyused.html', {'form': form})
 
+# Reactive sample which has been marked as fully used
 @login_required(login_url="/login/")
 def reactivate_sample(request,pk):
     sample = get_object_or_404(Sample, pk=pk)
@@ -279,24 +295,6 @@ def reactivate_sample(request,pk):
     else:
         form = ReactivateForm(instance=sample)
     return render(request, 'sample-reactivate.html', {'form': form})
-
-@login_required(login_url="/login/")
-def bulkadd(request):
-    if request.method == "POST":
-        formset = SampleFormSet(request.POST)
-        if formset.is_valid():
-            for form in formset:
-                sample = form.save(commit=False)
-                sample.created_by = request.user.username
-                sample.last_modified_by = request.user.username
-                sample.save()
-            messages.success(request, 'All samples registered successfully.')
-            return redirect('/')
-        else:
-            messages.error(request, 'Form is not valid.')
-    else:
-        formset = SampleFormSet()
-    return render(request, "bulk-add.html", {'formset': formset})
 
 #Export entire database to CSV for backup, currently not in use
 @login_required(login_url="/login/")
@@ -329,7 +327,28 @@ def export_excel_all(request):
     worksheet.title = 'All Samples'
 
     #Define the excel column names
-    columns = ['Sample ID', 'Patient ID', 'Sample Location', 'Sample Sublocation', 'Sample Type', 'Sampling Datetime', 'Processing Datetime', 'Sampling to Processing Time (mins)','Sample Volume', 'Sample Volume Units', 'Freeze Thaw Count', 'Haemolysis Reference Category (100 and above unusable)', 'Biopsy Location', 'Biopsy Inflamed Status', 'Sample Comments', 'Sample Fully Used?', 'Created By', 'Date Created', 'Last Modified By', 'Last Modified']
+    columns = [
+        'Sample ID', 
+        'Patient ID', 
+        'Sample Location', 
+        'Sample Sublocation', 
+        'Sample Type', 
+        'Sampling Datetime', 
+        'Processing Datetime', 
+        'Sampling to Processing Time (mins)',
+        'Sample Volume', 
+        'Sample Volume Units', 
+        'Freeze Thaw Count', 
+        'Haemolysis Reference Category (100 and above unusable)', 
+        'Biopsy Location', 
+        'Biopsy Inflamed Status', 
+        'Sample Comments', 
+        'Sample Fully Used?', 
+        'Created By', 
+        'Date Created', 
+        'Last Modified By', 
+        'Last Modified'
+        ]
     row_num = 1
 
     #Write the column names in
