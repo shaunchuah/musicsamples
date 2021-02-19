@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.forms import ModelForm, modelformset_factory, formset_factory
 from .models import Sample, Note
 
-
+# Set default sample creation time to the time the user is accessing the add new sample page
 class DateTimeInput(forms.DateTimeInput):
     input_type = "datetime-local"
 
@@ -15,11 +15,14 @@ def currentTime():
     time = timezone.localtime(timezone.now())
     return time
 
+# Main sample registration form
 class SampleForm(ModelForm):
     sample_datetime = forms.DateTimeField(label="Sample Created Datetime*", widget=DateTimeInput(), initial=currentTime)
     class Meta:
         model = Sample
         fields = ['musicsampleid', 'sample_location', 'patientid', 'sample_type', 'sample_datetime', 'sample_comments', 'processing_datetime', 'sample_sublocation', 'sample_volume', 'sample_volume_units', 'freeze_thaw_count', 'haemolysis_reference', 'biopsy_location', 'biopsy_inflamed_status']
+        
+        # Customising the dropdown select fields to ensure consistent data input
         HAEMOLYSIS_REFERENCE_CHOICES = (
             ('', 'Select category'),
             ('0', 'Minimal'),
@@ -114,30 +117,35 @@ class SampleForm(ModelForm):
             'biopsy_inflamed_status': "Biopsy Inflamed Status",
         }
 
+# Quick update of sample location from home page
 class CheckoutForm(ModelForm):
     class Meta:
         model = Sample
         fields = ['sample_location', 'sample_sublocation']
         labels = { 'sample_location': "Sample Location", 'sample_sublocation': "Sample Sublocation",}
 
+# Soft deleting a sample
 class DeleteForm(ModelForm):
     class Meta:
         model = Sample
         fields = ['is_deleted']
         labels = { 'is_deleted': "Confirm delete?" }
 
+# Restoring a soft deleted sample
 class RestoreForm(ModelForm):
     class Meta:
         model = Sample
         fields = ['is_deleted']
         labels = { 'is_deleted': "Uncheck to restore" }
 
+# Marking a sample as fully used
 class FullyUsedForm(ModelForm):
     class Meta:
         model = Sample
         fields = ['is_fully_used']
         labels = { 'is_fully_used': "Mark sample as fully used?" }
 
+# Restoring a sample that was accidentally marked as fully used
 class ReactivateForm(ModelForm):
     class Meta:
         model = Sample
@@ -155,6 +163,11 @@ from taggit.forms import TagWidget
 from taggit.models import Tag
 from django_select2.forms import ModelSelect2TagWidget, ModelSelect2MultipleWidget
 
+# Create new note form
+# Django select2 used to enable tagging of existing samples.
+# Django taggit used for tagging of notes similar to blogging
+# CKEditor Uploading widget used for adding of notes and supporting of file/image uploads - Suggest use an S3 backend to handle user media uploads.
+# You can also disable this by switching the uploading widget for the standard one - see django-ckeditor documentation.
 
 class NoteForm(ModelForm):   
     class Meta:
@@ -171,7 +184,8 @@ class NoteForm(ModelForm):
             'is_public': "Share settings:",
             'content': "",
         }
-        
+
+# Soft deletion of notes. Restoration will probably have to be done from the django admin panel unless you want to implement a restore view similar to the above sample restoration methods.       
 class NoteDeleteForm(ModelForm):
     class Meta:
         model = Note
