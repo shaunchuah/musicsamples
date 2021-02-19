@@ -1,9 +1,3 @@
-# -*- encoding: utf-8 -*-
-"""
-License: MIT
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 import os
 
 from django.core.asgi import get_asgi_application
