@@ -42,10 +42,10 @@ Help lab researchers improve time to discovery and reduce time spent on logistic
 SampleTrek was developed to solve the problem of tracking 30,000 research samples across multiple study sites with multiple laboratory endpoints. In our use we deployed it on a single droplet/virtual private server hosted by DigitalOcean and used Amazon Web Services for handling email and database backups. Code was deployed using github and this allowed rapid deployment of new features as the need arose. Check out the study here: [MUSIC IBD Study](https://www.musicstudy.uk)
 
 ### QR code labelling
-Cryogenic QR code labels were bulk printed from a label printing company and research samples were tagged at the point of collection and registered onto SampleTrek. At specified receiving entrypoints to various lab workflows the samples were scanned in bulk to update their location (alternatively a status could be set into the location).
+Cryogenic QR code labels were bulk printed from a label printing company and research samples were tagged at the point of collection and registered onto SampleTrek. At specified receiving entrypoints to various lab workflows the samples were scanned in bulk to update their location (alternatively a status could be set into the location eg. "Departure Glasgow").
 
 ### Electronic lab notebook with sample tagging
-A mini electronic lab notebook was created which allows tagging of samples used in order for collaboration and to allow easy finding of relevant data pertaining to experiments carried out on the samples.
+A mini electronic lab notebook was created which allows tagging of samples used in order to facilitate collaboration and to allow easy finding of relevant data pertaining to experiments carried out on the samples.
 
 
 ### Built With
@@ -59,7 +59,7 @@ A mini electronic lab notebook was created which allows tagging of samples used 
 
 To get a local copy up and running follow these simple steps. The default .env file will set up Django to run using sqlite as the backend.
 
-This requires a level of comfort and familiarity with python/django/linux/postgres web deployment. If you run into difficulty, you could consider hiring a django full stack developer to help. Certainly our team had a hard look at available commercial LIMS systems and due to various reasons they were not suitable (data not located in UK, pricey, hard to customise and adapt to changing experimental workflows).
+This requires a level of comfort and familiarity with python/django/linux/postgres web deployment. If you run into difficulty, you could consider hiring a django full stack developer to help. We had a hard look at available commercial LIMS systems and due to various reasons they were found to be lacking (data not located in UK, pricey, hard to customise and adapt to changing experimental workflows).
 
 ### Prerequisites
 
@@ -82,11 +82,13 @@ This requires a level of comfort and familiarity with python/django/linux/postgr
 
 ## Deployment
 
+You will need a domain name to deploy on. Configure the domain to point at your server.
+
 Suggested production deployment:
 
-1. Ubuntu VPS instance (DigitalOcean, Linode, Lightsail etc. many options)
-2. Install python, postgres and django into your VPS and set it up (alternatively managed database services might make life simpler)
-3. Setup nginx and gunicorn (static requests through nginx, dynamic requests redirected to gunicorn serving Django)
+1. Ubuntu VPS instance (DigitalOcean, Linode, Lightsail etc. many options) - we used 20.04 LTS on DigitalOcean
+2. Install python, postgres into your VPS and set it up (alternatively connecting to a managed database service might be easier although more costly)
+3. Setup nginx and gunicorn (static requests through nginx, dynamic requests redirected to gunicorn serving Django). [Useful guide here](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04).
 4. Set up an account on AWS for password reset emails or an alternative email provider of your choice
 5. Clone the repo into a folder of your choice and remember to run:
 
@@ -96,7 +98,7 @@ Suggested production deployment:
     python manage.py collectstatic
     ```
 6. **Edit .env file to a production configuration**
-7. Start up the whole stack
+7. Start up the whole stack and it should hopefully be working!
 
 
 
