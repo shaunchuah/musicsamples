@@ -37,7 +37,7 @@
           </div>
           <hr />
           <div class="card-body">
-            {{ note.content|striptags|truncatewords:60 }} (<a href="{% url 'note_detail' pk=note.pk %}">read more</a>)
+            {{ note.content|striptags|truncatechars:500 }} (<a href="{% url 'note_detail' pk=note.pk %}">view</a>)
             
           </div>
           <hr />
