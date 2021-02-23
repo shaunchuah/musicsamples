@@ -15,11 +15,12 @@
   </div>
 </div>
 <div class="row">
-  <div class="col-md-8">
+  <div class="col-xl-9 col-lg-8">
     {% if notes %}
-    {% for note in notes %}
     <div class="row">
-      <div class="col">
+    {% for note in notes %}
+    
+      <div class="col-xl-4 col-lg-6">
         <div class="card notes">
           <div class="card-header">
             <div class="float-right">
@@ -30,28 +31,35 @@
               {% endif %}
             </div>
             <h1 class="card-title"><a href="{% url 'note_detail' pk=note.pk %}">{{ note.title }}</a></h1>
-            <h4 class="card-subtitle">{{note.published_date|date:"j F Y" }} | {{ note.author.first_name }} {{ note.author.last_name }} | <a target="_blank" rel="noopener noreferrer" href="mailto:{{ note.author.email }}">{{note.author.email }}</a> </h4>
+            <h4 class="card-subtitle">{{note.published_date|date:"j F Y" }} | <a target="_blank" rel="noopener noreferrer" href="mailto:{{ note.author.email }}"> {{ note.author.first_name }} {{ note.author.last_name }} <i class="tim-icons icon-email-85"></i></a></h4>
           
             
           </div>
           <hr />
           <div class="card-body">
-            {{ note.content|safe }}
+            {{ note.content|striptags|truncatewords:60 }} (<a href="{% url 'note_detail' pk=note.pk %}">read more</a>)
             
           </div>
           <hr />
           <div class="card-footer">
-            <small>Tags: 
+            <small>
+              
+              {% if note.tags.all %}
+              Tags: 
               {% for tag in note.tags.all %}
               <a href="{% url 'note_tags' slug=tag.slug %}"><span class="tag badge badge-info">{{tag.slug}}</span></a>
               {% endfor %}
               
-              |
               
+              {% endif %}
+
+              {% if note.sample_tags.all %}
+              |
               Sample Tags:
               {% for sample in note.sample_tags.all %}
               <a href="{% url 'sample_detail' pk=sample.pk %}"><span class="tag badge badge-secondary">{{ sample }}</span></a>
               {% endfor %}
+              {% endif %}
             </small>
             {% if request.user.id == note.author.id %}
             <div class="float-right">
@@ -64,8 +72,9 @@
 
 
       </div>
-    </div>
+    
     {% endfor %}
+    </div>
     {% elif '/notes/search/' in request.path %}
     <div class="notes card">
       <div class="card-header">
@@ -88,7 +97,7 @@
     {% endif %}
   </div>
   
-  <div class="col-md-4">
+  <div class="col-xl-3 col-lg-4">
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Search Notes</h3>
@@ -107,7 +116,7 @@
     
     </div>
 
-    <div class="card">
+    <div class="card tags">
       <div class="card-header">
         <h3 class="card-title">Tags</h3>
       </div>
@@ -118,7 +127,7 @@
       </div>
     </div>
       
-    <div class="card">
+    <div class="card authors">
       <div class="card-header">
         <h3 class="card-title">Authors</h3>
       </div>
