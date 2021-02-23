@@ -210,3 +210,35 @@ if config('USE_S3', cast=bool) == True:
 else:
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
     MEDIA_URL = '/uploads/'
+
+## CACHING ##
+
+CACHES = {
+            "default": {
+                "BACKEND": config('DEFAULT_CACHE_BACKEND'),
+                "LOCATION": config('DEFAULT_CACHE_LOCATION'),
+                "OPTIONS": {
+                    "CLIENT_CLASS": config('CLIENT_CLASS'),
+                }
+            },
+        }
+
+# CACHES = {
+#             "default": {
+#                 "BACKEND": "django_redis.cache.RedisCache",
+#                 "LOCATION": "redis://127.0.0.1:6379/1",
+#                 "OPTIONS": {
+#                     "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#                 }
+#             },
+#             'select2': {
+#                 "BACKEND": "django_redis.cache.RedisCache",
+#                 "LOCATION": "redis://127.0.0.1:6379/2",
+#                 "OPTIONS": {
+#                     "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#                 }
+#             }
+#         }
+
+# Set the cache backend to select2
+SELECT2_CACHE_BACKEND = 'default'
