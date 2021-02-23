@@ -87,6 +87,7 @@
     border-collapse: collapse;
     border-color: rgba(34,42,66,0.5);
     width: 100%;
+    max-width: 100%;
     overflow: auto;
     border-width: 0.0625rem;
     margin-bottom: 2rem;
