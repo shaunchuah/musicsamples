@@ -80,9 +80,22 @@ This requires a level of comfort and familiarity with python/django/linux/postgr
    python manage.py runserver
    ```
 
+### Notes
+
+Sample tagging to notes does not work unless you configure the cache settings. Works in production using redis. You could try installing redis on your development environment.
+
 ## Deployment
 
 You will need a domain name to deploy on. Configure the domain to point at your server.
+
+### Suggested Server Software Requirements:
+
+* Ubuntu 20.04
+* Python
+* Postgres
+* Nginx
+* Gunicorn
+* Redis
 
 Suggested production deployment:
 
@@ -90,6 +103,7 @@ Suggested production deployment:
 2. Install python, postgres into your VPS and set it up (alternatively connecting to a managed database service might be easier although more costly)
 3. Setup nginx and gunicorn (static requests through nginx, dynamic requests redirected to gunicorn serving Django). [Useful guide here](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04).
 4. Set up an account on AWS for password reset emails or an alternative email provider of your choice
+5. Set up redis for caching (required for sample tagging to work properly - [https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04))
 5. Clone the repo into a folder of your choice and remember to run:
 
     ```sh
