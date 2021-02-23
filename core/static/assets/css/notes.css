@@ -1,18 +1,26 @@
-
+.notes.card {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    min-height: 30rem;
+}
 
 .notes .card-header {
-    padding:30px;
-    padding-bottom: 0px;
+    padding:1.5rem;
+    padding-bottom: 0;
 }
 
 .notes .card-body {
-    padding: 30px;
-    padding-top: 15px;
+    padding: 1.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    
 }
 
 .notes .card-footer{
-    padding: 30px;
-    padding-top: 0px;
+    padding: 1.5rem;
+    padding-top: 0;
+    
 }
 
 .notes .card-header a {
@@ -20,7 +28,7 @@
 }
 
 .notes h2, h3 {
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.5rem;
     margin-top: 10px;
     font-weight: 600;
 }
@@ -28,6 +36,8 @@
 .notes h1 {
     font-size: 1.8rem;
     font-weight: 600;
+    margin-bottom: 0.5rem;
+    line-height: 2.4rem;
 }
 
 .notes .card-title a {
@@ -82,3 +92,11 @@
 .django-ckeditor-widget{
     width: 100%;
   }
+
+.tags a {
+    line-height: 2rem;
+}
+
+.authors a {
+    line-height: 2rem;
+}
