@@ -537,7 +537,7 @@ def note_add(request):
             note.save()
             form.save_m2m()
             messages.success(request, 'Note saved successfully.')
-            return redirect('/notes/')
+            return redirect('/notes/personal/')
         else:
             messages.error(request, 'There are some errors.')
     else:
