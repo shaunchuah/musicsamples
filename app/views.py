@@ -676,7 +676,7 @@ def autocomplete_tags(request):
 # This allows you to install physical hardpoints - eg arrival and departure from sites and if you scan every sample that goes through you can begin to track all their locations.
 
 from rest_framework import viewsets, filters, permissions
-from .serializers import SampleSerializer
+from .serializers import SampleSerializer, SampleIsFullyUsedSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -690,7 +690,17 @@ class SampleViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'musicsampleid'
 
+class SampleIsFullyUsedViewSet(viewsets.ModelViewSet):
+    queryset = Sample.objects.filter(is_deleted=False)
+    serializer_class = SampleIsFullyUsedSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'musicsampleid'
+
 # Returns the front end page - frontend logic is in the barcode.html template file
 @login_required(login_url="/login/")
 def barcode(request):
     return render(request, "barcode.html")
+
+@login_required(login_url="/login/")
+def barcode_samples_used(request):
+    return render(request, "barcode-markused.html")
