@@ -1,10 +1,11 @@
 from django.urls import path, re_path, include
 from app import views
 from rest_framework import routers, serializers, viewsets
-from .views import SampleViewSet
+from .views import SampleViewSet, SampleIsFullyUsedViewSet
 
 router = routers.DefaultRouter()
 router.register(r'samples', SampleViewSet)
+router.register(r'samples_used', SampleIsFullyUsedViewSet)
 
 urlpatterns = [
     # Matches any html file 
@@ -42,4 +43,5 @@ urlpatterns = [
     path('notes/search/', views.search_notes, name='search_notes'),
     path('api/', include(router.urls)),
     path('barcode/', views.barcode, name='barcode'),
+    path('barcode/samples_used/', views.barcode_samples_used, name='barcode_samples_used')
 ]
