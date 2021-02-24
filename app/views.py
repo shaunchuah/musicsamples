@@ -13,7 +13,7 @@ from django.forms import formset_factory
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count
 from django.db.models.functions import Trunc
-
+from django.views.decorators.cache import cache_page
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -37,6 +37,7 @@ def index(request):
 
 # Analytics Page
 @login_required(login_url="/login/")
+@cache_page(60 * 60) #Cache page for 60 minutes
 def analytics(request):
     total_samples = Sample.objects.all().filter(is_deleted=False).count()
     total_active_samples = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).count()
@@ -54,6 +55,7 @@ def analytics(request):
 
 # Analytics --> Sample Overview Table Page
 @login_required(login_url="/login/")
+@cache_page(60 * 60) #Cache page for 60 minutes
 def gid_overview(request):
     sample_categories = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).values("sample_type").distinct()
     patient_id_list = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).order_by('patientid').values("patientid").distinct()
@@ -559,7 +561,7 @@ def note_edit(request, pk):
             if next_url:
                 return redirect(next_url)
             else:
-                return redirect('/notes/')
+                return redirect('/notes/personal/')
         else:
             messages.error(request, 'Unable to edit note.')
     else:
@@ -581,7 +583,7 @@ def note_delete(request, pk):
             if next_url:
                 return redirect(next_url)
             else:
-                return redirect('/notes/')
+                return redirect('/notes/personal/')
         else:
             messages.error(request, 'Unable to delete note.')
     else:
