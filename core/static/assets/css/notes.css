@@ -47,6 +47,10 @@
     font-weight: 600;
 }
 
+.notes .card-header .card-title {
+    font-weight: 600;
+}
+
 .notes h2 {
     font-size: 1.6rem;
 }
