@@ -65,6 +65,7 @@ def gid_overview(request):
 
 # Reference static page for publishing lab protocols
 @login_required(login_url="/login/")
+@cache_page(60 * 60) #Cache page for 60 minutes
 def reference(request):
     return render(request, "reference.html")
 
@@ -186,6 +187,7 @@ def sample_edit(request, pk):
 
 # Sample search in home page
 @login_required(login_url="/login/")
+@cache_page(60 * 5) #Cache page for 5 minutes
 def search(request):
     query_string=''
     if ('q' in request.GET) and request.GET['q'].strip():
@@ -436,6 +438,7 @@ from django.urls import reverse
 
 # Shared Lab Notes - Find all shared notes between all the users
 @login_required(login_url="/login/")
+@cache_page(60 * 1) #Cache page for 1 minute
 def notes(request):
     notes = Note.objects.all().filter(is_public=True).filter(is_deleted=False)
     page = request.GET.get('page', 1)
@@ -453,6 +456,7 @@ def notes(request):
 
 # My Notebook - Show all notes belonging to the logged in user
 @login_required(login_url="/login/")
+@cache_page(60 * 1) #Cache page for 1 minute
 def notes_personal(request):
     notes = Note.objects.all().filter(is_deleted=False).filter(author=request.user)
     page = request.GET.get('page', 1)
@@ -470,6 +474,7 @@ def notes_personal(request):
 
 # Find all shared notes by tags and private notes depending on the logged in user
 @login_required(login_url="/login/")
+@cache_page(60 * 5) #Cache page for 5 minutes
 def note_tags(request, slug):
     tag = get_object_or_404(Tag, slug=slug)
 
@@ -495,6 +500,7 @@ def note_tags(request, slug):
 
 # See all the shared notes by specific authors
 @login_required(login_url="/login/")
+@cache_page(60 * 5) #Cache page for 5 minutes
 def note_authors(request, pk):
     user = get_object_or_404(User, pk=pk)
     notes = Note.objects.filter(is_public=True).filter(is_deleted=False).filter(author=pk)
@@ -513,6 +519,7 @@ def note_authors(request, pk):
 
 # See single note
 @login_required(login_url="/login/")
+@cache_page(60 * 1) #Cache page for 1 minute
 def note_detail(request, pk):
     note = get_object_or_404(Note, pk=pk)
     if note.is_public == True:
