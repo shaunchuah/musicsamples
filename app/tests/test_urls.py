@@ -47,18 +47,10 @@ class TestUrls(SimpleTestCase):
     def test_search_url_resolves(self):
         url = reverse('search')
         self.assertEquals(resolve(url).func, search)
-    
-    def test_bulkadd_url_resolves(self):
-        url = reverse('bulkadd')
-        self.assertEquals(resolve(url).func, bulkadd)
 
     def test_csv_export_url_resolves(self):
         url = reverse('export_csv')
         self.assertEquals(resolve(url).func, export_csv)
-
-    def test_export_excel_add_url_resolves(self):
-        url = reverse('export_excel_all')
-        self.assertEquals(resolve(url).func, export_excel_all)
 
     def test_export_excel_url_resolves(self):
         url = reverse('export_excel')
@@ -67,3 +59,11 @@ class TestUrls(SimpleTestCase):
     def test_account_page_url_resolves(self):
         url = reverse('account')
         self.assertEquals(resolve(url).func, account)
+
+    def test_qrcode_update_location_api_call(self):
+        response = self.client.get('/api/samples/')
+        self.assertEqual(response.status_code, 200)
+    
+    def test_qrcode_mark_samples_as_used_api_call(self):
+        response = self.client.get('/api/samples_used/')
+        self.assertEqual(response.status_code, 200)
