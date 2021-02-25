@@ -1,4 +1,4 @@
-asgiref==3.3.1
+asgiref
 autopep8==1.5.4
 dj-database-url==0.5.0
 Django==3.1.2
@@ -24,3 +24,7 @@ django-filter==2.4.0
 boto3==1.17.7
 django-storages==1.11.1
 django-redis==4.12.1
+pytest==6.2.2
+pytest-django==4.1.0
+pytest-cov==2.11.1
+mixer==7.1.2
