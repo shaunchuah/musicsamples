@@ -143,3 +143,92 @@ def test_sample_edit_page(auto_login_user):
     response = client.get(path)
     assertTemplateUsed(response, 'sample-edit.html')
     assert response.context['form'].initial['musicsampleid'] == 'TEST003', 'Should create two separate sample instances and return the second one.'
+
+def test_sample_search_page(auto_login_user):
+    client, user = auto_login_user()
+    sample = mixer.blend('app.sample', musicsampleid='TEST002')
+    sample2 = mixer.blend('app.sample', musicsampleid='TEST003')
+    sample3 = mixer.blend('app.sample', musicsampleid='NO')
+    sample4 = mixer.blend('app.sample', musicsampleid='DONOTRETURN')
+    path = reverse('search')
+    response = client.get(path + '?q=TEST')
+    assertTemplateUsed(response, 'index.html')
+    assert 'TEST002' in response.context['sample_list'][0].musicsampleid, 'Should create a few objects, run a search and return 2 objects.'
+    assert response.context['sample_list'].count() == 2, 'Should create a few objects, run a search and return 2 objects.'
+
+    response = client.get(path)
+    assert response.context['query_string'] == 'Null', 'Should return no objects with empty query string.'
+
+def test_sample_checkout_page(auto_login_user):
+    client, user = auto_login_user()
+    sample = mixer.blend('app.sample', sample_location='location1')
+    path = reverse('checkout', kwargs={'pk':1})
+
+    # Get the sample checkout page and check template is correct
+    response = client.get(path)
+    assert response.context['form'].initial['sample_location'] == 'location1', 'Should retrieve an instance to checkout.'
+    assertTemplateUsed(response, 'sample-checkout.html')
+    
+    # Checkout the sample from location1 to location2
+    response = client.post(path, data={'sample_location': 'location2'})
+    assert Sample.objects.get(pk=1).sample_location == 'location2', 'Should checkout the sample location from location1 to location2.'
+    assert Sample.objects.get(pk=1).last_modified_by == 'testuser1'
+    assert response.status_code == 302
+
+def test_sample_delete(auto_login_user):
+    client, user = auto_login_user()
+    sample = mixer.blend('app.sample', musicpatientid='TEST05')
+    path = reverse('delete', kwargs={'pk':1})
+
+    # Get the delete page first and check template is correct
+    response = client.get(path)
+    assertTemplateUsed(response, 'sample-delete.html')
+
+    # Make the delete request now and also pass a next_url to check redirection
+    response = client.post(path + '?next=/samples/1/', data={'is_deleted': True})
+
+    assert Sample.objects.get(pk=1).is_deleted == True, 'Should delete the created sample'
+    assert response.url == '/samples/1/', 'Should redirect to passed url string after deleting sample.'
+
+def test_sample_restore(auto_login_user):
+    client, user = auto_login_user()
+    sample = mixer.blend('app.sample', is_deleted=True)
+    path = reverse('restore', kwargs={'pk': 1})
+
+    # Get the restore page and check template is correct
+    response = client.get(path)
+    assertTemplateUsed(response, 'sample-restore.html')
+
+    # Restore the sample
+    response = client.post(path, data={'is_deleted': False})
+    assert Sample.objects.get(pk=1).is_deleted == False, 'Should restore the deleted sample'
+    assert response.url == '/'
+
+def test_sample_fully_used(auto_login_user):
+    client, user = auto_login_user()
+    sample = mixer.blend('app.sample')
+    path = reverse('fully_used', kwargs={'pk':1})
+
+    # Get the delete page first and check template is correct
+    response = client.get(path)
+    assertTemplateUsed(response, 'sample-fullyused.html')
+
+    # Make the delete request now and also pass a next_url to check redirection
+    response = client.post(path, data={'is_fully_used': True})
+
+    assert Sample.objects.get(pk=1).is_fully_used == True, 'Should delete the created sample'
+    assert response.status_code == 302
+
+def test_sample_reactivate(auto_login_user):
+    client, user = auto_login_user()
+    sample = mixer.blend('app.sample', is_fully_used=True)
+    path = reverse('reactivate_sample', kwargs={'pk': 1})
+
+    # Get the restore page and check template is correct
+    response = client.get(path)
+    assertTemplateUsed(response, 'sample-reactivate.html')
+
+    # Restore the sample
+    response = client.post(path, data={'is_fully_used': False})
+    assert Sample.objects.get(pk=1).is_fully_used == False, 'Should restore the deleted sample'
+    assert response.url == '/'
