@@ -2,15 +2,16 @@ from django.urls import path, re_path, include
 from app import views
 from rest_framework import routers, serializers, viewsets
 from .views import SampleViewSet, SampleIsFullyUsedViewSet
+from django.conf.urls import handler404, handler500
 
 router = routers.DefaultRouter()
 router.register(r'samples', SampleViewSet)
 router.register(r'samples_used', SampleIsFullyUsedViewSet)
 
-urlpatterns = [
-    # Matches any html file 
-    re_path(r'^.*\.html', views.pages, name='pages'),
+handler404 = 'app.views.error_404'
+handler500 = 'app.views.error_500'
 
+urlpatterns = [
     path('', views.index, name='home'),
     path('analytics/', views.analytics, name='analytics'),
     path('analytics/gid_overview', views.gid_overview, name='gid_overview'),
@@ -45,3 +46,4 @@ urlpatterns = [
     path('barcode/', views.barcode, name='barcode'),
     path('barcode/samples_used/', views.barcode_samples_used, name='barcode_samples_used')
 ]
+

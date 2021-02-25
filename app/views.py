@@ -98,23 +98,6 @@ def used_samples(request):
     context = {'sample_list': sample_list}
     return render(request, "used_samples.html", context)
 
-# Allows static .html pages to be easily added - this was from Creative-Tim's original template
-@login_required(login_url="/login/")
-def pages(request):
-    context = {}
-    # All resource paths end in .html.
-    # Pick out the html file name from the url. And load that template.
-    try:
-        load_template = request.path.split('/')[-1]
-        html_template = loader.get_template( load_template )
-        return HttpResponse(html_template.render(context, request))
-    except template.TemplateDoesNotExist:
-        html_template = loader.get_template( 'error-404.html' )
-        return HttpResponse(html_template.render(context, request))
-    except:
-        html_template = loader.get_template( 'error-500.html' )
-        return HttpResponse(html_template.render(context, request))
-
 # Add mew sample page
 @login_required(login_url="/login/")
 def add(request):
@@ -704,3 +687,9 @@ def barcode(request):
 @login_required(login_url="/login/")
 def barcode_samples_used(request):
     return render(request, "barcode-markused.html")
+
+def error_404(request, exception):
+    return render(request, "error-404.html", status=400)
+
+def error_500(request):
+    return render(request, "error-500.html", status=500)
