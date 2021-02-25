@@ -1,38 +1,39 @@
-from django.test import TestCase, SimpleTestCase, Client
+import pytest
+from django.test import RequestFactory
 from ..models import Sample
 from django.urls import reverse, resolve
-from ..views import *
-import datetime
-import pytz
 from django.contrib.auth import get_user_model
+from .. import views
+from django.contrib.auth.models import AnonymousUser
+from mixer.backend.django import mixer
 
-class TestViews(TestCase):
+User = get_user_model()
 
-    def setUp(self):
-        Sample.objects.create(
-            musicsampleid = 'TEST001',
-            patientid = 'TEST001',
-            sample_location = 'test location',
-            sample_type = 'test sample type',
-            sample_datetime = datetime.datetime.now(tz=pytz.utc),
-            created_by = 'test_user',
-            last_modified_by = 'test_user',
-        )
-        User = get_user_model()
-        test_user = User.objects.create_user('temporary', 'temporary@gamil.com', 'temporary')
-        self.client.login(username='temporary', password='temporary')
+pytestmark = pytest.mark.django_db
+
+def test_home_page_authenticated():
+    path = reverse('home')
+    request = RequestFactory().get(path)
+    User = get_user_model()
+    request.user = mixer.blend(User) 
+    response = views.index(request)
+    assert response.status_code == 200, 'Should show homepage when logged in.'
+
+def test_home_page_as_anonymouse_user():
+    path = reverse('home')
+    request = RequestFactory().get(path)
+    request.user = AnonymousUser()
+    response = views.index(request)
+    assert 'login' in response.url, 'Should not show homepage and redirect to login'
+
+@pytest.fixture
+def api_client():
+   from rest_framework.test import APIClient
+   return APIClient()
 
 
-    def test_sample_detail_GET(self):        
-        response = self.client.get(reverse('sample_detail', kwargs={'pk':1}))
-        self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'sample-detail.html')
-    
-    def test_sample_detail_404_GET(self):
-        response = self.client.get(reverse('sample_detail', kwargs={'pk':100}))
-        self.assertEquals(response.status_code, 404)
+def test_unauthorized_request(api_client):
+   response = api_client.get('/api/samples')
+   assert response.status_code == 301
 
-    def test_sample_edit_GET(self):        
-        response = self.client.get(reverse('sample_edit', kwargs={'pk':1}))
-        self.assertEquals(response.status_code, 200)
-        self.assertTemplateUsed(response, 'sample-edit.html')
+
