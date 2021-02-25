@@ -59,3 +59,7 @@ class TestUrls(SimpleTestCase):
     def test_account_page_url_resolves(self):
         url = reverse('account')
         self.assertEqual(resolve(url).func, account)
+
+    def test_notes_main_url_resolves(self):
+        url = reverse('notes')
+        self.assertEqual(resolve(url).func, notes)
