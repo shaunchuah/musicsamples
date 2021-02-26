@@ -9,43 +9,34 @@
 
   {{ page_title }}
 </h2>
-<div class="row">
-  <div class="col-md-4 mb-4">
-    <a href="/notes/add/" class="btn btn-fill btn-success">Add New Note</a>
-  </div>
-  <div class="col-md-4 offset-md-4">
-  <form action="/notes/search/" method="GET">
-    <div class="input-group">
-      <input type="text" class="form-control search" name="q" placeholder="Search title, content and sample ID" />
-      <div class="input-group-append">
-      <button type="submit" class="btn btn-outline btn-success">Search</button>
-    </div>
-    </div>
-  </form>
-</div>
-</div>
 
-<div class="row">
-  <div class="col">
-  <div class="card">
-    
-    <div class="card-body">
-      <div class="tags"> Tags:
+<div class="row mb-3 px-3 d-flex">
+  <nav class="navbar bg-transparent">
+    <a href="/notes/add/" class="btn btn-fill btn-success mr-auto my-2">Add New Note</a>
+
+    <form class="form-inline" action="/notes/search/" method="GET">
+      <input class="form-control ml-2 " type="search" name="q" placeholder="Search title, content, sample ID" aria-label="Search">
+      <button class="btn btn-outline-success my-2" type="submit"><i class="tim-icons icon-zoom-split"></i> Search</button>
+    </form>
+
+    <span class="dropdown">
+      <a href="javascript:void(0)" class="" data-toggle="dropdown">
+          <button class="btn">Filter</button>
+      </a>
+      <ul class="dropdown-menu bg-white border">
+        <li class="dropdown-item">Tags</li>
         {% for tag in all_tags %}
-        <a href="{% url 'note_tags' slug=tag.slug %}"><span class="large-tag badge badge-info">{{tag.slug}}</span></a>
+        <li class="dropdown-item"><a href="{% url 'note_tags' slug=tag.slug %}"><span class="large-tag badge badge-info">{{tag.slug}}</span></a></li>
         {% endfor %}
-      </div>
-
-      <div class="authors"> Authors:
+        <li class="dropdown-item">Authors</li>
         {% for user in users %}
-        <a href="{% url 'note_authors' pk=user.pk %}"><span class="large-tag badge badge-secondary">{{user.first_name}} {{user.last_name}}</span></a>
+        <li class="dropdown-item"><a href="{% url 'note_authors' pk=user.pk %}"><span class="large-tag badge badge-secondary">{{user.first_name}} {{user.last_name}}</span></a></li>
         {% endfor %}
-      </div>
-    </div>   
-    
-  </div>
+      </ul>
+    </span>
+  </nav>
 </div>
-</div>
+
 
 <div class="row">
   <div class="col">
