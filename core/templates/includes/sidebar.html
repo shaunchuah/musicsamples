@@ -18,13 +18,13 @@
           <p>Add New Sample</p>
         </a>
       </li>
-      <li class="{% if request.path == '/barcode/' %}active{% endif %}">
+      <li class="{% if 'barcode' in request.path %}active{% endif %}">
         <a href="/barcode">
           <i class="tim-icons icon-tag"></i>
           <p>QR Scan</p>
         </a>
       </li>
-      <li class="{% if request.path == '/analytics/' %}active{% endif %}">
+      <li class="{% if 'analytics' in request.path %}active{% endif %}">
         <a href="/analytics">
           <i class="tim-icons icon-chart-bar-32"></i>
           <p>Analytics</p>

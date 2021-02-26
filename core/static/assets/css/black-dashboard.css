@@ -26,6 +26,12 @@
   text-align: center;
 }
 
+.form-control.search {
+  border-left: 0;
+  border-top: 0;
+  border-radius: 0;
+}
+
 .glogo img {
   max-width: 60%;
 }
@@ -14641,7 +14647,7 @@ fieldset[disabled] .btn-link.active {
 
 @media screen and (min-width: 992px) {
   .dropdown-menu .dropdown-item {
-    color: #9A9A9A;
+    color: #313131;
   }
 }
 
@@ -17111,7 +17117,7 @@ hr {
   background: -moz-linear-gradient(0deg, #ba54f5 0%, #e14eca 100%);
   background: linear-gradient(0deg, #ba54f5 0%, #e14eca 100%);
   height: 100vh;
-  width: 255px;
+  width: 240px;
   position: fixed;
   top: 0;
   left: 0;
@@ -17123,7 +17129,7 @@ hr {
   margin-top: 0px;
   padding-top: 0px;
   margin-left: 0px;
-  padding-left: 20px;
+  padding-left: 10px;
   border-top-right-radius: 0px;
   transition: 0.5s cubic-bezier(0.685, 0.0473, 0.346, 1);
 }
@@ -17270,7 +17276,7 @@ hr {
   text-transform: uppercase;
   cursor: pointer;
   font-size: 1rem;
-  padding: 10px 8px;
+  padding: 0.3rem 8px;
   line-height: 1.625rem;
 }
 
@@ -17584,7 +17590,7 @@ hr {
 }
 
 .main-panel>.content {
-  padding: 78px 30px 30px 280px;
+  padding: 78px 20px 30px 260px;
   min-height: calc(100vh - 70px);
 }
 
@@ -18398,8 +18404,8 @@ code {
 .input-group-prepend .input-group-text,
 .input-group-prepend .input-group-text {
   background-color: transparent;
-  border: 1px solid #2b3553;
-  border-radius: 0.4285rem;
+  /* border: 1px solid #2b3553;
+  border-radius: 0.4285rem; */
   color: #ffffff;
   margin: 0;
 }
@@ -18415,9 +18421,9 @@ code {
 .input-group-focus .input-group-prepend .input-group-text,
 .input-group-focus .input-group-append .input-group-text {
   background-color: #ffffff;
-  border-color: #e14eca;
+  border-color: #3055bb;
   background-color: transparent;
-  border-color: #e14eca;
+  border-color: #3055bb;
 }
 
 .input-group-focus.no-border .input-group-prepend .input-group-text,
@@ -19158,7 +19164,7 @@ Copyright (c) 2015 Daniel Eden
 .white-content .input-group-focus .input-group-prepend .input-group-text,
 .white-content .input-group-focus .input-group-append .input-group-text,
 .white-content .input-group-focus .form-control {
-  border-color: #e14eca;
+  border-color: ##3055bb;
 }
 
 .white-content .input-group-focus.no-border .input-group-prepend .input-group-text,
