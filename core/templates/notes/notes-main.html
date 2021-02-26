@@ -10,17 +10,50 @@
   {{ page_title }}
 </h2>
 <div class="row">
-  <div class="col mb-4">
+  <div class="col-md-4 mb-4">
     <a href="/notes/add/" class="btn btn-fill btn-success">Add New Note</a>
   </div>
+  <div class="col-md-4 offset-md-4">
+  <form action="/notes/search/" method="GET">
+    <div class="input-group">
+      <input type="text" class="form-control search" name="q" placeholder="Search title, content and sample ID" />
+      <div class="input-group-append">
+      <button type="submit" class="btn btn-outline btn-success">Search</button>
+    </div>
+    </div>
+  </form>
 </div>
+</div>
+
 <div class="row">
-  <div class="col-lg-8">
+  <div class="col">
+  <div class="card">
+    
+    <div class="card-body">
+      <div class="tags"> Tags:
+        {% for tag in all_tags %}
+        <a href="{% url 'note_tags' slug=tag.slug %}"><span class="large-tag badge badge-info">{{tag.slug}}</span></a>
+        {% endfor %}
+      </div>
+
+      <div class="authors"> Authors:
+        {% for user in users %}
+        <a href="{% url 'note_authors' pk=user.pk %}"><span class="large-tag badge badge-secondary">{{user.first_name}} {{user.last_name}}</span></a>
+        {% endfor %}
+      </div>
+    </div>   
+    
+  </div>
+</div>
+</div>
+
+<div class="row">
+  <div class="col">
     {% if notes %}
     <div class="row">
     {% for note in notes %}
     
-      <div class="col-lg-6">
+      <div class="col-lg-4">
         <div class="card notes">
           <div class="card-header">
             <div class="float-right">
@@ -97,48 +130,7 @@
     {% endif %}
   </div>
   
-  <div class="col-lg-4">
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Search Notes</h3>
-      </div>
-      
-      <div class="card-body">
-        <form action="/notes/search/" method="GET">
-        <div class="form-group">          
-          <input type="text" class="form-control" name="q" placeholder="Search title, content and sample ID" />
-        </div>
-        <div class="card-footer">
-          <button type="submit" class="btn btn-fill btn-success">Search</button>
-        </div>
-        </form>
-      </div>     
-    
-    </div>
 
-    <div class="card tags">
-      <div class="card-header">
-        <h3 class="card-title">Tags</h3>
-      </div>
-      <div class="card-body">
-        {% for tag in all_tags %}
-        <a href="{% url 'note_tags' slug=tag.slug %}"><span class="large-tag badge badge-info">{{tag.slug}}</span></a>
-        {% endfor %}
-      </div>
-    </div>
-      
-    <div class="card authors">
-      <div class="card-header">
-        <h3 class="card-title">Authors</h3>
-      </div>
-      <div class="card-body">
-        {% for user in users %}
-        <a href="{% url 'note_authors' pk=user.pk %}"><span class="large-tag badge badge-secondary">{{user.first_name}} {{user.last_name}}</span></a>
-        {% endfor %}
-      </div>
-    </div>
-
-  </div>
 
 
 </div>
