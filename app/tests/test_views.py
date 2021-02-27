@@ -1,6 +1,6 @@
 import pytest
 from django.test import RequestFactory
-from ..models import Sample
+from ..models import Sample, Note
 from django.urls import reverse, resolve
 from django.contrib.auth import get_user_model
 from .. import views
@@ -22,6 +22,10 @@ def create_user(db, django_user_model, test_password):
            kwargs['username'] = 'testuser1'
        return django_user_model.objects.create_user(**kwargs)
    return make_user
+
+@pytest.fixture
+def other_user(db, django_user_model):
+    return django_user_model.objects.create(username='user2', password='user2')
 
 @pytest.fixture
 def auto_login_user(db, client, create_user, test_password):
@@ -232,3 +236,65 @@ def test_sample_reactivate(auto_login_user):
     response = client.post(path, data={'is_fully_used': False})
     assert Sample.objects.get(pk=1).is_fully_used == False, 'Should restore the deleted sample'
     assert response.url == '/'
+
+########## TESTS FOR NOTES #############
+
+def test_shared_notes_page(auto_login_user):
+    client, user = auto_login_user()
+    path = reverse('notes')
+    response = client.get(path)
+    assertTemplateUsed(response, 'notes/notes-main.html')
+
+def test_personal_notes_page(auto_login_user):
+    client, user = auto_login_user()
+    path = reverse('note_personal')
+    response = client.get(path)
+    assertTemplateUsed(response, 'notes/notes-main.html') 
+
+def test_unable_to_get_private_note(auto_login_user, other_user):
+    client, user = auto_login_user()
+    private_note = mixer.blend('app.note', title='private', author = other_user, is_public = False)
+    assert Note.objects.count() == 1
+    path = reverse('note_detail', kwargs = {'pk': 1})
+    response = client.get(path)
+    assert response.status_code == 302
+
+def test_get_own_private_note(auto_login_user):
+    client, user = auto_login_user()
+    private_note = mixer.blend('app.note', title='my private note', is_public = False, author = user)
+    path = reverse('note_detail', kwargs = {'pk': 1})
+    response = client.get(path)
+    assert response.context['note'].title == 'my private note'
+
+def test_get_public_note(auto_login_user, other_user):
+    client, user = auto_login_user()
+    other_user_note = mixer.blend('app.note', title = 'Public Note', author = other_user, is_public = True)
+
+    path = reverse('note_detail', kwargs = {'pk':1})
+    response = client.get(path)
+    assert response.context['note'].title == 'Public Note'
+    assert response.context['note'].author.username == 'user2'
+
+def test_get_note_with_tags(auto_login_user):
+    client, user = auto_login_user()
+    note = mixer.blend('app.note', title = 'tag test', is_public = True)
+    note.tags.add('tag1')
+    path = reverse('note_tags', kwargs={'slug':'tag1'})
+    response = client.get(path)
+    assert response.context['notes'][0].title == 'tag test'
+
+def test_get_note_by_author(auto_login_user, other_user):
+    client, user = auto_login_user()
+    other_user_note = mixer.blend('app.note', title ='post by user2', author = other_user, is_public = True)
+
+    path = reverse('note_authors', kwargs={'pk': other_user.id})
+    response = client.get(path)
+    assert response.context['notes'][0].title == 'post by user2'
+
+def test_note_add(auto_login_user):
+    client, user = auto_login_user()
+    path = reverse('new_note')
+    response = client.get(path)
+    assertTemplateUsed('notes/notes-add.html')
+    response = client.post(path)
+    assert response.context['form'].is_bound == True
