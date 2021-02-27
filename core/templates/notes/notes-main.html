@@ -135,6 +135,8 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script>
-  
+  $(document).ready(function() {
+    $('.alert').delay(2000).fadeOut(2000);
+  });
 </script>
 {% endblock javascripts %}
