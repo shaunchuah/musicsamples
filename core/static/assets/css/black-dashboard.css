@@ -3927,7 +3927,7 @@ input[type="button"].btn-block {
 .dropdown-item {
   display: block;
   width: 100%;
-  padding: 0.25rem 1.5rem;
+  padding: 0.25rem 1rem;
   clear: both;
   font-weight: 400;
   color: #212529;
@@ -14311,8 +14311,8 @@ fieldset[disabled] .btn-link.active {
 .dropdown-menu .dropdown-item,
 .bootstrap-select .dropdown-menu.inner li a {
   font-size: 0.75rem;
-  padding-top: .6rem;
-  padding-bottom: .6rem;
+  padding-top: 0rem;
+  padding-bottom: .15rem;
   margin-top: 5px;
   -webkit-transition: all 150ms linear;
   -moz-transition: all 150ms linear;
