@@ -419,7 +419,6 @@ from django.urls import reverse
 
 # Shared Lab Notes - Find all shared notes between all the users
 @login_required(login_url="/login/")
-@cache_page(60 * 1) #Cache page for 1 minute
 def notes(request):
     notes = Note.objects.all().filter(is_public=True).filter(is_deleted=False)
     page = request.GET.get('page', 1)
@@ -437,7 +436,6 @@ def notes(request):
 
 # My Notebook - Show all notes belonging to the logged in user
 @login_required(login_url="/login/")
-@cache_page(60 * 1) #Cache page for 1 minute
 def notes_personal(request):
     notes = Note.objects.all().filter(is_deleted=False).filter(author=request.user)
     page = request.GET.get('page', 1)
@@ -455,7 +453,6 @@ def notes_personal(request):
 
 # Find all shared notes by tags and private notes depending on the logged in user
 @login_required(login_url="/login/")
-@cache_page(60 * 5) #Cache page for 5 minutes
 def note_tags(request, slug):
     tag = get_object_or_404(Tag, slug=slug)
 
