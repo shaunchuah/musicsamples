@@ -478,7 +478,6 @@ def note_tags(request, slug):
 
 # See all the shared notes by specific authors
 @login_required(login_url="/login/")
-@cache_page(60 * 5) #Cache page for 5 minutes
 def note_authors(request, pk):
     user = get_object_or_404(User, pk=pk)
     notes = Note.objects.filter(is_public=True).filter(is_deleted=False).filter(author=pk)
@@ -497,7 +496,6 @@ def note_authors(request, pk):
 
 # See single note
 @login_required(login_url="/login/")
-@cache_page(60 * 1) #Cache page for 1 minute
 def note_detail(request, pk):
     note = get_object_or_404(Note, pk=pk)
     if note.is_public == True:
