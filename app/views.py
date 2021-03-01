@@ -585,7 +585,6 @@ def search_notes(request):
         context = {'notes': notes, 'page_title': 'Search Results for: ' + query_string, 'all_tags': all_tags, 'users': users}
         return render(request, 'notes/notes-main.html', context)
     else:
-        messages.error(request, 'No search terms provided.')
         if "HTTP_REFERER" in request.META:
             return redirect(request.META['HTTP_REFERER'])
         else:
