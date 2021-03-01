@@ -2,14 +2,10 @@ from django.urls import path, re_path, include
 from app import views
 from rest_framework import routers, serializers, viewsets
 from .views import SampleViewSet, SampleIsFullyUsedViewSet
-from django.conf.urls import handler404, handler500
 
 router = routers.DefaultRouter()
 router.register(r'samples', SampleViewSet)
 router.register(r'samples_used', SampleIsFullyUsedViewSet)
-
-handler404 = 'app.views.error_404'
-handler500 = 'app.views.error_500'
 
 urlpatterns = [
     path('', views.index, name='home'),
