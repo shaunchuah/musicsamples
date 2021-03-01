@@ -42,9 +42,7 @@
       </div>
       <hr />
       <div class="card-body">
-        <!--<p>{{ note.content|striptags|slice:":400"}}...<a href="{% url 'note_detail' pk=note.pk %}">View More</a></p>-->
-        {{ note.content|safe }}
-        
+        {{ note.content|safe }}        
       </div>
       <hr />
       <div class="card-footer">

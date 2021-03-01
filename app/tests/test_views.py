@@ -298,3 +298,19 @@ def test_note_add(auto_login_user):
     assertTemplateUsed('notes/notes-add.html')
     response = client.post(path)
     assert response.context['form'].is_bound == True
+
+def test_note_edit(auto_login_user):
+    client, user = auto_login_user()
+    note = mixer.blend('app.note', title = 'unedited title', author = user)
+    path = reverse('note_edit', kwargs = {'pk':1})
+
+    response = client.get(path)
+    assert response.context['form'].initial['title'] == 'unedited title'
+
+def test_missing_note_edit(auto_login_user):
+    client, user = auto_login_user()
+    note = mixer.blend('app.note', title = 'unedited title', author = user)
+    path = reverse('note_edit', kwargs = {'pk':1})
+
+    response = client.post(path)
+    assert response.context['form'].initial['title'] == 'unedited title'
