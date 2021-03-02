@@ -600,7 +600,7 @@ from django.http import JsonResponse
 @login_required(login_url="/login/")
 def autocomplete_locations(request):
     if 'term' in request.GET:
-        qs = Sample.objects.filter(is_deleted=False).filter(sample_location__istartswith=request.GET.get('term')).values('sample_location').distinct()
+        qs = Sample.objects.filter(is_deleted=False).filter(sample_location__icontains=request.GET.get('term')).values('sample_location').distinct()
     else:
         qs = Sample.objects.filter(is_deleted=False).values('sample_location').distinct()
     locations = list()
@@ -612,7 +612,7 @@ def autocomplete_locations(request):
 @login_required(login_url="/login/")
 def autocomplete_patient_id(request):
     if 'term' in request.GET:
-        qs = Sample.objects.filter(is_deleted=False).filter(patientid__istartswith=request.GET.get('term')).values('patientid').distinct()
+        qs = Sample.objects.filter(is_deleted=False).filter(patientid__icontains=request.GET.get('term')).values('patientid').distinct()
     else:
         qs = Sample.objects.filter(is_deleted=False).values('patientid').distinct()
     patients = list()
@@ -624,7 +624,7 @@ def autocomplete_patient_id(request):
 @login_required(login_url="/login/")
 def autocomplete_tags(request):
     if 'term' in request.GET:
-        tags = Tag.objects.filter(name__istartswith=request.GET.get('term')).values('name').distinct()      
+        tags = Tag.objects.filter(name__icontains=request.GET.get('term')).values('name').distinct()      
     else:
         tags = Tag.objects.values('name').distinct()
     tag_list = list()
