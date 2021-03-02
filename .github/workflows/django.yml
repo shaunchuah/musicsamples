@@ -16,7 +16,34 @@ jobs:
         python-version: [3.7, 3.8, 3.9]
 
     env:
-      SECRET_KEY: github-testing
+      DEBUG=True
+      SECRET_KEY=githubactionstestingkey
+      ALLOWED_HOSTS=localhost, 127.0.0.1
+      DB_USER=
+      DB_PASSWORD=
+      DB_NAME=mydatabase
+      DB_HOST=
+      DB_ENGINE=django.db.backends.sqlite3
+      DB_PORT=10
+      EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+      EMAIL_HOST=
+      EMAIL_HOST_USER=
+      EMAIL_HOST_PASSWORD=
+      EMAIL_PORT=10
+      EMAIL_USE_TLS=
+      SECURE_SSL_REDIRECT=False
+      SESSION_COOKIE_SECURE=False
+      CSRF_COOKIE_SECURE=False
+      SECURE_HSTS_SECONDS=10
+      SECURE_BROWSER_XSS_FILTER=False
+      SECURE_CONTENT_TYPE_NOSNIFF=False
+      AWS_ACCESS_KEY_ID=
+      AWS_SECRET_ACCESS_KEY=
+      USE_S3=False
+      AWS_STORAGE_BUCKET_NAME=
+      DEFAULT_CACHE_BACKEND=django.core.cache.backends.dummy.DummyCache
+      DEFAULT_CACHE_LOCATION=
+      CLIENT_CLASS=
 
     steps:
     - uses: actions/checkout@v2
