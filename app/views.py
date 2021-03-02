@@ -601,37 +601,33 @@ from django.http import JsonResponse
 def autocomplete_locations(request):
     if 'term' in request.GET:
         qs = Sample.objects.filter(is_deleted=False).filter(sample_location__istartswith=request.GET.get('term')).values('sample_location').distinct()
-        locations = list()
-        for sample in qs:
-            locations.append(sample['sample_location'])
-        return JsonResponse(locations, safe=False)
     else:
         qs = Sample.objects.filter(is_deleted=False).values('sample_location').distinct()
-        for sample in qs:
-            locations.append(sample['sample_location'])
-        return JsonResponse(locations, safe=False)
+    locations = list()
+    for sample in qs:
+        locations.append(sample['sample_location'])
+    return JsonResponse(locations, safe=False)
 
 # Helps speed up sample adding by locating existing patient IDs
 @login_required(login_url="/login/")
 def autocomplete_patient_id(request):
     if 'term' in request.GET:
         qs = Sample.objects.filter(is_deleted=False).filter(patientid__istartswith=request.GET.get('term')).values('patientid').distinct()
-        patients = list()
-        for sample in qs:
-            patients.append(sample['patientid'])
-        return JsonResponse(patients, safe=False)
     else:
         qs = Sample.objects.filter(is_deleted=False).values('patientid').distinct()
-        patients = list()
-        for sample in qs:
-            patients.append(sample['patientid'])
-        return JsonResponse(patients, safe=False)
+    patients = list()
+    for sample in qs:
+        patients.append(sample['patientid'])
+    return JsonResponse(patients, safe=False)
 
 # Helps keep tags consistent by promoting autocompletion against existing tags in the database
 @login_required(login_url="/login/")
 def autocomplete_tags(request):
+    if 'term' in request.GET:
+        tags = Tag.objects.filter(name__istartswith=request.GET.get('term')).values('name').distinct()      
+    else:
+        tags = Tag.objects.values('name').distinct()
     tag_list = list()
-    tags = Tag.objects.values('name').distinct()
     for tag in tags:
         tag_list.append(tag['name'])
     return JsonResponse(tag_list, safe=False)
