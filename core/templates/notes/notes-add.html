@@ -68,9 +68,10 @@
 
   <script>
     $(document).ready(function () {
-    
-
-
+      
+      $('div.bootstrap-tagsinput > input').autocomplete({
+        source: '{% url 'autocomplete_tags' %}'
+      });
 
   });
   </script>
