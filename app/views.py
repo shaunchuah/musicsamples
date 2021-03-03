@@ -65,7 +65,6 @@ def gid_overview(request):
 
 # Reference static page for publishing lab protocols
 @login_required(login_url="/login/")
-@cache_page(60 * 60) #Cache page for 60 minutes
 def reference(request):
     return render(request, "reference.html")
 
