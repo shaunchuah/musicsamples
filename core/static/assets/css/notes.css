@@ -5,6 +5,23 @@
     min-height: 25rem;
 }
 
+.music-files a {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.music-files a:last-child {
+    margin-bottom: 2rem;
+}
+
+.music-files h3 {
+    margin-top: 1.5rem;
+}
+
+.music-files h3:first-child {
+    margin-top: 0;
+}
+
 .notes .card-header {
     padding:1.5rem;
     padding-bottom: 0;
