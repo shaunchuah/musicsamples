@@ -1,4 +1,4 @@
-name: Django CI Testing
+name: SampleTrek Automated CI Testing
 
 on:
   push:

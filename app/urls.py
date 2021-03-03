@@ -2,12 +2,14 @@ from django.urls import path, re_path, include
 from app import views
 from rest_framework import routers, serializers, viewsets
 from .views import SampleViewSet, SampleIsFullyUsedViewSet
+from django.views.generic.base import TemplateView
 
 router = routers.DefaultRouter()
 router.register(r'samples', SampleViewSet)
 router.register(r'samples_used', SampleIsFullyUsedViewSet)
 
 urlpatterns = [
+    path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
     path('', views.index, name='home'),
     path('analytics/', views.analytics, name='analytics'),
     path('analytics/gid_overview', views.gid_overview, name='gid_overview'),
