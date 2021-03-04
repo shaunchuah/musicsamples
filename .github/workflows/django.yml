@@ -80,6 +80,11 @@ jobs:
         SSH_KEY: ${{ secrets.SAMPLETREK_SSH_KEY }}
         SSH_HOST: ${{ secrets.SAMPLETREK_SSH_HOST }}
     
-    - name: Run server deployment script
-      run: ssh deploy 'sudo bash ~/scripts/update.sh'
-    
+    - name: Run django deployment script
+      run: ssh deploy './scripts/github_deploy_django.sh'
+
+    - name: Restart gunicorn
+      run: ssh deploy 'echo ${{ secrets.SAMPLETREK_SUDO }} | sudo -S systemctl restart gunicorn'
+
+    - name: Restart nginx
+      run: ssh deploy 'echo ${{ secrets.SAMPLETREK_SUDO }} | sudo -S systemctl restart nginx'
