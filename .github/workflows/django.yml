@@ -58,3 +58,28 @@ jobs:
     - name: Run Tests and Coverage Report
       run: |
         pytest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up SSH
+      run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/staging.key
+          chmod 600 ~/.ssh/staging.key
+          cat >>~/.ssh/config <<END
+          Host deploy
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/staging.key
+            StrictHostKeyChecking no
+          END
+      env:
+        SSH_USER: ${{ secrets.SAMPLETREK_SSH_USER }}
+        SSH_KEY: ${{ secrets.SAMPLETREK_SSH_KEY }}
+        SSH_HOST: ${{ secrets.SAMPLETREK_SSH_HOST }}
+    
+    - name: Run server deployment script
+        run: ssh deploy 'sudo bash ~/scripts/update.sh'
+    
