@@ -81,5 +81,5 @@ jobs:
         SSH_HOST: ${{ secrets.SAMPLETREK_SSH_HOST }}
     
     - name: Run server deployment script
-        run: ssh deploy 'sudo bash ~/scripts/update.sh'
+      run: ssh deploy 'sudo bash ~/scripts/update.sh'
     
