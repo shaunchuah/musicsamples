@@ -4,7 +4,7 @@ from simple_history.models import HistoricalRecords
 from ckeditor_uploader.fields import RichTextUploadingField
 from taggit.managers import TaggableManager
 
-# Create your models here.
+
 class Sample(models.Model):
     musicsampleid = models.CharField(max_length=200, unique=True)
     patientid = models.CharField(max_length=200)
@@ -23,8 +23,8 @@ class Sample(models.Model):
 
     haemolysis_reference = models.CharField(max_length=200, blank=True, null=True)
     biopsy_location = models.CharField(max_length=100, blank=True, null=True)
-    biopsy_inflamed_status = models.CharField(max_length=100, blank=True, null=True)    
-    
+    biopsy_inflamed_status = models.CharField(max_length=100, blank=True, null=True)
+
     created_by = models.CharField(max_length=200)
     last_modified_by = models.CharField(max_length=200)
     data_first_created = models.DateTimeField(auto_now_add=True)
@@ -37,6 +37,7 @@ class Sample(models.Model):
     def __str__(self):
         return self.musicsampleid
 
+
 class Note(models.Model):
     title = models.CharField(max_length=200, unique=True)
     content = RichTextUploadingField(blank=True, null=True)
@@ -45,7 +46,7 @@ class Note(models.Model):
     is_deleted = models.BooleanField(default=False)
     tags = TaggableManager(blank=True)
 
-    author = models.ForeignKey(User, on_delete= models.CASCADE, related_name='notes')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notes')
     published_date = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
     history = HistoricalRecords()

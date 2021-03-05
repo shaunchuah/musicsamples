@@ -1,15 +1,20 @@
+from .models import Sample, Note
+from .forms import SampleForm, CheckoutForm, DeleteForm, RestoreForm
+from .forms import NoteForm, NoteDeleteForm, ReactivateForm, FullyUsedForm
+from django.http import JsonResponse
 import datetime
-
+import csv
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from django.template import loader
 from django.http import HttpResponse
-from django import template
-
+from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
 from django.contrib import messages
 from django.db.models import Q
-from django.forms import formset_factory
-
+from rest_framework import viewsets, permissions
+from .serializers import SampleSerializer, SampleIsFullyUsedSerializer
+from taggit.models import Tag
+from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count
 from django.db.models.functions import Trunc
@@ -17,12 +22,10 @@ from django.views.decorators.cache import cache_page
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-from .models import Sample
-from .forms import SampleForm, CheckoutForm, DeleteForm, RestoreForm, ReactivateForm, FullyUsedForm
 
-# Home Page
 @login_required(login_url="/login/")
 def index(request):
+    # Home Page
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).order_by('-sample_datetime')
     page = request.GET.get('page', 1)
     paginator = Paginator(sample_list, 50)
@@ -35,10 +38,11 @@ def index(request):
     context = {'sample_list': samples}
     return render(request, "index.html", context)
 
-# Analytics Page
+
 @login_required(login_url="/login/")
-@cache_page(60 * 60) #Cache page for 60 minutes
+@cache_page(60 * 60)  # Cache page for 60 minutes
 def analytics(request):
+    # Analytics Page
     total_samples = Sample.objects.all().filter(is_deleted=False).count()
     total_active_samples = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).count()
     samples_by_month = Sample.objects.all().filter(is_deleted=False).annotate(sample_month=Trunc('sample_datetime', 'month')).values('sample_month').annotate(sample_count=Count('id')).order_by('sample_month')
@@ -54,8 +58,10 @@ def analytics(request):
     return render(request, "analytics.html", context)
 
 # Analytics --> Sample Overview Table Page
+
+
 @login_required(login_url="/login/")
-@cache_page(60 * 60) #Cache page for 60 minutes
+@cache_page(60 * 60)  # Cache page for 60 minutes
 def gid_overview(request):
     sample_categories = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).values("sample_type").distinct()
     patient_id_list = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).order_by('patientid').values("patientid").distinct()
@@ -64,11 +70,15 @@ def gid_overview(request):
     return render(request, "gid_overview.html", context)
 
 # Reference static page for publishing lab protocols
+
+
 @login_required(login_url="/login/")
 def reference(request):
     return render(request, "reference.html")
 
 # User account page showing recently accessed samples
+
+
 @login_required(login_url="/login/")
 def account(request):
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(last_modified_by=request.user.username).order_by('-last_modified')[:20]
@@ -84,6 +94,8 @@ def account(request):
     return render(request, "account.html", context)
 
 # Deleted samples page for samples which have been soft deleted
+
+
 @login_required(login_url="/login/")
 def archive(request):
     sample_list = Sample.objects.all().filter(is_deleted=True).order_by('-last_modified')
@@ -91,6 +103,8 @@ def archive(request):
     return render(request, "archive.html", context)
 
 # Used samples page for samples marked as being fully used
+
+
 @login_required(login_url="/login/")
 def used_samples(request):
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=True).order_by('-last_modified')
@@ -98,6 +112,8 @@ def used_samples(request):
     return render(request, "used_samples.html", context)
 
 # Add mew sample page
+
+
 @login_required(login_url="/login/")
 def add(request):
     if request.method == "POST":
@@ -116,6 +132,8 @@ def add(request):
     return render(request, "add.html", {'form': form})
 
 # Historical changes function to integrate simple history into the sample detail page
+
+
 def historical_changes(query):
     changes = []
     if query is not None:
@@ -129,6 +147,8 @@ def historical_changes(query):
         return changes
 
 # Sample Detail Page - retrieves sample history and also linked notes both public and private
+
+
 @login_required(login_url="/login/")
 def sample_detail(request, pk):
     sample = get_object_or_404(Sample, pk=pk)
@@ -142,14 +162,15 @@ def sample_detail(request, pk):
     else:
         gid_id = None
     processing_time = None
-    if sample.processing_datetime != None:
+    if sample.processing_datetime is not None:
         time_difference = sample.processing_datetime - sample.sample_datetime
         processing_time = int(time_difference.total_seconds() / 60)
     return render(request, "sample-detail.html", {'sample': sample, 'changes': changes, 'first': first_change, 'processing_time': processing_time, 'gid_id': gid_id, 'related_notes': related_notes, 'private_notes': private_notes})
 
-# Sample Edit Page    
+
 @login_required(login_url="/login/")
 def sample_edit(request, pk):
+    # Sample Edit Page
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
         form = SampleForm(request.POST, instance=sample)
@@ -167,27 +188,29 @@ def sample_edit(request, pk):
         form = SampleForm(instance=sample)
     return render(request, 'sample-edit.html', {'form': form})
 
-# Sample search in home page
+
 @login_required(login_url="/login/")
-@cache_page(60 * 5) #Cache page for 5 minutes
+@cache_page(60 * 5)  # Cache page for 5 minutes
 def search(request):
-    query_string=''
+    # Sample search in home page
+    query_string = ''
     if ('q' in request.GET) and request.GET['q'].strip():
         query_string = request.GET.get('q')
         sample_list = Sample.objects.filter(
-            Q(musicsampleid__icontains=query_string)|
-            Q(patientid__icontains=query_string)|
-            Q(sample_location__icontains=query_string)|
-            Q(sample_sublocation__icontains=query_string)|
-            Q(sample_type__icontains=query_string)|
+            Q(musicsampleid__icontains=query_string) |
+            Q(patientid__icontains=query_string) |
+            Q(sample_location__icontains=query_string) |
+            Q(sample_sublocation__icontains=query_string) |
+            Q(sample_type__icontains=query_string) |
             Q(sample_comments__icontains=query_string)).filter(is_fully_used=False).filter(is_deleted=False)
-        return render(request, 'index.html', { 'query_string': query_string, 'sample_list': sample_list})
+        return render(request, 'index.html', {'query_string': query_string, 'sample_list': sample_list})
     else:
-        return render(request, 'index.html', { 'query_string': 'Null' })
+        return render(request, 'index.html', {'query_string': 'Null'})
 
-# Sample Checkout - Quick update of sample location from home page
+
 @login_required(login_url="/login/")
-def checkout(request,pk):
+def checkout(request, pk):
+    # Sample Checkout - Quick update of sample location from home page
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
         form = CheckoutForm(request.POST, instance=sample)
@@ -205,9 +228,10 @@ def checkout(request,pk):
         form = CheckoutForm(instance=sample)
     return render(request, 'sample-checkout.html', {'form': form})
 
-# Soft deletion method for samples
+
 @login_required(login_url="/login/")
-def delete(request,pk):
+def delete(request, pk):
+    # Soft deletion method for samples
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
         form = DeleteForm(request.POST, instance=sample)
@@ -225,9 +249,10 @@ def delete(request,pk):
         form = DeleteForm(instance=sample)
     return render(request, 'sample-delete.html', {'form': form})
 
-# Restore soft-deleted sample
+
 @login_required(login_url="/login/")
-def restore(request,pk):
+def restore(request, pk):
+    # Restore soft-deleted sample
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
         form = RestoreForm(request.POST, instance=sample)
@@ -245,9 +270,10 @@ def restore(request,pk):
         form = RestoreForm(instance=sample)
     return render(request, 'sample-restore.html', {'form': form})
 
-# Mark sample as fully used
+
 @login_required(login_url="/login/")
-def fully_used(request,pk):
+def fully_used(request, pk):
+    # Mark sample as fully used
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
         form = FullyUsedForm(request.POST, instance=sample)
@@ -265,9 +291,10 @@ def fully_used(request,pk):
         form = FullyUsedForm(instance=sample)
     return render(request, 'sample-fullyused.html', {'form': form})
 
-# Reactive sample which has been marked as fully used
+
 @login_required(login_url="/login/")
-def reactivate_sample(request,pk):
+def reactivate_sample(request, pk):
+    # Reactive sample which has been marked as fully used
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
         form = ReactivateForm(request.POST, instance=sample)
@@ -285,33 +312,33 @@ def reactivate_sample(request,pk):
         form = ReactivateForm(instance=sample)
     return render(request, 'sample-reactivate.html', {'form': form})
 
-#Export entire database to CSV for backup, currently not in use
+
 @login_required(login_url="/login/")
 def export_csv(request):
+    # Export entire database to CSV for backup, currently not in use
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="music_samples_%s.csv"' % datetime.datetime.now().strftime("%Y-%m-%d")
     writer = csv.writer(response)
-    writer.writerow(['MUSIC Sample ID','Patient ID', 'Sample Location', 'Sample Type', 'Sample Datetime', 'Sample Comments', 'Created By', 'Date First Created', 'Last Modified By', 'Last Modified'])
-    samples = Sample.objects.all().filter(is_deleted=False).values_list('musicsampleid','patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments', 'created_by', 'data_first_created', 'last_modified_by',  'last_modified')
+    writer.writerow(['MUSIC Sample ID', 'Patient ID', 'Sample Location', 'Sample Type', 'Sample Datetime', 'Sample Comments', 'Created By', 'Date First Created', 'Last Modified By', 'Last Modified'])
+    samples = Sample.objects.all().filter(is_deleted=False).values_list('musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments', 'created_by', 'data_first_created', 'last_modified_by',  'last_modified')
     for sample in samples:
         writer.writerow(sample)
     return response
 
-##Excel Exports
-from openpyxl import Workbook
-from openpyxl.utils import get_column_letter
+# Excel Exports
 
-# Exports custom views depending on the search string otherwise exports entire database
+
 @login_required(login_url="/login/")
 def export_excel(request):
-    query_string=''
+    # Exports custom views depending on the search string otherwise exports entire database
+    query_string = ''
     if ('q' in request.GET) and request.GET['q'].strip():
         query_string = request.GET.get('q')
         samples_queryset = Sample.objects.filter(
-            Q(musicsampleid__icontains=query_string)|
-            Q(patientid__icontains=query_string)|
-            Q(sample_location__icontains=query_string)|
-            Q(sample_type__icontains=query_string)|
+            Q(musicsampleid__icontains=query_string) |
+            Q(patientid__icontains=query_string) |
+            Q(sample_location__icontains=query_string) |
+            Q(sample_type__icontains=query_string) |
             Q(sample_comments__icontains=query_string))
     else:
         samples_queryset = Sample.objects.all().filter(is_deleted=False)
@@ -320,36 +347,36 @@ def export_excel(request):
     response['Content-Disposition'] = 'attachment; filename="samples_export_%s.xlsx"' % datetime.datetime.now().strftime("%Y-%m-%d")
 
     workbook = Workbook()
-    #Get active worksheet
+    # Get active worksheet
     worksheet = workbook.active
     worksheet.title = 'All Samples'
 
-    #Define the excel column names
+    # Define the excel column names
     columns = [
-        'Sample ID', 
-        'Patient ID', 
-        'Sample Location', 
-        'Sample Sublocation', 
-        'Sample Type', 
-        'Sampling Datetime', 
-        'Processing Datetime', 
+        'Sample ID',
+        'Patient ID',
+        'Sample Location',
+        'Sample Sublocation',
+        'Sample Type',
+        'Sampling Datetime',
+        'Processing Datetime',
         'Sampling to Processing Time (mins)',
-        'Sample Volume', 
-        'Sample Volume Units', 
-        'Freeze Thaw Count', 
-        'Haemolysis Reference Category (100 and above unusable)', 
-        'Biopsy Location', 
-        'Biopsy Inflamed Status', 
-        'Sample Comments', 
-        'Sample Fully Used?', 
-        'Created By', 
-        'Date Created', 
-        'Last Modified By', 
+        'Sample Volume',
+        'Sample Volume Units',
+        'Freeze Thaw Count',
+        'Haemolysis Reference Category (100 and above unusable)',
+        'Biopsy Location',
+        'Biopsy Inflamed Status',
+        'Sample Comments',
+        'Sample Fully Used?',
+        'Created By',
+        'Date Created',
+        'Last Modified By',
         'Last Modified'
         ]
     row_num = 1
 
-    #Write the column names in
+    # Write the column names in
     for col_num, column_title in enumerate(columns, 1):
         cell = worksheet.cell(row=row_num, column=col_num)
         cell.value = column_title
@@ -360,7 +387,7 @@ def export_excel(request):
 
     for sample in samples_queryset:
         processing_time = None
-        if sample.processing_datetime != None:
+        if sample.processing_datetime is not None:
             time_difference = sample.processing_datetime - sample.sample_datetime
             processing_time = int(time_difference.total_seconds() / 60)
         row_num += 1
@@ -395,30 +422,32 @@ def export_excel(request):
     workbook.save(response)
     return response
 
-##############################################################################################
-### NOTES SECTION ############################################################################
-##############################################################################################
+############################################################################
+# NOTES SECTION ############################################################
+############################################################################
 # Notes is set up much like a blogging system with the usual blogging tags
-# The main unique point is the ability to tag the ID of relevant samples to allow quick access both from the notes side as well as from the sample-detail side
+# The main unique point is the ability to tag the ID of relevant samples
+# to allow quick access both from the notes side as well as from the
+# sample-detail side
 #
 # SHARING
-# The default option is for notes to be shared to every user of the system to promote a collaborative lab environment. There is an option to mark notes as 'private'. 
-# he logic controlling access to private notes is found here.
+# The default option is for notes to be shared to every user of the system
+# to promote a collaborative lab environment. There is an option to mark
+# notes as 'private'.
+# The logic controlling access to private notes is found here.
 # Do note that every note is still viewable by the administrator
-# 
-# FILE UPLOADS/ATTACHMENTS - **IMPORTANT** - THESE FILES ARE PUBLICLY AVAILABLE OVER THE INTERNET IF YOU KNOW THE URL
-# File uploads are supported via CKEditor but will require configuring some sort of S3 backend to work properly 
-# See Django's documentation on handling media uploads - there are a few customisation options you can consider
+#
+# FILE UPLOADS/ATTACHMENTS - **IMPORTANT** - THESE FILES ARE
+# PUBLICLY AVAILABLE OVER THE INTERNET IF YOU KNOW THE URL
+# File uploads are supported via CKEditor but will require
+# configuring some sort of S3 backend to work properly
+# See Django's documentation on handling media uploads - there are a
+# few customisation options you can consider
 
 
-from .models import Note
-from .forms import NoteForm, NoteDeleteForm
-from taggit.models import Tag
-from django.urls import reverse 
-
-# Shared Lab Notes - Find all shared notes between all the users
 @login_required(login_url="/login/")
 def notes(request):
+    # Shared Lab Notes - Find all shared notes between all the users
     notes = Note.objects.all().filter(is_public=True).filter(is_deleted=False)
     page = request.GET.get('page', 1)
     paginator = Paginator(notes, 10)
@@ -433,9 +462,10 @@ def notes(request):
     context = {'notes': notes, 'page_title': 'Shared Notes', 'all_tags': all_tags, 'users': users}
     return render(request, "notes/notes-main.html", context)
 
-# My Notebook - Show all notes belonging to the logged in user
+
 @login_required(login_url="/login/")
 def notes_personal(request):
+    # My Notebook - Show all notes belonging to the logged in user
     notes = Note.objects.all().filter(is_deleted=False).filter(author=request.user)
     page = request.GET.get('page', 1)
     paginator = Paginator(notes, 10)
@@ -450,15 +480,18 @@ def notes_personal(request):
     context = {'notes': notes, 'page_title': 'My Notebook', 'all_tags': all_tags, 'users': users, 'next_url': reverse('note_personal')}
     return render(request, "notes/notes-main.html", context)
 
-# Find all shared notes by tags and private notes depending on the logged in user
+
 @login_required(login_url="/login/")
 def note_tags(request, slug):
+    # Find all shared notes by tags and private notes depending on the
+    # logged in user
     tag = get_object_or_404(Tag, slug=slug)
 
     # Get all public notes with the requested tag
     public_notes = Note.objects.filter(is_public=True).filter(is_deleted=False).filter(tags=tag)
 
-    # Get all the private notes with the requested tag if the author and logged in user is the same
+    # Get all the private notes with the requested tag if the author and
+    # logged in user is the same
     private_notes = Note.objects.filter(is_public=False).filter(is_deleted=False).filter(author__id=request.user.id).filter(tags=tag)
 
     notes = public_notes | private_notes
@@ -475,9 +508,10 @@ def note_tags(request, slug):
     context = {'notes': notes, 'page_title': 'Tag Results: #' + slug, 'all_tags': all_tags, 'users': users}
     return render(request, "notes/notes-main.html", context)
 
-# See all the shared notes by specific authors
+
 @login_required(login_url="/login/")
 def note_authors(request, pk):
+    # See all the shared notes by specific authors
     user = get_object_or_404(User, pk=pk)
     notes = Note.objects.filter(is_public=True).filter(is_deleted=False).filter(author=pk)
     page = request.GET.get('page', 1)
@@ -493,11 +527,12 @@ def note_authors(request, pk):
     context = {'notes': notes, 'page_title': 'Notes by ' + user.first_name + ' ' + user.last_name, 'all_tags': all_tags, 'users': users}
     return render(request, "notes/notes-main.html", context)
 
-# See single note
+
 @login_required(login_url="/login/")
 def note_detail(request, pk):
+    # See single note
     note = get_object_or_404(Note, pk=pk)
-    if note.is_public == True:
+    if note.is_public:
         secured_note = note
     else:
         if request.user.id == note.author.id:
@@ -510,9 +545,10 @@ def note_detail(request, pk):
     context = {'note': secured_note, 'changes': changes}
     return render(request, "notes/notes-detail.html", context)
 
-# Adding a new note
+
 @login_required(login_url="/login/")
 def note_add(request):
+    # Adding a new note
     if request.method == "POST":
         form = NoteForm(request.POST)
         if form.is_valid():
@@ -528,13 +564,14 @@ def note_add(request):
         form = NoteForm()
     return render(request, "notes/notes-add.html", {'form': form})
 
-# Editing an existing note
+
 @login_required(login_url="/login/")
 def note_edit(request, pk):
+    # Editing an existing note
     note = get_object_or_404(Note, pk=pk)
     if request.method == "POST":
         form = NoteForm(request.POST, instance=note)
-        
+
         # Check user authorisation
         if form.is_valid() and request.user.id == note.author.id:
             form.save()
@@ -550,9 +587,10 @@ def note_edit(request, pk):
         form = NoteForm(instance=note)
     return render(request, "notes/notes-edit.html", {'form': form, 'note': note})
 
-# Soft deleting a note
+
 @login_required(login_url="/login/")
 def note_delete(request, pk):
+    # Soft deleting a note
     note = get_object_or_404(Note, pk=pk)
     if request.method == "POST":
         form = NoteDeleteForm(request.POST, instance=note)
@@ -572,15 +610,16 @@ def note_delete(request, pk):
         form = NoteDeleteForm(instance=note)
     return render(request, "notes/notes-delete.html", {'form': form, 'note': note})
 
-# Search Notes
+
 @login_required(login_url="/login/")
 def search_notes(request):
+    # Search Notes
     all_tags = Note.tags.all()
     users = User.objects.all()
-    query_string=''
+    query_string = ''
     if ('q' in request.GET) and request.GET['q'].strip():
         query_string = request.GET.get('q')
-        notes = Note.objects.filter(Q(title__icontains=query_string)|Q(sample_tags__musicsampleid__icontains=query_string)|Q(content__icontains=query_string)).filter(is_deleted=False)       
+        notes = Note.objects.filter(Q(title__icontains=query_string) | Q(sample_tags__musicsampleid__icontains=query_string) | Q(content__icontains=query_string)).filter(is_deleted=False)
         context = {'notes': notes, 'page_title': 'Search Results for: ' + query_string, 'all_tags': all_tags, 'users': users}
         return render(request, 'notes/notes-main.html', context)
     else:
@@ -590,14 +629,14 @@ def search_notes(request):
             return redirect(reverse('notes'))
 
 
-##############################################################################################
-### AUTOCOMPLETE/AJAX SECTION ################################################################
-##############################################################################################
-from django.http import JsonResponse
+#############################################################################
+# AUTOCOMPLETE/AJAX SECTION #################################################
+#############################################################################
 
-# Helps speed up sample adding by autocompleting already existing locations
+
 @login_required(login_url="/login/")
 def autocomplete_locations(request):
+    # Helps speed up sample adding by autocompleting already existing locations
     if 'term' in request.GET:
         qs = Sample.objects.filter(is_deleted=False).filter(sample_location__icontains=request.GET.get('term')).values('sample_location').distinct()
     else:
@@ -607,9 +646,10 @@ def autocomplete_locations(request):
         locations.append(sample['sample_location'])
     return JsonResponse(locations, safe=False)
 
-# Helps speed up sample adding by locating existing patient IDs
+
 @login_required(login_url="/login/")
 def autocomplete_patient_id(request):
+    # Helps speed up sample adding by locating existing patient IDs
     if 'term' in request.GET:
         qs = Sample.objects.filter(is_deleted=False).filter(patientid__icontains=request.GET.get('term')).values('patientid').distinct()
     else:
@@ -619,11 +659,13 @@ def autocomplete_patient_id(request):
         patients.append(sample['patientid'])
     return JsonResponse(patients, safe=False)
 
-# Helps keep tags consistent by promoting autocompletion against existing tags in the database
+
 @login_required(login_url="/login/")
 def autocomplete_tags(request):
+    # Helps keep tags consistent by promoting autocompletion against
+    # existing tags in the database
     if 'term' in request.GET:
-        tags = Tag.objects.filter(name__icontains=request.GET.get('term')).values('name').distinct()      
+        tags = Tag.objects.filter(name__icontains=request.GET.get('term')).values('name').distinct()
     else:
         tags = Tag.objects.values('name').distinct()
     tag_list = list()
@@ -632,35 +674,39 @@ def autocomplete_tags(request):
     return JsonResponse(tag_list, safe=False)
 
 
-##############################################################################################
-### REST FRAMEWORK/BARCODE APIS ##############################################################
-##############################################################################################
-# The bulk QR scanning capability is dependent on using JavaScript - jQuery in this instance - in the frontend and Django Rest Framework in the backend.
+##############################################################################
+# REST FRAMEWORK/BARCODE APIS ################################################
+##############################################################################
+# The bulk QR scanning capability is dependent on using JavaScript - jQuery in
+# this instance - in the frontend and Django Rest Framework in the backend.
 #
-# Barcode readers typically terminate the scan with either the 'enter' or 'tab' key.
-# 
+# Barcode readers typically terminate the scan with either the 'enter' or
+# 'tab' key.
+#
 # The barcode scanning page listens for both enter and tab keys
 #
 # When these keys are heard an ajax query is sent to the API /api/<Sample ID>/
-# This attempts to match the scanned label against an existing sample and if so updates the sample's location.
-# If it does not succeed it returns an error response - Object not found. A warning message is then displayed.
-# 
-# This allows you to install physical hardpoints - eg arrival and departure from sites and if you scan every sample that goes through you can begin to track all their locations.
+# This attempts to match the scanned label against an existing sample and
+# if so updates the sample's location.
+# If it does not succeed it returns an error response - Object not found.
+# A warning message is then displayed.
+#
+# This allows you to install physical hardpoints - eg arrival and departure
+# from sites and if you scan every sample that goes through you can begin to
+# track all their locations.
 
-from rest_framework import viewsets, filters, permissions
-from .serializers import SampleSerializer, SampleIsFullyUsedSerializer
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 
-# Lookup field set to the barcode ID instead of the default Django autoincrementing id system
 class SampleViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows samples to be viewed and edited
+    Lookup field set to the barcode ID instead of the default Django
+    autoincrementing id system
     """
     queryset = Sample.objects.filter(is_deleted=False)
     serializer_class = SampleSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'musicsampleid'
+
 
 class SampleIsFullyUsedViewSet(viewsets.ModelViewSet):
     queryset = Sample.objects.filter(is_deleted=False)
@@ -668,17 +714,13 @@ class SampleIsFullyUsedViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'musicsampleid'
 
-# Returns the front end page - frontend logic is in the barcode.html template file
+
 @login_required(login_url="/login/")
 def barcode(request):
+    # Returns the page - frontend logic is in the barcode.html template file
     return render(request, "barcode.html")
+
 
 @login_required(login_url="/login/")
 def barcode_samples_used(request):
     return render(request, "barcode-markused.html")
-
-def error_404(request, exception):
-    return render(request, "error-404.html", status=400)
-
-def error_500(request):
-    return render(request, "error-500.html", status=500)
