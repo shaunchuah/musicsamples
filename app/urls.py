@@ -1,6 +1,6 @@
-from django.urls import path, re_path, include
+from django.urls import path, include
 from app import views
-from rest_framework import routers, serializers, viewsets
+from rest_framework import routers
 from .views import SampleViewSet, SampleIsFullyUsedViewSet
 from django.views.generic.base import TemplateView
 
@@ -9,8 +9,8 @@ router.register(r'samples', SampleViewSet)
 router.register(r'samples_used', SampleIsFullyUsedViewSet)
 
 urlpatterns = [
-    path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
     path('', views.index, name='home'),
+    path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
     path('analytics/', views.analytics, name='analytics'),
     path('analytics/gid_overview', views.gid_overview, name='gid_overview'),
     path('reference/', views.reference, name='reference'),
@@ -44,4 +44,3 @@ urlpatterns = [
     path('barcode/', views.barcode, name='barcode'),
     path('barcode/samples_used/', views.barcode_samples_used, name='barcode_samples_used')
 ]
-

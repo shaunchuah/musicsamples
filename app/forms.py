@@ -1,27 +1,35 @@
 from django import forms
 from django.utils import timezone
-from django.forms import ModelForm, modelformset_factory, formset_factory
+from django.forms import ModelForm
 from .models import Sample, Note
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
+from taggit.forms import TagWidget
+from django_select2.forms import ModelSelect2MultipleWidget
 
-# Set default sample creation time to the time the user is accessing the add new sample page
+
 class DateTimeInput(forms.DateTimeInput):
+    # Set default sample creation time to the time
+    # the user is accessing the add new sample page
     input_type = "datetime-local"
 
     def __init__(self, **kwargs):
         kwargs["format"] = "%Y-%m-%dT%H:%M"
         super().__init__(**kwargs)
 
+
 def currentTime():
     time = timezone.localtime(timezone.now())
     return time
 
-# Main sample registration form
+
 class SampleForm(ModelForm):
+    # Main sample registration form
     sample_datetime = forms.DateTimeField(label="Sample Created Datetime*", widget=DateTimeInput(), initial=currentTime)
+
     class Meta:
         model = Sample
         fields = ['musicsampleid', 'sample_location', 'patientid', 'sample_type', 'sample_datetime', 'sample_comments', 'processing_datetime', 'sample_sublocation', 'sample_volume', 'sample_volume_units', 'freeze_thaw_count', 'haemolysis_reference', 'biopsy_location', 'biopsy_inflamed_status']
-        
+
         # Customising the dropdown select fields to ensure consistent data input
         HAEMOLYSIS_REFERENCE_CHOICES = (
             ('', 'Select category'),
@@ -58,11 +66,11 @@ class SampleForm(ModelForm):
         )
         SAMPLE_TYPE_CHOICES = (
             ('', 'Select type'),
-            ('Standard EDTA tube',(
+            ('Standard EDTA tube', (
                 ('Standard EDTA tube', 'Standard EDTA tube'),
                 ('EDTA plasma child aliquot', 'EDTA plasma child aliquot'),
             )),
-            ('PaxGene ccfDNA tube',(
+            ('PaxGene ccfDNA tube', (
                 ('PaxGene ccfDNA tube', 'PaxGene ccfDNA tube'),
                 ('PaxGene ccfDNA plasma child aliquot', 'PaxGene ccfDNA plasma child aliquot'),
                 ('PaxGene ccfDNA extracted cfDNA', 'PaxGene ccfDNA extracted cfDNA'),
@@ -117,51 +125,51 @@ class SampleForm(ModelForm):
             'biopsy_inflamed_status': "Biopsy Inflamed Status",
         }
 
-# Quick update of sample location from home page
+
 class CheckoutForm(ModelForm):
+    # Quick update of sample location from home page
     class Meta:
         model = Sample
         fields = ['sample_location', 'sample_sublocation']
-        labels = { 'sample_location': "Sample Location", 'sample_sublocation': "Sample Sublocation",}
+        labels = {'sample_location': "Sample Location", 'sample_sublocation': "Sample Sublocation"}
 
-# Soft deleting a sample
+
 class DeleteForm(ModelForm):
+    # Soft deleting a sample
     class Meta:
         model = Sample
         fields = ['is_deleted']
-        labels = { 'is_deleted': "Confirm delete?" }
+        labels = {'is_deleted': "Confirm delete?"}
 
-# Restoring a soft deleted sample
+
 class RestoreForm(ModelForm):
+    # Restoring a soft deleted sample
     class Meta:
         model = Sample
         fields = ['is_deleted']
-        labels = { 'is_deleted': "Uncheck to restore" }
+        labels = {'is_deleted': "Uncheck to restore"}
 
-# Marking a sample as fully used
+
 class FullyUsedForm(ModelForm):
+    # Marking a sample as fully used
     class Meta:
         model = Sample
         fields = ['is_fully_used']
-        labels = { 'is_fully_used': "Mark sample as fully used?" }
+        labels = {'is_fully_used': "Mark sample as fully used?"}
 
-# Restoring a sample that was accidentally marked as fully used
+
 class ReactivateForm(ModelForm):
+    # Restoring a sample that was accidentally marked as fully used
     class Meta:
         model = Sample
         fields = ['is_fully_used']
-        labels = { 'is_fully_used': "Uncheck to reactivate" }
+        labels = {'is_fully_used': "Uncheck to reactivate"}
 
 
-########################################################################################################################################################
-######  NOTEFORMS  #####################################################################################################################################
-########################################################################################################################################################
-####SELECT2#####
-
-from ckeditor_uploader.widgets import CKEditorUploadingWidget
-from taggit.forms import TagWidget
-from taggit.models import Tag
-from django_select2.forms import ModelSelect2TagWidget, ModelSelect2MultipleWidget
+#########################################################################
+# NOTEFORMS  ############################################################
+#########################################################################
+# SELECT2 #####
 
 # Create new note form
 # Django select2 used to enable tagging of existing samples.
@@ -169,14 +177,14 @@ from django_select2.forms import ModelSelect2TagWidget, ModelSelect2MultipleWidg
 # CKEditor Uploading widget used for adding of notes and supporting of file/image uploads - Suggest use an S3 backend to handle user media uploads.
 # You can also disable this by switching the uploading widget for the standard one - see django-ckeditor documentation.
 
-class NoteForm(ModelForm):   
+class NoteForm(ModelForm):
     class Meta:
         model = Note
         fields = ['title', 'content', 'sample_tags', 'tags', 'is_public']
         widgets = {
             'content': forms.CharField(widget=CKEditorUploadingWidget()),
             'tags': TagWidget(attrs={'data-role': 'tagsinput'}),
-            
+
             'is_public': forms.Select(choices=((False, 'Private'), (True, 'Shared'))),
             'sample_tags': ModelSelect2MultipleWidget(model=Sample, search_fields=['musicsampleid__icontains']),
         }
@@ -185,11 +193,12 @@ class NoteForm(ModelForm):
             'content': "",
         }
 
-# Soft deletion of notes. Restoration will probably have to be done from the django admin panel unless you want to implement a restore view similar to the above sample restoration methods.       
+
 class NoteDeleteForm(ModelForm):
+    # Soft deletion of notes. Restoration will probably have to be done
+    # from the django admin panel unless you want to implement a restore
+    # view similar to the above sample restoration methods.
     class Meta:
         model = Note
         fields = ['is_deleted']
-        labels = { 'is_deleted': "Confirm delete?" }
-
-
+        labels = {'is_deleted': "Confirm delete?"}
