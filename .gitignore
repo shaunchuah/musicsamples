@@ -30,3 +30,5 @@ media/*
 .env.prod
 
 mydatabase
+
+.vscode
