@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
-from django.forms.utils import ErrorList
-from django.http import HttpResponse
-from .forms import LoginForm, SignUpForm
+# from django.contrib.auth.models import User
+# from django.forms.utils import ErrorList
+# from django.http import HttpResponse
+from .forms import LoginForm  # , SignUpForm
 
 
 def login_view(request):
@@ -20,12 +20,12 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 return redirect("/")
-            else:    
-                msg = 'Invalid credentials'    
+            else:
+                msg = 'Invalid credentials'
         else:
-            msg = 'Error validating the form'    
+            msg = 'Error validating the form'
 
-    return render(request, "accounts/login.html", {"form": form, "msg" : msg})
+    return render(request, "accounts/login.html", {"form": form, "msg": msg})
 
 # Public access to registration is disabled. Uncomment to re-enable - you will need to activate the registration url in authentication/urls.py
 # def register_user(request):
@@ -43,11 +43,11 @@ def login_view(request):
 
 #             msg     = 'User created.'
 #             success = True
-            
+
 #             return redirect("/login/")
 
 #         else:
-#             msg = 'Form is not valid'    
+#             msg = 'Form is not valid'
 #     else:
 #         form = SignUpForm()
 
