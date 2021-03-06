@@ -24,13 +24,32 @@ def currentTime():
 
 class SampleForm(ModelForm):
     # Main sample registration form
-    sample_datetime = forms.DateTimeField(label="Sample Created Datetime*", widget=DateTimeInput(), initial=currentTime)
+    sample_datetime = forms.DateTimeField(
+        label="Sample Created Datetime*",
+        widget=DateTimeInput(),
+        initial=currentTime
+        )
 
     class Meta:
         model = Sample
-        fields = ['musicsampleid', 'sample_location', 'patientid', 'sample_type', 'sample_datetime', 'sample_comments', 'processing_datetime', 'sample_sublocation', 'sample_volume', 'sample_volume_units', 'freeze_thaw_count', 'haemolysis_reference', 'biopsy_location', 'biopsy_inflamed_status']
+        fields = [
+            'musicsampleid',
+            'sample_location',
+            'patientid',
+            'sample_type',
+            'sample_datetime',
+            'sample_comments',
+            'processing_datetime',
+            'sample_sublocation',
+            'sample_volume',
+            'sample_volume_units',
+            'freeze_thaw_count',
+            'haemolysis_reference',
+            'biopsy_location',
+            'biopsy_inflamed_status'
+            ]
 
-        # Customising the dropdown select fields to ensure consistent data input
+        # Customise dropdown select fields to ensure consistent data input
         HAEMOLYSIS_REFERENCE_CHOICES = (
             ('', 'Select category'),
             ('0', 'Minimal'),
@@ -186,7 +205,10 @@ class NoteForm(ModelForm):
             'tags': TagWidget(attrs={'data-role': 'tagsinput'}),
 
             'is_public': forms.Select(choices=((False, 'Private'), (True, 'Shared'))),
-            'sample_tags': ModelSelect2MultipleWidget(model=Sample, search_fields=['musicsampleid__icontains']),
+            'sample_tags': ModelSelect2MultipleWidget(
+                model=Sample,
+                search_fields=['musicsampleid__icontains']
+                ),
         }
         labels = {
             'is_public': "Share settings:",
