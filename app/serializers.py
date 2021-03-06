@@ -9,7 +9,7 @@ class SampleSerializer(serializers.HyperlinkedModelSerializer):
             'musicsampleid',
             'sample_location',
             'sample_sublocation',
-            ]
+        ]
         lookup_field = 'musicsampleid'
 
 
@@ -19,5 +19,5 @@ class SampleIsFullyUsedSerializer(serializers.HyperlinkedModelSerializer):
         fields = [
             'musicsampleid',
             'is_fully_used',
-            ]
+        ]
         lookup_field = 'musicsampleid'

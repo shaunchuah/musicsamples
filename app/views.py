@@ -197,12 +197,12 @@ def search(request):
     if ('q' in request.GET) and request.GET['q'].strip():
         query_string = request.GET.get('q')
         sample_list = Sample.objects.filter(
-            Q(musicsampleid__icontains=query_string) |
-            Q(patientid__icontains=query_string) |
-            Q(sample_location__icontains=query_string) |
-            Q(sample_sublocation__icontains=query_string) |
-            Q(sample_type__icontains=query_string) |
-            Q(sample_comments__icontains=query_string)).filter(is_fully_used=False).filter(is_deleted=False)
+            Q(musicsampleid__icontains=query_string)
+            | Q(patientid__icontains=query_string)
+            | Q(sample_location__icontains=query_string)
+            | Q(sample_sublocation__icontains=query_string)
+            | Q(sample_type__icontains=query_string)
+            | Q(sample_comments__icontains=query_string)).filter(is_fully_used=False).filter(is_deleted=False)
         return render(request, 'index.html', {'query_string': query_string, 'sample_list': sample_list})
     else:
         return render(request, 'index.html', {'query_string': 'Null'})
@@ -320,7 +320,7 @@ def export_csv(request):
     response['Content-Disposition'] = 'attachment; filename="music_samples_%s.csv"' % datetime.datetime.now().strftime("%Y-%m-%d")
     writer = csv.writer(response)
     writer.writerow(['MUSIC Sample ID', 'Patient ID', 'Sample Location', 'Sample Type', 'Sample Datetime', 'Sample Comments', 'Created By', 'Date First Created', 'Last Modified By', 'Last Modified'])
-    samples = Sample.objects.all().filter(is_deleted=False).values_list('musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments', 'created_by', 'data_first_created', 'last_modified_by',  'last_modified')
+    samples = Sample.objects.all().filter(is_deleted=False).values_list('musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments', 'created_by', 'data_first_created', 'last_modified_by', 'last_modified')
     for sample in samples:
         writer.writerow(sample)
     return response
@@ -335,11 +335,11 @@ def export_excel(request):
     if ('q' in request.GET) and request.GET['q'].strip():
         query_string = request.GET.get('q')
         samples_queryset = Sample.objects.filter(
-            Q(musicsampleid__icontains=query_string) |
-            Q(patientid__icontains=query_string) |
-            Q(sample_location__icontains=query_string) |
-            Q(sample_type__icontains=query_string) |
-            Q(sample_comments__icontains=query_string))
+            Q(musicsampleid__icontains=query_string)
+            | Q(patientid__icontains=query_string)
+            | Q(sample_location__icontains=query_string)
+            | Q(sample_type__icontains=query_string)
+            | Q(sample_comments__icontains=query_string))
     else:
         samples_queryset = Sample.objects.all().filter(is_deleted=False)
 
@@ -373,7 +373,7 @@ def export_excel(request):
         'Date Created',
         'Last Modified By',
         'Last Modified'
-        ]
+    ]
     row_num = 1
 
     # Write the column names in

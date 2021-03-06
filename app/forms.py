@@ -28,7 +28,7 @@ class SampleForm(ModelForm):
         label="Sample Created Datetime*",
         widget=DateTimeInput(),
         initial=currentTime
-        )
+    )
 
     class Meta:
         model = Sample
@@ -47,7 +47,7 @@ class SampleForm(ModelForm):
             'haemolysis_reference',
             'biopsy_location',
             'biopsy_inflamed_status'
-            ]
+        ]
 
         # Customise dropdown select fields to ensure consistent data input
         HAEMOLYSIS_REFERENCE_CHOICES = (
@@ -208,7 +208,7 @@ class NoteForm(ModelForm):
             'sample_tags': ModelSelect2MultipleWidget(
                 model=Sample,
                 search_fields=['musicsampleid__icontains']
-                ),
+            ),
         }
         labels = {
             'is_public': "Share settings:",
