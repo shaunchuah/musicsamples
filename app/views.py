@@ -77,17 +77,9 @@ def reference(request):
 
 @login_required(login_url="/login/")
 def account(request):
-    # User account page showing recently accessed samples
+    # User account page showing last 20 recently accessed samples
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(last_modified_by=request.user.username).order_by('-last_modified')[:20]
-    page = request.GET.get('page', 1)
-    paginator = Paginator(sample_list, 50)
-    try:
-        samples = paginator.page(page)
-    except PageNotAnInteger:
-        samples = paginator.page(1)
-    except EmptyPage:
-        samples = paginator.page(paginator.num_pages)
-    context = {'sample_list': samples}
+    context = {'sample_list': sample_list}
     return render(request, "account.html", context)
 
 
