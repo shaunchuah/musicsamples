@@ -1,4 +1,4 @@
-name: SampleTrek Automated CI Testing
+name: Main Branch Deploy
 
 on:
   push:
