@@ -48,9 +48,9 @@ class TestUrls(SimpleTestCase):
         url = reverse('search')
         self.assertEqual(resolve(url).func, views.search)
 
-    def test_csv_export_url_resolves(self):
-        url = reverse('export_csv')
-        self.assertEqual(resolve(url).func, views.export_csv)
+    # def test_csv_export_url_resolves(self):
+    #     url = reverse('export_csv')
+    #     self.assertEqual(resolve(url).func, views.export_csv)
 
     def test_export_excel_url_resolves(self):
         url = reverse('export_excel')
