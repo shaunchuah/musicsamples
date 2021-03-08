@@ -57,30 +57,27 @@ def analytics(request):
     }
     return render(request, "analytics.html", context)
 
-# Analytics --> Sample Overview Table Page
-
 
 @login_required(login_url="/login/")
 @cache_page(60 * 60)  # Cache page for 60 minutes
 def gid_overview(request):
+    # Analytics --> Sample Overview Table Page
     sample_categories = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).values("sample_type").distinct()
     patient_id_list = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).order_by('patientid').values("patientid").distinct()
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False)
     context = {'sample_list': sample_list, 'sample_categories': sample_categories, 'patient_id_list': patient_id_list}
     return render(request, "gid_overview.html", context)
 
-# Reference static page for publishing lab protocols
-
 
 @login_required(login_url="/login/")
 def reference(request):
+    # Reference static page for publishing lab protocols
     return render(request, "reference.html")
-
-# User account page showing recently accessed samples
 
 
 @login_required(login_url="/login/")
 def account(request):
+    # User account page showing recently accessed samples
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(last_modified_by=request.user.username).order_by('-last_modified')[:20]
     page = request.GET.get('page', 1)
     paginator = Paginator(sample_list, 50)
@@ -93,29 +90,26 @@ def account(request):
     context = {'sample_list': samples}
     return render(request, "account.html", context)
 
-# Deleted samples page for samples which have been soft deleted
-
 
 @login_required(login_url="/login/")
-def archive(request):
+def sample_archive(request):
+    # Deleted samples page for samples which have been soft deleted
     sample_list = Sample.objects.all().filter(is_deleted=True).order_by('-last_modified')
     context = {'sample_list': sample_list}
     return render(request, "samples/sample-archive.html", context)
 
-# Used samples page for samples marked as being fully used
-
 
 @login_required(login_url="/login/")
 def used_samples(request):
+    # Used samples page for samples marked as being fully used
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=True).order_by('-last_modified')
     context = {'sample_list': sample_list}
     return render(request, "samples/used_samples.html", context)
 
-# Add mew sample page
-
 
 @login_required(login_url="/login/")
 def sample_add(request):
+    # Add mew sample page
     if request.method == "POST":
         form = SampleForm(request.POST)
         if form.is_valid():
@@ -131,10 +125,9 @@ def sample_add(request):
         form = SampleForm()
     return render(request, "samples/sample-add.html", {'form': form})
 
-# Historical changes function to integrate simple history into the sample detail page
-
 
 def historical_changes(query):
+    # Historical changes function to integrate simple history into the sample detail page
     changes = []
     if query is not None:
         last = query.first()
@@ -146,11 +139,10 @@ def historical_changes(query):
                 last = old_record
         return changes
 
-# Sample Detail Page - retrieves sample history and also linked notes both public and private
-
 
 @login_required(login_url="/login/")
 def sample_detail(request, pk):
+    # Sample Detail Page - retrieves sample history and also linked notes both public and private
     sample = get_object_or_404(Sample, pk=pk)
     sample_history = sample.history.filter(id=pk)
     changes = historical_changes(sample_history)
@@ -463,7 +455,7 @@ def notes(request):
 
 
 @login_required(login_url="/login/")
-def notes_personal(request):
+def note_personal(request):
     # My Notebook - Show all notes belonging to the logged in user
     notes = Note.objects.all().filter(is_deleted=False).filter(author=request.user)
     page = request.GET.get('page', 1)
@@ -611,7 +603,7 @@ def note_delete(request, pk):
 
 
 @login_required(login_url="/login/")
-def search_notes(request):
+def note_search(request):
     # Search Notes
     all_tags = Note.tags.all()
     users = User.objects.all()

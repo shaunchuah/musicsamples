@@ -114,7 +114,7 @@ def test_barcode_samples_used_page(admin_client):
 
 
 def test_archive_page(admin_client):
-    path = reverse('archive')
+    path = reverse('sample_archive')
     response = admin_client.get(path)
     assert response.status_code == 200, 'Check archive view and url is working. (Soft deleted samples.)'
     assertTemplateUsed(response, 'samples/sample-archive.html')
@@ -329,7 +329,7 @@ def test_get_note_by_author(auto_login_user, other_user):
 
 def test_note_add(auto_login_user):
     client, user = auto_login_user()
-    path = reverse('new_note')
+    path = reverse('note_add')
     response = client.get(path)
     assertTemplateUsed('notes/notes-add.html')
     response = client.post(path)
@@ -369,7 +369,7 @@ def test_note_search(auto_login_user):
     mixer.blend('app.note', title='TEST003')
     mixer.blend('app.note', title='NO')
     mixer.blend('app.note', title='DONOTRETURN')
-    path = reverse('search_notes')
+    path = reverse('note_search')
     response = client.get(path + '?q=TEST')
     assertTemplateUsed(response, 'notes/notes-main.html')
     assert 'TEST' in response.context['notes'][0].title, 'Should create a few objects, run a search and return 2 objects.'

@@ -5,6 +5,8 @@ from .views import SampleViewSet, SampleIsFullyUsedViewSet
 from django.views.generic.base import TemplateView
 
 router = routers.DefaultRouter()
+
+# Django Rest Framework API endpoints
 router.register(r'samples', SampleViewSet)
 router.register(r'samples_used', SampleIsFullyUsedViewSet)
 
@@ -14,9 +16,12 @@ urlpatterns = [
     path('analytics/', views.analytics, name='analytics'),
     path('analytics/gid_overview', views.gid_overview, name='gid_overview'),
     path('reference/', views.reference, name='reference'),
-    path('archive/', views.archive, name='archive'),
+    path('account/', views.account, name='account'),
+
+    # Samples URLs
+    path('samples/archive/', views.sample_archive, name='sample_archive'),
     path('used_samples/', views.used_samples, name='used_samples'),
-    path('add/', views.sample_add, name='sample_add'),
+    path('samples/add/', views.sample_add, name='sample_add'),
     path('samples/<int:pk>/', views.sample_detail, name='sample_detail'),
     path('samples/<int:pk>/edit/', views.sample_edit, name='sample_edit'),
     path('samples/<int:pk>/delete/', views.sample_delete, name='sample_delete'),
@@ -27,20 +32,27 @@ urlpatterns = [
     path('search/', views.sample_search, name="sample_search"),
     # path('export_csv/', views.export_csv, name='export_csv'),
     path('export_excel/', views.export_excel, name='export_excel'),
-    path('account/', views.account, name='account'),
+
+    # Notes URLs
     path('notes/', views.notes, name='notes'),
     path('notes/<int:pk>/', views.note_detail, name='note_detail'),
-    path('notes/add/', views.note_add, name='new_note'),
+    path('notes/add/', views.note_add, name='note_add'),
     path('notes/<int:pk>/edit/', views.note_edit, name='note_edit'),
     path('notes/<int:pk>/delete/', views.note_delete, name='note_delete'),
-    path('notes/personal/', views.notes_personal, name='note_personal'),
+    path('notes/personal/', views.note_personal, name='note_personal'),
     path('notes/tag/<slug>', views.note_tags, name='note_tags'),
     path('notes/authors/<int:pk>', views.note_authors, name='note_authors'),
+    path('notes/search/', views.note_search, name='note_search'),
+
+    # Autocomplete API URLs
     path('autocomplete/locations/', views.autocomplete_locations, name='autocomplete_locations'),
     path('autocomplete/patients/', views.autocomplete_patient_id, name='autocomplete_patients'),
     path('autocomplete/tags/', views.autocomplete_tags, name='autocomplete_tags'),
-    path('notes/search/', views.search_notes, name='search_notes'),
+
+    # Django Rest Framework URLs
     path('api/', include(router.urls)),
+
+    # QR code URLs
     path('barcode/', views.barcode, name='barcode'),
     path('barcode/samples_used/', views.barcode_samples_used, name='barcode_samples_used')
 ]
