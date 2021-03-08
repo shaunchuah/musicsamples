@@ -7,32 +7,32 @@
     {% if user.is_authenticated %}
     <ul class="nav">
       <li class="{% if request.path == '/' %}active{% endif %}">
-        <a href="/">
+        <a href="{% url 'home' %}">
           <i class="tim-icons icon-molecule-40"></i>
           <p>Dashboard</p>
         </a>
       </li>
       <li class="{% if request.path == '/add/' %}active{% endif %}">
-        <a href="/add">
+        <a href="{% url 'sample_add' %}">
           <i class="tim-icons icon-pencil"></i>
           <p>Add New Sample</p>
         </a>
       </li>
       <li class="{% if 'barcode' in request.path %}active{% endif %}">
-        <a href="/barcode">
+        <a href="{% url 'barcode' %}">
           <i class="tim-icons icon-tag"></i>
           <p>QR Scan</p>
         </a>
       </li>
       <li class="{% if 'analytics' in request.path %}active{% endif %}">
-        <a href="/analytics">
+        <a href="{% url 'analytics' %}">
           <i class="tim-icons icon-chart-bar-32"></i>
           <p>Analytics</p>
         </a>
       </li>
 
       <li class="{% if request.path == '/reference/' %}active{% endif %}">
-        <a href="/reference">
+        <a href="{% url 'reference' %}">
           <i class="tim-icons icon-single-copy-04"></i>
           <p>Reference</p>
         </a>
@@ -44,13 +44,13 @@
     <div class="mt-5">
       <ul class="nav">
         <li class="{% if request.path == '/notes/' %}active{% endif %}">
-          <a href="/notes">
+          <a href="{% url 'notes' %}">
             <i class="tim-icons icon-calendar-60"></i>
             <p>Lab Notes</p>
           </a>
         </li>
         <li class="{% if request.path == '/notes/personal/' %}active{% endif %}">
-          <a href="/notes/personal">
+          <a href="{% url 'note_personal' %}">
             <i class="tim-icons icon-single-02"></i>
             <p>My Notebook</p>
           </a>
@@ -62,13 +62,13 @@
     <div class="mt-5">
       <ul class="nav">
         <li class="{% if request.path == '/used_samples/' %}active{% endif %}">
-          <a href="/used_samples">
+          <a href="{% url 'used_samples' %}">
             <i class="tim-icons icon-send"></i>
             <p>Used Samples</p>
           </a>
         </li>
-        <li class="{% if request.path == '/archive/' %}active{% endif %}">
-          <a href="/archive">
+        <li class="{% if 'archive' in request.path %}active{% endif %}">
+          <a href="{% url 'sample_archive' %}">
             <i class="tim-icons icon-trash-simple"></i>
             <p>Deleted Samples</p>
           </a>
