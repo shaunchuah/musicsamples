@@ -89,7 +89,7 @@
             {% for s in samples_by_location %}
             <tr>
             <td>
-              <a href="{% url 'search' %}?q={{ s.sample_location }}">
+              <a href="{% url 'sample_search' %}?q={{ s.sample_location }}">
                 {{ s.sample_location }}
               </a>
             </td>
