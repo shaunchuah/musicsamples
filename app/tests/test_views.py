@@ -1,4 +1,5 @@
 import pytest
+import json
 from django.test import RequestFactory
 from ..models import Sample, Note
 from django.urls import reverse
@@ -146,7 +147,7 @@ def test_sample_detail_page(auto_login_user):
 
 def test_sample_detail_processing_datetime_logic(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend('app.sample', sample_datetime='2020-01-01T13:20:30', processing_datetime='2020-01-01T13:25:30')
+    mixer.blend('app.sample', sample_datetime='2020-01-01T13:20:30+00', processing_datetime='2020-01-01T13:25:30+00')
     path = reverse('sample_detail', kwargs={'pk': 1})
     response = client.get(path)
     assert response.context['processing_time'] == 5, 'Should test that processing_time calculation is correct given sampling datetime and processing datetime.'
@@ -351,3 +352,67 @@ def test_missing_note_edit(auto_login_user):
 
     response = client.post(path)
     assert response.context['form'].initial['title'] == 'unedited title'
+
+
+def test_note_delete(auto_login_user):
+    client, user = auto_login_user()
+    mixer.blend('app.note', title='soft delete this note', author=user)
+    path = reverse('note_delete', kwargs={'pk': 1})
+    response = client.get(path)
+    assertTemplateUsed(response, 'notes/notes-delete.html')
+    assert response.context['note'].title == 'soft delete this note'
+
+
+def test_note_search(auto_login_user):
+    client, user = auto_login_user()
+    mixer.blend('app.note', title='TEST002')
+    mixer.blend('app.note', title='TEST003')
+    mixer.blend('app.note', title='NO')
+    mixer.blend('app.note', title='DONOTRETURN')
+    path = reverse('search_notes')
+    response = client.get(path + '?q=TEST')
+    assertTemplateUsed(response, 'notes/notes-main.html')
+    assert 'TEST' in response.context['notes'][0].title, 'Should create a few objects, run a search and return 2 objects.'
+    assert response.context['notes'].count() == 2, 'Should create a few objects, run a search and return 2 objects.'
+
+    response = client.get(path)
+    assert response.status_code == 302
+
+
+# AUTOCOMPLETE TESTS
+
+
+def test_autocomplete_locations(auto_login_user):
+    client, user = auto_login_user()
+    mixer.blend('app.Sample', sample_location='location1')
+    mixer.blend('app.Sample', sample_location='test2')
+    path = reverse('autocomplete_locations')
+    response = client.get(path + '?term=loc')
+    assert 'location1' in json.loads(response.content)
+    assert 'test2' not in json.loads(response.content)
+
+    response_2 = client.get(path + '?term=te')
+    assert 'location1' not in json.loads(response_2.content)
+    assert 'test2' in json.loads(response_2.content)
+
+    response_3 = client.get(path)
+    assert 'location1' in json.loads(response_3.content)
+    assert 'test2' in json.loads(response_3.content)
+
+
+def test_autocomplete_patient_id(auto_login_user):
+    client, user = auto_login_user()
+    mixer.blend('app.Sample', patientid='GID-123-P')
+    mixer.blend('app.Sample', patientid='GID-003-P')
+    path = reverse('autocomplete_patients')
+    response = client.get(path + '?term=GID-123')
+    assert 'GID-123-P' in json.loads(response.content)
+    assert 'GID-003-P' not in json.loads(response.content)
+
+    response_2 = client.get(path + '?term=003')
+    assert 'GID-123-P' not in json.loads(response_2.content)
+    assert 'GID-003-P' in json.loads(response_2.content)
+
+    response_3 = client.get(path)
+    assert 'GID-123-P' in json.loads(response_3.content)
+    assert 'GID-003-P' in json.loads(response_3.content)
