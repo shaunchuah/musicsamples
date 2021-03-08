@@ -71,7 +71,7 @@
                 </td>
                 <td>
                   <a
-                    href="{% url 'checkout' pk=sample.pk %}?next={{ request.get_full_path }}"
+                    href="{% url 'sample_checkout' pk=sample.pk %}?next={{ request.get_full_path }}"
                   >
                     <i class="tim-icons icon-cloud-upload-94"></i> Checkout
                   </a>
@@ -84,7 +84,7 @@
                 </td>
 
                 <td>
-                  <a href="{% url 'delete' pk=sample.pk %}"
+                  <a href="{% url 'sample_delete' pk=sample.pk %}"
                     ><i class="tim-icons icon-trash-simple"></i> Delete</a
                   >
                 </td>
