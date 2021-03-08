@@ -1,4 +1,5 @@
 import pytest
+import json
 from django.test import RequestFactory
 from ..models import Sample, Note
 from django.urls import reverse
@@ -97,7 +98,7 @@ def test_account_page(admin_client):
 def test_used_samples_page(admin_client):
     path = reverse('used_samples')
     response = admin_client.get(path)
-    assertTemplateUsed(response, 'used_samples.html'), 'Check that used samples page is accessible through url and returns the used_samples.html template.'
+    assertTemplateUsed(response, 'samples/used_samples.html'), 'Check that used samples page is accessible through url and returns the used_samples.html template.'
 
 
 def test_barcode_main_page(admin_client):
@@ -116,7 +117,7 @@ def test_archive_page(admin_client):
     path = reverse('archive')
     response = admin_client.get(path)
     assert response.status_code == 200, 'Check archive view and url is working. (Soft deleted samples.)'
-    assertTemplateUsed(response, 'archive.html')
+    assertTemplateUsed(response, 'samples/sample-archive.html')
 
 
 def test_error_404_template(admin_client):
@@ -129,7 +130,7 @@ def test_error_404_template(admin_client):
 
 def test_add_sample_page(auto_login_user):
     client, user = auto_login_user()
-    path = reverse('new_sample')
+    path = reverse('sample_add')
     response = client.get(path)
     assert response.status_code == 200, 'Should return add new sample page via GET request.'
     response = client.post(path)
@@ -146,7 +147,7 @@ def test_sample_detail_page(auto_login_user):
 
 def test_sample_detail_processing_datetime_logic(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend('app.sample', sample_datetime='2020-01-01T13:20:30', processing_datetime='2020-01-01T13:25:30')
+    mixer.blend('app.sample', sample_datetime='2020-01-01T13:20:30+00', processing_datetime='2020-01-01T13:25:30+00')
     path = reverse('sample_detail', kwargs={'pk': 1})
     response = client.get(path)
     assert response.context['processing_time'] == 5, 'Should test that processing_time calculation is correct given sampling datetime and processing datetime.'
@@ -166,7 +167,7 @@ def test_sample_edit_page(auto_login_user):
     mixer.blend('app.sample', musicsampleid='TEST003')
     path = reverse('sample_edit', kwargs={'pk': 2})
     response = client.get(path)
-    assertTemplateUsed(response, 'sample-edit.html')
+    assertTemplateUsed(response, 'samples/sample-edit.html')
     assert response.context['form'].initial['musicsampleid'] == 'TEST003', 'Should create two separate sample instances and return the second one.'
 
 
@@ -176,7 +177,7 @@ def test_sample_search_page(auto_login_user):
     mixer.blend('app.sample', musicsampleid='TEST003')
     mixer.blend('app.sample', musicsampleid='NO')
     mixer.blend('app.sample', musicsampleid='DONOTRETURN')
-    path = reverse('search')
+    path = reverse('sample_search')
     response = client.get(path + '?q=TEST')
     assertTemplateUsed(response, 'index.html')
     assert 'TEST002' in response.context['sample_list'][0].musicsampleid, 'Should create a few objects, run a search and return 2 objects.'
@@ -189,12 +190,12 @@ def test_sample_search_page(auto_login_user):
 def test_sample_checkout_page(auto_login_user):
     client, user = auto_login_user()
     mixer.blend('app.sample', sample_location='location1')
-    path = reverse('checkout', kwargs={'pk': 1})
+    path = reverse('sample_checkout', kwargs={'pk': 1})
 
     # Get the sample checkout page and check template is correct
     response = client.get(path)
     assert response.context['form'].initial['sample_location'] == 'location1', 'Should retrieve an instance to checkout.'
-    assertTemplateUsed(response, 'sample-checkout.html')
+    assertTemplateUsed(response, 'samples/sample-checkout.html')
 
     # Checkout the sample from location1 to location2
     response = client.post(path, data={'sample_location': 'location2'})
@@ -206,11 +207,11 @@ def test_sample_checkout_page(auto_login_user):
 def test_sample_delete(auto_login_user):
     client, user = auto_login_user()
     mixer.blend('app.sample', musicpatientid='TEST05')
-    path = reverse('delete', kwargs={'pk': 1})
+    path = reverse('sample_delete', kwargs={'pk': 1})
 
     # Get the delete page first and check template is correct
     response = client.get(path)
-    assertTemplateUsed(response, 'sample-delete.html')
+    assertTemplateUsed(response, 'samples/sample-delete.html')
 
     # Make the delete request now and also pass a next_url to check redirection
     response = client.post(path + '?next=/samples/1/', data={'is_deleted': True})
@@ -222,11 +223,11 @@ def test_sample_delete(auto_login_user):
 def test_sample_restore(auto_login_user):
     client, user = auto_login_user()
     mixer.blend('app.sample', is_deleted=True)
-    path = reverse('restore', kwargs={'pk': 1})
+    path = reverse('sample_restore', kwargs={'pk': 1})
 
     # Get the restore page and check template is correct
     response = client.get(path)
-    assertTemplateUsed(response, 'sample-restore.html')
+    assertTemplateUsed(response, 'samples/sample-restore.html')
 
     # Restore the sample
     response = client.post(path, data={'is_deleted': False})
@@ -237,11 +238,11 @@ def test_sample_restore(auto_login_user):
 def test_sample_fully_used(auto_login_user):
     client, user = auto_login_user()
     mixer.blend('app.sample')
-    path = reverse('fully_used', kwargs={'pk': 1})
+    path = reverse('sample_fully_used', kwargs={'pk': 1})
 
     # Get the delete page first and check template is correct
     response = client.get(path)
-    assertTemplateUsed(response, 'sample-fullyused.html')
+    assertTemplateUsed(response, 'samples/sample-fullyused.html')
 
     # Make the delete request now and also pass a next_url to check redirection
     response = client.post(path, data={'is_fully_used': True})
@@ -257,7 +258,7 @@ def test_sample_reactivate(auto_login_user):
 
     # Get the restore page and check template is correct
     response = client.get(path)
-    assertTemplateUsed(response, 'sample-reactivate.html')
+    assertTemplateUsed(response, 'samples/sample-reactivate.html')
 
     # Restore the sample
     response = client.post(path, data={'is_fully_used': False})
@@ -351,3 +352,85 @@ def test_missing_note_edit(auto_login_user):
 
     response = client.post(path)
     assert response.context['form'].initial['title'] == 'unedited title'
+
+
+def test_note_delete(auto_login_user):
+    client, user = auto_login_user()
+    mixer.blend('app.note', title='soft delete this note', author=user)
+    path = reverse('note_delete', kwargs={'pk': 1})
+    response = client.get(path)
+    assertTemplateUsed(response, 'notes/notes-delete.html')
+    assert response.context['note'].title == 'soft delete this note'
+
+
+def test_note_search(auto_login_user):
+    client, user = auto_login_user()
+    mixer.blend('app.note', title='TEST002')
+    mixer.blend('app.note', title='TEST003')
+    mixer.blend('app.note', title='NO')
+    mixer.blend('app.note', title='DONOTRETURN')
+    path = reverse('search_notes')
+    response = client.get(path + '?q=TEST')
+    assertTemplateUsed(response, 'notes/notes-main.html')
+    assert 'TEST' in response.context['notes'][0].title, 'Should create a few objects, run a search and return 2 objects.'
+    assert response.context['notes'].count() == 2, 'Should create a few objects, run a search and return 2 objects.'
+
+    response = client.get(path)
+    assert response.status_code == 302
+
+
+# AUTOCOMPLETE TESTS
+
+
+def test_autocomplete_locations(auto_login_user):
+    client, user = auto_login_user()
+    mixer.blend('app.Sample', sample_location='location1')
+    mixer.blend('app.Sample', sample_location='test2')
+    path = reverse('autocomplete_locations')
+    response = client.get(path + '?term=loc')
+    assert 'location1' in json.loads(response.content)
+    assert 'test2' not in json.loads(response.content)
+
+    response_2 = client.get(path + '?term=te')
+    assert 'location1' not in json.loads(response_2.content)
+    assert 'test2' in json.loads(response_2.content)
+
+    response_3 = client.get(path)
+    assert 'location1' in json.loads(response_3.content)
+    assert 'test2' in json.loads(response_3.content)
+
+
+def test_autocomplete_patient_id(auto_login_user):
+    client, user = auto_login_user()
+    mixer.blend('app.Sample', patientid='GID-123-P')
+    mixer.blend('app.Sample', patientid='GID-003-P')
+    path = reverse('autocomplete_patients')
+    response = client.get(path + '?term=GID-123')
+    assert 'GID-123-P' in json.loads(response.content)
+    assert 'GID-003-P' not in json.loads(response.content)
+
+    response_2 = client.get(path + '?term=003')
+    assert 'GID-123-P' not in json.loads(response_2.content)
+    assert 'GID-003-P' in json.loads(response_2.content)
+
+    response_3 = client.get(path)
+    assert 'GID-123-P' in json.loads(response_3.content)
+    assert 'GID-003-P' in json.loads(response_3.content)
+
+
+def test_autocomplete_tags(auto_login_user):
+    client, user = auto_login_user()
+    mixer.blend('taggit.Tag', name='tag1')
+    mixer.blend('taggit.Tag', name='Test2')
+    path = reverse('autocomplete_tags')
+    response = client.get(path + '?term=ta')
+    assert 'tag1' in json.loads(response.content)
+    assert 'Test2' not in json.loads(response.content)
+
+    response_2 = client.get(path + '?term=test')
+    assert 'tag1' not in json.loads(response_2.content)
+    assert 'Test2' in json.loads(response_2.content)
+
+    response_3 = client.get(path)
+    assert 'tag1' in json.loads(response_3.content)
+    assert 'Test2' in json.loads(response_3.content)

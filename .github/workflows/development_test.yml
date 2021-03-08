@@ -1,10 +1,8 @@
-name: SampleTrek Automated CI Testing
+name: Development Branch Testing
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [ development ]
 
 jobs:
   build:
@@ -57,37 +55,7 @@ jobs:
         pip install -r requirements.txt
     - name: Run flake8 for code linting
       run: |
-        flake8
+        flake8 -v
     - name: Run Tests and Coverage Report
       run: |
         pytest
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - name: Set up SSH
-      run: |
-          mkdir -p ~/.ssh/
-          echo "$SSH_KEY" > ~/.ssh/staging.key
-          chmod 600 ~/.ssh/staging.key
-          cat >>~/.ssh/config <<END
-          Host deploy
-            HostName $SSH_HOST
-            User $SSH_USER
-            IdentityFile ~/.ssh/staging.key
-            StrictHostKeyChecking no
-          END
-      env:
-        SSH_USER: ${{ secrets.SAMPLETREK_SSH_USER }}
-        SSH_KEY: ${{ secrets.SAMPLETREK_SSH_KEY }}
-        SSH_HOST: ${{ secrets.SAMPLETREK_SSH_HOST }}
-    
-    - name: Run django deployment script
-      run: ssh deploy './scripts/github_deploy_django.sh'
-
-    - name: Restart gunicorn
-      run: ssh deploy 'echo ${{ secrets.SAMPLETREK_SUDO }} | sudo -S systemctl restart gunicorn'
-
-    - name: Restart nginx
-      run: ssh deploy 'echo ${{ secrets.SAMPLETREK_SUDO }} | sudo -S systemctl restart nginx'
