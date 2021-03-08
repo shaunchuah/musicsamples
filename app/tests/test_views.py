@@ -7,7 +7,9 @@ from django.contrib.auth import get_user_model
 from .. import views
 from django.contrib.auth.models import AnonymousUser
 from mixer.backend.django import mixer
-from pytest_django.asserts import assertTemplateUsed
+from pytest_django.asserts import assertTemplateUsed, assertRaisesMessage
+from django.core.paginator import EmptyPage, PageNotAnInteger
+
 
 pytestmark = pytest.mark.django_db
 
@@ -57,6 +59,34 @@ class TestHomePage:
         request.user = AnonymousUser()
         response = views.index(request)
         assert 'login' in response.url, 'Should not show homepage and redirect to login.'
+
+
+def test_index_pagination_not_an_integer(auto_login_user):
+    client, user = auto_login_user()
+    number_of_samples = 10
+    for i in range(number_of_samples):
+        mixer.blend('app.Sample')
+    path = reverse('home') + '?page=notaninteger'
+    response = client.get(path)
+    assertRaisesMessage(PageNotAnInteger, response)
+    assert response.context['sample_list'].number == 1  # test page number returns as 1
+
+
+def test_index_pagination_empty_page(auto_login_user):
+    client, user = auto_login_user()
+    path = reverse('home') + '?page=2'
+    response = client.get(path)
+    assertRaisesMessage(EmptyPage, response)
+
+
+def test_index_pagination(auto_login_user):
+    client, user = auto_login_user()
+    number_of_samples = 60
+    for i in range(number_of_samples):
+        mixer.blend('app.Sample')
+    path = reverse('home') + '?page=1'
+    response = client.get(path)
+    assert response.context['sample_list'].paginator.num_pages == 2
 
 
 def test_analytics_unauthorized(client):
@@ -135,6 +165,32 @@ def test_add_sample_page(auto_login_user):
     assert response.status_code == 200, 'Should return add new sample page via GET request.'
     response = client.post(path)
     assert response.status_code == 200, 'Should return add new sample page via POST request without form data.'
+
+
+
+def test_add_sample_post(auto_login_user):
+    client, user = auto_login_user()
+    path = reverse('sample_add')
+    form_data = {
+        'musicsampleid': 'test001',
+        'patientid': 'patient001',
+        'sample_location': 'location001',
+        'sample_type': 'test_sample_type',
+        'sample_datetime': '2020-01-01T13:20:30+00',
+        'sample_comments': '',
+        'processing_datetime': '',
+        'sample_sublocation': '',
+        'sample_volume': '',
+        'sample_volume_units': '',
+        'freeze_thaw_count': '',
+        'haemolysis_reference': '',
+        'biopsy_location': '',
+        'biopsy_inflamed_status': ''
+    }
+    response = client.post(path, data=form_data, content_type="application/x-www-form-urlencoded")
+    print(response)
+    assert response.status_code == 302
+
 
 
 def test_sample_detail_page(auto_login_user):
