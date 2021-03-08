@@ -21,8 +21,8 @@ class TestUrls(SimpleTestCase):
         self.assertEqual(resolve(url).func, views.archive)
 
     def test_add_sample_url_resolves(self):
-        url = reverse('new_sample')
-        self.assertEqual(resolve(url).func, views.add)
+        url = reverse('sample_add')
+        self.assertEqual(resolve(url).func, views.sample_add)
 
     def test_view_single_sample_url_resolves(self):
         url = reverse('sample_detail', kwargs={'pk': 1})
@@ -33,11 +33,11 @@ class TestUrls(SimpleTestCase):
         self.assertEqual(resolve(url).func, views.sample_edit)
 
     def test_delete_sample_url_resolves(self):
-        url = reverse('delete', kwargs={'pk': 3})
+        url = reverse('sample_delete', kwargs={'pk': 3})
         self.assertEqual(resolve(url).func, views.delete)
 
     def test_restore_sample_url_resolves(self):
-        url = reverse('restore', kwargs={'pk': 3})
+        url = reverse('sample_restore', kwargs={'pk': 3})
         self.assertEqual(resolve(url).func, views.restore)
 
     def test_checkout_sample_url_resolves(self):
