@@ -1,0 +1,91 @@
+name: SampleTrek Automated CI Testing
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.8, 3.9]
+
+    env:
+      DEBUG: True
+      SECRET_KEY: githubactionstestingkey
+      ALLOWED_HOSTS: localhost, 127.0.0.1
+      DB_USER:
+      DB_PASSWORD:
+      DB_NAME: mydatabase
+      DB_HOST: 
+      DB_ENGINE: django.db.backends.sqlite3
+      DB_PORT: 10
+      EMAIL_BACKEND: django.core.mail.backends.console.EmailBackend
+      EMAIL_HOST: 
+      EMAIL_HOST_USER: 
+      EMAIL_HOST_PASSWORD: 
+      EMAIL_PORT: 10
+      EMAIL_USE_TLS:
+      SECURE_SSL_REDIRECT: False
+      SESSION_COOKIE_SECURE: False
+      CSRF_COOKIE_SECURE: False
+      SECURE_HSTS_SECONDS: 10
+      SECURE_BROWSER_XSS_FILTER: False
+      SECURE_CONTENT_TYPE_NOSNIFF: False
+      AWS_ACCESS_KEY_ID: 
+      AWS_SECRET_ACCESS_KEY: 
+      USE_S3: False
+      AWS_STORAGE_BUCKET_NAME: 
+      DEFAULT_CACHE_BACKEND: django.core.cache.backends.dummy.DummyCache
+      DEFAULT_CACHE_LOCATION: 
+      CLIENT_CLASS: 
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Run flake8 for code linting
+      run: |
+        flake8
+    - name: Run Tests and Coverage Report
+      run: |
+        pytest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up SSH
+      run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/staging.key
+          chmod 600 ~/.ssh/staging.key
+          cat >>~/.ssh/config <<END
+          Host deploy
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/staging.key
+            StrictHostKeyChecking no
+          END
+      env:
+        SSH_USER: ${{ secrets.SAMPLETREK_SSH_USER }}
+        SSH_KEY: ${{ secrets.SAMPLETREK_SSH_KEY }}
+        SSH_HOST: ${{ secrets.SAMPLETREK_SSH_HOST }}
+    
+    - name: Run django deployment script
+      run: ssh deploy './scripts/github_deploy_django.sh'
+
+    - name: Restart gunicorn
+      run: ssh deploy 'echo ${{ secrets.SAMPLETREK_SUDO }} | sudo -S systemctl restart gunicorn'
+
+    - name: Restart nginx
+      run: ssh deploy 'echo ${{ secrets.SAMPLETREK_SUDO }} | sudo -S systemctl restart nginx'
