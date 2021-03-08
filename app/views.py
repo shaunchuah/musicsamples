@@ -3,7 +3,7 @@ from .forms import SampleForm, CheckoutForm, DeleteForm, RestoreForm
 from .forms import NoteForm, NoteDeleteForm, ReactivateForm, FullyUsedForm
 from django.http import JsonResponse
 import datetime
-import csv
+# import csv
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
@@ -100,7 +100,7 @@ def account(request):
 def archive(request):
     sample_list = Sample.objects.all().filter(is_deleted=True).order_by('-last_modified')
     context = {'sample_list': sample_list}
-    return render(request, "archive.html", context)
+    return render(request, "samples/sample-archive.html", context)
 
 # Used samples page for samples marked as being fully used
 
@@ -109,13 +109,13 @@ def archive(request):
 def used_samples(request):
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=True).order_by('-last_modified')
     context = {'sample_list': sample_list}
-    return render(request, "used_samples.html", context)
+    return render(request, "samples/used_samples.html", context)
 
 # Add mew sample page
 
 
 @login_required(login_url="/login/")
-def add(request):
+def sample_add(request):
     if request.method == "POST":
         form = SampleForm(request.POST)
         if form.is_valid():
@@ -124,12 +124,12 @@ def add(request):
             sample.last_modified_by = request.user.username
             sample.save()
             messages.success(request, 'Sample registered successfully.')
-            return redirect('/add/')
+            return redirect(reverse('sample_add'))
         else:
             messages.error(request, 'Form is not valid.')
     else:
         form = SampleForm()
-    return render(request, "add.html", {'form': form})
+    return render(request, "samples/sample-add.html", {'form': form})
 
 # Historical changes function to integrate simple history into the sample detail page
 
@@ -165,7 +165,7 @@ def sample_detail(request, pk):
     if sample.processing_datetime is not None:
         time_difference = sample.processing_datetime - sample.sample_datetime
         processing_time = int(time_difference.total_seconds() / 60)
-    return render(request, "sample-detail.html", {'sample': sample, 'changes': changes, 'first': first_change, 'processing_time': processing_time, 'gid_id': gid_id, 'related_notes': related_notes, 'private_notes': private_notes})
+    return render(request, "samples/sample-detail.html", {'sample': sample, 'changes': changes, 'first': first_change, 'processing_time': processing_time, 'gid_id': gid_id, 'related_notes': related_notes, 'private_notes': private_notes})
 
 
 @login_required(login_url="/login/")
@@ -186,12 +186,11 @@ def sample_edit(request, pk):
                 return redirect('/')
     else:
         form = SampleForm(instance=sample)
-    return render(request, 'sample-edit.html', {'form': form})
+    return render(request, 'samples/sample-edit.html', {'form': form})
 
 
 @login_required(login_url="/login/")
-@cache_page(60 * 5)  # Cache page for 5 minutes
-def search(request):
+def sample_search(request):
     # Sample search in home page
     query_string = ''
     if ('q' in request.GET) and request.GET['q'].strip():
@@ -209,7 +208,7 @@ def search(request):
 
 
 @login_required(login_url="/login/")
-def checkout(request, pk):
+def sample_checkout(request, pk):
     # Sample Checkout - Quick update of sample location from home page
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
@@ -226,11 +225,11 @@ def checkout(request, pk):
                 return redirect('/')
     else:
         form = CheckoutForm(instance=sample)
-    return render(request, 'sample-checkout.html', {'form': form})
+    return render(request, 'samples/sample-checkout.html', {'form': form})
 
 
 @login_required(login_url="/login/")
-def delete(request, pk):
+def sample_delete(request, pk):
     # Soft deletion method for samples
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
@@ -247,11 +246,11 @@ def delete(request, pk):
                 return redirect('/')
     else:
         form = DeleteForm(instance=sample)
-    return render(request, 'sample-delete.html', {'form': form})
+    return render(request, 'samples/sample-delete.html', {'form': form})
 
 
 @login_required(login_url="/login/")
-def restore(request, pk):
+def sample_restore(request, pk):
     # Restore soft-deleted sample
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
@@ -268,11 +267,11 @@ def restore(request, pk):
                 return redirect('/')
     else:
         form = RestoreForm(instance=sample)
-    return render(request, 'sample-restore.html', {'form': form})
+    return render(request, 'samples/sample-restore.html', {'form': form})
 
 
 @login_required(login_url="/login/")
-def fully_used(request, pk):
+def sample_fully_used(request, pk):
     # Mark sample as fully used
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
@@ -289,7 +288,7 @@ def fully_used(request, pk):
                 return redirect('/')
     else:
         form = FullyUsedForm(instance=sample)
-    return render(request, 'sample-fullyused.html', {'form': form})
+    return render(request, 'samples/sample-fullyused.html', {'form': form})
 
 
 @login_required(login_url="/login/")
@@ -310,20 +309,20 @@ def reactivate_sample(request, pk):
                 return redirect('/')
     else:
         form = ReactivateForm(instance=sample)
-    return render(request, 'sample-reactivate.html', {'form': form})
+    return render(request, 'samples/sample-reactivate.html', {'form': form})
 
 
-@login_required(login_url="/login/")
-def export_csv(request):
-    # Export entire database to CSV for backup, currently not in use
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="music_samples_%s.csv"' % datetime.datetime.now().strftime("%Y-%m-%d")
-    writer = csv.writer(response)
-    writer.writerow(['MUSIC Sample ID', 'Patient ID', 'Sample Location', 'Sample Type', 'Sample Datetime', 'Sample Comments', 'Created By', 'Date First Created', 'Last Modified By', 'Last Modified'])
-    samples = Sample.objects.all().filter(is_deleted=False).values_list('musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments', 'created_by', 'data_first_created', 'last_modified_by', 'last_modified')
-    for sample in samples:
-        writer.writerow(sample)
-    return response
+# @login_required(login_url="/login/")
+# def export_csv(request):
+#     # Export entire database to CSV for backup, currently not in use
+#     response = HttpResponse(content_type='text/csv')
+#     response['Content-Disposition'] = 'attachment; filename="music_samples_%s.csv"' % datetime.datetime.now().strftime("%Y-%m-%d")
+#     writer = csv.writer(response)
+#     writer.writerow(['MUSIC Sample ID', 'Patient ID', 'Sample Location', 'Sample Type', 'Sample Datetime', 'Sample Comments', 'Created By', 'Date First Created', 'Last Modified By', 'Last Modified'])
+#     samples = Sample.objects.all().filter(is_deleted=False).values_list('musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments', 'created_by', 'data_first_created', 'last_modified_by', 'last_modified')
+#     for sample in samples:
+#         writer.writerow(sample)
+#     return response
 
 # Excel Exports
 

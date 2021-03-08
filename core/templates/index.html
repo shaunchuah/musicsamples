@@ -8,7 +8,7 @@
     <div class="card">
       <div class="card-header"><h3 class="card-title">Search Active Samples</h3></div>
       <div class="card-body">
-        <form id="searchform" action="{% url 'search' %}" method="GET">
+        <form id="searchform" action="{% url 'sample_search' %}" method="GET">
           <div class="form-group">
             <input type="text" autofocus name="q" class="form-control" />
           </div>
@@ -33,7 +33,7 @@
         <h3 class="card-title">Active Samples</h3>
       </div>
       <div class="card-footer">
-        <a href="/add/" class="btn btn-fill btn-success">Add New Sample</a>
+        <a href="{% url 'sample_add' %}" class="btn btn-fill btn-success">Add New Sample</a>
         <a href="/barcode/" class="btn btn-fill btn-success">Barcode Location Scanning</a>
         <!--<a href="/bulkadd/" class="btn btn-success"
           >Bulk Add Samples</a
@@ -90,7 +90,7 @@
                 </td>
                 <td>
                   <a
-                    href="{% url 'checkout' pk=sample.pk %}?next={{ request.get_full_path }}"
+                    href="{% url 'sample_checkout' pk=sample.pk %}?next={{ request.get_full_path }}"
                   >
                     <i class="tim-icons icon-cloud-upload-94"></i> Checkout
                   </a>
@@ -102,12 +102,12 @@
                   >
                 </td>
                 <td class="text-center">
-                  <a href="{% url 'fully_used' pk=sample.pk %}"
+                  <a href="{% url 'sample_fully_used' pk=sample.pk %}"
                     ><i class="tim-icons icon-send align-center"></i></a
                   >
                 </td>
                 <td class="text-center">
-                  <a href="{% url 'delete' pk=sample.pk %}"
+                  <a href="{% url 'sample_delete' pk=sample.pk %}"
                     ><i class="tim-icons icon-trash-simple align-center"></i></a
                   >
                 </td>
@@ -166,13 +166,7 @@
             </div>
           </div>
           {% endif %}
-
-          <!--<div class="row">
-            <div class="col">Total Samples: {{ sample_list|length }}</div>
-          </div>-->
         </div>
-
-
       </div>
     </div>
   </div>
