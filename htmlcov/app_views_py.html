@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for app\views.py: 75%</title>
+    <title>Coverage for app\views.py: 77%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="jquery.min.js"></script>
@@ -18,13 +18,13 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>app\views.py</b> :
-            <span class="pc_cov">75%</span>
+            <span class="pc_cov">77%</span>
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
             435 statements &nbsp;
-            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">327 run</button>
-            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">108 missing</button>
+            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">334 run</button>
+            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">101 missing</button>
             <button type="button" class="exc show_exc shortkey_x button_toggle_exc" title="Toggle lines excluded">0 excluded</button>
         </h2>
     </div>
@@ -718,14 +718,14 @@
     <p id="t664" class="run"><span class="n"><a href="#t664">664</a></span><span class="t"><span class="key">def</span> <span class="nam">autocomplete_tags</span><span class="op">(</span><span class="nam">request</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t665" class="pln"><span class="n"><a href="#t665">665</a></span><span class="t">    <span class="com"># Helps keep tags consistent by promoting autocompletion against</span>&nbsp;</span><span class="r"></span></p>
     <p id="t666" class="pln"><span class="n"><a href="#t666">666</a></span><span class="t">    <span class="com"># existing tags in the database</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t667" class="mis show_mis"><span class="n"><a href="#t667">667</a></span><span class="t">    <span class="key">if</span> <span class="str">'term'</span> <span class="key">in</span> <span class="nam">request</span><span class="op">.</span><span class="nam">GET</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t668" class="mis show_mis"><span class="n"><a href="#t668">668</a></span><span class="t">        <span class="nam">tags</span> <span class="op">=</span> <span class="nam">Tag</span><span class="op">.</span><span class="nam">objects</span><span class="op">.</span><span class="nam">filter</span><span class="op">(</span><span class="nam">name__icontains</span><span class="op">=</span><span class="nam">request</span><span class="op">.</span><span class="nam">GET</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">'term'</span><span class="op">)</span><span class="op">)</span><span class="op">.</span><span class="nam">values</span><span class="op">(</span><span class="str">'name'</span><span class="op">)</span><span class="op">.</span><span class="nam">distinct</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t667" class="run"><span class="n"><a href="#t667">667</a></span><span class="t">    <span class="key">if</span> <span class="str">'term'</span> <span class="key">in</span> <span class="nam">request</span><span class="op">.</span><span class="nam">GET</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t668" class="run"><span class="n"><a href="#t668">668</a></span><span class="t">        <span class="nam">tags</span> <span class="op">=</span> <span class="nam">Tag</span><span class="op">.</span><span class="nam">objects</span><span class="op">.</span><span class="nam">filter</span><span class="op">(</span><span class="nam">name__icontains</span><span class="op">=</span><span class="nam">request</span><span class="op">.</span><span class="nam">GET</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">'term'</span><span class="op">)</span><span class="op">)</span><span class="op">.</span><span class="nam">values</span><span class="op">(</span><span class="str">'name'</span><span class="op">)</span><span class="op">.</span><span class="nam">distinct</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t669" class="pln"><span class="n"><a href="#t669">669</a></span><span class="t">    <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t670" class="mis show_mis"><span class="n"><a href="#t670">670</a></span><span class="t">        <span class="nam">tags</span> <span class="op">=</span> <span class="nam">Tag</span><span class="op">.</span><span class="nam">objects</span><span class="op">.</span><span class="nam">values</span><span class="op">(</span><span class="str">'name'</span><span class="op">)</span><span class="op">.</span><span class="nam">distinct</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t671" class="mis show_mis"><span class="n"><a href="#t671">671</a></span><span class="t">    <span class="nam">tag_list</span> <span class="op">=</span> <span class="nam">list</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t672" class="mis show_mis"><span class="n"><a href="#t672">672</a></span><span class="t">    <span class="key">for</span> <span class="nam">tag</span> <span class="key">in</span> <span class="nam">tags</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t673" class="mis show_mis"><span class="n"><a href="#t673">673</a></span><span class="t">        <span class="nam">tag_list</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">tag</span><span class="op">[</span><span class="str">'name'</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t674" class="mis show_mis"><span class="n"><a href="#t674">674</a></span><span class="t">    <span class="key">return</span> <span class="nam">JsonResponse</span><span class="op">(</span><span class="nam">tag_list</span><span class="op">,</span> <span class="nam">safe</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t670" class="run"><span class="n"><a href="#t670">670</a></span><span class="t">        <span class="nam">tags</span> <span class="op">=</span> <span class="nam">Tag</span><span class="op">.</span><span class="nam">objects</span><span class="op">.</span><span class="nam">values</span><span class="op">(</span><span class="str">'name'</span><span class="op">)</span><span class="op">.</span><span class="nam">distinct</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t671" class="run"><span class="n"><a href="#t671">671</a></span><span class="t">    <span class="nam">tag_list</span> <span class="op">=</span> <span class="nam">list</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t672" class="run"><span class="n"><a href="#t672">672</a></span><span class="t">    <span class="key">for</span> <span class="nam">tag</span> <span class="key">in</span> <span class="nam">tags</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t673" class="run"><span class="n"><a href="#t673">673</a></span><span class="t">        <span class="nam">tag_list</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">tag</span><span class="op">[</span><span class="str">'name'</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t674" class="run"><span class="n"><a href="#t674">674</a></span><span class="t">    <span class="key">return</span> <span class="nam">JsonResponse</span><span class="op">(</span><span class="nam">tag_list</span><span class="op">,</span> <span class="nam">safe</span><span class="op">=</span><span class="key">False</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t675" class="pln"><span class="n"><a href="#t675">675</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t676" class="pln"><span class="n"><a href="#t676">676</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t677" class="pln"><span class="n"><a href="#t677">677</a></span><span class="t"><span class="com">##############################################################################</span>&nbsp;</span><span class="r"></span></p>
@@ -783,7 +783,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.4</a>,
-            created at 2021-03-08 12:06 +0000
+            created at 2021-03-08 12:19 +0000
         </p>
     </div>
 </div>

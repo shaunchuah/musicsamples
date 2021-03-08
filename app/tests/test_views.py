@@ -416,3 +416,21 @@ def test_autocomplete_patient_id(auto_login_user):
     response_3 = client.get(path)
     assert 'GID-123-P' in json.loads(response_3.content)
     assert 'GID-003-P' in json.loads(response_3.content)
+
+
+def test_autocomplete_tags(auto_login_user):
+    client, user = auto_login_user()
+    mixer.blend('taggit.Tag', name='tag1')
+    mixer.blend('taggit.Tag', name='Test2')
+    path = reverse('autocomplete_tags')
+    response = client.get(path + '?term=ta')
+    assert 'tag1' in json.loads(response.content)
+    assert 'Test2' not in json.loads(response.content)
+
+    response_2 = client.get(path + '?term=test')
+    assert 'tag1' not in json.loads(response_2.content)
+    assert 'Test2' in json.loads(response_2.content)
+
+    response_3 = client.get(path)
+    assert 'tag1' in json.loads(response_3.content)
+    assert 'Test2' in json.loads(response_3.content)
