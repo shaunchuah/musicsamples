@@ -177,7 +177,7 @@ def test_sample_search_page(auto_login_user):
     mixer.blend('app.sample', musicsampleid='TEST003')
     mixer.blend('app.sample', musicsampleid='NO')
     mixer.blend('app.sample', musicsampleid='DONOTRETURN')
-    path = reverse('search')
+    path = reverse('sample_search')
     response = client.get(path + '?q=TEST')
     assertTemplateUsed(response, 'index.html')
     assert 'TEST002' in response.context['sample_list'][0].musicsampleid, 'Should create a few objects, run a search and return 2 objects.'
@@ -190,7 +190,7 @@ def test_sample_search_page(auto_login_user):
 def test_sample_checkout_page(auto_login_user):
     client, user = auto_login_user()
     mixer.blend('app.sample', sample_location='location1')
-    path = reverse('checkout', kwargs={'pk': 1})
+    path = reverse('sample_checkout', kwargs={'pk': 1})
 
     # Get the sample checkout page and check template is correct
     response = client.get(path)
