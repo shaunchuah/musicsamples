@@ -98,7 +98,7 @@ def test_account_page(admin_client):
 def test_used_samples_page(admin_client):
     path = reverse('used_samples')
     response = admin_client.get(path)
-    assertTemplateUsed(response, 'used_samples.html'), 'Check that used samples page is accessible through url and returns the used_samples.html template.'
+    assertTemplateUsed(response, 'samples/used_samples.html'), 'Check that used samples page is accessible through url and returns the used_samples.html template.'
 
 
 def test_barcode_main_page(admin_client):
@@ -117,7 +117,7 @@ def test_archive_page(admin_client):
     path = reverse('archive')
     response = admin_client.get(path)
     assert response.status_code == 200, 'Check archive view and url is working. (Soft deleted samples.)'
-    assertTemplateUsed(response, 'archive.html')
+    assertTemplateUsed(response, 'samples/sample-archive.html')
 
 
 def test_error_404_template(admin_client):
@@ -167,7 +167,7 @@ def test_sample_edit_page(auto_login_user):
     mixer.blend('app.sample', musicsampleid='TEST003')
     path = reverse('sample_edit', kwargs={'pk': 2})
     response = client.get(path)
-    assertTemplateUsed(response, 'sample-edit.html')
+    assertTemplateUsed(response, 'samples/sample-edit.html')
     assert response.context['form'].initial['musicsampleid'] == 'TEST003', 'Should create two separate sample instances and return the second one.'
 
 
@@ -195,7 +195,7 @@ def test_sample_checkout_page(auto_login_user):
     # Get the sample checkout page and check template is correct
     response = client.get(path)
     assert response.context['form'].initial['sample_location'] == 'location1', 'Should retrieve an instance to checkout.'
-    assertTemplateUsed(response, 'sample-checkout.html')
+    assertTemplateUsed(response, 'samples/sample-checkout.html')
 
     # Checkout the sample from location1 to location2
     response = client.post(path, data={'sample_location': 'location2'})
@@ -211,7 +211,7 @@ def test_sample_delete(auto_login_user):
 
     # Get the delete page first and check template is correct
     response = client.get(path)
-    assertTemplateUsed(response, 'sample-delete.html')
+    assertTemplateUsed(response, 'samples/sample-delete.html')
 
     # Make the delete request now and also pass a next_url to check redirection
     response = client.post(path + '?next=/samples/1/', data={'is_deleted': True})
@@ -227,7 +227,7 @@ def test_sample_restore(auto_login_user):
 
     # Get the restore page and check template is correct
     response = client.get(path)
-    assertTemplateUsed(response, 'sample-restore.html')
+    assertTemplateUsed(response, 'samples/sample-restore.html')
 
     # Restore the sample
     response = client.post(path, data={'is_deleted': False})
@@ -242,7 +242,7 @@ def test_sample_fully_used(auto_login_user):
 
     # Get the delete page first and check template is correct
     response = client.get(path)
-    assertTemplateUsed(response, 'sample-fullyused.html')
+    assertTemplateUsed(response, 'samples/sample-fullyused.html')
 
     # Make the delete request now and also pass a next_url to check redirection
     response = client.post(path, data={'is_fully_used': True})
@@ -258,7 +258,7 @@ def test_sample_reactivate(auto_login_user):
 
     # Get the restore page and check template is correct
     response = client.get(path)
-    assertTemplateUsed(response, 'sample-reactivate.html')
+    assertTemplateUsed(response, 'samples/sample-reactivate.html')
 
     # Restore the sample
     response = client.post(path, data={'is_fully_used': False})
