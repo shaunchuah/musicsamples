@@ -3,7 +3,7 @@ from .forms import SampleForm, CheckoutForm, DeleteForm, RestoreForm
 from .forms import NoteForm, NoteDeleteForm, ReactivateForm, FullyUsedForm
 from django.http import JsonResponse
 import datetime
-import csv
+# import csv
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
@@ -313,17 +313,17 @@ def reactivate_sample(request, pk):
     return render(request, 'sample-reactivate.html', {'form': form})
 
 
-@login_required(login_url="/login/")
-def export_csv(request):
-    # Export entire database to CSV for backup, currently not in use
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="music_samples_%s.csv"' % datetime.datetime.now().strftime("%Y-%m-%d")
-    writer = csv.writer(response)
-    writer.writerow(['MUSIC Sample ID', 'Patient ID', 'Sample Location', 'Sample Type', 'Sample Datetime', 'Sample Comments', 'Created By', 'Date First Created', 'Last Modified By', 'Last Modified'])
-    samples = Sample.objects.all().filter(is_deleted=False).values_list('musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments', 'created_by', 'data_first_created', 'last_modified_by', 'last_modified')
-    for sample in samples:
-        writer.writerow(sample)
-    return response
+# @login_required(login_url="/login/")
+# def export_csv(request):
+#     # Export entire database to CSV for backup, currently not in use
+#     response = HttpResponse(content_type='text/csv')
+#     response['Content-Disposition'] = 'attachment; filename="music_samples_%s.csv"' % datetime.datetime.now().strftime("%Y-%m-%d")
+#     writer = csv.writer(response)
+#     writer.writerow(['MUSIC Sample ID', 'Patient ID', 'Sample Location', 'Sample Type', 'Sample Datetime', 'Sample Comments', 'Created By', 'Date First Created', 'Last Modified By', 'Last Modified'])
+#     samples = Sample.objects.all().filter(is_deleted=False).values_list('musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments', 'created_by', 'data_first_created', 'last_modified_by', 'last_modified')
+#     for sample in samples:
+#         writer.writerow(sample)
+#     return response
 
 # Excel Exports
 
