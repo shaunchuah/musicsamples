@@ -115,7 +115,7 @@ def used_samples(request):
 
 
 @login_required(login_url="/login/")
-def add(request):
+def sample_add(request):
     if request.method == "POST":
         form = SampleForm(request.POST)
         if form.is_valid():
@@ -124,12 +124,12 @@ def add(request):
             sample.last_modified_by = request.user.username
             sample.save()
             messages.success(request, 'Sample registered successfully.')
-            return redirect('/add/')
+            return redirect(reverse('sample_add'))
         else:
             messages.error(request, 'Form is not valid.')
     else:
         form = SampleForm()
-    return render(request, "add.html", {'form': form})
+    return render(request, "samples/sample-add.html", {'form': form})
 
 # Historical changes function to integrate simple history into the sample detail page
 
