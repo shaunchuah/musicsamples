@@ -34,19 +34,19 @@ class TestUrls(SimpleTestCase):
 
     def test_delete_sample_url_resolves(self):
         url = reverse('sample_delete', kwargs={'pk': 3})
-        self.assertEqual(resolve(url).func, views.delete)
+        self.assertEqual(resolve(url).func, views.sample_delete)
 
     def test_restore_sample_url_resolves(self):
         url = reverse('sample_restore', kwargs={'pk': 3})
-        self.assertEqual(resolve(url).func, views.restore)
+        self.assertEqual(resolve(url).func, views.sample_restore)
 
     def test_checkout_sample_url_resolves(self):
-        url = reverse('checkout', kwargs={'pk': 3})
-        self.assertEqual(resolve(url).func, views.checkout)
+        url = reverse('sample_checkout', kwargs={'pk': 3})
+        self.assertEqual(resolve(url).func, views.sample_checkout)
 
     def test_search_url_resolves(self):
-        url = reverse('search')
-        self.assertEqual(resolve(url).func, views.search)
+        url = reverse('sample_search')
+        self.assertEqual(resolve(url).func, views.sample_search)
 
     # def test_csv_export_url_resolves(self):
     #     url = reverse('export_csv')

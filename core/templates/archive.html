@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Dashboard {% endblock %} 
+{% block title %} Dashboard {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -19,57 +19,44 @@
             <thead class=" text-primary">
               <tr>
                 <th>Sample ID</th>
-                <th>
-                  Patient ID
-                </th>
-                <th>
-                  Sample Location
-                </th>
-                <th>
-                  Sample Sublocation
-                </th>
-                <th>
-                  Sample Type
-                </th>
-                <th>
-                  Sample Datetime
-                </th>
-                <th>
-                  Comments
-                </th>
-                <th>
-                  Restore
-                </th>
+                <th>Patient ID</th>
+                <th>Sample Location</th>
+                <th>Sample Sublocation</th>
+                <th>Sample Type</th>
+                <th>Sample Datetime</th>
+                <th>Comments</th>
+                <th>Restore</th>
               </tr>
             </thead>
             <tbody>
 
-
               {% if sample_list %}
-                  
-                  {% for sample in sample_list %}
-                  <tr>
-                      <td>{{ sample.musicsampleid }}</td>
-                      <td>{{ sample.patientid }}</td>
-                      <td>{{ sample.sample_location }}</td>
-                      <td>
-                        {% if sample.sample_sublocation is None %}
-                        {% else %}
-                        {{ sample.sample_sublocation }}
-                        {% endif %}
-                      </td>
-                      <td>{{ sample.sample_type }}</td>
-                      <td>{{ sample.sample_datetime }}</td>
-                      <td>{{ sample.sample_comments }}</td>                      
-                      <td>
-                        <a href="{% url 'sample_restore' pk=sample.pk %}"><i class="tim-icons icon-upload"></i> Restore</a>
-                      </td>
-                    </tr>
-                  {% endfor %}
+
+              {% for sample in sample_list %}
+              <tr>
+                <td>{{ sample.musicsampleid }}</td>
+                <td>{{ sample.patientid }}</td>
+                <td>{{ sample.sample_location }}</td>
+                <td>
+                  {% if sample.sample_sublocation is None %}
+                  {% else %}
+                  {{ sample.sample_sublocation }}
+                  {% endif %}
+                </td>
+                <td>{{ sample.sample_type }}</td>
+                <td>{{ sample.sample_datetime }}</td>
+                <td>{{ sample.sample_comments }}</td>
+                <td>
+                  <a href="{% url 'sample_restore' pk=sample.pk %}"><i class="tim-icons icon-upload"></i> Restore</a>
+                </td>
+              </tr>
+              {% endfor %}
               {% else %}
-                  <tr><td colspan="8" align="center">No samples found.</td></tr>
+              <tr>
+                <td colspan="8" align="center">No samples found.</td>
+              </tr>
               {% endif %}
-              
+
             </tbody>
           </table>
         </div>
@@ -173,11 +160,11 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 
-  <script>
-    $(document).ready(function() {
-      // Javascript method's body can be found in assets/js/demos.js
-      demo.initDashboardPageCharts();
-    });    
-  </script>
+<script>
+  $(document).ready(function () {
+    // Javascript method's body can be found in assets/js/demos.js
+    demo.initDashboardPageCharts();
+  });
+</script>
 
 {% endblock javascripts %}

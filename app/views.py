@@ -190,8 +190,7 @@ def sample_edit(request, pk):
 
 
 @login_required(login_url="/login/")
-@cache_page(60 * 5)  # Cache page for 5 minutes
-def search(request):
+def sample_search(request):
     # Sample search in home page
     query_string = ''
     if ('q' in request.GET) and request.GET['q'].strip():
@@ -209,7 +208,7 @@ def search(request):
 
 
 @login_required(login_url="/login/")
-def checkout(request, pk):
+def sample_checkout(request, pk):
     # Sample Checkout - Quick update of sample location from home page
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
@@ -230,7 +229,7 @@ def checkout(request, pk):
 
 
 @login_required(login_url="/login/")
-def delete(request, pk):
+def sample_delete(request, pk):
     # Soft deletion method for samples
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
@@ -251,7 +250,7 @@ def delete(request, pk):
 
 
 @login_required(login_url="/login/")
-def restore(request, pk):
+def sample_restore(request, pk):
     # Restore soft-deleted sample
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
@@ -272,7 +271,7 @@ def restore(request, pk):
 
 
 @login_required(login_url="/login/")
-def fully_used(request, pk):
+def sample_fully_used(request, pk):
     # Mark sample as fully used
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
