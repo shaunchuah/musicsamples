@@ -130,7 +130,7 @@ def test_error_404_template(admin_client):
 
 def test_add_sample_page(auto_login_user):
     client, user = auto_login_user()
-    path = reverse('new_sample')
+    path = reverse('sample_add')
     response = client.get(path)
     assert response.status_code == 200, 'Should return add new sample page via GET request.'
     response = client.post(path)
@@ -207,7 +207,7 @@ def test_sample_checkout_page(auto_login_user):
 def test_sample_delete(auto_login_user):
     client, user = auto_login_user()
     mixer.blend('app.sample', musicpatientid='TEST05')
-    path = reverse('delete', kwargs={'pk': 1})
+    path = reverse('sample_delete', kwargs={'pk': 1})
 
     # Get the delete page first and check template is correct
     response = client.get(path)
@@ -223,7 +223,7 @@ def test_sample_delete(auto_login_user):
 def test_sample_restore(auto_login_user):
     client, user = auto_login_user()
     mixer.blend('app.sample', is_deleted=True)
-    path = reverse('restore', kwargs={'pk': 1})
+    path = reverse('sample_restore', kwargs={'pk': 1})
 
     # Get the restore page and check template is correct
     response = client.get(path)
@@ -238,7 +238,7 @@ def test_sample_restore(auto_login_user):
 def test_sample_fully_used(auto_login_user):
     client, user = auto_login_user()
     mixer.blend('app.sample')
-    path = reverse('fully_used', kwargs={'pk': 1})
+    path = reverse('sample_fully_used', kwargs={'pk': 1})
 
     # Get the delete page first and check template is correct
     response = client.get(path)
