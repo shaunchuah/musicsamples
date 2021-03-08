@@ -167,7 +167,6 @@ def test_add_sample_page(auto_login_user):
     assert response.status_code == 200, 'Should return add new sample page via POST request without form data.'
 
 
-
 def test_add_sample_post(auto_login_user):
     client, user = auto_login_user()
     path = reverse('sample_add')
@@ -176,21 +175,20 @@ def test_add_sample_post(auto_login_user):
         'patientid': 'patient001',
         'sample_location': 'location001',
         'sample_type': 'test_sample_type',
-        'sample_datetime': '2020-01-01T13:20:30+00',
+        'sample_datetime': '2020-01-01T13:20:30',
         'sample_comments': '',
         'processing_datetime': '',
         'sample_sublocation': '',
         'sample_volume': '',
         'sample_volume_units': '',
-        'freeze_thaw_count': '',
+        'freeze_thaw_count': 0,
         'haemolysis_reference': '',
         'biopsy_location': '',
         'biopsy_inflamed_status': ''
     }
-    response = client.post(path, data=form_data, content_type="application/x-www-form-urlencoded")
-    print(response)
+    response = client.post(path, data=form_data)
+    assert Sample.objects.get(pk=1).patientid == 'patient001'
     assert response.status_code == 302
-
 
 
 def test_sample_detail_page(auto_login_user):
