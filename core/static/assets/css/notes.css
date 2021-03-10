@@ -2,7 +2,7 @@
     font-family: 'Open Sans', sans-serif;
     font-size: 1rem;
     line-height: 1.5rem;
-    min-height: 25rem;
+    min-height: 20rem;
 }
 
 .music-files a {
@@ -45,7 +45,7 @@
 }
 
 .notes h2, h3 {
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
     font-weight: 600;
 }
 
@@ -78,6 +78,7 @@
 
 .notes h4 {
     font-size: 1.3rem;
+    font-weight: 600;
 }
 
 .notes li {
@@ -86,10 +87,12 @@
 
 .notes h5 {
     font-size: 1.2rem;
+    font-weight: 600;
 }
 
 .notes h6 {
     font-size: 1.1rem;
+    font-weight: 600;
 }
 
 .notes .card-subtitle {
