@@ -115,7 +115,7 @@ def sample_add(request):
             messages.error(request, 'Form is not valid.')
     else:
         form = SampleForm()
-    return render(request, "samples/sample-add.html", {'form': form})
+    return render(request, "samples/sample-add.html", {'form': form, 'page_title': 'Add New Sample'})
 
 
 def historical_changes(query):
@@ -170,7 +170,7 @@ def sample_edit(request, pk):
                 return redirect('/')
     else:
         form = SampleForm(instance=sample)
-    return render(request, 'samples/sample-edit.html', {'form': form})
+    return render(request, 'samples/sample-add.html', {'form': form, 'page_title': 'Update Sample'})
 
 
 @login_required(login_url="/login/")

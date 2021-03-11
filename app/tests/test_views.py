@@ -221,7 +221,7 @@ def test_sample_edit_page(auto_login_user):
     mixer.blend('app.sample', musicsampleid='TEST003')
     path = reverse('sample_edit', kwargs={'pk': 2})
     response = client.get(path)
-    assertTemplateUsed(response, 'samples/sample-edit.html')
+    assertTemplateUsed(response, 'samples/sample-add.html')
     assert response.context['form'].initial['musicsampleid'] == 'TEST003', 'Should create two separate sample instances and return the second one.'
 
 
