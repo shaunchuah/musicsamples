@@ -35,18 +35,18 @@ class SampleForm(ModelForm):
         fields = [
             'musicsampleid',
             'sample_location',
+            'sample_sublocation',
             'patientid',
             'sample_type',
+            'biopsy_location',
+            'biopsy_inflamed_status',
             'sample_datetime',
-            'sample_comments',
             'processing_datetime',
-            'sample_sublocation',
+            'sample_comments',
             'sample_volume',
             'sample_volume_units',
             'freeze_thaw_count',
             'haemolysis_reference',
-            'biopsy_location',
-            'biopsy_inflamed_status'
         ]
 
         # Customise dropdown select fields to ensure consistent data input
