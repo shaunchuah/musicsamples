@@ -26,7 +26,7 @@
 
 <div class="row">
     <div class="col-xl-9">
-      <h2><i class="tim-icons icon-pencil"></i> Add New Sample</h2>
+      <h2><i class="tim-icons icon-pencil"></i> {{ page_title }}</h2>
       <div class="card">
         <!--<div class="card-header"><h3 class="card-title">Add New Sample</h3></div>-->
         <div class=card-body>
@@ -42,7 +42,7 @@
               {% if field.name == 'sample_location' or field.name == 'sample_volume' %}
 
               <div class="row">
-                <div class="form-group col-6">
+                <div class="form-group col-md-8">
                   {{ field.label_tag }}
                   {% render_field field class="form-control" %}
                   {% if field.help_text %}
@@ -52,7 +52,7 @@
               
               {% elif field.name == 'sample_sublocation' or field.name == 'sample_volume_units' %}
 
-                <div class="form-group col-6">
+                <div class="form-group col-md-4">
                   {{ field.label_tag }}
                   {% render_field field class="form-control" %}
                   {% if field.help_text %}
