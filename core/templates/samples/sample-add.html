@@ -38,6 +38,33 @@
             {% endfor %}
 
             {% for field in form.visible_fields %}
+
+              {% if field.name == 'sample_location' or field.name == 'sample_volume' %}
+
+              <div class="row">
+                <div class="form-group col-6">
+                  {{ field.label_tag }}
+                  {% render_field field class="form-control" %}
+                  {% if field.help_text %}
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                  {% endif %}
+                </div>
+              
+              {% elif field.name == 'sample_sublocation' or field.name == 'sample_volume_units' %}
+
+                <div class="form-group col-6">
+                  {{ field.label_tag }}
+                  {% render_field field class="form-control" %}
+                  {% if field.help_text %}
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                  {% endif %}
+                </div>
+              </div>
+
+              {% else %}
+
+
+
               <div class="form-group">
                 {{ field.label_tag }}
                 {% render_field field class="form-control" %}
@@ -45,6 +72,11 @@
                   <small class="form-text text-muted">{{ field.help_text }}</small>
                 {% endif %}
               </div>
+
+
+
+              {% endif %}
+
             {% endfor %}
 
             <div class="card-footer">
@@ -78,6 +110,33 @@
       $('input#id_patientid').autocomplete({
         source: '{% url 'autocomplete_patients' %}'
       });
+
+      // Show/Hide form fields depending on input sample type
+      if ($('#id_sample_type').val() == 'Formalin biopsy' 
+        || $('#id_sample_type').val() == 'RNAlater biopsy' 
+        || $('#id_sample_type').val() == 'Paraffin tissue block') {
+          
+        } else {
+          $('label[for=id_biopsy_location], #id_biopsy_location').hide();
+          $('label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status').hide();
+        }
+      
+
+      $('#id_sample_type').change(function(){
+        if ($('#id_sample_type').val() == 'Formalin biopsy' 
+        || $('#id_sample_type').val() == 'RNAlater biopsy' 
+        || $('#id_sample_type').val() == 'Paraffin tissue block') {
+          $('label[for=id_biopsy_location], #id_biopsy_location').show("slow");
+          $('label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status').show("slow");
+        } else {
+          $('label[for=id_biopsy_location], #id_biopsy_location').hide();
+          $('label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status').hide();
+        };
+      });
+
+
+
+
 
     });
   </script>
