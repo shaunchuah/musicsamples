@@ -24,8 +24,13 @@ def currentTime():
 
 class SampleForm(ModelForm):
     # Main sample registration form
-    sample_datetime = forms.DateTimeField(
-        label="Sample Created Datetime*",
+    # sample_datetime = forms.DateTimeField(
+    #     label="Sampling Datetime*",
+    #     widget=DateTimeInput(),
+    # )
+
+    processing_datetime = forms.DateTimeField(
+        label="Processing Datetime",
         widget=DateTimeInput(),
         initial=currentTime
     )
@@ -122,8 +127,8 @@ class SampleForm(ModelForm):
         )
         widgets = {
             'sample_type': forms.Select(choices=SAMPLE_TYPE_CHOICES),
+            'sample_datetime': DateTimeInput(),
             'sample_volume_units': forms.Select(choices=SAMPLE_VOLUME_UNIT_CHOICES, attrs={'class': 'form-control'}),
-            'processing_datetime': DateTimeInput(),
             'haemolysis_reference': forms.Select(choices=HAEMOLYSIS_REFERENCE_CHOICES),
             'biopsy_location': forms.Select(choices=BIOPSY_LOCATION_CHOICES),
             'biopsy_inflamed_status': forms.Select(choices=BIOPSY_INFLAMED_STATUS_CHOICES),
@@ -131,11 +136,11 @@ class SampleForm(ModelForm):
         labels = {
             'musicsampleid': "Sample ID*",
             'patientid': "Patient ID*",
+            'sample_datetime': "Sampling Datetime*",
             'sample_location': "Sample Location*",
             'sample_sublocation': "Sample Sublocation",
             'sample_type': "Sample Type*",
             'sample_comments': "Comments",
-            'processing_datetime': "Processing Datetime",
             'sample_volume': "Volume Remaining (est.)",
             'sample_volume_units': "Sample Volume Units",
             'freeze_thaw_count': "No. of Freeze-Thaw Cycles",
