@@ -177,7 +177,7 @@ def test_add_sample_post(auto_login_user):
         'sample_type': 'test_sample_type',
         'sample_datetime': '2020-01-01T13:20:30',
         'sample_comments': '',
-        'processing_datetime': '',
+        'processing_datetime': '2020-01-01T13:20:30',
         'sample_sublocation': '',
         'sample_volume': '',
         'sample_volume_units': '',
