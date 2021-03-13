@@ -111,15 +111,24 @@
         source: '{% url 'autocomplete_patients' %}'
       });
 
+      $('label[for=id_biopsy_location], #id_biopsy_location').hide();
+      $('label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status').hide();
+      $('label[for=id_haemolysis_reference], #id_haemolysis_reference').hide();
+
+
       // Show/Hide form fields depending on input sample type
       if ($('#id_sample_type').val() == 'Formalin biopsy' 
         || $('#id_sample_type').val() == 'RNAlater biopsy' 
         || $('#id_sample_type').val() == 'Paraffin tissue block') {
-          
-        } else {
-          $('label[for=id_biopsy_location], #id_biopsy_location').hide();
-          $('label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status').hide();
-        }
+          $('label[for=id_biopsy_location], #id_biopsy_location').show();
+          $('label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status').show();
+        };
+        
+      if ($('#id_sample_type').val() == 'EDTA plasma child aliquot'
+        || $('#id_sample_type').val() == 'PaxGene ccfDNA plasma child aliquot'
+        || $('#id_sample_type').val() == 'PaxGene ccfDNA extracted cfDNA') {
+          $('label[for=id_haemolysis_reference], #id_haemolysis_reference').show();
+        };
       
 
       $('#id_sample_type').change(function(){
@@ -131,6 +140,16 @@
         } else {
           $('label[for=id_biopsy_location], #id_biopsy_location').hide();
           $('label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status').hide();
+        };
+      });
+
+      $('#id_sample_type').change(function(){
+        if ($('#id_sample_type').val() == 'EDTA plasma child aliquot'
+        || $('#id_sample_type').val() == 'PaxGene ccfDNA plasma child aliquot'
+        || $('#id_sample_type').val() == 'PaxGene ccfDNA extracted cfDNA') {
+          $('label[for=id_haemolysis_reference], #id_haemolysis_reference').show("slow");
+        } else {
+          $('label[for=id_haemolysis_reference], #id_haemolysis_reference').hide();
         };
       });
 

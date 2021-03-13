@@ -32,7 +32,8 @@ class SampleForm(ModelForm):
     processing_datetime = forms.DateTimeField(
         label="Processing Datetime",
         widget=DateTimeInput(),
-        initial=currentTime
+        initial=currentTime,
+        required=False
     )
 
     class Meta:
@@ -43,6 +44,7 @@ class SampleForm(ModelForm):
             'sample_sublocation',
             'patientid',
             'sample_type',
+            'haemolysis_reference',
             'biopsy_location',
             'biopsy_inflamed_status',
             'sample_datetime',
@@ -51,7 +53,6 @@ class SampleForm(ModelForm):
             'sample_volume',
             'sample_volume_units',
             'freeze_thaw_count',
-            'haemolysis_reference',
         ]
 
         # Customise dropdown select fields to ensure consistent data input
