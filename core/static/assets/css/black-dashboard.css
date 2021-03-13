@@ -19165,7 +19165,7 @@ Copyright (c) 2015 Daniel Eden
 .white-content .input-group-focus .input-group-prepend .input-group-text,
 .white-content .input-group-focus .input-group-append .input-group-text,
 .white-content .input-group-focus .form-control {
-  border-color: ##3055bb;
+  border-color: #3055bb;
 }
 
 .white-content .input-group-focus.no-border .input-group-prepend .input-group-text,
@@ -19857,7 +19857,6 @@ Copyright (c) 2015 Daniel Eden
   padding-right: 0;
 }
 
-/*# sourceMappingURL=dashboard-free.css.map */
 
 
 /* Nucleo Icons */
