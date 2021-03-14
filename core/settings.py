@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django_select2',
     'rest_framework',
     'storages',
+    'debug_toolbar',
     'app'  # Enable the inner app
 ]
 
@@ -61,6 +62,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -243,3 +245,6 @@ CACHES = {
 
 # Set the cache backend to select2
 SELECT2_CACHE_BACKEND = 'default'
+
+
+INTERNAL_IPS = ['127.0.0.1']
