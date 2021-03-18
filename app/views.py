@@ -12,7 +12,7 @@ from openpyxl.utils import get_column_letter
 from django.contrib import messages
 from django.db.models import Q
 from rest_framework import viewsets, permissions
-from .serializers import SampleSerializer, SampleIsFullyUsedSerializer
+from .serializers import SampleSerializer, SampleIsFullyUsedSerializer, MultipleSampleSerializer
 from taggit.models import Tag
 from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -698,6 +698,13 @@ class SampleIsFullyUsedViewSet(viewsets.ModelViewSet):
     lookup_field = 'musicsampleid'
 
 
+class MultipleSampleViewSet(viewsets.ModelViewSet):
+    queryset = Sample.objects.filter(is_deleted=False)
+    serializer_class = MultipleSampleSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'musicsampleid'
+
+
 @login_required(login_url="/login/")
 def barcode(request):
     # Returns the page - frontend logic is in the barcode.html template file
@@ -707,3 +714,8 @@ def barcode(request):
 @login_required(login_url="/login/")
 def barcode_samples_used(request):
     return render(request, "barcode-markused.html")
+
+
+@login_required(login_url="/login/")
+def barcode_add_multiple(request):
+    return render(request, "barcode-addmultiple.html")
