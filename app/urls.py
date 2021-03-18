@@ -1,7 +1,7 @@
 from django.urls import path, include
 from app import views
 from rest_framework import routers
-from .views import SampleViewSet, SampleIsFullyUsedViewSet
+from .views import SampleViewSet, SampleIsFullyUsedViewSet, MultipleSampleViewSet
 from django.views.generic.base import TemplateView
 
 router = routers.DefaultRouter()
@@ -9,6 +9,7 @@ router = routers.DefaultRouter()
 # Django Rest Framework API endpoints
 router.register(r'samples', SampleViewSet)
 router.register(r'samples_used', SampleIsFullyUsedViewSet)
+router.register(r'multiple_samples', MultipleSampleViewSet)
 
 urlpatterns = [
     path('', views.index, name='home'),
@@ -54,5 +55,6 @@ urlpatterns = [
 
     # QR code URLs
     path('barcode/', views.barcode, name='barcode'),
-    path('barcode/samples_used/', views.barcode_samples_used, name='barcode_samples_used')
+    path('barcode/samples_used/', views.barcode_samples_used, name='barcode_samples_used'),
+    path('barcode/add_multiple/', views.barcode_add_multiple, name='barcode_add_multiple'),
 ]
