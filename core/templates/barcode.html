@@ -154,6 +154,9 @@ function submitScan(){
 $(document).ready(function() {
   // Javascript method's body can be found in assets/js/demos.js
   $('.alert').hide();
+  $('#sample_location').autocomplete({
+    source: '{% url 'autocomplete_locations' %}'
+  });
 
   $('#sample_id').keyup(function(){
     url_string = '/api/samples/' + $('#sample_id').val() + '/';
