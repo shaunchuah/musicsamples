@@ -27,6 +27,7 @@ User = get_user_model()
 def index(request):
     # Home Page
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).order_by('-sample_datetime')
+    sample_count = sample_list.count()
     page = request.GET.get('page', 1)
     paginator = Paginator(sample_list, 50)
     try:
@@ -35,7 +36,7 @@ def index(request):
         samples = paginator.page(1)
     except EmptyPage:
         samples = paginator.page(paginator.num_pages)
-    context = {'sample_list': samples}
+    context = {'sample_list': samples, 'sample_count': sample_count}
     return render(request, "index.html", context)
 
 
@@ -186,9 +187,10 @@ def sample_search(request):
             | Q(sample_sublocation__icontains=query_string)
             | Q(sample_type__icontains=query_string)
             | Q(sample_comments__icontains=query_string)).filter(is_fully_used=False).filter(is_deleted=False)
-        return render(request, 'index.html', {'query_string': query_string, 'sample_list': sample_list})
+        sample_count = sample_list.count()
+        return render(request, 'index.html', {'query_string': query_string, 'sample_list': sample_list, 'sample_count': sample_count})
     else:
-        return render(request, 'index.html', {'query_string': 'Null'})
+        return render(request, 'index.html', {'query_string': 'Null', 'sample_count': 0})
 
 
 @login_required(login_url="/login/")
