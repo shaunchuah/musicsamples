@@ -8,12 +8,38 @@
 {% block content %}
 
 <div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Search Used Samples</h3></div>
+      <div class="card-body">
+        <form id="searchform" action="{% url 'used_samples_search' %}" method="GET">
+          <div class="form-group">
+            <input type="text" autofocus name="q" class="form-control" />
+          </div>
+          <div class="card-footer">
+            <button type="submit" class="btn btn-fill btn-success">
+              Search
+            </button>
+            <a href="{% url 'used_samples' %}" class="btn btn-fill btn-secondary"
+              >Clear</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
   <div class="col-md-12">
     <div class="card ">
       <div class="card-header">
         <h3 class="card-title">Used Samples</h3>
       </div>
       <div class="card-body">
+        <div class="d-flex flex-row-reverse pb-3">
+          Total Count: {{ sample_count }}
+        </div>
         <div class="table-responsive">
           <table class="table tablesorter " id="">
             <thead class=" text-primary">
@@ -75,7 +101,7 @@
                     </tr>
                   {% endfor %}
               {% else %}
-                  <tr><td colspan="8" align="center">No samples found.</td></tr>
+                  <tr><td colspan="9" align="center">No samples found.</td></tr>
               {% endif %}
               
             </tbody>
