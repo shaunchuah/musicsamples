@@ -41,12 +41,18 @@ def index(request):
 
 
 @login_required(login_url="/login/")
-@cache_page(60 * 60)  # Cache page for 60 minutes
+# @cache_page(60 * 60)  # Cache page for 60 minutes
 def analytics(request):
     # Analytics Page
+
+    # Get last 12 months date
+    current_date = datetime.datetime.now(datetime.timezone.utc)
+    months_ago = 12
+    twelve_months_previous_date = current_date - datetime.timedelta(days=(months_ago * 365 / 12))
+
     total_samples = Sample.objects.all().filter(is_deleted=False).count()
     total_active_samples = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).count()
-    samples_by_month = Sample.objects.all().filter(is_deleted=False).annotate(sample_month=Trunc('sample_datetime', 'month')).values('sample_month').annotate(sample_count=Count('id')).order_by('sample_month')
+    samples_by_month = Sample.objects.all().filter(is_deleted=False, sample_datetime__gte=twelve_months_previous_date).annotate(sample_month=Trunc('sample_datetime', 'month')).values('sample_month').annotate(sample_count=Count('id')).order_by('sample_month')
     samples_by_type = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).values('sample_type').annotate(sample_type_count=Count('id'))
     samples_by_location = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).values('sample_location').annotate(sample_location_count=Count('id'))
     context = {
