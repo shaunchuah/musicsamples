@@ -22,6 +22,7 @@ urlpatterns = [
     # Samples URLs
     path('samples/archive/', views.sample_archive, name='sample_archive'),
     path('used_samples/', views.used_samples, name='used_samples'),
+    path('used_samples/search/', views.used_samples_search, name='used_samples_search'),
     path('samples/add/', views.sample_add, name='sample_add'),
     path('samples/<int:pk>/', views.sample_detail, name='sample_detail'),
     path('samples/<int:pk>/edit/', views.sample_edit, name='sample_edit'),
