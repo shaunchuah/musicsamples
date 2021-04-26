@@ -102,8 +102,27 @@ def sample_archive(request):
 def used_samples(request):
     # Used samples page for samples marked as being fully used
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=True).order_by('-last_modified')
-    context = {'sample_list': sample_list}
+    sample_count = sample_list.count()
+    context = {'sample_list': sample_list, 'sample_count': sample_count}
     return render(request, "samples/used_samples.html", context)
+
+
+@login_required(login_url="/login/")
+def used_samples_search(request):
+    query_string = ''
+    if ('q' in request.GET) and request.GET['q'].strip():
+        query_string = request.GET.get('q')
+        sample_list = Sample.objects.filter(
+            Q(musicsampleid__icontains=query_string)
+            | Q(patientid__icontains=query_string)
+            | Q(sample_location__icontains=query_string)
+            | Q(sample_sublocation__icontains=query_string)
+            | Q(sample_type__icontains=query_string)
+            | Q(sample_comments__icontains=query_string)).filter(is_fully_used=True).filter(is_deleted=False)
+        sample_count = sample_list.count()
+        return render(request, 'samples/used_samples.html', {'query_string': query_string, 'sample_list': sample_list, 'sample_count': sample_count})
+    else:
+        return render(request, 'samples/used_samples.html', {'query_string': 'Null', 'sample_count': 0})
 
 
 @login_required(login_url="/login/")
