@@ -7,8 +7,8 @@ from django.views.generic.base import TemplateView
 router = routers.DefaultRouter()
 
 # Django Rest Framework API endpoints
-router.register(r'samples', SampleViewSet)
-router.register(r'samples_used', SampleIsFullyUsedViewSet)
+router.register(r'samples', SampleViewSet, "samples")
+router.register(r'samples_used', SampleIsFullyUsedViewSet, "samples_used")
 router.register(r'multiple_samples', MultipleSampleViewSet)
 
 urlpatterns = [
