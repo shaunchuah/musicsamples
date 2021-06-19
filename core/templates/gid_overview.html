@@ -25,32 +25,23 @@
         </thead>
 
         <tbody>
-          {% for patient in patient_id_list %}
-          
-          <tr>
-            
+          {% for patient in patient_id_list %}          
+          <tr>            
             <td><strong>{{ patient }}</strong></td>
             {% for category in sample_category_list %}
             <td>
-              {% for sample in sample_list %}
-                
+              {% for sample in sample_list %}                
                 {% if sample.patientid == patient %}
-
                   {% if sample.sample_type == category %}
                   <a href="{% url 'sample_detail' pk=sample.pk %}">
-                    {{ sample.musicsampleid }}
-                  </a><br />
-                  
-                  
-                  {% endif %}
-                
+                    {{ sample.musicsampleid }}<br />
+                  </a>                  
+                  {% endif %}                
                 {% endif %}
               {% endfor %}
             </td>
-
             {% endfor %}
-          </tr>
-          
+          </tr>          
           {% endfor %}
         </tbody>
 
