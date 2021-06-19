@@ -26,20 +26,21 @@
         </div>
 
       </div>
-     
+     {% regroup sample_list by patientid as grouped_sample_list %}
       <div class="card-body">
-
+      <p>Number of samples: {{sample_list|length}}</p>
+      <p>Number of subjects: {{grouped_sample_list|length}}</p>
         <div class="table-responsive">
         <table class="table">
           <thead class="text-primary">
             <tr>
-              <th>Sample Type against Patient ID </th>
-              <th>{{ query }}</th>
+              <th>Patient ID </th>
+              <th>{{ query }} </th>
             </tr>
         </thead>
 
         <tbody>
-          {% regroup sample_list by patientid as grouped_sample_list %}
+          
           {% for sample in grouped_sample_list %}
           <tr>
             <td>{{sample.grouper }}</td>
