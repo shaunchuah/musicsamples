@@ -70,9 +70,18 @@ def analytics(request):
 def gid_overview(request):
     # Analytics --> Sample Overview Table Page
     sample_categories = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).values("sample_type").distinct()
-    patient_id_list = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).order_by('patientid').values("patientid").distinct()
+    all_patient_ids = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).order_by('patientid').values("patientid").distinct()
+
+    sample_category_list = []
+    patient_id_list = []
+
+    for item in sample_categories:
+        sample_category_list.append(item['sample_type'])
+    for item in all_patient_ids:
+        patient_id_list.append(item['patientid'])
+
     sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False)
-    context = {'sample_list': sample_list, 'sample_categories': sample_categories, 'patient_id_list': patient_id_list}
+    context = {'sample_list': sample_list, 'sample_category_list': sample_category_list, 'patient_id_list': patient_id_list}
     return render(request, "gid_overview.html", context)
 
 
