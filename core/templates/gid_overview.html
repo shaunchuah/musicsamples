@@ -18,8 +18,8 @@
           <thead class="text-primary">
             <tr>
               <th>Sample Types against Patient ID </th>
-                {% for category in sample_categories %}
-                  <th>{{ category.sample_type }}</th>
+                {% for item in sample_category_list %}
+                  <th>{{ item }}</th>
                 {% endfor %}
             </tr>
         </thead>
@@ -29,14 +29,14 @@
           
           <tr>
             
-            <td><strong>{{ patient.patientid }}</strong></td>
-            {% for category in sample_categories %}
+            <td><strong>{{ patient }}</strong></td>
+            {% for category in sample_category_list %}
             <td>
               {% for sample in sample_list %}
                 
-                {% if sample.patientid == patient.patientid %}
+                {% if sample.patientid == patient %}
 
-                  {% if sample.sample_type == category.sample_type %}
+                  {% if sample.sample_type == category %}
                   <a href="{% url 'sample_detail' pk=sample.pk %}">
                     {{ sample.musicsampleid }}
                   </a><br />
