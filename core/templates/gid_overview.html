@@ -8,45 +8,55 @@
   <div class="col">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">All Samples Overview</h3>
+        <h3 class="card-title">Samples Overview By Type</h3>
+      </div>
+      <div class="card-body">
+      <div class="form-group">
+              <form method="get">
+        <select class="form-control" name="q" id="sample_type_select">
+          <option value="">Select a sample type</option>
+          {% for type in sample_category_list %}
+            <option value="{{ type }}">{{ type }}</option>
+          {% endfor %}
+        </select>
+        
+              <button type="submit" value="submit" class="btn btn-fill btn-success">Show Samples</button>
+            
+        </form>
+        </div>
+
       </div>
      
       <div class="card-body">
-        
+
         <div class="table-responsive">
-          <table class="table">
+        <table class="table">
           <thead class="text-primary">
             <tr>
-              <th>Sample Types against Patient ID </th>
-                {% for item in sample_category_list %}
-                  <th>{{ item }}</th>
-                {% endfor %}
+              <th>Sample Type against Patient ID </th>
+              <th>{{ query }}</th>
             </tr>
         </thead>
 
         <tbody>
-          {% for patient in patient_id_list %}          
-          <tr>            
-            <td><strong>{{ patient }}</strong></td>
-            {% for category in sample_category_list %}
+          {% regroup sample_list by patientid as grouped_sample_list %}
+          {% for sample in grouped_sample_list %}
+          <tr>
+            <td>{{sample.grouper }}</td>
             <td>
-              {% for sample in sample_list %}                
-                {% if sample.patientid == patient %}
-                  {% if sample.sample_type == category %}
-                  <a href="{% url 'sample_detail' pk=sample.pk %}">
-                    {{ sample.musicsampleid }}<br />
-                  </a>                  
-                  {% endif %}                
-                {% endif %}
-              {% endfor %}
+            {% for item in sample.list %}
+            <a href="{% url 'sample_detail' pk=item.pk %}">
+              {{ item.musicsampleid }}<br />
+            </a>
+            {% endfor %}      
             </td>
-            {% endfor %}
-          </tr>          
+          </tr>
           {% endfor %}
         </tbody>
 
       </table>
         </div>
+
 
         </div>
 

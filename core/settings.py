@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django_select2',
     'rest_framework',
     'storages',
+    'django_filters',
     'app'  # Enable the inner app
 ]
 
