@@ -77,6 +77,7 @@ def gid_overview(request):
         query = request.GET.get('q')
         sample_list = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).filter(sample_type=query).order_by("patientid")
     else:
+        query = None
         sample_list = Sample.objects.none()
     context = {'sample_list': sample_list, 'sample_category_list': sample_category_list, 'query': query}
     return render(request, "gid_overview.html", context)
