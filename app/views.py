@@ -66,7 +66,7 @@ def analytics(request):
 
 
 @login_required(login_url="/login/")
-@cache_page(60 * 60)  # Cache page for 60 minutes
+@cache_page(3 * 60)  # Cache page for 60 minutes
 def gid_overview(request):
     # Analytics --> Sample Overview Table Page
     sample_categories = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).values("sample_type").distinct()
