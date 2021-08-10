@@ -108,7 +108,7 @@
     <div class="notes card" id="edta_extraction">
       <div class="card-header">
         <h3 class="card-title">
-          EDTA Plasma Extraction
+          EDTA Plasma Spin
         </h3>
       </div>
       <div class="card-body">
@@ -143,37 +143,69 @@
     <div class="notes card" id="ccfdna_extraction">
       <div class="card-header">
         <h3 class="card-title">
-          PAXgene ccfDNA Plasma Extraction
+          PAXgene ccfDNA Plasma Spin
         </h3>
       </div>
       <div class="card-body">
         <h5>Equipment:</h5>
         <ul>
           <li>Refrigerated centrifuge(s)</li>
-          <li>1.5ml eppendorf tubes</li>
-          <li>2ml screw-top tubes</li>
+          <li>2ml eppendorf tubes</li>
+          <li>2ml cryotubes</li>
           <li>QR labels</li>
           <li>Pipette and 1ml tips</li>
-          <li>(Fume hood)</li>
         </ul>
         <h5>Notes:</h5>
         <ul>
           <li>Gentle acceleration/deceleration – suggestion set to 5/5 respectively.</li>
           <li>Score haemolysis by assessing colour of plasma using chart (available on add new sample page). Plasma with a score of 4 or higher (100 mg/dL) not to be used for MUSIC</li>
           <li>To enable automated calculation of time to processing: please fill in sample created datetime as datetime of original blood sample and record processing datetime as datetime of finishing this process</li>
-          <li>Perform this protocol as sterile as possible - we extract these samples under a fume hood in QMRI</li>
+          <li>Perform this protocol as sterile as possible</li>
         </ul>
         <h5>Steps:</h5>
         <ol>
           <li><strong>1,600 x g for 10 mins at room temp</strong></li>
-          <li>Transfer plasma into new tube leaving ~1cm buffer between cells and plasma</li>
+          <li>Transfer plasma in 2ml aliquots into 2ml eppendorf tube leaving ~1cm buffer between cells and plasma</li>
           <li>Record haemolysis levels</li>
           <li><strong>16,000 x g for 10mins at room temp</strong></li>
-          <li>Divide into 1 ml aliquots in screw-top tubes</li>
+          <li>Transfer in 2 ml aliquots into cryotubes</li>
           <li>Label and register each aliquot onto G-Trac</li>
           <li>Freeze at -80&deg;C</li>
         </ol>
 
+      </div>
+
+      <div class="card-footer"></div>
+    </div>
+  </div>
+  </div>
+
+
+  <div class="row">
+    <div class="col">
+    <div class="notes card" id="ccfdna_extraction">
+      <div class="card-header">
+        <h3 class="card-title">
+          cfDNA Extraction
+        </h3>
+      </div>
+      <div class="card-body">
+        <h5>Protocol:</h5>
+        <ul>
+          <li>QIAmp circulating nucleic acid handbook: 
+            <a href="https://www.qiagen.com/us/resources/download.aspx?id=0c4b31ab-f4fb-425f-99bf-10ab9538c061&lang=en" target="_blank" rel="noopener">Download here</a>. Protocol starts on page 26. Use 2ml plasma extraction steps.
+          </li>
+          <li>
+            Qubit hsDNA assay:
+            <a href="https://assets.thermofisher.com/TFS-Assets/LSG/manuals/Qubit_dsDNA_HS_Assay_UG.pdf" target="_blank" rel="noopener">Download here</a>.
+          </li>
+        </ul>
+        <h5>Notes:</h5>
+        <ul>
+          <li>For elution we use ultrapure water rather than buffer AVE in step 15.</li>
+          <li>Elution volume is 25ul as of 10 Aug 2021. Prior to that elution volumes were 20ul.</li>
+          <li>QC step with Qubit hsDNA assay - use 2ul of sample and 198ul of working solution.</li>
+        </ul>
       </div>
 
       <div class="card-footer"></div>
