@@ -12,13 +12,19 @@
           <p>Dashboard</p>
         </a>
       </li>
-      <li class="{% if request.path == '/add/' %}active{% endif %}">
+      <li class="{% if request.path == '/samples/add/' %}active{% endif %}">
         <a href="{% url 'sample_add' %}">
           <i class="tim-icons icon-pencil"></i>
           <p>Add New Sample</p>
         </a>
       </li>
-      <li class="{% if 'barcode' in request.path %}active{% endif %}">
+      <li class="{% if 'add_multiple' in request.path %}active{% endif %}">
+        <a href="{% url 'barcode_add_multiple' %}">
+          <i class="tim-icons icon-bullet-list-67"></i>
+          <p>Add Multiple</p>
+        </a>
+      </li>
+      <li class="{% if 'barcode' in request.path and 'add_multiple' not in request.path %}active{% endif %}">
         <a href="{% url 'barcode' %}">
           <i class="tim-icons icon-tag"></i>
           <p>QR Scan</p>
