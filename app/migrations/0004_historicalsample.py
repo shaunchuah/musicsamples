@@ -10,35 +10,57 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('app', '0003_sample_is_deleted'),
+        ("app", "0003_sample_is_deleted"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='HistoricalSample',
+            name="HistoricalSample",
             fields=[
-                ('id', models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name='ID')),
-                ('musicsampleid', models.CharField(db_index=True, max_length=200)),
-                ('patientid', models.CharField(max_length=200)),
-                ('sample_location', models.CharField(max_length=200)),
-                ('sample_type', models.CharField(max_length=200)),
-                ('sample_datetime', models.DateTimeField()),
-                ('sample_comments', models.TextField(blank=True, null=True)),
-                ('is_deleted', models.BooleanField(default=False)),
-                ('created_by', models.CharField(max_length=200)),
-                ('last_modified_by', models.CharField(max_length=200)),
-                ('data_first_created', models.DateTimeField(blank=True, editable=False)),
-                ('last_modified', models.DateTimeField(blank=True, editable=False)),
-                ('history_id', models.AutoField(primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField()),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.IntegerField(
+                        auto_created=True, blank=True, db_index=True, verbose_name="ID"
+                    ),
+                ),
+                ("musicsampleid", models.CharField(db_index=True, max_length=200)),
+                ("patientid", models.CharField(max_length=200)),
+                ("sample_location", models.CharField(max_length=200)),
+                ("sample_type", models.CharField(max_length=200)),
+                ("sample_datetime", models.DateTimeField()),
+                ("sample_comments", models.TextField(blank=True, null=True)),
+                ("is_deleted", models.BooleanField(default=False)),
+                ("created_by", models.CharField(max_length=200)),
+                ("last_modified_by", models.CharField(max_length=200)),
+                (
+                    "data_first_created",
+                    models.DateTimeField(blank=True, editable=False),
+                ),
+                ("last_modified", models.DateTimeField(blank=True, editable=False)),
+                ("history_id", models.AutoField(primary_key=True, serialize=False)),
+                ("history_date", models.DateTimeField()),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                (
+                    "history_type",
+                    models.CharField(
+                        choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")],
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical sample',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': 'history_date',
+                "verbose_name": "historical sample",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": "history_date",
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),

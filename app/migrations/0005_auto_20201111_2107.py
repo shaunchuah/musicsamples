@@ -6,28 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app', '0004_historicalsample'),
+        ("app", "0004_historicalsample"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historicalsample',
-            name='sample_volume',
+            model_name="historicalsample",
+            name="sample_volume",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='historicalsample',
-            name='sample_volume_units',
+            model_name="historicalsample",
+            name="sample_volume_units",
             field=models.CharField(blank=True, max_length=30, null=True),
         ),
         migrations.AddField(
-            model_name='sample',
-            name='sample_volume',
+            model_name="sample",
+            name="sample_volume",
             field=models.IntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='sample',
-            name='sample_volume_units',
+            model_name="sample",
+            name="sample_volume_units",
             field=models.CharField(blank=True, max_length=30, null=True),
         ),
     ]

@@ -11,46 +11,103 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('app', '0010_auto_20201210_1109'),
+        ("app", "0010_auto_20201210_1109"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Note',
+            name="Note",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200, unique=True)),
-                ('content', ckeditor_uploader.fields.RichTextUploadingField(blank=True, null=True)),
-                ('is_public', models.BooleanField(default=True)),
-                ('published_date', models.DateTimeField(auto_now_add=True)),
-                ('last_modified', models.DateTimeField(auto_now=True)),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='notes', to=settings.AUTH_USER_MODEL)),
-                ('sample_tags', models.ManyToManyField(blank=True, null=True, to='app.Sample')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200, unique=True)),
+                (
+                    "content",
+                    ckeditor_uploader.fields.RichTextUploadingField(
+                        blank=True, null=True
+                    ),
+                ),
+                ("is_public", models.BooleanField(default=True)),
+                ("published_date", models.DateTimeField(auto_now_add=True)),
+                ("last_modified", models.DateTimeField(auto_now=True)),
+                (
+                    "author",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="notes",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "sample_tags",
+                    models.ManyToManyField(blank=True, null=True, to="app.Sample"),
+                ),
             ],
             options={
-                'ordering': ['-published_date'],
+                "ordering": ["-published_date"],
             },
         ),
         migrations.CreateModel(
-            name='HistoricalNote',
+            name="HistoricalNote",
             fields=[
-                ('id', models.IntegerField(auto_created=True, blank=True, db_index=True, verbose_name='ID')),
-                ('title', models.CharField(db_index=True, max_length=200)),
-                ('content', ckeditor_uploader.fields.RichTextUploadingField(blank=True, null=True)),
-                ('is_public', models.BooleanField(default=True)),
-                ('published_date', models.DateTimeField(blank=True, editable=False)),
-                ('last_modified', models.DateTimeField(blank=True, editable=False)),
-                ('history_id', models.AutoField(primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField()),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('author', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.IntegerField(
+                        auto_created=True, blank=True, db_index=True, verbose_name="ID"
+                    ),
+                ),
+                ("title", models.CharField(db_index=True, max_length=200)),
+                (
+                    "content",
+                    ckeditor_uploader.fields.RichTextUploadingField(
+                        blank=True, null=True
+                    ),
+                ),
+                ("is_public", models.BooleanField(default=True)),
+                ("published_date", models.DateTimeField(blank=True, editable=False)),
+                ("last_modified", models.DateTimeField(blank=True, editable=False)),
+                ("history_id", models.AutoField(primary_key=True, serialize=False)),
+                ("history_date", models.DateTimeField()),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                (
+                    "history_type",
+                    models.CharField(
+                        choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")],
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "author",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical note',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': 'history_date',
+                "verbose_name": "historical note",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": "history_date",
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),
