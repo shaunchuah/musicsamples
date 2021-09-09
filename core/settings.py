@@ -1,6 +1,7 @@
 import os
 from decouple import config, Csv
 from unipath import Path
+
 # import dj_database_url
 
 # Sentry Monitoring
@@ -11,10 +12,9 @@ sentry_sdk.init(
     dsn="https://565f64fc7bea4af39487c5f0edcdab0b@o482942.ingest.sentry.io/5533900",
     integrations=[DjangoIntegration()],
     traces_sample_rate=1.0,
-
     # If you wish to associate users to errors (assuming you are using
     # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True
+    send_default_pii=True,
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -22,82 +22,82 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = Path(__file__).parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', cast=bool, default=False)
+DEBUG = config("DEBUG", cast=bool, default=False)
 
 # load production server from .env
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
 
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'widget_tweaks',
-    'simple_history',
-    'ckeditor_uploader',
-    'ckeditor',
-    'taggit',
-    'django_select2',
-    'rest_framework',
-    'storages',
-    'django_filters',
-    'app'  # Enable the inner app
+    "jazzmin",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "widget_tweaks",
+    "simple_history",
+    "ckeditor_uploader",
+    "ckeditor",
+    "taggit",
+    "django_select2",
+    "rest_framework",
+    "storages",
+    "django_filters",
+    "app",  # Enable the inner app
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'simple_history.middleware.HistoryRequestMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
-ROOT_URLCONF = 'core.urls'
-LOGIN_REDIRECT_URL = "home"   # Route defined in app/urls.py
+ROOT_URLCONF = "core.urls"
+LOGIN_REDIRECT_URL = "home"  # Route defined in app/urls.py
 LOGOUT_REDIRECT_URL = "home"  # Route defined in app/urls.py
 TEMPLATE_DIR = os.path.join(BASE_DIR, "core/templates")  # ROOT dir for templates
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [TEMPLATE_DIR],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [TEMPLATE_DIR],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
+WSGI_APPLICATION = "core.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': config('DB_ENGINE'),
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', cast=int),
+    "default": {
+        "ENGINE": config("DB_ENGINE"),
+        "NAME": config("DB_NAME"),
+        "USER": config("DB_USER"),
+        "PASSWORD": config("DB_PASSWORD"),
+        "HOST": config("DB_HOST"),
+        "PORT": config("DB_PORT", cast=int),
     }
 }
 
@@ -106,16 +106,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -123,9 +123,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'GB'
+TIME_ZONE = "GB"
 
 USE_I18N = True
 
@@ -141,87 +141,107 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_ROOT = '/var/www/staticfiles/'
-STATIC_URL = '/static/'
+STATIC_ROOT = "/var/www/staticfiles/"
+STATIC_URL = "/static/"
 
 # Extra places for collectstatic to find static files.
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'core/static'),
-)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "core/static"),)
 #############################################################
 #############################################################
-EMAIL_BACKEND = config('EMAIL_BACKEND')
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-EMAIL_PORT = config('EMAIL_PORT', cast=int)
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
-AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+EMAIL_BACKEND = config("EMAIL_BACKEND")
+EMAIL_HOST = config("EMAIL_HOST")
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = config("EMAIL_PORT", cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
 
-DEFAULT_FROM_EMAIL = 'SampleTrek <password_reset@musicstudy.uk>'
+DEFAULT_FROM_EMAIL = "SampleTrek <password_reset@musicstudy.uk>"
 
 # POST SSL DEPLOYMENT SETTINGS
-SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', cast=bool)
-SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', cast=bool)
-CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', cast=bool)
-SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', cast=int)
-SECURE_BROWSER_XSS_FILTER = config('SECURE_BROWSER_XSS_FILTER', cast=bool)
-SECURE_CONTENT_TYPE_NOSNIFF = config('SECURE_CONTENT_TYPE_NOSNIFF', cast=bool)
+SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", cast=bool)
+SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", cast=bool)
+CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", cast=bool)
+SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", cast=int)
+SECURE_BROWSER_XSS_FILTER = config("SECURE_BROWSER_XSS_FILTER", cast=bool)
+SECURE_CONTENT_TYPE_NOSNIFF = config("SECURE_CONTENT_TYPE_NOSNIFF", cast=bool)
 
 # CKEDITOR CONFIG
 
-CKEDITOR_UPLOAD_PATH = ''
+CKEDITOR_UPLOAD_PATH = ""
 TAGGIT_CASE_INSENSITIVE = True
 
 CKEDITOR_CONFIGS = {
-    'default': {
-        'width': '100%',
-        'height': '500px',
-        'toolbar': [
-            ['Format', 'FontSize'],
-            ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', ],
-            ['NumberedList', 'BulletedList', '-', 'Blockquote', 'CreateDiv', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', ],
-            ['Link', 'Unlink', ],
-            ['Image', 'Table', 'HorizontalRule', 'Smiley', 'SpecialChar'],
-            ['Undo', 'Redo'],
-            ['Source', 'Print'],
+    "default": {
+        "width": "100%",
+        "height": "500px",
+        "toolbar": [
+            ["Format", "FontSize"],
+            [
+                "Bold",
+                "Italic",
+                "Underline",
+                "Strike",
+                "Subscript",
+                "Superscript",
+            ],
+            [
+                "NumberedList",
+                "BulletedList",
+                "-",
+                "Blockquote",
+                "CreateDiv",
+                "-",
+                "JustifyLeft",
+                "JustifyCenter",
+                "JustifyRight",
+                "JustifyBlock",
+                "-",
+            ],
+            [
+                "Link",
+                "Unlink",
+            ],
+            ["Image", "Table", "HorizontalRule", "Smiley", "SpecialChar"],
+            ["Undo", "Redo"],
+            ["Source", "Print"],
         ],
     }
 }
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
 
 
 # MEDIA UPLOADS USING S3
 
-if config('USE_S3', cast=bool) is True:
-    AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+if config("USE_S3", cast=bool) is True:
+    AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME")
     AWS_DEFAULT_ACL = None
-    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.eu-west-2.amazonaws.com'
-    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-    PUBLIC_MEDIA_LOCATION = 'media'
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
-    DEFAULT_FILE_STORAGE = 'core.storage_backends.PublicMediaStorage'
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.eu-west-2.amazonaws.com"
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+    PUBLIC_MEDIA_LOCATION = "media"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/"
+    DEFAULT_FILE_STORAGE = "core.storage_backends.PublicMediaStorage"
     AWS_QUERYSTRING_AUTH = False
 else:
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-    MEDIA_URL = '/uploads/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+    MEDIA_URL = "/uploads/"
 
 # CACHING
 
 CACHES = {
     "default": {
-        "BACKEND": config('DEFAULT_CACHE_BACKEND'),
-        "LOCATION": config('DEFAULT_CACHE_LOCATION'),
+        "BACKEND": config("DEFAULT_CACHE_BACKEND"),
+        "LOCATION": config("DEFAULT_CACHE_LOCATION"),
         "OPTIONS": {
-            "CLIENT_CLASS": config('CLIENT_CLASS'),
-        }
+            "CLIENT_CLASS": config("CLIENT_CLASS"),
+        },
     },
 }
 
@@ -243,8 +263,8 @@ CACHES = {
 #         }
 
 # Set the cache backend to select2
-SELECT2_CACHE_BACKEND = 'default'
+SELECT2_CACHE_BACKEND = "default"
 
 
-INTERNAL_IPS = ['127.0.0.1']
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+INTERNAL_IPS = ["127.0.0.1"]
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
