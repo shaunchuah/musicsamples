@@ -35,6 +35,7 @@ class Sample(models.Model):
 
     def clean(self):
         self.musicsampleid = self.musicsampleid.upper()
+        self.patientid = self.patientid.upper()
 
     def __str__(self):
         return self.musicsampleid
