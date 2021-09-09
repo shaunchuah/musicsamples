@@ -12,3 +12,4 @@ omit =
     *config.py,
     *storage_backends.py,
     *tests.py
+    *venv/*
