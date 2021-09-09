@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
+
 # from django.contrib.auth.models import User
 # from django.forms.utils import ErrorList
 # from django.http import HttpResponse
@@ -21,11 +22,12 @@ def login_view(request):
                 login(request, user)
                 return redirect("/")
             else:
-                msg = 'Invalid credentials'
+                msg = "Invalid credentials"
         else:
-            msg = 'Error validating the form'
+            msg = "Error validating the form"
 
     return render(request, "accounts/login.html", {"form": form, "msg": msg})
+
 
 # Public access to registration is disabled. Uncomment to re-enable - you will need to activate the registration url in authentication/urls.py
 # def register_user(request):
