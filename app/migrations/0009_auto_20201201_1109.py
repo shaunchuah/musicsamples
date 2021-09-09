@@ -6,28 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app', '0008_auto_20201114_2206'),
+        ("app", "0008_auto_20201114_2206"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historicalsample',
-            name='is_fully_used',
+            model_name="historicalsample",
+            name="is_fully_used",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='historicalsample',
-            name='sample_sublocation',
+            model_name="historicalsample",
+            name="sample_sublocation",
             field=models.CharField(blank=True, max_length=200, null=True),
         ),
         migrations.AddField(
-            model_name='sample',
-            name='is_fully_used',
+            model_name="sample",
+            name="is_fully_used",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='sample',
-            name='sample_sublocation',
+            model_name="sample",
+            name="sample_sublocation",
             field=models.CharField(blank=True, max_length=200, null=True),
         ),
     ]

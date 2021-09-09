@@ -3,6 +3,7 @@ from .forms import SampleForm, CheckoutForm, DeleteForm, RestoreForm
 from .forms import NoteForm, NoteDeleteForm, ReactivateForm, FullyUsedForm
 from django.http import JsonResponse
 import datetime
+
 # import csv
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
@@ -12,7 +13,11 @@ from openpyxl.utils import get_column_letter
 from django.contrib import messages
 from django.db.models import Q
 from rest_framework import viewsets, permissions
-from .serializers import SampleSerializer, SampleIsFullyUsedSerializer, MultipleSampleSerializer
+from .serializers import (
+    SampleSerializer,
+    SampleIsFullyUsedSerializer,
+    MultipleSampleSerializer,
+)
 from taggit.models import Tag
 from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -20,15 +25,21 @@ from django.db.models import Count
 from django.db.models.functions import Trunc
 from django.views.decorators.cache import cache_page
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 
 
 @login_required(login_url="/login/")
 def index(request):
     # Home Page
-    sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).order_by('-sample_datetime')
+    sample_list = (
+        Sample.objects.all()
+        .filter(is_deleted=False)
+        .filter(is_fully_used=False)
+        .order_by("-sample_datetime")
+    )
     sample_count = sample_list.count()
-    page = request.GET.get('page', 1)
+    page = request.GET.get("page", 1)
     paginator = Paginator(sample_list, 50)
     try:
         samples = paginator.page(page)
@@ -36,7 +47,7 @@ def index(request):
         samples = paginator.page(1)
     except EmptyPage:
         samples = paginator.page(paginator.num_pages)
-    context = {'sample_list': samples, 'sample_count': sample_count}
+    context = {"sample_list": samples, "sample_count": sample_count}
     return render(request, "index.html", context)
 
 
@@ -48,19 +59,45 @@ def analytics(request):
     # Get last 12 months date
     current_date = datetime.datetime.now(datetime.timezone.utc)
     months_ago = 12
-    twelve_months_previous_date = current_date - datetime.timedelta(days=(months_ago * 365 / 12))
+    twelve_months_previous_date = current_date - datetime.timedelta(
+        days=(months_ago * 365 / 12)
+    )
 
     total_samples = Sample.objects.all().filter(is_deleted=False).count()
-    total_active_samples = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).count()
-    samples_by_month = Sample.objects.all().filter(is_deleted=False, sample_datetime__gte=twelve_months_previous_date).annotate(sample_month=Trunc('sample_datetime', 'month')).values('sample_month').annotate(sample_count=Count('id')).order_by('sample_month')
-    samples_by_type = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).values('sample_type').annotate(sample_type_count=Count('id'))
-    samples_by_location = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=False).values('sample_location').annotate(sample_location_count=Count('id'))
+    total_active_samples = (
+        Sample.objects.all()
+        .filter(is_deleted=False)
+        .filter(is_fully_used=False)
+        .count()
+    )
+    samples_by_month = (
+        Sample.objects.all()
+        .filter(is_deleted=False, sample_datetime__gte=twelve_months_previous_date)
+        .annotate(sample_month=Trunc("sample_datetime", "month"))
+        .values("sample_month")
+        .annotate(sample_count=Count("id"))
+        .order_by("sample_month")
+    )
+    samples_by_type = (
+        Sample.objects.all()
+        .filter(is_deleted=False)
+        .filter(is_fully_used=False)
+        .values("sample_type")
+        .annotate(sample_type_count=Count("id"))
+    )
+    samples_by_location = (
+        Sample.objects.all()
+        .filter(is_deleted=False)
+        .filter(is_fully_used=False)
+        .values("sample_location")
+        .annotate(sample_location_count=Count("id"))
+    )
     context = {
-        'total_samples': total_samples,
-        'samples_by_month': samples_by_month,
-        'samples_by_type': samples_by_type,
-        'samples_by_location': samples_by_location,
-        'total_active_samples': total_active_samples,
+        "total_samples": total_samples,
+        "samples_by_month": samples_by_month,
+        "samples_by_type": samples_by_type,
+        "samples_by_location": samples_by_location,
+        "total_active_samples": total_active_samples,
     }
     return render(request, "analytics.html", context)
 
@@ -69,17 +106,31 @@ def analytics(request):
 @cache_page(3 * 60)  # Cache page for 60 minutes
 def gid_overview(request):
     # Analytics --> Sample Overview Table Page
-    sample_categories = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).values("sample_type").distinct()
+    sample_categories = (
+        Sample.objects.filter(is_deleted=False)
+        .filter(is_fully_used=False)
+        .values("sample_type")
+        .distinct()
+    )
     sample_category_list = []
     for item in sample_categories:
-        sample_category_list.append(item['sample_type'])
-    if 'q' in request.GET:
-        query = request.GET.get('q')
-        sample_list = Sample.objects.filter(is_deleted=False).filter(is_fully_used=False).filter(sample_type=query).order_by("patientid")
+        sample_category_list.append(item["sample_type"])
+    if "q" in request.GET:
+        query = request.GET.get("q")
+        sample_list = (
+            Sample.objects.filter(is_deleted=False)
+            .filter(is_fully_used=False)
+            .filter(sample_type=query)
+            .order_by("patientid")
+        )
     else:
         query = None
         sample_list = Sample.objects.none()
-    context = {'sample_list': sample_list, 'sample_category_list': sample_category_list, 'query': query}
+    context = {
+        "sample_list": sample_list,
+        "sample_category_list": sample_category_list,
+        "query": query,
+    }
     return render(request, "gid_overview.html", context)
 
 
@@ -92,44 +143,73 @@ def reference(request):
 @login_required(login_url="/login/")
 def account(request):
     # User account page showing last 20 recently accessed samples
-    sample_list = Sample.objects.all().filter(is_deleted=False).filter(last_modified_by=request.user.username).order_by('-last_modified')[:20]
-    context = {'sample_list': sample_list}
+    sample_list = (
+        Sample.objects.all()
+        .filter(is_deleted=False)
+        .filter(last_modified_by=request.user.username)
+        .order_by("-last_modified")[:20]
+    )
+    context = {"sample_list": sample_list}
     return render(request, "account.html", context)
 
 
 @login_required(login_url="/login/")
 def sample_archive(request):
     # Deleted samples page for samples which have been soft deleted
-    sample_list = Sample.objects.all().filter(is_deleted=True).order_by('-last_modified')
-    context = {'sample_list': sample_list}
+    sample_list = (
+        Sample.objects.all().filter(is_deleted=True).order_by("-last_modified")
+    )
+    context = {"sample_list": sample_list}
     return render(request, "samples/sample-archive.html", context)
 
 
 @login_required(login_url="/login/")
 def used_samples(request):
     # Used samples page for samples marked as being fully used
-    sample_list = Sample.objects.all().filter(is_deleted=False).filter(is_fully_used=True).order_by('-last_modified')
+    sample_list = (
+        Sample.objects.all()
+        .filter(is_deleted=False)
+        .filter(is_fully_used=True)
+        .order_by("-last_modified")
+    )
     sample_count = sample_list.count()
-    context = {'sample_list': sample_list, 'sample_count': sample_count}
+    context = {"sample_list": sample_list, "sample_count": sample_count}
     return render(request, "samples/used_samples.html", context)
 
 
 @login_required(login_url="/login/")
 def used_samples_search(request):
-    query_string = ''
-    if ('q' in request.GET) and request.GET['q'].strip():
-        query_string = request.GET.get('q')
-        sample_list = Sample.objects.filter(
-            Q(musicsampleid__icontains=query_string)
-            | Q(patientid__icontains=query_string)
-            | Q(sample_location__icontains=query_string)
-            | Q(sample_sublocation__icontains=query_string)
-            | Q(sample_type__icontains=query_string)
-            | Q(sample_comments__icontains=query_string)).filter(is_fully_used=True).filter(is_deleted=False)
+    query_string = ""
+    if ("q" in request.GET) and request.GET["q"].strip():
+        query_string = request.GET.get("q")
+        sample_list = (
+            Sample.objects.filter(
+                Q(musicsampleid__icontains=query_string)
+                | Q(patientid__icontains=query_string)
+                | Q(sample_location__icontains=query_string)
+                | Q(sample_sublocation__icontains=query_string)
+                | Q(sample_type__icontains=query_string)
+                | Q(sample_comments__icontains=query_string)
+            )
+            .filter(is_fully_used=True)
+            .filter(is_deleted=False)
+        )
         sample_count = sample_list.count()
-        return render(request, 'samples/used_samples.html', {'query_string': query_string, 'sample_list': sample_list, 'sample_count': sample_count})
+        return render(
+            request,
+            "samples/used_samples.html",
+            {
+                "query_string": query_string,
+                "sample_list": sample_list,
+                "sample_count": sample_count,
+            },
+        )
     else:
-        return render(request, 'samples/used_samples.html', {'query_string': 'Null', 'sample_count': 0})
+        return render(
+            request,
+            "samples/used_samples.html",
+            {"query_string": "Null", "sample_count": 0},
+        )
 
 
 @login_required(login_url="/login/")
@@ -142,13 +222,17 @@ def sample_add(request):
             sample.created_by = request.user.username
             sample.last_modified_by = request.user.username
             sample.save()
-            messages.success(request, 'Sample registered successfully.')
-            return redirect(reverse('sample_add'))
+            messages.success(request, "Sample registered successfully.")
+            return redirect(reverse("sample_add"))
         else:
-            messages.error(request, 'Form is not valid.')
+            messages.error(request, "Form is not valid.")
     else:
         form = SampleForm()
-    return render(request, "samples/sample-add.html", {'form': form, 'page_title': 'Add New Sample'})
+    return render(
+        request,
+        "samples/sample-add.html",
+        {"form": form, "page_title": "Add New Sample"},
+    )
 
 
 def historical_changes(query):
@@ -182,7 +266,19 @@ def sample_detail(request, pk):
     if sample.processing_datetime is not None:
         time_difference = sample.processing_datetime - sample.sample_datetime
         processing_time = int(time_difference.total_seconds() / 60)
-    return render(request, "samples/sample-detail.html", {'sample': sample, 'changes': changes, 'first': first_change, 'processing_time': processing_time, 'gid_id': gid_id, 'related_notes': related_notes, 'private_notes': private_notes})
+    return render(
+        request,
+        "samples/sample-detail.html",
+        {
+            "sample": sample,
+            "changes": changes,
+            "first": first_change,
+            "processing_time": processing_time,
+            "gid_id": gid_id,
+            "related_notes": related_notes,
+            "private_notes": private_notes,
+        },
+    )
 
 
 @login_required(login_url="/login/")
@@ -195,34 +291,53 @@ def sample_edit(request, pk):
             sample = form.save(commit=False)
             sample.last_modified_by = request.user.username
             sample.save()
-            messages.success(request, 'Sample updated successfully.')
-            next_url = request.GET.get('next')
+            messages.success(request, "Sample updated successfully.")
+            next_url = request.GET.get("next")
             if next_url:
                 return redirect(next_url)
             else:
-                return redirect('/')
+                return redirect("/")
     else:
         form = SampleForm(instance=sample)
-    return render(request, 'samples/sample-add.html', {'form': form, 'page_title': 'Update Sample'})
+    return render(
+        request,
+        "samples/sample-add.html",
+        {"form": form, "page_title": "Update Sample"},
+    )
 
 
 @login_required(login_url="/login/")
 def sample_search(request):
     # Sample search in home page
-    query_string = ''
-    if ('q' in request.GET) and request.GET['q'].strip():
-        query_string = request.GET.get('q')
-        sample_list = Sample.objects.filter(
-            Q(musicsampleid__icontains=query_string)
-            | Q(patientid__icontains=query_string)
-            | Q(sample_location__icontains=query_string)
-            | Q(sample_sublocation__icontains=query_string)
-            | Q(sample_type__icontains=query_string)
-            | Q(sample_comments__icontains=query_string)).filter(is_fully_used=False).filter(is_deleted=False)
+    query_string = ""
+    if ("q" in request.GET) and request.GET["q"].strip():
+        query_string = request.GET.get("q")
+        sample_list = (
+            Sample.objects.filter(
+                Q(musicsampleid__icontains=query_string)
+                | Q(patientid__icontains=query_string)
+                | Q(sample_location__icontains=query_string)
+                | Q(sample_sublocation__icontains=query_string)
+                | Q(sample_type__icontains=query_string)
+                | Q(sample_comments__icontains=query_string)
+            )
+            .filter(is_fully_used=False)
+            .filter(is_deleted=False)
+        )
         sample_count = sample_list.count()
-        return render(request, 'index.html', {'query_string': query_string, 'sample_list': sample_list, 'sample_count': sample_count})
+        return render(
+            request,
+            "index.html",
+            {
+                "query_string": query_string,
+                "sample_list": sample_list,
+                "sample_count": sample_count,
+            },
+        )
     else:
-        return render(request, 'index.html', {'query_string': 'Null', 'sample_count': 0})
+        return render(
+            request, "index.html", {"query_string": "Null", "sample_count": 0}
+        )
 
 
 @login_required(login_url="/login/")
@@ -235,15 +350,15 @@ def sample_checkout(request, pk):
             sample = form.save(commit=False)
             sample.last_modified_by = request.user.username
             sample.save()
-            messages.success(request, 'Sample updated successfully.')
-            next_url = request.GET.get('next')
+            messages.success(request, "Sample updated successfully.")
+            next_url = request.GET.get("next")
             if next_url:
                 return redirect(next_url)
             else:
-                return redirect('/')
+                return redirect("/")
     else:
         form = CheckoutForm(instance=sample)
-    return render(request, 'samples/sample-checkout.html', {'form': form})
+    return render(request, "samples/sample-checkout.html", {"form": form})
 
 
 @login_required(login_url="/login/")
@@ -256,15 +371,15 @@ def sample_delete(request, pk):
             sample = form.save(commit=False)
             sample.last_modified_by = request.user.username
             sample.save()
-            messages.success(request, 'Sample deleted.')
-            next_url = request.GET.get('next')
+            messages.success(request, "Sample deleted.")
+            next_url = request.GET.get("next")
             if next_url:
                 return redirect(next_url)
             else:
-                return redirect('/')
+                return redirect("/")
     else:
         form = DeleteForm(instance=sample)
-    return render(request, 'samples/sample-delete.html', {'form': form})
+    return render(request, "samples/sample-delete.html", {"form": form})
 
 
 @login_required(login_url="/login/")
@@ -277,15 +392,15 @@ def sample_restore(request, pk):
             sample = form.save(commit=False)
             sample.last_modified_by = request.user.username
             sample.save()
-            messages.success(request, 'Sample restored.')
-            next_url = request.GET.get('next')
+            messages.success(request, "Sample restored.")
+            next_url = request.GET.get("next")
             if next_url:
                 return redirect(next_url)
             else:
-                return redirect('/')
+                return redirect("/")
     else:
         form = RestoreForm(instance=sample)
-    return render(request, 'samples/sample-restore.html', {'form': form})
+    return render(request, "samples/sample-restore.html", {"form": form})
 
 
 @login_required(login_url="/login/")
@@ -298,15 +413,15 @@ def sample_fully_used(request, pk):
             sample = form.save(commit=False)
             sample.last_modified_by = request.user.username
             sample.save()
-            messages.success(request, 'Sample marked as fully used.')
-            next_url = request.GET.get('next')
+            messages.success(request, "Sample marked as fully used.")
+            next_url = request.GET.get("next")
             if next_url:
                 return redirect(next_url)
             else:
-                return redirect('/')
+                return redirect("/")
     else:
         form = FullyUsedForm(instance=sample)
-    return render(request, 'samples/sample-fullyused.html', {'form': form})
+    return render(request, "samples/sample-fullyused.html", {"form": form})
 
 
 @login_required(login_url="/login/")
@@ -319,15 +434,15 @@ def reactivate_sample(request, pk):
             sample = form.save(commit=False)
             sample.last_modified_by = request.user.username
             sample.save()
-            messages.success(request, 'Sample restored.')
-            next_url = request.GET.get('next')
+            messages.success(request, "Sample restored.")
+            next_url = request.GET.get("next")
             if next_url:
                 return redirect(next_url)
             else:
-                return redirect('/')
+                return redirect("/")
     else:
         form = ReactivateForm(instance=sample)
-    return render(request, 'samples/sample-reactivate.html', {'form': form})
+    return render(request, "samples/sample-reactivate.html", {"form": form})
 
 
 # @login_required(login_url="/login/")
@@ -348,48 +463,53 @@ def reactivate_sample(request, pk):
 @login_required(login_url="/login/")
 def export_excel(request):
     # Exports custom views depending on the search string otherwise exports entire database
-    query_string = ''
-    if ('q' in request.GET) and request.GET['q'].strip():
-        query_string = request.GET.get('q')
+    query_string = ""
+    if ("q" in request.GET) and request.GET["q"].strip():
+        query_string = request.GET.get("q")
         samples_queryset = Sample.objects.filter(
             Q(musicsampleid__icontains=query_string)
             | Q(patientid__icontains=query_string)
             | Q(sample_location__icontains=query_string)
             | Q(sample_type__icontains=query_string)
-            | Q(sample_comments__icontains=query_string))
+            | Q(sample_comments__icontains=query_string)
+        )
     else:
         samples_queryset = Sample.objects.all().filter(is_deleted=False)
 
-    response = HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="samples_export_%s.xlsx"' % datetime.datetime.now().strftime("%Y-%m-%d")
+    response = HttpResponse(content_type="application/ms-excel")
+    response[
+        "Content-Disposition"
+    ] = 'attachment; filename="samples_export_%s.xlsx"' % datetime.datetime.now().strftime(
+        "%Y-%m-%d"
+    )
 
     workbook = Workbook()
     # Get active worksheet
     worksheet = workbook.active
-    worksheet.title = 'All Samples'
+    worksheet.title = "All Samples"
 
     # Define the excel column names
     columns = [
-        'Sample ID',
-        'Patient ID',
-        'Sample Location',
-        'Sample Sublocation',
-        'Sample Type',
-        'Sampling Datetime',
-        'Processing Datetime',
-        'Sampling to Processing Time (mins)',
-        'Sample Volume',
-        'Sample Volume Units',
-        'Freeze Thaw Count',
-        'Haemolysis Reference Category (100 and above unusable)',
-        'Biopsy Location',
-        'Biopsy Inflamed Status',
-        'Sample Comments',
-        'Sample Fully Used?',
-        'Created By',
-        'Date Created',
-        'Last Modified By',
-        'Last Modified'
+        "Sample ID",
+        "Patient ID",
+        "Sample Location",
+        "Sample Sublocation",
+        "Sample Type",
+        "Sampling Datetime",
+        "Processing Datetime",
+        "Sampling to Processing Time (mins)",
+        "Sample Volume",
+        "Sample Volume Units",
+        "Freeze Thaw Count",
+        "Haemolysis Reference Category (100 and above unusable)",
+        "Biopsy Location",
+        "Biopsy Inflamed Status",
+        "Sample Comments",
+        "Sample Fully Used?",
+        "Created By",
+        "Date Created",
+        "Last Modified By",
+        "Last Modified",
     ]
     row_num = 1
 
@@ -435,9 +555,10 @@ def export_excel(request):
             cell = worksheet.cell(row=row_num, column=col_num)
             cell.value = cell_value
 
-    worksheet.freeze_panes = worksheet['A2']
+    worksheet.freeze_panes = worksheet["A2"]
     workbook.save(response)
     return response
+
 
 ############################################################################
 # NOTES SECTION ############################################################
@@ -466,7 +587,7 @@ def export_excel(request):
 def notes(request):
     # Shared Lab Notes - Find all shared notes between all the users
     notes = Note.objects.all().filter(is_public=True).filter(is_deleted=False)
-    page = request.GET.get('page', 1)
+    page = request.GET.get("page", 1)
     paginator = Paginator(notes, 10)
     try:
         notes = paginator.page(page)
@@ -476,7 +597,12 @@ def notes(request):
         notes = paginator.page(paginator.num_pages)
     all_tags = Note.tags.all()
     users = User.objects.all()
-    context = {'notes': notes, 'page_title': 'Shared Notes', 'all_tags': all_tags, 'users': users}
+    context = {
+        "notes": notes,
+        "page_title": "Shared Notes",
+        "all_tags": all_tags,
+        "users": users,
+    }
     return render(request, "notes/notes-main.html", context)
 
 
@@ -484,7 +610,7 @@ def notes(request):
 def note_personal(request):
     # My Notebook - Show all notes belonging to the logged in user
     notes = Note.objects.all().filter(is_deleted=False).filter(author=request.user)
-    page = request.GET.get('page', 1)
+    page = request.GET.get("page", 1)
     paginator = Paginator(notes, 10)
     try:
         notes = paginator.page(page)
@@ -494,7 +620,13 @@ def note_personal(request):
         notes = paginator.page(paginator.num_pages)
     all_tags = Note.tags.all()
     users = User.objects.all()
-    context = {'notes': notes, 'page_title': 'My Notebook', 'all_tags': all_tags, 'users': users, 'next_url': reverse('note_personal')}
+    context = {
+        "notes": notes,
+        "page_title": "My Notebook",
+        "all_tags": all_tags,
+        "users": users,
+        "next_url": reverse("note_personal"),
+    }
     return render(request, "notes/notes-main.html", context)
 
 
@@ -505,14 +637,21 @@ def note_tags(request, slug):
     tag = get_object_or_404(Tag, slug=slug)
 
     # Get all public notes with the requested tag
-    public_notes = Note.objects.filter(is_public=True).filter(is_deleted=False).filter(tags=tag)
+    public_notes = (
+        Note.objects.filter(is_public=True).filter(is_deleted=False).filter(tags=tag)
+    )
 
     # Get all the private notes with the requested tag if the author and
     # logged in user is the same
-    private_notes = Note.objects.filter(is_public=False).filter(is_deleted=False).filter(author__id=request.user.id).filter(tags=tag)
+    private_notes = (
+        Note.objects.filter(is_public=False)
+        .filter(is_deleted=False)
+        .filter(author__id=request.user.id)
+        .filter(tags=tag)
+    )
 
     notes = public_notes | private_notes
-    page = request.GET.get('page', 1)
+    page = request.GET.get("page", 1)
     paginator = Paginator(notes, 10)
     try:
         notes = paginator.page(page)
@@ -522,7 +661,12 @@ def note_tags(request, slug):
         notes = paginator.page(paginator.num_pages)
     all_tags = Note.tags.all()
     users = User.objects.all()
-    context = {'notes': notes, 'page_title': 'Tag Results: #' + slug, 'all_tags': all_tags, 'users': users}
+    context = {
+        "notes": notes,
+        "page_title": "Tag Results: #" + slug,
+        "all_tags": all_tags,
+        "users": users,
+    }
     return render(request, "notes/notes-main.html", context)
 
 
@@ -530,8 +674,10 @@ def note_tags(request, slug):
 def note_authors(request, pk):
     # See all the shared notes by specific authors
     user = get_object_or_404(User, pk=pk)
-    notes = Note.objects.filter(is_public=True).filter(is_deleted=False).filter(author=pk)
-    page = request.GET.get('page', 1)
+    notes = (
+        Note.objects.filter(is_public=True).filter(is_deleted=False).filter(author=pk)
+    )
+    page = request.GET.get("page", 1)
     paginator = Paginator(notes, 10)
     try:
         notes = paginator.page(page)
@@ -541,7 +687,12 @@ def note_authors(request, pk):
         notes = paginator.page(paginator.num_pages)
     all_tags = Note.tags.all()
     users = User.objects.all()
-    context = {'notes': notes, 'page_title': 'Notes by ' + user.first_name + ' ' + user.last_name, 'all_tags': all_tags, 'users': users}
+    context = {
+        "notes": notes,
+        "page_title": "Notes by " + user.first_name + " " + user.last_name,
+        "all_tags": all_tags,
+        "users": users,
+    }
     return render(request, "notes/notes-main.html", context)
 
 
@@ -555,11 +706,11 @@ def note_detail(request, pk):
         if request.user.id == note.author.id:
             secured_note = note
         else:
-            messages.error(request, 'This note is private. Access denied')
-            return redirect('/notes/personal')
+            messages.error(request, "This note is private. Access denied")
+            return redirect("/notes/personal")
     note_history = note.history.filter(id=pk)
     changes = historical_changes(note_history)
-    context = {'note': secured_note, 'changes': changes}
+    context = {"note": secured_note, "changes": changes}
     return render(request, "notes/notes-detail.html", context)
 
 
@@ -573,13 +724,13 @@ def note_add(request):
             note.author = request.user
             note.save()
             form.save_m2m()
-            messages.success(request, 'Note saved successfully.')
-            return redirect('/notes/personal/')
+            messages.success(request, "Note saved successfully.")
+            return redirect("/notes/personal/")
         else:
-            messages.error(request, 'There are some errors.')
+            messages.error(request, "There are some errors.")
     else:
         form = NoteForm()
-    return render(request, "notes/notes-add.html", {'form': form})
+    return render(request, "notes/notes-add.html", {"form": form})
 
 
 @login_required(login_url="/login/")
@@ -592,17 +743,17 @@ def note_edit(request, pk):
         # Check user authorisation
         if form.is_valid() and request.user.id == note.author.id:
             form.save()
-            messages.success(request, 'Note updated successfully.')
-            next_url = request.GET.get('next_url')
+            messages.success(request, "Note updated successfully.")
+            next_url = request.GET.get("next_url")
             if next_url:
                 return redirect(next_url)
             else:
-                return redirect('/notes/personal/')
+                return redirect("/notes/personal/")
         else:
-            messages.error(request, 'Unable to edit note.')
+            messages.error(request, "Unable to edit note.")
     else:
         form = NoteForm(instance=note)
-    return render(request, "notes/notes-edit.html", {'form': form, 'note': note})
+    return render(request, "notes/notes-edit.html", {"form": form, "note": note})
 
 
 @login_required(login_url="/login/")
@@ -615,17 +766,17 @@ def note_delete(request, pk):
         # Check user authorisation
         if form.is_valid() and request.user.id == note.author.id:
             form.save()
-            messages.success(request, 'Note deleted successfully.')
-            next_url = request.GET.get('next_url')
+            messages.success(request, "Note deleted successfully.")
+            next_url = request.GET.get("next_url")
             if next_url:
                 return redirect(next_url)
             else:
-                return redirect('/notes/personal/')
+                return redirect("/notes/personal/")
         else:
-            messages.error(request, 'Unable to delete note.')
+            messages.error(request, "Unable to delete note.")
     else:
         form = NoteDeleteForm(instance=note)
-    return render(request, "notes/notes-delete.html", {'form': form, 'note': note})
+    return render(request, "notes/notes-delete.html", {"form": form, "note": note})
 
 
 @login_required(login_url="/login/")
@@ -633,17 +784,26 @@ def note_search(request):
     # Search Notes
     all_tags = Note.tags.all()
     users = User.objects.all()
-    query_string = ''
-    if ('q' in request.GET) and request.GET['q'].strip():
-        query_string = request.GET.get('q')
-        notes = Note.objects.filter(Q(title__icontains=query_string) | Q(sample_tags__musicsampleid__icontains=query_string) | Q(content__icontains=query_string)).filter(is_deleted=False)
-        context = {'notes': notes, 'page_title': 'Search Results for: ' + query_string, 'all_tags': all_tags, 'users': users}
-        return render(request, 'notes/notes-main.html', context)
+    query_string = ""
+    if ("q" in request.GET) and request.GET["q"].strip():
+        query_string = request.GET.get("q")
+        notes = Note.objects.filter(
+            Q(title__icontains=query_string)
+            | Q(sample_tags__musicsampleid__icontains=query_string)
+            | Q(content__icontains=query_string)
+        ).filter(is_deleted=False)
+        context = {
+            "notes": notes,
+            "page_title": "Search Results for: " + query_string,
+            "all_tags": all_tags,
+            "users": users,
+        }
+        return render(request, "notes/notes-main.html", context)
     else:
         if "HTTP_REFERER" in request.META:
-            return redirect(request.META['HTTP_REFERER'])
+            return redirect(request.META["HTTP_REFERER"])
         else:
-            return redirect(reverse('notes'))
+            return redirect(reverse("notes"))
 
 
 #############################################################################
@@ -654,26 +814,38 @@ def note_search(request):
 @login_required(login_url="/login/")
 def autocomplete_locations(request):
     # Helps speed up sample adding by autocompleting already existing locations
-    if 'term' in request.GET:
-        qs = Sample.objects.filter(is_deleted=False).filter(sample_location__icontains=request.GET.get('term')).values('sample_location').distinct()
+    if "term" in request.GET:
+        qs = (
+            Sample.objects.filter(is_deleted=False)
+            .filter(sample_location__icontains=request.GET.get("term"))
+            .values("sample_location")
+            .distinct()
+        )
     else:
-        qs = Sample.objects.filter(is_deleted=False).values('sample_location').distinct()
+        qs = (
+            Sample.objects.filter(is_deleted=False).values("sample_location").distinct()
+        )
     locations = list()
     for sample in qs:
-        locations.append(sample['sample_location'])
+        locations.append(sample["sample_location"])
     return JsonResponse(locations, safe=False)
 
 
 @login_required(login_url="/login/")
 def autocomplete_patient_id(request):
     # Helps speed up sample adding by locating existing patient IDs
-    if 'term' in request.GET:
-        qs = Sample.objects.filter(is_deleted=False).filter(patientid__icontains=request.GET.get('term')).values('patientid').distinct()
+    if "term" in request.GET:
+        qs = (
+            Sample.objects.filter(is_deleted=False)
+            .filter(patientid__icontains=request.GET.get("term"))
+            .values("patientid")
+            .distinct()
+        )
     else:
-        qs = Sample.objects.filter(is_deleted=False).values('patientid').distinct()
+        qs = Sample.objects.filter(is_deleted=False).values("patientid").distinct()
     patients = list()
     for sample in qs:
-        patients.append(sample['patientid'])
+        patients.append(sample["patientid"])
     return JsonResponse(patients, safe=False)
 
 
@@ -681,13 +853,17 @@ def autocomplete_patient_id(request):
 def autocomplete_tags(request):
     # Helps keep tags consistent by promoting autocompletion against
     # existing tags in the database
-    if 'term' in request.GET:
-        tags = Tag.objects.filter(name__icontains=request.GET.get('term')).values('name').distinct()
+    if "term" in request.GET:
+        tags = (
+            Tag.objects.filter(name__icontains=request.GET.get("term"))
+            .values("name")
+            .distinct()
+        )
     else:
-        tags = Tag.objects.values('name').distinct()
+        tags = Tag.objects.values("name").distinct()
     tag_list = list()
     for tag in tags:
-        tag_list.append(tag['name'])
+        tag_list.append(tag["name"])
     return JsonResponse(tag_list, safe=False)
 
 
@@ -719,25 +895,26 @@ class SampleViewSet(viewsets.ModelViewSet):
     Lookup field set to the barcode ID instead of the default Django
     autoincrementing id system
     """
+
     queryset = Sample.objects.filter(is_deleted=False)
     serializer_class = SampleSerializer
     permission_classes = [permissions.IsAuthenticated]
-    lookup_field = 'musicsampleid'
-    filterset_fields = ['sample_type']
+    lookup_field = "musicsampleid"
+    filterset_fields = ["sample_type"]
 
 
 class SampleIsFullyUsedViewSet(viewsets.ModelViewSet):
     queryset = Sample.objects.filter(is_deleted=False)
     serializer_class = SampleIsFullyUsedSerializer
     permission_classes = [permissions.IsAuthenticated]
-    lookup_field = 'musicsampleid'
+    lookup_field = "musicsampleid"
 
 
 class MultipleSampleViewSet(viewsets.ModelViewSet):
     queryset = Sample.objects.filter(is_deleted=False)
     serializer_class = MultipleSampleSerializer
     permission_classes = [permissions.IsAuthenticated]
-    lookup_field = 'musicsampleid'
+    lookup_field = "musicsampleid"
 
 
 @login_required(login_url="/login/")
