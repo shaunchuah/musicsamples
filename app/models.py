@@ -14,7 +14,9 @@ class Sample(models.Model):
     sample_comments = models.TextField(blank=True, null=True)
     is_deleted = models.BooleanField(default=False)
     processing_datetime = models.DateTimeField(blank=True, null=True)
-    sample_volume = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
+    sample_volume = models.DecimalField(
+        max_digits=10, decimal_places=3, blank=True, null=True
+    )
     sample_volume_units = models.CharField(max_length=30, blank=True, null=True)
     freeze_thaw_count = models.IntegerField(default=0)
 
@@ -33,6 +35,7 @@ class Sample(models.Model):
 
     def clean(self):
         self.musicsampleid = self.musicsampleid.upper()
+        self.patientid = self.patientid.upper()
 
     def __str__(self):
         return self.musicsampleid
@@ -46,13 +49,13 @@ class Note(models.Model):
     is_deleted = models.BooleanField(default=False)
     tags = TaggableManager(blank=True)
 
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notes')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notes")
     published_date = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
     history = HistoricalRecords()
 
     class Meta:
-        ordering = ['-published_date']
+        ordering = ["-published_date"]
 
     def __str__(self):
         return self.title

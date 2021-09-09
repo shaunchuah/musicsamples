@@ -6,18 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app', '0007_auto_20201111_2124'),
+        ("app", "0007_auto_20201111_2124"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='historicalsample',
-            name='sample_volume',
-            field=models.DecimalField(blank=True, decimal_places=3, max_digits=10, null=True),
+            model_name="historicalsample",
+            name="sample_volume",
+            field=models.DecimalField(
+                blank=True, decimal_places=3, max_digits=10, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='sample',
-            name='sample_volume',
-            field=models.DecimalField(blank=True, decimal_places=3, max_digits=10, null=True),
+            model_name="sample",
+            name="sample_volume",
+            field=models.DecimalField(
+                blank=True, decimal_places=3, max_digits=10, null=True
+            ),
         ),
     ]

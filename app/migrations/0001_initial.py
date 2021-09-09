@@ -7,24 +7,31 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Sample',
+            name="Sample",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('musicsampleid', models.CharField(max_length=10)),
-                ('patientid', models.CharField(max_length=30)),
-                ('sample_location', models.CharField(max_length=200)),
-                ('sample_type', models.CharField(max_length=200)),
-                ('sample_datetime', models.DateTimeField()),
-                ('sample_comments', models.TextField(blank=True, null=True)),
-                ('created_by', models.CharField(max_length=200)),
-                ('last_modified_by', models.CharField(max_length=200)),
-                ('data_first_created', models.DateTimeField(auto_now_add=True)),
-                ('last_modified', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("musicsampleid", models.CharField(max_length=10)),
+                ("patientid", models.CharField(max_length=30)),
+                ("sample_location", models.CharField(max_length=200)),
+                ("sample_type", models.CharField(max_length=200)),
+                ("sample_datetime", models.DateTimeField()),
+                ("sample_comments", models.TextField(blank=True, null=True)),
+                ("created_by", models.CharField(max_length=200)),
+                ("last_modified_by", models.CharField(max_length=200)),
+                ("data_first_created", models.DateTimeField(auto_now_add=True)),
+                ("last_modified", models.DateTimeField(auto_now=True)),
             ],
         ),
     ]
