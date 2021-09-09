@@ -5,7 +5,7 @@ __pycache__/
 # tests and coverage
 *.pytest_cache
 .coverage
-htmlcov/*
+
 
 # database & logs
 *.db
