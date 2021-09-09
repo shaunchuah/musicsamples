@@ -210,7 +210,7 @@ def test_add_sample_post(auto_login_user):
         "biopsy_inflamed_status": "",
     }
     response = client.post(path, data=form_data)
-    assert Sample.objects.get(pk=1).patientid == "patient001"
+    assert Sample.objects.get(pk=1).patientid == "PATIENT001"  # should return patientid as uppercase as well
     assert response.status_code == 302
 
 
