@@ -1,15 +1,16 @@
-import pytest
 import json
-from django.test import RequestFactory
-from ..models import Sample, Note
-from django.urls import reverse
-from django.contrib.auth import get_user_model
-from .. import views
-from django.contrib.auth.models import AnonymousUser
-from mixer.backend.django import mixer
-from pytest_django.asserts import assertTemplateUsed, assertRaisesMessage
-from django.core.paginator import EmptyPage, PageNotAnInteger
 
+import pytest
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
+from django.core.paginator import EmptyPage, PageNotAnInteger
+from django.test import RequestFactory
+from django.urls import reverse
+from mixer.backend.django import mixer
+from pytest_django.asserts import assertRaisesMessage, assertTemplateUsed
+
+from .. import views
+from ..models import Note, Sample
 
 pytestmark = pytest.mark.django_db
 
@@ -210,7 +211,9 @@ def test_add_sample_post(auto_login_user):
         "biopsy_inflamed_status": "",
     }
     response = client.post(path, data=form_data)
-    assert Sample.objects.get(pk=1).patientid == "PATIENT001"  # should return patientid as uppercase as well
+    assert (
+        Sample.objects.get(pk=1).patientid == "PATIENT001"
+    )  # should return patientid as uppercase as well
     assert response.status_code == 302
 
 
