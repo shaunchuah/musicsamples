@@ -133,7 +133,7 @@ def test_account_page(admin_client):
     response = admin_client.get(path)
     assertTemplateUsed(
         response, "account.html"
-    ), "Check that account page is accessible through url and returns the account.html template."
+    ), "Check account page url and returns the account.html template."
 
 
 def test_used_samples_page(admin_client):
@@ -141,7 +141,7 @@ def test_used_samples_page(admin_client):
     response = admin_client.get(path)
     assertTemplateUsed(
         response, "samples/used_samples.html"
-    ), "Check that used samples page is accessible through url and returns the used_samples.html template."
+    ), "Check used samples page url and returns the used_samples.html template."
 
 
 def test_barcode_main_page(admin_client):
@@ -149,7 +149,7 @@ def test_barcode_main_page(admin_client):
     response = admin_client.get(path)
     assertTemplateUsed(
         response, "barcode.html"
-    ), "Check that used samples page is accessible through url and returns the used_samples.html template."
+    ), "Check used samples page url and returns the used_samples.html template."
 
 
 def test_barcode_samples_used_page(admin_client):
@@ -157,7 +157,7 @@ def test_barcode_samples_used_page(admin_client):
     response = admin_client.get(path)
     assertTemplateUsed(
         response, "barcode-markused.html"
-    ), "Check that used samples page is accessible through url and returns the used_samples.html template."
+    ), "Check used samples page url and returns the used_samples.html template."
 
 
 def test_archive_page(admin_client):
@@ -224,7 +224,7 @@ def test_sample_detail_page(auto_login_user):
     response = client.get(path)
     assert (
         response.context["sample"].musicsampleid == "TEST001"
-    ), "Should create sample instance with ID TEST001 and be able to retrieve sample detail view corresponding to this objects."
+    ), "Should create sample with ID TEST001 and retrieve sample detail view."
 
 
 def test_sample_detail_processing_datetime_logic(auto_login_user):
@@ -238,7 +238,7 @@ def test_sample_detail_processing_datetime_logic(auto_login_user):
     response = client.get(path)
     assert (
         response.context["processing_time"] == 5
-    ), "Should test that processing_time calculation is correct given sampling datetime and processing datetime."
+    ), "Should test processing_time calculation given sampling and processing datetime."
 
 
 def test_sample_detail_linkage_to_redcap_db(auto_login_user):
