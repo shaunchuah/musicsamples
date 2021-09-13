@@ -1,7 +1,8 @@
-from django.urls import path
-from .views import login_view  # , register_user
-from django.contrib.auth.views import LogoutView
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LogoutView
+from django.urls import path
+
+from .views import login_view  # , register_user
 
 # sentry debug intentional error
 # def trigger_error(request):
@@ -9,7 +10,8 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path("login/", login_view, name="login"),
-    # path('register/', register_user, name="register"), Accounts are provisioned by the superuser through the django admin interface
+    # path('register/', register_user, name="register"),
+    # Accounts are provisioned by the superuser through the django admin interface
     path("logout/", LogoutView.as_view(), name="logout"),
     path(
         "password_reset/done/",
