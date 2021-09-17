@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect, render
 
 # from django.contrib.auth.models import User
 # from django.forms.utils import ErrorList
@@ -29,7 +29,9 @@ def login_view(request):
     return render(request, "accounts/login.html", {"form": form, "msg": msg})
 
 
-# Public access to registration is disabled. Uncomment to re-enable - you will need to activate the registration url in authentication/urls.py
+# Public access to registration is disabled. Uncomment to re-enable -
+# you will need to activate the registration url in authentication/urls.py
+#
 # def register_user(request):
 
 #     msg     = None
@@ -53,4 +55,7 @@ def login_view(request):
 #     else:
 #         form = SignUpForm()
 
-#     return render(request, "accounts/register.html", {"form": form, "msg" : msg, "success" : success })
+#     return render(request,
+#       "accounts/register.html",
+#       {"form": form, "msg" : msg, "success" : success }
+#     )

@@ -1,30 +1,38 @@
-from .models import Sample, Note
-from .forms import SampleForm, CheckoutForm, DeleteForm, RestoreForm
-from .forms import NoteForm, NoteDeleteForm, ReactivateForm, FullyUsedForm
-from django.http import JsonResponse
 import datetime
+
+from django.contrib import messages
+from django.contrib.auth import get_user_model
 
 # import csv
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Count, Q
+from django.db.models.functions import Trunc
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.views.decorators.cache import cache_page
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
-from django.contrib import messages
-from django.db.models import Q
-from rest_framework import viewsets, permissions
-from .serializers import (
-    SampleSerializer,
-    SampleIsFullyUsedSerializer,
-    MultipleSampleSerializer,
-)
+from rest_framework import permissions, viewsets
 from taggit.models import Tag
-from django.urls import reverse
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Count
-from django.db.models.functions import Trunc
-from django.views.decorators.cache import cache_page
-from django.contrib.auth import get_user_model
+
+from .forms import (
+    CheckoutForm,
+    DeleteForm,
+    FullyUsedForm,
+    NoteDeleteForm,
+    NoteForm,
+    ReactivateForm,
+    RestoreForm,
+    SampleForm,
+)
+from .models import Note, Sample
+from .serializers import (
+    MultipleSampleSerializer,
+    SampleIsFullyUsedSerializer,
+    SampleSerializer,
+)
 
 User = get_user_model()
 
@@ -236,7 +244,7 @@ def sample_add(request):
 
 
 def historical_changes(query):
-    # Historical changes function to integrate simple history into the sample detail page
+    # Historical changes integrates simple history into the sample detail page
     changes = []
     if query is not None:
         last = query.first()
@@ -251,7 +259,7 @@ def historical_changes(query):
 
 @login_required(login_url="/login/")
 def sample_detail(request, pk):
-    # Sample Detail Page - retrieves sample history and also linked notes both public and private
+    # retrieves sample history and also linked notes both public and private
     sample = get_object_or_404(Sample, pk=pk)
     sample_history = sample.history.filter(id=pk)
     changes = historical_changes(sample_history)
@@ -448,21 +456,54 @@ def reactivate_sample(request, pk):
 # @login_required(login_url="/login/")
 # def export_csv(request):
 #     # Export entire database to CSV for backup, currently not in use
-#     response = HttpResponse(content_type='text/csv')
-#     response['Content-Disposition'] = 'attachment; filename="music_samples_%s.csv"' % datetime.datetime.now().strftime("%Y-%m-%d")
+#     response = HttpResponse(content_type="text/csv")
+#     response[
+#         "Content-Disposition"
+#     ] = 'attachment; filename="music_samples_%s.csv"' % datetime.datetime.now().strftime(  # noqa E501
+#         "%Y-%m-%d"
+#     )
 #     writer = csv.writer(response)
-#     writer.writerow(['MUSIC Sample ID', 'Patient ID', 'Sample Location', 'Sample Type', 'Sample Datetime', 'Sample Comments', 'Created By', 'Date First Created', 'Last Modified By', 'Last Modified'])
-#     samples = Sample.objects.all().filter(is_deleted=False).values_list('musicsampleid', 'patientid', 'sample_location', 'sample_type', 'sample_datetime', 'sample_comments', 'created_by', 'data_first_created', 'last_modified_by', 'last_modified')
+#     writer.writerow(
+#         [
+#             "MUSIC Sample ID",
+#             "Patient ID",
+#             "Sample Location",
+#             "Sample Type",
+#             "Sample Datetime",
+#             "Sample Comments",
+#             "Created By",
+#             "Date First Created",
+#             "Last Modified By",
+#             "Last Modified",
+#         ]
+#     )
+#     samples = (
+#         Sample.objects.all()
+#         .filter(is_deleted=False)
+#         .values_list(
+#             "musicsampleid",
+#             "patientid",
+#             "sample_location",
+#             "sample_type",
+#             "sample_datetime",
+#             "sample_comments",
+#             "created_by",
+#             "data_first_created",
+#             "last_modified_by",
+#             "last_modified",
+#         )
+#     )
 #     for sample in samples:
 #         writer.writerow(sample)
 #     return response
+
 
 # Excel Exports
 
 
 @login_required(login_url="/login/")
 def export_excel(request):
-    # Exports custom views depending on the search string otherwise exports entire database
+    # Exports custom views based on the search string otherwise exports entire database
     query_string = ""
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
@@ -479,7 +520,7 @@ def export_excel(request):
     response = HttpResponse(content_type="application/ms-excel")
     response[
         "Content-Disposition"
-    ] = 'attachment; filename="samples_export_%s.xlsx"' % datetime.datetime.now().strftime(
+    ] = 'attachment; filename="samples_export_%s.xlsx"' % datetime.datetime.now().strftime(  # noqa E501
         "%Y-%m-%d"
     )
 
