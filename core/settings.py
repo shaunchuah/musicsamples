@@ -1,12 +1,13 @@
 import os
-from decouple import config, Csv
+
+# Sentry Monitoring
+import sentry_sdk
+from decouple import Csv, config
+from sentry_sdk.integrations.django import DjangoIntegration
 from unipath import Path
 
 # import dj_database_url
 
-# Sentry Monitoring
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 
 sentry_sdk.init(
     dsn="https://565f64fc7bea4af39487c5f0edcdab0b@o482942.ingest.sentry.io/5533900",
@@ -106,7 +107,7 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa E501
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",

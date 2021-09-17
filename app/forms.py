@@ -1,10 +1,11 @@
-from django import forms
-from django.utils import timezone
-from django.forms import ModelForm
-from .models import Sample, Note
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
-from taggit.forms import TagWidget
+from django import forms
+from django.forms import ModelForm
+from django.utils import timezone
 from django_select2.forms import ModelSelect2MultipleWidget
+from taggit.forms import TagWidget
+
+from .models import Note, Sample
 
 
 class DateTimeInput(forms.DateTimeInput):
@@ -226,8 +227,10 @@ class ReactivateForm(ModelForm):
 # Create new note form
 # Django select2 used to enable tagging of existing samples.
 # Django taggit used for tagging of notes similar to blogging
-# CKEditor Uploading widget used for adding of notes and supporting of file/image uploads - Suggest use an S3 backend to handle user media uploads.
-# You can also disable this by switching the uploading widget for the standard one - see django-ckeditor documentation.
+# CKEditor Uploading widget used for adding of notes and supporting of file/image
+# uploads - Suggest use an S3 backend to handle user media uploads.
+# You can also disable this by switching the uploading widget for the standard one
+#  - see django-ckeditor documentation.
 
 
 class NoteForm(ModelForm):
