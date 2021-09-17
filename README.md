@@ -47,9 +47,9 @@ SampleTrek was developed to solve the problem of tracking 30,000 research sample
 
 Cryogenic QR code labels were bulk printed from a label printing company and research samples were tagged at the point of collection and registered onto SampleTrek. At specified receiving entrypoints to various lab workflows the samples were scanned in bulk to update their location (alternatively a status could be set into the location eg. "Departure Glasgow").
 
-### Electronic lab notebook with sample tagging
+### Electronic lab notebook with sample tagging (Deprecated as of 1/09/2021)
 
-A mini electronic lab notebook was created which allows tagging of samples used in order to facilitate collaboration and to allow easy finding of relevant data pertaining to experiments carried out on the samples.
+A mini electronic lab notebook was created which allows tagging of samples used in order to facilitate collaboration and to allow easy finding of relevant data pertaining to experiments carried out on the sampls.
 
 ### Built With
 
@@ -61,36 +61,52 @@ A mini electronic lab notebook was created which allows tagging of samples used 
 
 ## Getting Started
 
-To get a local copy up and running follow these simple steps. The default .env file will set up Django to run using sqlite as the backend.
+To get a local copy up and running follow these steps. Rename development_example.env to .env to get development values set up.
 
 This requires a level of comfort and familiarity with python/django/linux/postgres web deployment. If you run into difficulty, you could consider hiring a django full stack developer to help. We had a hard look at available commercial LIMS systems and due to various reasons they were found to be lacking (data not located in UK, pricey, hard to customise and adapt to changing experimental workflows).
 
-### Prerequisites
+## Prerequisites
 
 - Python > 3.7.2
 - Pip
 
-### Installation
+## Installation
 
-1. Clone the repo
+### 1. Clone the repo
+
    ```sh
-   git clone https://github.com/shaunchuah/sampletrek.git
+   git clone https://github.com/shaunchuah/musicsamples.git
    ```
-2. Django setup
+
+### 2. Setup a virtual environment for Django
+
+  ```sh
+  cd musicsamples
+  virtualenv venv/
+
+  # Activate the virtual environment
+
+  source venv/bin/activate # for linux
+  ./venv/Scripts/activate # for windows
+
+  # Install required dependencies
+
+  pip install -r requirements.txt
+  ```
+
+### 3. Setup Django database and create a super user
+
    ```sh
-   pip install -r requirements.txt
    python manage.py migrate
    python manage.py createsuperuser
    python manage.py runserver
    ```
 
-### Notes
-
-Sample tagging to notes does not work unless you configure the cache settings. Works in production using redis. You could try installing redis on your development environment.
-
 ## Deployment
 
 You will need a domain name to deploy on. Configure the domain to point at your server.
+
+The following would be a simple deployment for a small group onto a single server.
 
 ### Suggested Server Software Requirements:
 
@@ -101,10 +117,10 @@ You will need a domain name to deploy on. Configure the domain to point at your 
 - Gunicorn
 - Redis
 
-Suggested production deployment:
+### Suggested production deployment:
 
 1. Ubuntu VPS instance (DigitalOcean, Linode, Lightsail etc. many options) - we used 20.04 LTS on DigitalOcean
-2. Install python, postgres into your VPS and set it up (alternatively connecting to a managed database service might be easier although more costly)
+2. Fork this repository. Install python, postgres into your VPS and set it up (alternatively connecting to a managed database service might be easier although more costly)
 3. Setup nginx and gunicorn (static requests through nginx, dynamic requests redirected to gunicorn serving Django). [Useful guide here](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04).
 4. Set up an account on AWS for password reset emails or an alternative email provider of your choice
 5. Set up redis for caching (required for sample tagging to work properly - [https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04))
@@ -120,6 +136,23 @@ Suggested production deployment:
 8. Start up the whole stack and it should hopefully be working!
 9. Now that it's working - setup SSL encryption on your server using letsencrypt
 10. Harden your production .env file
+11. Edit `scripts/github_deploy_django.sh` and `.github/workflows/deploy.yml` to suit your server for automated deployments
+
+### Database Backups
+
+Since this is not a managed Postgres instance, 2 scripts are included to backup Postgres to AWS `scripts/db_backup_example.sh` and `scripts/db_sync.sh`.
+
+You will need to make the scripts executable and configure a cron job to run the scripts.
+
+The scripts backup the database to the local VM first and then syncs it across to S3. VM needs aws-cli installed for this to work. If you're not comfortable with this then I would suggest a managed database instance.
+
+### Scaling Deployment
+
+If you want to scale this app I would suggest:
+
+- Create a Dockerfile
+- Separate out the database instance to AWS RDS or Postgres
+- Edit GitHub Actions config to automate building Docker images and pushing it to a container registry
 
 <!-- USAGE EXAMPLES -->
 
@@ -137,7 +170,6 @@ Use this space to show useful examples of how a project can be used. Additional 
 - authentication: all authentication handling/views here
 - core: settings.py and templates/css/js lives here
 - media: local media folder for development
-- staticfiles: local staticfiles folder
 
 ### Customisation Tips
 
@@ -155,14 +187,12 @@ Here are some tips for customising this to suit your workflow:
 - Most of the view logic is in app/views.py. I have written this mostly in function based views to make it explicit and easy to identify where you wish to alter the workflow rather than class based views. I appreciated this means the views.py file is more verbose but hopefully this helps you customise this to fit what you're trying to achieve.
 - The templates are found in core/templates. Most functions are using a single template for a single view so you can customise particular aspects as you desire
 
-<!-- ROADMAP
-## Roadmap
 
-See the [open issues](https://github.com/github_username/repo_name/issues) for a list of proposed features (and known issues).
+## SAAS version available here
 
--->
+I offer a SAAS version of this here so you don't have to worry about all the above steps: https://www.sampletrek.com/
 
-<!-- CONTRIBUTING -->
+Documentation for that here: https://docs.sampletrek.com/
 
 ## Contributing
 
@@ -176,17 +206,9 @@ Contributions are what make the open source community such an amazing place to b
 
 ### Possible areas of development
 
-1. Make deployment easier for beginners/non-technical users - perhaps Docker? (I'm afraid I don't have time to learn that)
-2. Improving testing coverage
-3. Perhaps simplifying the dependency list
-4. Improving the note writing interface
-5. Clean up CSS and javascript static files while allowing easy customisation
-
-## Code of Conduct
-
-Code of conduct available [here].(docs/code_of_conduct.md) taken from [https://www.contributor-covenant.org/](https://www.contributor-covenant.org/).
-
-<!-- LICENSE -->
+- Improve testing coverage
+- Swap out Django templates/jQuery for DRF + NuxtJS
+- Custom fields by users
 
 ## License
 
@@ -246,20 +268,7 @@ University of Edinburgh
 
 If you've used this to create something cool let me know about it!
 
-Twitter: [@chershiong](https://twitter.com/chershiong) <br />
-Email: cchuah@ed.ac.uk <br />
-Project Link: [https://github.com/shaunchuah/sampletrek](https://github.com/shaunchuah/sampletrek)
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-
-[contributors-shield]: https://img.shields.io/github/contributors/shaunchuah/repo.svg?style=for-the-badge
-[contributors-url]: https://github.com/shaunchuah/repo/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/github_username/repo.svg?style=for-the-badge
-[forks-url]: https://github.com/shaunchuah/repo/network/members
-[stars-shield]: https://img.shields.io/github/stars/github_username/repo.svg?style=for-the-badge
-[stars-url]: https://github.com/shaunchuah/repo/stargazers
-[issues-shield]: https://img.shields.io/github/issues/github_username/repo.svg?style=for-the-badge
-[issues-url]: https://github.com/shaunchuah/repo/issues
-[license-shield]: https://img.shields.io/github/license/github_username/repo.svg?style=for-the-badge
-[license-url]: https://github.com/shaunchuah/repo/blob/master/LICENSE.txt
+Twitter: [@chershiong](https://twitter.com/chershiong) \
+Email: cchuah@ed.ac.uk \
+Project Link: [https://github.com/shaunchuah/musicsamples](https://github.com/shaunchuah/sampletrek) \
+SAAS Version: https://www.sampletrek.com
