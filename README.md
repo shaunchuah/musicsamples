@@ -1,6 +1,8 @@
 # G-Trac
 
-Open source lab sample inventory tracking system and electronic lab notebook created with Django (Python web framework) to support clinical research in Scotland.
+Open source lab sample inventory tracking system and electronic lab notebook created with [Django](https://www.djangoproject.com) to support clinical research in Scotland.
+
+![G-Trac](g-trac.gif)
 
 ## Goals
 
@@ -148,19 +150,11 @@ The scripts backup the database to the local VM first and then syncs it across t
 
 ### Scaling Deployment
 
-If you want to scale this app I would suggest:
+If you want to scale this app I would:
 
 - Create a Dockerfile
 - Separate out the database instance to AWS RDS or Postgres
 - Edit GitHub Actions config to automate building Docker images and pushing it to a container registry
-
-<!-- USAGE EXAMPLES -->
-
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-<!-- Customisation -->
 
 ## Customisation
 
@@ -190,7 +184,7 @@ Here are some tips for customising this to suit your workflow:
 
 ## SAAS version available here
 
-I offer a SAAS version of this here so you don't have to worry about all the above steps: https://www.sampletrek.com/
+SAAS version of this here if you don't want to worry about configuring all the above steps: https://www.sampletrek.com/
 
 Documentation for that here: https://docs.sampletrek.com/
 
