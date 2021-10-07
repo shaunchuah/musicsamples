@@ -32,6 +32,44 @@
       </div>
     </div>
   </div>
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">API Token</h3>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col">
+            <p>This will allow you to programmatically access G-trac data from the api endpoint <a href="/api" target="_blank">here</a>. 
+            Full guide available <a href="https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication" target="_blank" rel="noopener">here</a>.
+            </p>
+            <p>For clients to authenticate, the token key should be included in the Authorization HTTP header. The key should be prefixed by the string literal "Token", with whitespace separating the two strings. For example:
+
+Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b</p>
+            
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-4">API Token:</div>
+          {% if request.user.auth_token %}
+          <div class="col-8">{{ request.user.auth_token }}</div>
+          {% else %}
+          <div class="col-8">No token. Create one using the button below.</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="card-footer">
+        <!--<button type="submit" class="btn btn-fill btn-primary">Save</button>-->
+        
+        {% if request.user.auth_token %}
+        <a href="{% url 'refresh_token' %}" class="btn btn-fill btn-success">Renew Token</a>
+        <a href="{% url 'delete_token' %}" class="btn btn-fill btn-danger">Delete Token</a>
+        {% else %}
+        <a href="{% url 'generate_token' %}" class="btn btn-fill btn-success">Generate Token</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="row">

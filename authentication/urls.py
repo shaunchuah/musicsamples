@@ -1,8 +1,14 @@
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LogoutView
 from django.urls import path
+from rest_framework.authtoken.views import obtain_auth_token
 
-from .views import login_view  # , register_user
+from .views import (
+    login_view,
+    generate_token,
+    delete_token,
+    refresh_token,
+)  # , register_user
 
 # sentry debug intentional error
 # def trigger_error(request):
@@ -57,5 +63,9 @@ urlpatterns = [
         ),
         name="password_change_done",
     ),
+    path("get_api_token/", obtain_auth_token, name="obtain_auth_token"),
+    path("generate_token/", generate_token, name="generate_token"),
+    path("delete_token/", delete_token, name="delete_token"),
+    path("refresh_token/", refresh_token, name="refresh_token")
     # path('sentry_debug/', trigger_error),
 ]

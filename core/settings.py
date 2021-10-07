@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "taggit",
     "django_select2",
     "rest_framework",
+    "rest_framework.authtoken",
     "storages",
     "django_filters",
     "app",  # Enable the inner app
@@ -213,9 +214,13 @@ CKEDITOR_CONFIGS = {
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
+        "rest_framework.permissions.IsAuthenticated"
     ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
 }
 
 
