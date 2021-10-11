@@ -962,11 +962,11 @@ class MultipleSampleViewSet(viewsets.ModelViewSet):
     lookup_field = "musicsampleid"
 
 
-class SampleExportViewset(viewsets.ModelViewSet):
+class SampleExportViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Sample.objects.filter(is_deleted=False).filter(patientid__startswith="GID")
     serializer_class = SampleExportSerializer
     lookup_field = "musicsampleid"
-    filterset_fields = ["sample_type"]
+    filterset_fields = ["sample_type", "sample_location", "sample_sublocation"]
 
 
 @login_required(login_url="/login/")
