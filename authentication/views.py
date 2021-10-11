@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
+
 # from django.contrib.auth.models import User
 # from django.forms.utils import ErrorList
 # from django.http import HttpResponse
@@ -29,20 +30,24 @@ def login_view(request):
 
     return render(request, "accounts/login.html", {"form": form, "msg": msg})
 
+
 def generate_token(request):
     Token.objects.get_or_create(user=request.user)
     return redirect(reverse("data_export"))
+
 
 def delete_token(request):
     token = get_object_or_404(Token, user=request.user)
     token.delete()
     return redirect(reverse("data_export"))
 
+
 def refresh_token(request):
     token = get_object_or_404(Token, user=request.user)
     token.delete()
     Token.objects.get_or_create(user=request.user)
     return redirect(reverse("data_export"))
+
 
 # Public access to registration is disabled. Uncomment to re-enable -
 # you will need to activate the registration url in authentication/urls.py

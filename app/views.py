@@ -14,8 +14,7 @@ from django.urls import reverse
 from django.views.decorators.cache import cache_page
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
-from rest_framework import permissions, viewsets
-from rest_framework.decorators import api_view
+from rest_framework import viewsets
 from taggit.models import Tag
 
 from .forms import (
@@ -963,7 +962,9 @@ class MultipleSampleViewSet(viewsets.ModelViewSet):
 
 
 class SampleExportViewset(viewsets.ReadOnlyModelViewSet):
-    queryset = Sample.objects.filter(is_deleted=False).filter(patientid__startswith="GID")
+    queryset = Sample.objects.filter(is_deleted=False).filter(
+        patientid__startswith="GID"
+    )
     serializer_class = SampleExportSerializer
     lookup_field = "musicsampleid"
     filterset_fields = ["sample_type", "sample_location", "sample_sublocation"]

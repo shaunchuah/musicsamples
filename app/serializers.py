@@ -44,6 +44,7 @@ class MultipleSampleSerializer(serializers.HyperlinkedModelSerializer):
         ]
         lookup_field = "musicsampleid"
 
+
 class SampleExportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sample
@@ -66,6 +67,6 @@ class SampleExportSerializer(serializers.ModelSerializer):
             "created_by",
             "last_modified_by",
             "data_first_created",
-            "last_modified"
+            "last_modified",
         ]
         lookup_field = "musicsampleid"

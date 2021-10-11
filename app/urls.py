@@ -1,7 +1,12 @@
 from django.urls import path, include
 from app import views
 from rest_framework import routers
-from .views import SampleViewSet, SampleIsFullyUsedViewSet, MultipleSampleViewSet, SampleExportViewset
+from .views import (
+    SampleViewSet,
+    SampleIsFullyUsedViewSet,
+    MultipleSampleViewSet,
+    SampleExportViewset,
+)
 from django.views.generic.base import TemplateView
 
 router = routers.DefaultRouter()

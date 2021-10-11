@@ -159,6 +159,7 @@ def test_barcode_samples_used_page(admin_client):
         response, "barcode-markused.html"
     ), "Check used samples page url and returns the used_samples.html template."
 
+
 def test_barcode_add_multiple_view(admin_client):
     path = reverse("barcode_add_multiple")
     response = admin_client.get(path)
