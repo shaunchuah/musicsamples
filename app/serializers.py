@@ -43,3 +43,29 @@ class MultipleSampleSerializer(serializers.HyperlinkedModelSerializer):
             "freeze_thaw_count",
         ]
         lookup_field = "musicsampleid"
+
+class SampleExportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sample
+        fields = [
+            "musicsampleid",
+            "patientid",
+            "sample_location",
+            "sample_type",
+            "sample_datetime",
+            "sample_comments",
+            "processing_datetime",
+            "sample_volume",
+            "sample_volume_units",
+            "freeze_thaw_count",
+            "sample_sublocation",
+            "is_fully_used",
+            "haemolysis_reference",
+            "biopsy_location",
+            "biopsy_inflamed_status",
+            "created_by",
+            "last_modified_by",
+            "data_first_created",
+            "last_modified"
+        ]
+        lookup_field = "musicsampleid"

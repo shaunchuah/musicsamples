@@ -1,7 +1,7 @@
 from django.urls import path, include
 from app import views
 from rest_framework import routers
-from .views import SampleViewSet, SampleIsFullyUsedViewSet, MultipleSampleViewSet
+from .views import SampleViewSet, SampleIsFullyUsedViewSet, MultipleSampleViewSet, SampleExportViewset
 from django.views.generic.base import TemplateView
 
 router = routers.DefaultRouter()
@@ -9,7 +9,8 @@ router = routers.DefaultRouter()
 # Django Rest Framework API endpoints
 router.register(r"samples", SampleViewSet, "samples")
 router.register(r"samples_used", SampleIsFullyUsedViewSet, "samples_used")
-router.register(r"multiple_samples", MultipleSampleViewSet)
+router.register(r"multiple_samples", MultipleSampleViewSet, "multiple_samples")
+router.register(r"gidamps", SampleExportViewset, "gidamps")
 
 urlpatterns = [
     path("", views.index, name="home"),
@@ -21,6 +22,7 @@ urlpatterns = [
     path("analytics/gid_overview", views.gid_overview, name="gid_overview"),
     path("reference/", views.reference, name="reference"),
     path("account/", views.account, name="account"),
+    path("data_export/", views.data_export, name="data_export"),
     # Samples URLs
     path("samples/archive/", views.sample_archive, name="sample_archive"),
     path("used_samples/", views.used_samples, name="used_samples"),

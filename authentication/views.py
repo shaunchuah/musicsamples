@@ -31,18 +31,18 @@ def login_view(request):
 
 def generate_token(request):
     Token.objects.get_or_create(user=request.user)
-    return redirect(reverse("account"))
+    return redirect(reverse("data_export"))
 
 def delete_token(request):
     token = get_object_or_404(Token, user=request.user)
     token.delete()
-    return redirect(reverse("account"))
+    return redirect(reverse("data_export"))
 
 def refresh_token(request):
     token = get_object_or_404(Token, user=request.user)
     token.delete()
     Token.objects.get_or_create(user=request.user)
-    return redirect(reverse("account"))
+    return redirect(reverse("data_export"))
 
 # Public access to registration is disabled. Uncomment to re-enable -
 # you will need to activate the registration url in authentication/urls.py

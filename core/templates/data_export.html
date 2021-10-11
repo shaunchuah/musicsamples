@@ -1,0 +1,75 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Page User {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="row">
+  
+  <div class="col-lg-8">
+  <h2><i class="tim-icons icon-upload"></i> Data Export</h2>
+    <div class="notes card">
+      <div class="card-header">
+        <h2 class="card-title">API Token</h2>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col">
+            <p>This will allow you to programmatically access G-trac data from the api endpoints listed here. This API token does not expire so please delete it if you no longer require access.            
+            </p>
+            
+            
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-4">API Token:</div>
+          {% if request.user.auth_token %}
+          <div class="col-8">{{ request.user.auth_token }}</div>
+          {% else %}
+          <div class="col-8">No token. Create one using the button below.</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="card-footer">
+        <!--<button type="submit" class="btn btn-fill btn-primary">Save</button>-->
+        
+        {% if request.user.auth_token %}
+        <a href="{% url 'refresh_token' %}" class="btn btn-fill btn-success">Renew Token</a>
+        <a href="{% url 'delete_token' %}" class="btn btn-fill btn-danger">Delete Token</a>
+        {% else %}
+        <a href="{% url 'generate_token' %}" class="btn btn-fill btn-success">Generate Token</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="notes card">
+      <div class="card-header">
+        <h2 class="card-title">
+          GI-DAMPs API Endpoint
+        </h2>
+      </div>
+      <div class="card-body">
+      <p>The GI-DAMPs api endpoint is available at: <a href="/api/gidamps/" target="_blank"><pre>https://samples.musicstudy.uk/api/gidamps/</pre></a>
+      </p>
+      
+      <p>This endpoint will return every sample in json format that has a patient ID beginning with "GID" (including fully used samples). Authorization is by token authentication.
+        To authenticate with the endpoint, include the http header: <pre>Authorization: Token {{ request.user.auth_token }}</pre>
+      </p>
+      <p>Full guide to API authorization <a href="https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication" target="_blank" rel="noopener">here</a>.</p>
+      </div>
+  </div>
+</div>
+
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

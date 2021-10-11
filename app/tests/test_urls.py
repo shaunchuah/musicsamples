@@ -115,3 +115,7 @@ class TestUrls(SimpleTestCase):
     def test_barcode_samples_used_url_resolves(self):
         url = reverse("barcode_samples_used")
         self.assertEqual(resolve(url).func, views.barcode_samples_used)
+
+    def test_data_export_url_resolves(self):
+        url = reverse("data_export")
+        self.assertEqual(resolve(url).func, views.data_export)

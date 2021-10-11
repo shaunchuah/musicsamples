@@ -44,6 +44,13 @@
         </a>
       </li>
 
+      <li class="{% if request.path == '/data_export/' %}active{% endif %}">
+        <a href="{% url 'data_export' %}">
+          <i class="tim-icons icon-upload"></i>
+          <p>Data Export</p>
+        </a>
+      </li>
+
       
     </ul>
     <!-- Deprecated 13 Sep 2021

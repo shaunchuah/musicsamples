@@ -15,6 +15,7 @@ from django.views.decorators.cache import cache_page
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from rest_framework import permissions, viewsets
+from rest_framework.decorators import api_view
 from taggit.models import Tag
 
 from .forms import (
@@ -32,6 +33,7 @@ from .serializers import (
     MultipleSampleSerializer,
     SampleIsFullyUsedSerializer,
     SampleSerializer,
+    SampleExportSerializer,
 )
 
 User = get_user_model()
@@ -159,6 +161,11 @@ def account(request):
     )
     context = {"sample_list": sample_list}
     return render(request, "account.html", context)
+
+
+@login_required(login_url="/login/")
+def data_export(request):
+    return render(request, "data_export.html")
 
 
 @login_required(login_url="/login/")
@@ -939,7 +946,6 @@ class SampleViewSet(viewsets.ModelViewSet):
 
     queryset = Sample.objects.filter(is_deleted=False)
     serializer_class = SampleSerializer
-    permission_classes = [permissions.IsAuthenticated]
     lookup_field = "musicsampleid"
     filterset_fields = ["sample_type"]
 
@@ -947,15 +953,20 @@ class SampleViewSet(viewsets.ModelViewSet):
 class SampleIsFullyUsedViewSet(viewsets.ModelViewSet):
     queryset = Sample.objects.filter(is_deleted=False)
     serializer_class = SampleIsFullyUsedSerializer
-    permission_classes = [permissions.IsAuthenticated]
     lookup_field = "musicsampleid"
 
 
 class MultipleSampleViewSet(viewsets.ModelViewSet):
     queryset = Sample.objects.filter(is_deleted=False)
     serializer_class = MultipleSampleSerializer
-    permission_classes = [permissions.IsAuthenticated]
     lookup_field = "musicsampleid"
+
+
+class SampleExportViewset(viewsets.ModelViewSet):
+    queryset = Sample.objects.filter(is_deleted=False).filter(patientid__startswith="GID")
+    serializer_class = SampleExportSerializer
+    lookup_field = "musicsampleid"
+    filterset_fields = ["sample_type"]
 
 
 @login_required(login_url="/login/")
