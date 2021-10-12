@@ -62,6 +62,18 @@
         To authenticate with the endpoint, include the http header: <pre>Authorization: Token {{ request.user.auth_token }}</pre>
       </p>
       <p>Full guide to API authorization <a href="https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication" target="_blank" rel="noopener">here</a>.</p>
+      <h3>Python Example</h3>
+      <pre>
+import requests
+
+GTRAC_API_TOKEN = {{ request.user.auth_token }} 
+# Don't commit this to git! 
+# Read this key in from an external file and exclude that file from git
+
+authorization_header = {'Authorization': f'Token {GTRAC_API_TOKEN}'}
+response = requests.get(https://samples.musicstudy.uk/api/gidamps/, headers = authorization_header, timeout=20)
+data = response.json()
+      </pre>
       </div>
   </div>
 </div>
