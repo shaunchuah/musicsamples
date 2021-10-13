@@ -1,6 +1,6 @@
 # G-Trac
 
-Open source lab sample inventory tracking system and electronic lab notebook created with [Django](https://www.djangoproject.com) to support clinical research in Scotland.
+Open source lab sample inventory tracking system created with [Django](https://www.djangoproject.com) to support clinical research in Scotland.
 
 ![G-Trac](g-trac.gif)
 
