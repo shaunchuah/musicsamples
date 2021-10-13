@@ -30,7 +30,7 @@ class MultipleSampleSerializer(serializers.HyperlinkedModelSerializer):
             "sample_id",
             "sample_location",
             "sample_sublocation",
-            "patientid",
+            "patient_id",
             "sample_type",
             "haemolysis_reference",
             "biopsy_location",
@@ -50,7 +50,7 @@ class SampleExportSerializer(serializers.ModelSerializer):
         model = Sample
         fields = [
             "sample_id",
-            "patientid",
+            "patient_id",
             "sample_location",
             "sample_type",
             "sample_datetime",

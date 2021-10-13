@@ -43,7 +43,7 @@ class SampleForm(ModelForm):
             "sample_id",
             "sample_location",
             "sample_sublocation",
-            "patientid",
+            "patient_id",
             "sample_type",
             "haemolysis_reference",
             "biopsy_location",
@@ -161,7 +161,7 @@ class SampleForm(ModelForm):
         }
         labels = {
             "sample_id": "Sample ID*",
-            "patientid": "Patient ID*",
+            "patient_id": "Patient ID*",
             "sample_datetime": "Sampling Datetime*",
             "sample_location": "Sample Location*",
             "sample_sublocation": "Sample Sublocation",

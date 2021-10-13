@@ -7,7 +7,7 @@ from taggit.managers import TaggableManager
 
 class Sample(models.Model):
     sample_id = models.CharField(max_length=200, unique=True)
-    patientid = models.CharField(max_length=200)
+    patient_id = models.CharField(max_length=200)
     sample_location = models.CharField(max_length=200)
     sample_type = models.CharField(max_length=200)
     sample_datetime = models.DateTimeField()
@@ -36,7 +36,7 @@ class Sample(models.Model):
 
     def clean(self):
         self.sample_id = self.sample_id.upper()
-        self.patientid = self.patientid.upper()
+        self.patient_id = self.patient_id.upper()
 
     def __str__(self):
         return self.sample_id

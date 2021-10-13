@@ -130,7 +130,7 @@ def gid_overview(request):
             Sample.objects.filter(is_deleted=False)
             .filter(is_fully_used=False)
             .filter(sample_type=query)
-            .order_by("patientid")
+            .order_by("patient_id")
         )
     else:
         query = None
@@ -199,7 +199,7 @@ def used_samples_search(request):
         sample_list = (
             Sample.objects.filter(
                 Q(sample_id__icontains=query_string)
-                | Q(patientid__icontains=query_string)
+                | Q(patient_id__icontains=query_string)
                 | Q(sample_location__icontains=query_string)
                 | Q(sample_sublocation__icontains=query_string)
                 | Q(sample_type__icontains=query_string)
@@ -272,8 +272,8 @@ def sample_detail(request, pk):
     first_change = sample_history.first()
     related_notes = sample.note_set.filter(is_public=True)
     private_notes = sample.note_set.filter(is_public=False).filter(author=request.user)
-    if sample.patientid[0:3] == "GID":
-        gid_id = int(sample.patientid.split("-")[1])
+    if sample.patient_id[0:3] == "GID":
+        gid_id = int(sample.patient_id.split("-")[1])
     else:
         gid_id = None
     processing_time = None
@@ -329,7 +329,7 @@ def sample_search(request):
         sample_list = (
             Sample.objects.filter(
                 Q(sample_id__icontains=query_string)
-                | Q(patientid__icontains=query_string)
+                | Q(patient_id__icontains=query_string)
                 | Q(sample_location__icontains=query_string)
                 | Q(sample_sublocation__icontains=query_string)
                 | Q(sample_type__icontains=query_string)
@@ -488,7 +488,7 @@ def reactivate_sample(request, pk):
 #         .filter(is_deleted=False)
 #         .values_list(
 #             "sample_id",
-#             "patientid",
+#             "patient_id",
 #             "sample_location",
 #             "sample_type",
 #             "sample_datetime",
@@ -515,7 +515,7 @@ def export_excel(request):
         query_string = request.GET.get("q")
         samples_queryset = Sample.objects.filter(
             Q(sample_id__icontains=query_string)
-            | Q(patientid__icontains=query_string)
+            | Q(patient_id__icontains=query_string)
             | Q(sample_location__icontains=query_string)
             | Q(sample_type__icontains=query_string)
             | Q(sample_comments__icontains=query_string)
@@ -577,7 +577,7 @@ def export_excel(request):
         row_num += 1
         row = [
             sample.sample_id,
-            sample.patientid,
+            sample.patient_id,
             sample.sample_location,
             sample.sample_sublocation,
             sample.sample_type,
@@ -884,15 +884,15 @@ def autocomplete_patient_id(request):
     if "term" in request.GET:
         qs = (
             Sample.objects.filter(is_deleted=False)
-            .filter(patientid__icontains=request.GET.get("term"))
-            .values("patientid")
+            .filter(patient_id__icontains=request.GET.get("term"))
+            .values("patient_id")
             .distinct()
         )
     else:
-        qs = Sample.objects.filter(is_deleted=False).values("patientid").distinct()
+        qs = Sample.objects.filter(is_deleted=False).values("patient_id").distinct()
     patients = list()
     for sample in qs:
-        patients.append(sample["patientid"])
+        patients.append(sample["patient_id"])
     return JsonResponse(patients, safe=False)
 
 
@@ -963,7 +963,7 @@ class MultipleSampleViewSet(viewsets.ModelViewSet):
 
 class SampleExportViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Sample.objects.filter(is_deleted=False).filter(
-        patientid__startswith="GID"
+        patient_id__startswith="GID"
     )
     serializer_class = SampleExportSerializer
     lookup_field = "sample_id"
