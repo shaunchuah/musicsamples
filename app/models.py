@@ -6,7 +6,7 @@ from taggit.managers import TaggableManager
 
 
 class Sample(models.Model):
-    musicsampleid = models.CharField(max_length=200, unique=True)
+    sample_id = models.CharField(max_length=200, unique=True)
     patientid = models.CharField(max_length=200)
     sample_location = models.CharField(max_length=200)
     sample_type = models.CharField(max_length=200)
@@ -34,11 +34,11 @@ class Sample(models.Model):
     history = HistoricalRecords()
 
     def clean(self):
-        self.musicsampleid = self.musicsampleid.upper()
+        self.sample_id = self.sample_id.upper()
         self.patientid = self.patientid.upper()
 
     def __str__(self):
-        return self.musicsampleid
+        return self.sample_id
 
 
 class Note(models.Model):

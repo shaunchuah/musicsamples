@@ -409,7 +409,7 @@ Dashboard
       url: url_string,
       method: "post",
       data: {
-        'musicsampleid': $("#sample_id").val(),
+        'sample_id': $("#sample_id").val(),
         'sample_location': $('#id_sample_location').val(),
         'sample_sublocation': $('#id_sample_sublocation').val(),
         'patientid': $('#id_patientid').val(),
@@ -482,7 +482,7 @@ Dashboard
       }
     });
 
-    $("input#id_musicsampleid").focus();
+    $("input#id_sample_id").focus();
     $("input#id_sample_location").autocomplete({
       source: "/autocomplete/locations/",
     });

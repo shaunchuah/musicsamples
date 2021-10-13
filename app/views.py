@@ -198,7 +198,7 @@ def used_samples_search(request):
         query_string = request.GET.get("q")
         sample_list = (
             Sample.objects.filter(
-                Q(musicsampleid__icontains=query_string)
+                Q(sample_id__icontains=query_string)
                 | Q(patientid__icontains=query_string)
                 | Q(sample_location__icontains=query_string)
                 | Q(sample_sublocation__icontains=query_string)
@@ -328,7 +328,7 @@ def sample_search(request):
         query_string = request.GET.get("q")
         sample_list = (
             Sample.objects.filter(
-                Q(musicsampleid__icontains=query_string)
+                Q(sample_id__icontains=query_string)
                 | Q(patientid__icontains=query_string)
                 | Q(sample_location__icontains=query_string)
                 | Q(sample_sublocation__icontains=query_string)
@@ -487,7 +487,7 @@ def reactivate_sample(request, pk):
 #         Sample.objects.all()
 #         .filter(is_deleted=False)
 #         .values_list(
-#             "musicsampleid",
+#             "sample_id",
 #             "patientid",
 #             "sample_location",
 #             "sample_type",
@@ -514,7 +514,7 @@ def export_excel(request):
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
         samples_queryset = Sample.objects.filter(
-            Q(musicsampleid__icontains=query_string)
+            Q(sample_id__icontains=query_string)
             | Q(patientid__icontains=query_string)
             | Q(sample_location__icontains=query_string)
             | Q(sample_type__icontains=query_string)
@@ -576,7 +576,7 @@ def export_excel(request):
             processing_time = int(time_difference.total_seconds() / 60)
         row_num += 1
         row = [
-            sample.musicsampleid,
+            sample.sample_id,
             sample.patientid,
             sample.sample_location,
             sample.sample_sublocation,
@@ -836,7 +836,7 @@ def note_search(request):
         query_string = request.GET.get("q")
         notes = Note.objects.filter(
             Q(title__icontains=query_string)
-            | Q(sample_tags__musicsampleid__icontains=query_string)
+            | Q(sample_tags__sample_id__icontains=query_string)
             | Q(content__icontains=query_string)
         ).filter(is_deleted=False)
         context = {
@@ -945,20 +945,20 @@ class SampleViewSet(viewsets.ModelViewSet):
 
     queryset = Sample.objects.filter(is_deleted=False)
     serializer_class = SampleSerializer
-    lookup_field = "musicsampleid"
+    lookup_field = "sample_id"
     filterset_fields = ["sample_type"]
 
 
 class SampleIsFullyUsedViewSet(viewsets.ModelViewSet):
     queryset = Sample.objects.filter(is_deleted=False)
     serializer_class = SampleIsFullyUsedSerializer
-    lookup_field = "musicsampleid"
+    lookup_field = "sample_id"
 
 
 class MultipleSampleViewSet(viewsets.ModelViewSet):
     queryset = Sample.objects.filter(is_deleted=False)
     serializer_class = MultipleSampleSerializer
-    lookup_field = "musicsampleid"
+    lookup_field = "sample_id"
 
 
 class SampleExportViewset(viewsets.ReadOnlyModelViewSet):
@@ -966,7 +966,7 @@ class SampleExportViewset(viewsets.ReadOnlyModelViewSet):
         patientid__startswith="GID"
     )
     serializer_class = SampleExportSerializer
-    lookup_field = "musicsampleid"
+    lookup_field = "sample_id"
     filterset_fields = ["sample_type", "sample_location", "sample_sublocation"]
 
 

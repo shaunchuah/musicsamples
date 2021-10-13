@@ -47,7 +47,7 @@
             <td>
             {% for item in sample.list %}
             <a href="{% url 'sample_detail' pk=item.pk %}">
-              {{ item.musicsampleid }}<br />
+              {{ item.sample_id }}<br />
             </a>
             {% endfor %}      
             </td>

@@ -6,28 +6,28 @@ class SampleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Sample
         fields = [
-            "musicsampleid",
+            "sample_id",
             "sample_location",
             "sample_sublocation",
         ]
-        lookup_field = "musicsampleid"
+        lookup_field = "sample_id"
 
 
 class SampleIsFullyUsedSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Sample
         fields = [
-            "musicsampleid",
+            "sample_id",
             "is_fully_used",
         ]
-        lookup_field = "musicsampleid"
+        lookup_field = "sample_id"
 
 
 class MultipleSampleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Sample
         fields = [
-            "musicsampleid",
+            "sample_id",
             "sample_location",
             "sample_sublocation",
             "patientid",
@@ -42,14 +42,14 @@ class MultipleSampleSerializer(serializers.HyperlinkedModelSerializer):
             "sample_volume_units",
             "freeze_thaw_count",
         ]
-        lookup_field = "musicsampleid"
+        lookup_field = "sample_id"
 
 
 class SampleExportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sample
         fields = [
-            "musicsampleid",
+            "sample_id",
             "patientid",
             "sample_location",
             "sample_type",
@@ -69,4 +69,4 @@ class SampleExportSerializer(serializers.ModelSerializer):
             "data_first_created",
             "last_modified",
         ]
-        lookup_field = "musicsampleid"
+        lookup_field = "sample_id"

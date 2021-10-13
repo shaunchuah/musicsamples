@@ -203,7 +203,7 @@ def test_add_sample_post(auto_login_user):
     client, user = auto_login_user()
     path = reverse("sample_add")
     form_data = {
-        "musicsampleid": "test001",
+        "sample_id": "test001",
         "patientid": "patient001",
         "sample_location": "location001",
         "sample_type": "test_sample_type",
@@ -227,11 +227,11 @@ def test_add_sample_post(auto_login_user):
 
 def test_sample_detail_page(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", musicsampleid="TEST001")
+    mixer.blend("app.sample", sample_id="TEST001")
     path = reverse("sample_detail", kwargs={"pk": 1})
     response = client.get(path)
     assert (
-        response.context["sample"].musicsampleid == "TEST001"
+        response.context["sample"].sample_id == "TEST001"
     ), "Should create sample with ID TEST001 and retrieve sample detail view."
 
 
@@ -261,27 +261,27 @@ def test_sample_detail_linkage_to_redcap_db(auto_login_user):
 
 def test_sample_edit_page(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", musicsampleid="TEST002")
-    mixer.blend("app.sample", musicsampleid="TEST003")
+    mixer.blend("app.sample", sample_id="TEST002")
+    mixer.blend("app.sample", sample_id="TEST003")
     path = reverse("sample_edit", kwargs={"pk": 2})
     response = client.get(path)
     assertTemplateUsed(response, "samples/sample-add.html")
     assert (
-        response.context["form"].initial["musicsampleid"] == "TEST003"
+        response.context["form"].initial["sample_id"] == "TEST003"
     ), "Should create two separate sample instances and return the second one."
 
 
 def test_sample_search_page(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", musicsampleid="TEST002")
-    mixer.blend("app.sample", musicsampleid="TEST003")
-    mixer.blend("app.sample", musicsampleid="NO")
-    mixer.blend("app.sample", musicsampleid="DONOTRETURN")
+    mixer.blend("app.sample", sample_id="TEST002")
+    mixer.blend("app.sample", sample_id="TEST003")
+    mixer.blend("app.sample", sample_id="NO")
+    mixer.blend("app.sample", sample_id="DONOTRETURN")
     path = reverse("sample_search")
     response = client.get(path + "?q=TEST")
     assertTemplateUsed(response, "index.html")
     assert (
-        "TEST002" in response.context["sample_list"][0].musicsampleid
+        "TEST002" in response.context["sample_list"][0].sample_id
     ), "Should create a few objects, run a search and return 2 objects."
     assert (
         response.context["sample_list"].count() == 2
