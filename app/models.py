@@ -27,10 +27,11 @@ class Sample(models.Model):
     biopsy_location = models.CharField(max_length=100, blank=True, null=True)
     biopsy_inflamed_status = models.CharField(max_length=100, blank=True, null=True)
 
+    created = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=200)
-    last_modified_by = models.CharField(max_length=200)
-    data_first_created = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
+    last_modified_by = models.CharField(max_length=200)
+
     history = HistoricalRecords()
 
     def clean(self):

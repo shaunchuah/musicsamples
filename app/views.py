@@ -494,7 +494,7 @@ def reactivate_sample(request, pk):
 #             "sample_datetime",
 #             "sample_comments",
 #             "created_by",
-#             "data_first_created",
+#             "created",
 #             "last_modified_by",
 #             "last_modified",
 #         )
@@ -593,7 +593,7 @@ def export_excel(request):
             sample.sample_comments,
             sample.is_fully_used,
             sample.created_by,
-            sample.data_first_created,
+            sample.created,
             sample.last_modified_by,
             sample.last_modified,
         ]

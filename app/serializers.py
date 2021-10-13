@@ -66,7 +66,7 @@ class SampleExportSerializer(serializers.ModelSerializer):
             "biopsy_inflamed_status",
             "created_by",
             "last_modified_by",
-            "data_first_created",
+            "created",
             "last_modified",
         ]
         lookup_field = "sample_id"
