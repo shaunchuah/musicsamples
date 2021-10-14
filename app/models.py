@@ -6,8 +6,8 @@ from taggit.managers import TaggableManager
 
 
 class Sample(models.Model):
-    musicsampleid = models.CharField(max_length=200, unique=True)
-    patientid = models.CharField(max_length=200)
+    sample_id = models.CharField(max_length=200, unique=True)
+    patient_id = models.CharField(max_length=200)
     sample_location = models.CharField(max_length=200)
     sample_type = models.CharField(max_length=200)
     sample_datetime = models.DateTimeField()
@@ -27,18 +27,19 @@ class Sample(models.Model):
     biopsy_location = models.CharField(max_length=100, blank=True, null=True)
     biopsy_inflamed_status = models.CharField(max_length=100, blank=True, null=True)
 
+    created = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=200)
-    last_modified_by = models.CharField(max_length=200)
-    data_first_created = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
+    last_modified_by = models.CharField(max_length=200)
+
     history = HistoricalRecords()
 
     def clean(self):
-        self.musicsampleid = self.musicsampleid.upper()
-        self.patientid = self.patientid.upper()
+        self.sample_id = self.sample_id.upper()
+        self.patient_id = self.patient_id.upper()
 
     def __str__(self):
-        return self.musicsampleid
+        return self.sample_id
 
 
 class Note(models.Model):

@@ -12,8 +12,8 @@ class TestSampleForm:
 
 def test_sample_add_form():
     sample_data = {
-        "musicsampleid": "test001",
-        "patientid": "patient001",
+        "sample_id": "test001",
+        "patient_id": "patient001",
         "sample_location": "location001",
         "sample_type": "test_sample_type",
         "sample_datetime": "2020-01-01T13:20:30",
@@ -33,8 +33,8 @@ def test_sample_add_form():
 
 def test_sample_add_form_without_processing_time():
     sample_data = {
-        "musicsampleid": "test001",
-        "patientid": "patient001",
+        "sample_id": "test001",
+        "patient_id": "patient001",
         "sample_location": "location001",
         "sample_type": "test_sample_type",
         "sample_datetime": "2020-01-01T13:20:30",

@@ -203,8 +203,8 @@ def test_add_sample_post(auto_login_user):
     client, user = auto_login_user()
     path = reverse("sample_add")
     form_data = {
-        "musicsampleid": "test001",
-        "patientid": "patient001",
+        "sample_id": "test001",
+        "patient_id": "patient001",
         "sample_location": "location001",
         "sample_type": "test_sample_type",
         "sample_datetime": "2020-01-01T13:20:30",
@@ -220,18 +220,18 @@ def test_add_sample_post(auto_login_user):
     }
     response = client.post(path, data=form_data)
     assert (
-        Sample.objects.get(pk=1).patientid == "PATIENT001"
-    )  # should return patientid as uppercase as well
+        Sample.objects.get(pk=1).patient_id == "PATIENT001"
+    )  # should return patient_id as uppercase as well
     assert response.status_code == 302
 
 
 def test_sample_detail_page(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", musicsampleid="TEST001")
+    mixer.blend("app.sample", sample_id="TEST001")
     path = reverse("sample_detail", kwargs={"pk": 1})
     response = client.get(path)
     assert (
-        response.context["sample"].musicsampleid == "TEST001"
+        response.context["sample"].sample_id == "TEST001"
     ), "Should create sample with ID TEST001 and retrieve sample detail view."
 
 
@@ -251,7 +251,7 @@ def test_sample_detail_processing_datetime_logic(auto_login_user):
 
 def test_sample_detail_linkage_to_redcap_db(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", patientid="GID-312-P")
+    mixer.blend("app.sample", patient_id="GID-312-P")
     path = reverse("sample_detail", kwargs={"pk": 1})
     response = client.get(path)
     assert (
@@ -261,27 +261,27 @@ def test_sample_detail_linkage_to_redcap_db(auto_login_user):
 
 def test_sample_edit_page(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", musicsampleid="TEST002")
-    mixer.blend("app.sample", musicsampleid="TEST003")
+    mixer.blend("app.sample", sample_id="TEST002")
+    mixer.blend("app.sample", sample_id="TEST003")
     path = reverse("sample_edit", kwargs={"pk": 2})
     response = client.get(path)
     assertTemplateUsed(response, "samples/sample-add.html")
     assert (
-        response.context["form"].initial["musicsampleid"] == "TEST003"
+        response.context["form"].initial["sample_id"] == "TEST003"
     ), "Should create two separate sample instances and return the second one."
 
 
 def test_sample_search_page(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", musicsampleid="TEST002")
-    mixer.blend("app.sample", musicsampleid="TEST003")
-    mixer.blend("app.sample", musicsampleid="NO")
-    mixer.blend("app.sample", musicsampleid="DONOTRETURN")
+    mixer.blend("app.sample", sample_id="TEST002")
+    mixer.blend("app.sample", sample_id="TEST003")
+    mixer.blend("app.sample", sample_id="NO")
+    mixer.blend("app.sample", sample_id="DONOTRETURN")
     path = reverse("sample_search")
     response = client.get(path + "?q=TEST")
     assertTemplateUsed(response, "index.html")
     assert (
-        "TEST002" in response.context["sample_list"][0].musicsampleid
+        "TEST002" in response.context["sample_list"][0].sample_id
     ), "Should create a few objects, run a search and return 2 objects."
     assert (
         response.context["sample_list"].count() == 2
@@ -316,7 +316,7 @@ def test_sample_checkout_page(auto_login_user):
 
 def test_sample_delete(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", musicpatientid="TEST05")
+    mixer.blend("app.sample", musicpatient_id="TEST05")
     path = reverse("sample_delete", kwargs={"pk": 1})
 
     # Get the delete page first and check template is correct
@@ -535,8 +535,8 @@ def test_autocomplete_locations(auto_login_user):
 
 def test_autocomplete_patient_id(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.Sample", patientid="GID-123-P")
-    mixer.blend("app.Sample", patientid="GID-003-P")
+    mixer.blend("app.Sample", patient_id="GID-123-P")
+    mixer.blend("app.Sample", patient_id="GID-003-P")
     path = reverse("autocomplete_patients")
     response = client.get(path + "?term=GID-123")
     assert "GID-123-P" in json.loads(response.content)

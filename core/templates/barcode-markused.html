@@ -110,7 +110,7 @@ function submitScan(){
     url: url_string,
     method: 'put',
     data: {
-      'musicsampleid': $('#sample_id').val(),
+      'sample_id': $('#sample_id').val(),
       'is_fully_used': true,
     },
     success: function(result){

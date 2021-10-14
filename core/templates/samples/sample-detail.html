@@ -36,18 +36,18 @@
                 <tbody>
                   <tr>
                     <td>Sample ID</td>
-                    <td>{{ sample.musicsampleid }}</td>
+                    <td>{{ sample.sample_id }}</td>
                   </tr>
                   <tr>
                     <td>Patient ID</td>
                     <td>
            
                       {% if gid_id %}                        
-                        <a href="https://ecrf.igmm.ed.ac.uk/redcap_v10.0.30/DataEntry/record_home.php?pid=140&arm=1&id={{ gid_id }}" target="_blank" rel="noopener">{{ sample.patientid }} <i class="tim-icons icon-link-72"></i></a>
+                        <a href="https://ecrf.igmm.ed.ac.uk/redcap_v10.0.30/DataEntry/record_home.php?pid=140&arm=1&id={{ gid_id }}" target="_blank" rel="noopener">{{ sample.patient_id }} <i class="tim-icons icon-link-72"></i></a>
                         
                       {% else %}
                       
-                        {{ sample.patientid }}
+                        {{ sample.patient_id }}
 
                       {% endif %}
                     </td>
@@ -192,7 +192,7 @@
               <tbody>
                 <tr>
                   <td>First Registered</td>
-                  <td>{{ sample.data_first_created }}</td>
+                  <td>{{ sample.created }}</td>
                 </tr>
                 <tr>
                   <td>Created By</td>
@@ -250,7 +250,7 @@
               
               {% endfor %}
               <tr>
-                <td>{{ sample.data_first_created }}</td>
+                <td>{{ sample.created }}</td>
                 <td>First Created</td>
                 <td>{{ sample.created_by }}</td>
               </tr>

@@ -16,19 +16,19 @@ class TestNote:
         assert note.pk == 1, "Should create a new note with primary key id of 1."
 
 
-def test_return_musicsampleid():
-    sample = mixer.blend("app.Sample", musicsampleid="test001")
+def test_return_sample_id():
+    sample = mixer.blend("app.Sample", sample_id="test001")
     assert sample.__str__() == "test001"
 
 
 def test_sample_model_cleaning():
-    sample = mixer.blend("app.Sample", musicsampleid="test001")
+    sample = mixer.blend("app.Sample", sample_id="test001")
     sample.clean()
-    assert sample.musicsampleid == "TEST001"
+    assert sample.sample_id == "TEST001"
 
 
 def test_sample_cleaning_and_returning():
-    sample = mixer.blend("app.Sample", musicsampleid="test002")
+    sample = mixer.blend("app.Sample", sample_id="test002")
     sample.clean()
     assert sample.__str__() == "TEST002"
 

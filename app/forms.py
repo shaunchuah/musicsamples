@@ -40,10 +40,10 @@ class SampleForm(ModelForm):
     class Meta:
         model = Sample
         fields = [
-            "musicsampleid",
+            "sample_id",
             "sample_location",
             "sample_sublocation",
-            "patientid",
+            "patient_id",
             "sample_type",
             "haemolysis_reference",
             "biopsy_location",
@@ -160,8 +160,8 @@ class SampleForm(ModelForm):
             ),
         }
         labels = {
-            "musicsampleid": "Sample ID*",
-            "patientid": "Patient ID*",
+            "sample_id": "Sample ID*",
+            "patient_id": "Patient ID*",
             "sample_datetime": "Sampling Datetime*",
             "sample_location": "Sample Location*",
             "sample_sublocation": "Sample Sublocation",
@@ -242,7 +242,7 @@ class NoteForm(ModelForm):
             "tags": TagWidget(attrs={"data-role": "tagsinput"}),
             "is_public": forms.Select(choices=((False, "Private"), (True, "Shared"))),
             "sample_tags": ModelSelect2MultipleWidget(
-                model=Sample, search_fields=["musicsampleid__icontains"]
+                model=Sample, search_fields=["sample_id__icontains"]
             ),
         }
         labels = {
