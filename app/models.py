@@ -9,20 +9,20 @@ class Sample(models.Model):
     sample_id = models.CharField(max_length=200, unique=True)
     patient_id = models.CharField(max_length=200)
     sample_location = models.CharField(max_length=200)
+    sample_sublocation = models.CharField(max_length=200, blank=True, null=True)
     sample_type = models.CharField(max_length=200)
     sample_datetime = models.DateTimeField()
     sample_comments = models.TextField(blank=True, null=True)
+
     is_deleted = models.BooleanField(default=False)
+    is_fully_used = models.BooleanField(default=False)
+
     processing_datetime = models.DateTimeField(blank=True, null=True)
     sample_volume = models.DecimalField(
         max_digits=10, decimal_places=3, blank=True, null=True
     )
     sample_volume_units = models.CharField(max_length=30, blank=True, null=True)
     freeze_thaw_count = models.IntegerField(default=0)
-
-    sample_sublocation = models.CharField(max_length=200, blank=True, null=True)
-    is_fully_used = models.BooleanField(default=False)
-
     haemolysis_reference = models.CharField(max_length=200, blank=True, null=True)
     biopsy_location = models.CharField(max_length=100, blank=True, null=True)
     biopsy_inflamed_status = models.CharField(max_length=100, blank=True, null=True)
