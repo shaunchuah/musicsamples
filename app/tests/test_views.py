@@ -567,3 +567,14 @@ def test_autocomplete_tags(auto_login_user):
     response_3 = client.get(path)
     assert "tag1" in json.loads(response_3.content)
     assert "Test2" in json.loads(response_3.content)
+
+
+# Test Data Export Views
+
+def test_gidamps_export_csv_view(auto_login_user):
+    client, user = auto_login_user()
+    path = reverse("gidamps_export_csv")
+    response = client.get(path)
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'text/csv'
+    assert "attachment" in response['Content-Disposition']

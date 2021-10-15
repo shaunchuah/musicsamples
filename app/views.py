@@ -3,7 +3,7 @@ import datetime
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 
-# import csv
+import csv
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Count, Q
@@ -606,6 +606,60 @@ def export_excel(request):
     workbook.save(response)
     return response
 
+
+@login_required(login_url="/login/")
+def gidamps_export_csv(request):
+    # Export samples beginning with GID- to csv file
+    response = HttpResponse(content_type="text/csv")
+    response[
+        "Content-Disposition"
+    ] = 'attachment; filename="gidamps_samples_%s.csv"' % datetime.datetime.now().strftime(  # noqa E501
+        "%d-%b-%Y"
+    )
+    writer = csv.writer(response)
+    writer.writerow(
+        [
+            "sample_id",
+            "patient_id",
+            "sample_type",
+            "sample_location",
+            "sample_sublocation",
+            "sample_datetime",
+            "sample_comments",
+            "is_fully_used",
+            "processing_datetime",
+            "sample_volume",
+            "sample_volume_units",
+            "freeze_thaw_count",
+            "haemolysis_reference",
+            "biopsy_location",
+            "biopsy_inflamed_status"
+        ]
+    )
+    samples = (
+        Sample.objects.filter(is_deleted=False)
+        .filter(patient_id__startswith='GID')
+        .values_list(
+            "sample_id",
+            "patient_id",
+            "sample_type",
+            "sample_location",
+            "sample_sublocation",
+            "sample_datetime",
+            "sample_comments",
+            "is_fully_used",
+            "processing_datetime",
+            "sample_volume",
+            "sample_volume_units",
+            "freeze_thaw_count",
+            "haemolysis_reference",
+            "biopsy_location",
+            "biopsy_inflamed_status"
+        )
+    )
+    for sample in samples:
+        writer.writerow(sample)
+    return response
 
 ############################################################################
 # NOTES SECTION ############################################################
