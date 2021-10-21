@@ -23,6 +23,7 @@ urlpatterns = [
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
+    path("filter/", views.filter, name="filter"),
     path("analytics/", views.analytics, name="analytics"),
     path("analytics/gid_overview", views.gid_overview, name="gid_overview"),
     path("reference/", views.reference, name="reference"),
