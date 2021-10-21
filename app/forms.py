@@ -6,6 +6,13 @@ from django_select2.forms import ModelSelect2MultipleWidget
 from taggit.forms import TagWidget
 
 from .models import Note, Sample
+from .choices import (
+    SAMPLE_TYPE_CHOICES,
+    SAMPLE_VOLUME_UNIT_CHOICES,
+    HAEMOLYSIS_REFERENCE_CHOICES,
+    BIOPSY_LOCATION_CHOICES,
+    BIOPSY_INFLAMED_STATUS_CHOICES,
+)
 
 
 class DateTimeInput(forms.DateTimeInput):
@@ -55,98 +62,6 @@ class SampleForm(ModelForm):
             "sample_volume_units",
             "freeze_thaw_count",
         ]
-
-        # Customise dropdown select fields to ensure consistent data input
-        HAEMOLYSIS_REFERENCE_CHOICES = (
-            ("", "Select category"),
-            ("0", "Minimal"),
-            ("20", "20 mg/dL"),
-            ("50", "50 mg/dL"),
-            ("100", "100 mg/dL (unusable)"),
-            ("250", "250 mg/dL (unusable)"),
-            ("500", "500 mg/dL (unusable)"),
-            ("1000", "1000 mg/dL (unusable)"),
-        )
-        BIOPSY_LOCATION_CHOICES = (
-            ("", "Select biopsy location"),
-            ("Terminal ileum", "Terminal ileum"),
-            ("Caecum", "Caecum"),
-            ("Ascending colon", "Ascending colon"),
-            ("Transverse colon", "Transverse colon"),
-            ("Descending colon", "Descending colon"),
-            ("Sigmoid colon", "Sigmoid colon"),
-            ("Rectum", "Rectum"),
-            ("Right colon", "Right colon"),
-            ("Left colon", "Left colon"),
-        )
-        BIOPSY_INFLAMED_STATUS_CHOICES = (
-            ("", "Select inflamed status"),
-            ("inflamed", "Inflamed"),
-            ("uninflamed", "Uninflamed"),
-            ("healthy", "Healthy"),
-        )
-        SAMPLE_VOLUME_UNIT_CHOICES = (
-            ("", "Select unit"),
-            ("ml", "ml"),
-            ("ul", "ul"),
-        )
-        SAMPLE_TYPE_CHOICES = (
-            ("", "Select type"),
-            (
-                "Standard EDTA tube",
-                (
-                    ("Standard EDTA tube", "Standard EDTA tube"),
-                    ("EDTA plasma child aliquot", "EDTA plasma child aliquot"),
-                ),
-            ),
-            (
-                "PaxGene ccfDNA tube",
-                (
-                    ("PaxGene ccfDNA tube", "PaxGene ccfDNA tube"),
-                    (
-                        "PaxGene ccfDNA plasma child aliquot",
-                        "PaxGene ccfDNA plasma child aliquot",
-                    ),
-                    (
-                        "PaxGene ccfDNA extracted cfDNA",
-                        "PaxGene ccfDNA extracted cfDNA",
-                    ),
-                ),
-            ),
-            (
-                "PaxGene RNA tube",
-                (
-                    ("PaxGene RNA tube", "PaxGene RNA tube"),
-                    ("PaxGene RNA child aliquot", "PaxGene RNA child aliquot"),
-                ),
-            ),
-            (
-                "Standard Gel/Serum tube",
-                (
-                    ("Standard gel tube", "Standard gel tube"),
-                    ("Serum child aliquot", "Serum child aliquot"),
-                ),
-            ),
-            (
-                "Tissue/Biopsy",
-                (
-                    ("Formalin biopsy", "Formalin biopsy"),
-                    ("RNAlater biopsy", "RNAlater biopsy"),
-                    ("Paraffin tissue block", "Paraffin tissue block"),
-                ),
-            ),
-            (
-                "Stool",
-                (
-                    ("Calprotectin", "Calprotectin"),
-                    ("FIT", "FIT"),
-                    ("OmniGut", "Omnigut"),
-                    ("Stool supernatant", "Stool supernatant"),
-                ),
-            ),
-            ("Saliva", (("Saliva", "Saliva"),)),
-            ("Other", (("Other", "Other please specify in comments"),)),
-        )
         widgets = {
             "sample_type": forms.Select(choices=SAMPLE_TYPE_CHOICES),
             "sample_datetime": DateTimeInput(),
