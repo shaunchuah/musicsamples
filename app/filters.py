@@ -17,7 +17,7 @@ class SampleFilter(django_filters.FilterSet):
         label="Sample Date Range",
     )
     sample_comments = django_filters.CharFilter(
-        lookup_expr="icontains", label="Sample Comments Contains"
+        lookup_expr="icontains", label="Sample Comments"
     )
     sample_volume = django_filters.NumberFilter(label="Sample Volume")
 
@@ -29,7 +29,7 @@ class SampleFilter(django_filters.FilterSet):
             "sample_sublocation",
             "sample_type",
             "is_fully_used",
-            "sample_datetime",
             "sample_comments",
             "sample_volume",
+            "sample_datetime",
         ]
