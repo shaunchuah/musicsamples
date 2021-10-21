@@ -142,7 +142,7 @@
                 <li class="page-item">
                   <a
                     class="page-link"
-                    href="?page={{ sample_list.previous_page_number }}"
+                    href="?page={{ sample_list.previous_page_number }}{{ parameter_string }}"
                     >&laquo;</a
                   >
                 </li>
@@ -160,7 +160,7 @@
                 </li>
                 {% else %}
                 <li class="page-item">
-                  <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                  <a class="page-link" href="?page={{ i }}{{ parameter_string }}">{{ i }}</a>
                 </li>
                 {% endif %}
                 {% endfor %}
@@ -168,7 +168,7 @@
                 <li class="page-item">
                   <a
                     class="page-link"
-                    href="?page={{ sample_list.next_page_number }}"
+                    href="?page={{ sample_list.next_page_number }}{{ parameter_string }}"
                     >&raquo;</a
                   >
                 </li>

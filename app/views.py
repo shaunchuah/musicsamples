@@ -38,6 +38,8 @@ from .filters import SampleFilter
 
 User = get_user_model()
 
+SAMPLE_PAGINATION_SIZE = 100
+
 
 @login_required(login_url="/login/")
 def index(request):
@@ -50,7 +52,7 @@ def index(request):
     )
     sample_count = sample_list.count()
     page = request.GET.get("page", 1)
-    paginator = Paginator(sample_list, 100)
+    paginator = Paginator(sample_list, SAMPLE_PAGINATION_SIZE)
     try:
         samples = paginator.page(page)
     except PageNotAnInteger:
@@ -63,14 +65,34 @@ def index(request):
 
 @login_required(login_url="/login/")
 def filter(request):
+    # Perform filtering
     all_samples = Sample.objects.all()
     sample_filter = SampleFilter(request.GET, queryset=all_samples)
     sample_list = sample_filter.qs
     sample_count = sample_list.count()
+
+    # Pagination
+    page = request.GET.get("page", 1)
+    paginator = Paginator(sample_list, SAMPLE_PAGINATION_SIZE)
+    try:
+        samples = paginator.page(page)
+    except PageNotAnInteger:
+        samples = paginator.page(1)
+    except EmptyPage:
+        samples = paginator.page(paginator.num_pages)
+
+    # Allows paginator to reconstruct the initial query string
+    parameter_string = ""
+    for i in request.GET:
+        if i != "page":
+            val = request.GET.get(i)
+            parameter_string += f"&{i}={val}"
+
     context = {
-        "sample_list": sample_list,
+        "sample_list": samples,
         "sample_count": sample_count,
         "sample_filter": sample_filter,
+        "parameter_string": parameter_string,
     }
     return render(request, "filter.html", context)
 
