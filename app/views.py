@@ -67,16 +67,8 @@ def filter(request):
     sample_filter = SampleFilter(request.GET, queryset=all_samples)
     sample_list = sample_filter.qs
     sample_count = sample_list.count()
-    page = request.GET.get("page", 1)
-    paginator = Paginator(sample_list, 100)
-    try:
-        samples = paginator.page(page)
-    except PageNotAnInteger:
-        samples = paginator.page(1)
-    except EmptyPage:
-        samples = paginator.page(paginator.num_pages)
     context = {
-        "sample_list": samples,
+        "sample_list": sample_list,
         "sample_count": sample_count,
         "sample_filter": sample_filter,
     }
