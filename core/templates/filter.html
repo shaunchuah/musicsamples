@@ -1,7 +1,10 @@
-{% extends "layouts/base.html" %} {% block title %} Dashboard {% endblock %}
+{% extends "layouts/base.html" %}
+{% block title %} Dashboard {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %} {% block content %}
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
 
 <div class="row">
   <div class="col">
@@ -9,20 +12,33 @@
       <div class="card-header"><h3 class="card-title">Filter Samples</h3></div>
       <div class="card-body">
         <form id="searchform" method="GET">
-          
           {% load widget_tweaks %}
-          <div class="row">
-          {% for field in sample_filter.form %}
-          
-          <div class="col-md-3">
-          <div class="form-group">
-              {{ field.label_tag }}
-              {% render_field field class="form-control" %}
-          </div>
-          </div>
+            <div class="row">
+            {% for field in sample_filter.form %}
 
-          {% endfor %}
-          </div>
+              {% if field.name == 'sample_datetime' %}
+              
+                <div class="col-md-3">
+                {{ field.label_tag }}
+                  <div class="d-flex flex-row align-items-center">
+
+                     {% render_field field class="form-control" %}
+
+                  </div>
+                </div>
+              
+              {% else %}
+                
+                <div class="col-md-3">
+                  <div class="form-group">
+                    {{ field.label_tag }} {% render_field field class="form-control" %}
+                  </div>
+                </div>
+                
+              {% endif %}
+            {% endfor %}
+            </div>
+          
           <div class="card-footer">
             <button type="submit" class="btn btn-fill btn-success">
               Filter
@@ -32,8 +48,6 @@
             >
           </div>
         </form>
-
-        
       </div>
     </div>
   </div>
@@ -68,7 +82,8 @@
               </tr>
             </thead>
             <tbody>
-              {% if sample_list %} {% for sample in sample_list %}
+              {% if sample_list %}
+              {% for sample in sample_list %}
               <tr>
                 <td>{{ sample.sample_id }}</td>
                 <td>{{ sample.patient_id }}</td>
@@ -102,17 +117,16 @@
                 </td>
                 <td class="text-center">
                   <a href="{% url 'sample_fully_used' pk=sample.pk %}"
-                    ><i class="tim-icons icon-send align-center"></i></a
-                  >
+                    ><i class="tim-icons icon-send align-center"></i
+                  ></a>
                 </td>
                 <td class="text-center">
                   <a href="{% url 'sample_delete' pk=sample.pk %}"
-                    ><i class="tim-icons icon-trash-simple align-center"></i></a
-                  >
+                    ><i class="tim-icons icon-trash-simple align-center"></i
+                  ></a>
                 </td>
               </tr>
-              {% endfor %} 
-              {% else %}
+              {% endfor %} {% else %}
               <tr>
                 <td colspan="12" align="center">No active samples found.</td>
               </tr>
@@ -136,7 +150,7 @@
                 <li class="page-item disabled">
                   <span class="page-link">&laquo;</span>
                 </li>
-                {% endif %} 
+                {% endif %}
                 {% for i in sample_list.paginator.page_range %} 
                 {% if sample_list.number == i %}
                 <li class="page-item active">
@@ -148,7 +162,9 @@
                 <li class="page-item">
                   <a class="page-link" href="?page={{ i }}">{{ i }}</a>
                 </li>
-                {% endif %} {% endfor %} {% if sample_list.has_next %}
+                {% endif %}
+                {% endfor %}
+                {% if sample_list.has_next %}
                 <li class="page-item">
                   <a
                     class="page-link"
@@ -176,13 +192,20 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script>
-$(document).ready(function(){
-  $('[data-toggle="tooltip"]').tooltip();
-  $("#mainTable").tablesorter({
-    sortReset   : true,
-    dateFormat : "ddmmyyyy",
-    headers: { 5: {sorter: 'shortDate'}, 7: {sorter: false}, 8: {sorter: false}, 9: {sorter: false}, 10: {sorter: false}, 11: {sorter: false} },
+  $(document).ready(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+    $("#mainTable").tablesorter({
+      sortReset: true,
+      dateFormat: "ddmmyyyy",
+      headers: {
+        5: { sorter: "shortDate" },
+        7: { sorter: false },
+        8: { sorter: false },
+        9: { sorter: false },
+        10: { sorter: false },
+        11: { sorter: false },
+      },
+    });
   });
-});
 </script>
 {% endblock javascripts %}
