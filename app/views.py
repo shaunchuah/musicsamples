@@ -50,7 +50,7 @@ def index(request):
     )
     sample_count = sample_list.count()
     page = request.GET.get("page", 1)
-    paginator = Paginator(sample_list, 50)
+    paginator = Paginator(sample_list, 100)
     try:
         samples = paginator.page(page)
     except PageNotAnInteger:
@@ -68,7 +68,7 @@ def filter(request):
     sample_list = sample_filter.qs
     sample_count = sample_list.count()
     page = request.GET.get("page", 1)
-    paginator = Paginator(sample_list, 10)
+    paginator = Paginator(sample_list, 100)
     try:
         samples = paginator.page(page)
     except PageNotAnInteger:
