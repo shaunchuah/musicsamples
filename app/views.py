@@ -34,6 +34,7 @@ from .serializers import (
     SampleSerializer,
     SampleExportSerializer,
 )
+from .filters import SampleFilter
 
 User = get_user_model()
 
@@ -58,6 +59,28 @@ def index(request):
         samples = paginator.page(paginator.num_pages)
     context = {"sample_list": samples, "sample_count": sample_count}
     return render(request, "index.html", context)
+
+
+@login_required(login_url="/login/")
+def filter(request):
+    all_samples = Sample.objects.all()
+    sample_filter = SampleFilter(request.GET, queryset=all_samples)
+    sample_list = sample_filter.qs
+    sample_count = sample_list.count()
+    page = request.GET.get("page", 1)
+    paginator = Paginator(sample_list, 10)
+    try:
+        samples = paginator.page(page)
+    except PageNotAnInteger:
+        samples = paginator.page(1)
+    except EmptyPage:
+        samples = paginator.page(paginator.num_pages)
+    context = {
+        "sample_list": samples,
+        "sample_count": sample_count,
+        "sample_filter": sample_filter,
+    }
+    return render(request, "filter.html", context)
 
 
 @login_required(login_url="/login/")
@@ -633,12 +656,12 @@ def gidamps_export_csv(request):
             "freeze_thaw_count",
             "haemolysis_reference",
             "biopsy_location",
-            "biopsy_inflamed_status"
+            "biopsy_inflamed_status",
         ]
     )
     samples = (
         Sample.objects.filter(is_deleted=False)
-        .filter(patient_id__startswith='GID')
+        .filter(patient_id__startswith="GID")
         .values_list(
             "sample_id",
             "patient_id",
@@ -654,12 +677,13 @@ def gidamps_export_csv(request):
             "freeze_thaw_count",
             "haemolysis_reference",
             "biopsy_location",
-            "biopsy_inflamed_status"
+            "biopsy_inflamed_status",
         )
     )
     for sample in samples:
         writer.writerow(sample)
     return response
+
 
 ############################################################################
 # NOTES SECTION ############################################################

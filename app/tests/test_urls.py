@@ -123,3 +123,7 @@ class TestUrls(SimpleTestCase):
     def test_gidamps_export_csv_url(self):
         url = reverse("gidamps_export_csv")
         self.assertEqual(resolve(url).func, views.gidamps_export_csv)
+
+    def test_filter_url(self):
+        url = reverse("filter")
+        self.assertEqual(resolve(url).func, views.filter)
