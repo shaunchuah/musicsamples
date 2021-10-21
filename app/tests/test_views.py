@@ -86,7 +86,7 @@ def test_index_pagination_empty_page(auto_login_user):
 
 def test_index_pagination(auto_login_user):
     client, user = auto_login_user()
-    number_of_samples = 60
+    number_of_samples = 120
     for i in range(number_of_samples):
         mixer.blend("app.Sample")
     path = reverse("home") + "?page=1"
