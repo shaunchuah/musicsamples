@@ -1040,17 +1040,33 @@ class SampleViewSet(viewsets.ModelViewSet):
     lookup_field = "sample_id"
     filterset_fields = ["sample_type"]
 
+    def perform_update(self, serializer):
+        serializer.save(
+            last_modified_by=self.request.user.username,
+        )
+
 
 class SampleIsFullyUsedViewSet(viewsets.ModelViewSet):
     queryset = Sample.objects.filter(is_deleted=False)
     serializer_class = SampleIsFullyUsedSerializer
     lookup_field = "sample_id"
 
+    def perform_update(self, serializer):
+        serializer.save(
+            last_modified_by=self.request.user.username,
+        )
+
 
 class MultipleSampleViewSet(viewsets.ModelViewSet):
     queryset = Sample.objects.filter(is_deleted=False)
     serializer_class = MultipleSampleSerializer
     lookup_field = "sample_id"
+
+    def perform_create(self, serializer):
+        serializer.save(
+            created_by=self.request.user.username,
+            last_modified_by=self.request.user.username,
+        )
 
 
 class SampleExportViewset(viewsets.ReadOnlyModelViewSet):
