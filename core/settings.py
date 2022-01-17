@@ -4,6 +4,7 @@ import os
 import sentry_sdk
 from decouple import Csv, config
 from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
 from unipath import Path
 
 # import dj_database_url
@@ -11,7 +12,7 @@ from unipath import Path
 
 sentry_sdk.init(
     dsn="https://565f64fc7bea4af39487c5f0edcdab0b@o482942.ingest.sentry.io/5533900",
-    integrations=[DjangoIntegration()],
+    integrations=[DjangoIntegration(), RedisIntegration()],
     traces_sample_rate=1.0,
     # If you wish to associate users to errors (assuming you are using
     # django.contrib.auth) you may enable sending PII data.
