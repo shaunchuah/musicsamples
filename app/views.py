@@ -118,6 +118,7 @@ def analytics(request):
     samples_by_month = (
         Sample.objects.all()
         .filter(is_deleted=False, sample_datetime__gte=twelve_months_previous_date)
+        .order_by()
         .annotate(sample_month=Trunc("sample_datetime", "month"))
         .values("sample_month")
         .annotate(sample_count=Count("id"))
@@ -156,6 +157,7 @@ def gid_overview(request):
     sample_categories = (
         Sample.objects.filter(is_deleted=False)
         .filter(is_fully_used=False)
+        .order_by()
         .values("sample_type")
         .distinct()
     )
@@ -958,12 +960,16 @@ def autocomplete_locations(request):
         qs = (
             Sample.objects.filter(is_deleted=False)
             .filter(sample_location__icontains=request.GET.get("term"))
+            .order_by()
             .values("sample_location")
             .distinct()
         )
     else:
         qs = (
-            Sample.objects.filter(is_deleted=False).values("sample_location").distinct()
+            Sample.objects.filter(is_deleted=False)
+            .order_by()
+            .values("sample_location")
+            .distinct()
         )
     locations = list()
     for sample in qs:
@@ -978,11 +984,17 @@ def autocomplete_patient_id(request):
         qs = (
             Sample.objects.filter(is_deleted=False)
             .filter(patient_id__icontains=request.GET.get("term"))
+            .order_by()
             .values("patient_id")
             .distinct()
         )
     else:
-        qs = Sample.objects.filter(is_deleted=False).values("patient_id").distinct()
+        qs = (
+            Sample.objects.filter(is_deleted=False)
+            .order_by()
+            .values("patient_id")
+            .distinct()
+        )
     patients = list()
     for sample in qs:
         patients.append(sample["patient_id"])
@@ -996,11 +1008,12 @@ def autocomplete_tags(request):
     if "term" in request.GET:
         tags = (
             Tag.objects.filter(name__icontains=request.GET.get("term"))
+            .order_by()
             .values("name")
             .distinct()
         )
     else:
-        tags = Tag.objects.values("name").distinct()
+        tags = Tag.objects.order_by().values("name").distinct()
     tag_list = list()
     for tag in tags:
         tag_list.append(tag["name"])
