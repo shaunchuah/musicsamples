@@ -1,9 +1,8 @@
+import csv
 import datetime
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-
-import csv
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Count, Q
@@ -17,6 +16,7 @@ from openpyxl.utils import get_column_letter
 from rest_framework import viewsets
 from taggit.models import Tag
 
+from .filters import SampleFilter
 from .forms import (
     CheckoutForm,
     DeleteForm,
@@ -30,11 +30,10 @@ from .forms import (
 from .models import Note, Sample
 from .serializers import (
     MultipleSampleSerializer,
+    SampleExportSerializer,
     SampleIsFullyUsedSerializer,
     SampleSerializer,
-    SampleExportSerializer,
 )
-from .filters import SampleFilter
 
 User = get_user_model()
 
@@ -1075,12 +1074,19 @@ class SampleExportViewset(viewsets.ReadOnlyModelViewSet):
     )
     serializer_class = SampleExportSerializer
     lookup_field = "sample_id"
-    filterset_fields = ["sample_type", "sample_location", "sample_sublocation"]
 
 
 class AllSampleExportViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Sample.objects.filter(is_deleted=False)
     serializer_class = SampleExportSerializer
+    lookup_field = "sample_id"
+
+    def get_queryset(self):
+        queryset = self.queryset
+        patient_id_starts_with = self.request.query_params.get("patient_id_starts_with")
+        if patient_id_starts_with is not None:
+            queryset = queryset.filter(patient_id__istartswith=patient_id_starts_with)
+        return queryset
 
 
 @login_required(login_url="/login/")

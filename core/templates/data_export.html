@@ -1,13 +1,13 @@
 {% extends 'layouts/base.html' %}
 
-{% block title %} Page User {% endblock %} 
+{% block title %} Page User {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
 
 {% block content %}
 
-<div class="row">  
+<div class="row">
   <div class="col-lg-8">
 
   <h2><i class="tim-icons icon-upload"></i> Data Export</h2>
@@ -18,8 +18,8 @@
       <div class="card-body">
         <div class="row">
           <div class="col">
-            <p>This will allow you to programmatically access G-trac data from the api endpoints listed here. This API token does not expire so please delete it if you no longer require access.            
-            </p>            
+            <p>This will allow you to programmatically access G-trac data from the api endpoints listed here. This API token does not expire so please delete it if you no longer require access.
+            </p>
           </div>
         </div>
         <div class="row">
@@ -33,7 +33,7 @@
       </div>
       <div class="card-footer">
         <!--<button type="submit" class="btn btn-fill btn-primary">Save</button>-->
-        
+
         {% if request.user.auth_token %}
         <a href="{% url 'refresh_token' %}" class="btn btn-fill btn-success">Renew Token</a>
         <a href="{% url 'delete_token' %}" class="btn btn-fill btn-danger">Delete Token</a>
@@ -82,17 +82,25 @@
       <h3>GI-DAMPs</h3>
       <p><a href="/api/gidamps/" target="_blank"><pre>https://samples.musicstudy.uk/api/gidamps/</pre></a>
       </p>
-      
+
       <p>This endpoint will return every sample in json format that has a patient ID beginning with "GID" (including fully used samples). </p>
-        
+
       <h3>Single Sample Lookup</h3>
       <p>You can query particular samples by their sample ID using the following format:
       <pre>https://samples.musicstudy.uk/api/all/{sample_id}/</pre></p>
-      <p>For example:
+      <p>For example (click to try):
       <a href="/api/all/MUS10083/" target="_blank">
       <pre>https://samples.musicstudy.uk/api/all/MUS10083/</pre>
       </a>
       </p>
+      <h3>Filtering Samples by Starting Characters of Patient ID</h3>
+      <p>You can query for particular samples by what their patient ID starts with (this is case insensitive) using the following format:
+        <pre>https://samples.musicstudy.uk/api/all/?patient_id_starts_with={query}</pre></p>
+        <p>For example (click to try):
+        <a href="/api/all/?patient_id_starts_with=MID-90" target="_blank">
+        <pre>https://samples.musicstudy.uk/api/all/?patient_id_starts_with=MID-90</pre>
+        </a>
+        </p>
       <h3>API Security and Authentication</h3>
         <p>Authorization is by token authentication.
         To authenticate with the endpoint, include the http header: <pre>Authorization: Token {{ request.user.auth_token }}</pre>
@@ -102,8 +110,8 @@
       <pre>
 import requests
 
-GTRAC_API_TOKEN = {{ request.user.auth_token }} 
-# Don't commit this to git! 
+GTRAC_API_TOKEN = {{ request.user.auth_token }}
+# Don't commit this to git!
 # Read this key in from an external file and exclude that file from git
 
 authorization_header = {'Authorization': f'Token {GTRAC_API_TOKEN}'}
@@ -112,7 +120,7 @@ data = response.json()
       </pre>
       </div>
   </div>
-  
+
 </div>
 
 </div>
