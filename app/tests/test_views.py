@@ -281,8 +281,8 @@ def test_sample_search_page(auto_login_user):
     response = client.get(path + "?q=TEST")
     assertTemplateUsed(response, "index.html")
     assert (
-        "TEST002" in response.context["sample_list"][0].sample_id
-    ), "Should create a few objects, run a search and return 2 objects."
+        "TEST003" in response.context["sample_list"][0].sample_id
+    ), "Should create objects, run a search and return 2 objects. Checks ordering."
     assert (
         response.context["sample_list"].count() == 2
     ), "Should create a few objects, run a search and return 2 objects."

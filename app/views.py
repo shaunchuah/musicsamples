@@ -1078,6 +1078,11 @@ class SampleExportViewset(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ["sample_type", "sample_location", "sample_sublocation"]
 
 
+class AllSampleExportViewset(viewsets.ReadOnlyModelViewSet):
+    queryset = Sample.objects.filter(is_deleted=False)
+    serializer_class = SampleExportSerializer
+
+
 @login_required(login_url="/login/")
 def barcode(request):
     # Returns the page - frontend logic is in the barcode.html template file

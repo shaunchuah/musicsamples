@@ -6,6 +6,7 @@ from .views import (
     SampleIsFullyUsedViewSet,
     MultipleSampleViewSet,
     SampleExportViewset,
+    AllSampleExportViewset,
 )
 from django.views.generic.base import TemplateView
 
@@ -16,6 +17,7 @@ router.register(r"samples", SampleViewSet, "samples")
 router.register(r"samples_used", SampleIsFullyUsedViewSet, "samples_used")
 router.register(r"multiple_samples", MultipleSampleViewSet, "multiple_samples")
 router.register(r"gidamps", SampleExportViewset, "gidamps")
+router.register(r"all", AllSampleExportViewset, "all")
 
 urlpatterns = [
     path("", views.index, name="home"),

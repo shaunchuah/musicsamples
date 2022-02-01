@@ -1,7 +1,7 @@
-from django.db import models
-from django.contrib.auth.models import User
-from simple_history.models import HistoricalRecords
 from ckeditor_uploader.fields import RichTextUploadingField
+from django.contrib.auth.models import User
+from django.db import models
+from simple_history.models import HistoricalRecords
 from taggit.managers import TaggableManager
 
 
@@ -40,6 +40,9 @@ class Sample(models.Model):
 
     def __str__(self):
         return self.sample_id
+
+    class Meta:
+        ordering = ["-created"]
 
 
 class Note(models.Model):
