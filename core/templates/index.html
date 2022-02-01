@@ -42,14 +42,14 @@
         <a
           href="/export_excel?q={{query_string}}"
           class="btn btn-success float-lg-right"
-          data-toggle="tooltip" 
+          data-toggle="tooltip"
           data-placement="bottom"
-          data-html="true" 
+          data-html="true"
           title="<strong>Tip:</strong> Customise the export by searching for the set of samples you wish to download."
           ><i class="tim-icons icon-cloud-download-93"></i> Export Current View
           to Excel</a
         >
-        
+
       </div>
       <div class="card-body">
         <div class="d-flex flex-row-reverse pb-3">
@@ -117,7 +117,7 @@
                   >
                 </td>
               </tr>
-              {% endfor %} 
+              {% endfor %}
               {% else %}
               <tr>
                 <td colspan="12" align="center">No active samples found.</td>
@@ -142,19 +142,31 @@
                 <li class="page-item disabled">
                   <span class="page-link">&laquo;</span>
                 </li>
-                {% endif %} 
-                {% for i in sample_list.paginator.page_range %} 
-                {% if sample_list.number == i %}
-                <li class="page-item active">
-                  <span class="page-link"
-                    >{{ i }} <span class="sr-only">(current)</span></span
-                  >
-                </li>
-                {% else %}
-                <li class="page-item">
-                  <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                </li>
-                {% endif %} {% endfor %} {% if sample_list.has_next %}
+                {% endif %}
+
+                {% if sample_list.number|add:'-4' > 1 %}
+                    <li class="page-item"><a class="page-link" href="?page={{ sample_list.number|add:'-5' }}">&hellip;</a></li>
+                {% endif %}
+
+                {% for i in sample_list.paginator.page_range %}
+                  {% if sample_list.number == i %}
+                  <li class="page-item active">
+                    <span class="page-link"
+                      >{{ i }} <span class="sr-only">(current)</span></span
+                    >
+                  </li>
+                  {% elif i > sample_list.number|add:'-5' and i < sample_list.number|add:'5' %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                  </li>
+                  {% endif %}
+                {% endfor %}
+
+                {% if sample_list.paginator.num_pages > sample_list.number|add:'4' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ sample_list.number|add:'5' }}">&hellip;</a></li>
+                {% endif %}
+
+                {% if sample_list.has_next %}
                 <li class="page-item">
                   <a
                     class="page-link"
