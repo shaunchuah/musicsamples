@@ -1077,6 +1077,10 @@ class SampleExportViewset(viewsets.ReadOnlyModelViewSet):
     lookup_field = "sample_id"
     filterset_fields = ["sample_type", "sample_location", "sample_sublocation"]
 
+class AllSampleExportViewset(viewsets.ReadOnlyModelViewSet):
+    queryset = Sample.objects.filter(is_deleted=False)
+    serializer_class = SampleExportSerializer
+
 
 @login_required(login_url="/login/")
 def barcode(request):

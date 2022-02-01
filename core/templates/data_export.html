@@ -68,14 +68,33 @@
     <div class="notes card">
       <div class="card-header">
         <h2 class="card-title">
-          GI-DAMPs API Endpoint
+          API Endpoints
         </h2>
       </div>
       <div class="card-body">
-      <p>The GI-DAMPs api endpoint is available at: <a href="/api/gidamps/" target="_blank"><pre>https://samples.musicstudy.uk/api/gidamps/</pre></a>
+        <p>These endpoints allow for programmatic access to the data held on G-Trac.</p>
+      <h3>All Samples</h3>
+      <p><a href="/api/all/" target="_blank">
+        <pre>https://samples.musicstudy.uk/api/all/</pre></a>
+      <strong>Warning: This API will be slow as it exports every single sample in G-Trac.</strong>
+      Suggest download the data once to a json file rather than accessing the API repeatedly.</p>
+
+      <h3>GI-DAMPs</h3>
+      <p><a href="/api/gidamps/" target="_blank"><pre>https://samples.musicstudy.uk/api/gidamps/</pre></a>
       </p>
       
-      <p>This endpoint will return every sample in json format that has a patient ID beginning with "GID" (including fully used samples). Authorization is by token authentication.
+      <p>This endpoint will return every sample in json format that has a patient ID beginning with "GID" (including fully used samples). </p>
+        
+      <h3>Single Sample Lookup</h3>
+      <p>You can query particular samples by their sample ID using the following format:
+      <pre>https://samples.musicstudy.uk/api/all/{sample_id}/</pre></p>
+      <p>For example:
+      <a href="/api/all/MUS10083/" target="_blank">
+      <pre>https://samples.musicstudy.uk/api/all/MUS10083/</pre>
+      </a>
+      </p>
+      <h3>API Security and Authentication</h3>
+        <p>Authorization is by token authentication.
         To authenticate with the endpoint, include the http header: <pre>Authorization: Token {{ request.user.auth_token }}</pre>
       </p>
       <p>Full guide to API authorization <a href="https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication" target="_blank" rel="noopener">here</a>.</p>
@@ -95,8 +114,6 @@ data = response.json()
   </div>
   
 </div>
-
-
 
 </div>
 

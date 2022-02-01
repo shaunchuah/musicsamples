@@ -5,7 +5,7 @@ Django==3.2.11
 django-simple-history==2.12.0
 django-widget-tweaks==1.4.8
 gunicorn==20.0.4
-psycopg2-binary==2.8.6
+psycopg2-binary==2.9.3
 pycodestyle==2.6.0
 python-decouple==3.3
 pytz==2020.4
