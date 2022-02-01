@@ -97,7 +97,7 @@ def filter(request):
 
 
 @login_required(login_url="/login/")
-# @cache_page(60 * 60)  # Cache page for 60 minutes
+@cache_page(60 * 10)  # Cache page for 10 minutes
 def analytics(request):
     # Analytics Page
 
@@ -127,6 +127,7 @@ def analytics(request):
         Sample.objects.all()
         .filter(is_deleted=False)
         .filter(is_fully_used=False)
+        .order_by()
         .values("sample_type")
         .annotate(sample_type_count=Count("id"))
     )
@@ -134,6 +135,7 @@ def analytics(request):
         Sample.objects.all()
         .filter(is_deleted=False)
         .filter(is_fully_used=False)
+        .order_by()
         .values("sample_location")
         .annotate(sample_location_count=Count("id"))
     )
