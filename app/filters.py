@@ -1,7 +1,7 @@
 import django_filters
 
-from .models import Sample
-from .choices import SAMPLE_TYPE_CHOICES
+from app.models import Sample
+from app.choices import SAMPLE_TYPE_CHOICES
 
 
 class SampleFilter(django_filters.FilterSet):

@@ -1,5 +1,5 @@
 import pytest
-from .. import forms
+from app import forms
 
 pytestmark = pytest.mark.django_db
 

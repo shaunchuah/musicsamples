@@ -2,14 +2,14 @@ from django import forms
 from django.forms import ModelForm
 from django.utils import timezone
 
-from .choices import (
+from app.choices import (
     BIOPSY_INFLAMED_STATUS_CHOICES,
     BIOPSY_LOCATION_CHOICES,
     HAEMOLYSIS_REFERENCE_CHOICES,
     SAMPLE_TYPE_CHOICES,
     SAMPLE_VOLUME_UNIT_CHOICES,
 )
-from .models import Sample
+from app.models import Sample
 
 
 class DateTimeInput(forms.DateTimeInput):
@@ -29,11 +29,6 @@ def currentTime():
 
 class SampleForm(ModelForm):
     # Main sample registration form
-    # sample_datetime = forms.DateTimeField(
-    #     label="Sampling Datetime*",
-    #     widget=DateTimeInput(),
-    # )
-
     processing_datetime = forms.DateTimeField(
         label="Processing Datetime",
         widget=DateTimeInput(),
@@ -92,7 +87,6 @@ class SampleForm(ModelForm):
 
 
 class CheckoutForm(ModelForm):
-    # Quick update of sample location from home page
     class Meta:
         model = Sample
         fields = ["sample_location", "sample_sublocation"]
@@ -103,7 +97,6 @@ class CheckoutForm(ModelForm):
 
 
 class DeleteForm(ModelForm):
-    # Soft deleting a sample
     class Meta:
         model = Sample
         fields = ["is_deleted"]
@@ -111,7 +104,6 @@ class DeleteForm(ModelForm):
 
 
 class RestoreForm(ModelForm):
-    # Restoring a soft deleted sample
     class Meta:
         model = Sample
         fields = ["is_deleted"]
@@ -119,7 +111,6 @@ class RestoreForm(ModelForm):
 
 
 class FullyUsedForm(ModelForm):
-    # Marking a sample as fully used
     class Meta:
         model = Sample
         fields = ["is_fully_used"]
@@ -127,9 +118,7 @@ class FullyUsedForm(ModelForm):
 
 
 class ReactivateForm(ModelForm):
-    # Restoring a sample that was accidentally marked as fully used
     class Meta:
         model = Sample
         fields = ["is_fully_used"]
         labels = {"is_fully_used": "Uncheck to reactivate"}
-

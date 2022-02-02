@@ -1,8 +1,5 @@
-from ckeditor_uploader.fields import RichTextUploadingField
-from django.contrib.auth.models import User
 from django.db import models
 from simple_history.models import HistoricalRecords
-from taggit.managers import TaggableManager
 
 
 class Sample(models.Model):
@@ -44,4 +41,3 @@ class Sample(models.Model):
 
     class Meta:
         ordering = ["-created"]
-

@@ -149,7 +149,7 @@ def analytics(request):
 
 
 @login_required(login_url="/login/")
-@cache_page(3 * 60)  # Cache page for 60 minutes
+@cache_page(3 * 60)  # Cache page for 3 minutes
 def gid_overview(request):
     # Analytics --> Sample Overview Table Page
     sample_categories = (
@@ -486,54 +486,6 @@ def reactivate_sample(request, pk):
     else:
         form = ReactivateForm(instance=sample)
     return render(request, "samples/sample-reactivate.html", {"form": form})
-
-
-# @login_required(login_url="/login/")
-# def export_csv(request):
-#     # Export entire database to CSV for backup, currently not in use
-#     response = HttpResponse(content_type="text/csv")
-#     response[
-#         "Content-Disposition"
-#     ] = 'attachment; filename="music_samples_%s.csv"' % datetime.datetime.now().strftime(  # noqa E501
-#         "%Y-%m-%d"
-#     )
-#     writer = csv.writer(response)
-#     writer.writerow(
-#         [
-#             "MUSIC Sample ID",
-#             "Patient ID",
-#             "Sample Location",
-#             "Sample Type",
-#             "Sample Datetime",
-#             "Sample Comments",
-#             "Created By",
-#             "Date First Created",
-#             "Last Modified By",
-#             "Last Modified",
-#         ]
-#     )
-#     samples = (
-#         Sample.objects.all()
-#         .filter(is_deleted=False)
-#         .values_list(
-#             "sample_id",
-#             "patient_id",
-#             "sample_location",
-#             "sample_type",
-#             "sample_datetime",
-#             "sample_comments",
-#             "created_by",
-#             "created",
-#             "last_modified_by",
-#             "last_modified",
-#         )
-#     )
-#     for sample in samples:
-#         writer.writerow(sample)
-#     return response
-
-
-# Excel Exports
 
 
 @login_required(login_url="/login/")
