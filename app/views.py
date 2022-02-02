@@ -573,7 +573,7 @@ def export_excel(request):
     workbook = Workbook()
     # Get active worksheet
     worksheet = workbook.active
-    worksheet.title = "All Samples"
+    worksheet.title = "Samples"
 
     # Define the excel column names
     columns = [
@@ -584,6 +584,7 @@ def export_excel(request):
         "Sample Type",
         "Sampling Datetime",
         "Processing Datetime",
+        "Frozen Datetime",
         "Sampling to Processing Time (mins)",
         "Sample Volume",
         "Sample Volume Units",
@@ -623,6 +624,7 @@ def export_excel(request):
             sample.sample_type,
             sample.sample_datetime,
             sample.processing_datetime,
+            sample.frozen_datetime,
             processing_time,
             sample.sample_volume,
             sample.sample_volume_units,
@@ -668,6 +670,7 @@ def gidamps_export_csv(request):
             "sample_comments",
             "is_fully_used",
             "processing_datetime",
+            "frozen_datetime",
             "sample_volume",
             "sample_volume_units",
             "freeze_thaw_count",
@@ -689,6 +692,7 @@ def gidamps_export_csv(request):
             "sample_comments",
             "is_fully_used",
             "processing_datetime",
+            "frozen_datetime",
             "sample_volume",
             "sample_volume_units",
             "freeze_thaw_count",

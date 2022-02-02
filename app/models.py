@@ -18,6 +18,7 @@ class Sample(models.Model):
     is_fully_used = models.BooleanField(default=False)
 
     processing_datetime = models.DateTimeField(blank=True, null=True)
+    frozen_datetime = models.DateTimeField(blank=True, null=True)
     sample_volume = models.DecimalField(
         max_digits=10, decimal_places=3, blank=True, null=True
     )
