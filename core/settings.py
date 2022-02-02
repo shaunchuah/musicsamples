@@ -1,6 +1,6 @@
 import os
 
-# Sentry Monitoring
+
 import sentry_sdk
 from decouple import Csv, config
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -14,8 +14,6 @@ sentry_sdk.init(
     dsn="https://565f64fc7bea4af39487c5f0edcdab0b@o482942.ingest.sentry.io/5533900",
     integrations=[DjangoIntegration(), RedisIntegration()],
     traces_sample_rate=1.0,
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True,
 )
 
@@ -32,8 +30,6 @@ DEBUG = config("DEBUG", cast=bool, default=False)
 # load production server from .env
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
 
-# Application definition
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -49,7 +45,7 @@ INSTALLED_APPS = [
     "storages",
     "django_filters",
     "taggit",
-    "app",  # Enable the inner app
+    "app"
 ]
 
 MIDDLEWARE = [
@@ -191,8 +187,6 @@ CACHES = {
     },
 }
 
-# Set the cache backend to select2
 SELECT2_CACHE_BACKEND = "default"
-
 INTERNAL_IPS = ["127.0.0.1"]
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
