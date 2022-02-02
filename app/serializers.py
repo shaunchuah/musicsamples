@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import Sample
 
 
@@ -37,6 +38,7 @@ class MultipleSampleSerializer(serializers.HyperlinkedModelSerializer):
             "biopsy_inflamed_status",
             "sample_datetime",
             "processing_datetime",
+            "frozen_datetime",
             "sample_comments",
             "sample_volume",
             "sample_volume_units",
@@ -57,6 +59,7 @@ class SampleExportSerializer(serializers.ModelSerializer):
             "sample_datetime",
             "sample_comments",
             "processing_datetime",
+            "frozen_datetime",
             "sample_volume",
             "sample_volume_units",
             "freeze_thaw_count",

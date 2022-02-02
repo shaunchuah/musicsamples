@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Dashboard {% endblock %} 
+{% block title %} Dashboard {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -21,7 +21,7 @@
   </div>
 </div>
 </div>
-    {% endfor %} 
+    {% endfor %}
   {% endfor %}
 {% endif %}
 
@@ -32,7 +32,7 @@
         <div class=card-body>
           <div class="table-responsive">
               <table class="table" id="">
-  
+
                 <tbody>
                   <tr>
                     <td>Sample ID</td>
@@ -41,12 +41,12 @@
                   <tr>
                     <td>Patient ID</td>
                     <td>
-           
-                      {% if gid_id %}                        
+
+                      {% if gid_id %}
                         <a href="https://ecrf.igmm.ed.ac.uk/redcap_v10.0.30/DataEntry/record_home.php?pid=140&arm=1&id={{ gid_id }}" target="_blank" rel="noopener">{{ sample.patient_id }} <i class="tim-icons icon-link-72"></i></a>
-                        
+
                       {% else %}
-                      
+
                         {{ sample.patient_id }}
 
                       {% endif %}
@@ -76,19 +76,23 @@
               </table>
               </div>
 
-              
 
-          
+
+
         </div>
         <h3 class="card-header card-title">Sample Processing</h3>
         <div class=card-body>
           <div class="table-responsive">
               <table class="table" id="">
-  
+
                 <tbody>
                   <tr>
                     <td>Sample Processing Datetime</td>
                     <td>{{ sample.processing_datetime }}</td>
+                  </tr>
+                  <tr>
+                    <td>Frozen Datetime</td>
+                    <td>{{ sample.frozen_datetime }}</td>
                   </tr>
                   <tr>
                     <td>Sample Fully Used?</td>
@@ -104,7 +108,7 @@
                       {% endif %}
                       </td>
                   </tr>
-                  
+
                   <tr>
                     <td>Sample Volume Remaining</td>
                     <td>
@@ -113,15 +117,15 @@
                       {% else %}
                       {{ sample.sample_volume }} {{ sample.sample_volume_units }}
                       {% endif %}
-                    
-                    
-                    
+
+
+
                     </td>
                   </tr>
                   <tr>
                     <td>Freeze Thaw Count</td>
                     <td>{{ sample.freeze_thaw_count }}</td>
-                  </tr> 
+                  </tr>
                   <tr>
                     <td>Haemolysis Reference Category (100 and above unusable)</td>
                     <td>{% if sample.haemolysis_reference is None %}
@@ -145,7 +149,7 @@
                       {% else %}
                       {{ sample.biopsy_inflamed_status }}
                       {% endif %}</td>
-                  </tr>                  
+                  </tr>
                 </tbody>
               </table>
               </div>
@@ -207,27 +211,27 @@
                   <td>{{ sample.last_modified_by }}</td>
                 </tr>
               </tbody>
-            </table>  
-            
+            </table>
+
             <p></p>
             <p></p>
 
             <table class="table" id="history_table">
-              <thead>              
-                <tr>               
-                  <th>date/time</th>              
-                  <th>change made</th>              
-                  <th>responsible</th>              
-              </tr>              
+              <thead>
+                <tr>
+                  <th>date/time</th>
+                  <th>change made</th>
+                  <th>responsible</th>
+              </tr>
               </thead>
-              
+
               <tbody>
 
               {% for change in changes %}
               <tr>
                 <td>{{ change.new_record.history_date|date:"D j M Y, H:i"}}</td>
                 <td>
-                  
+
                     {% if change.changed_fields|length > 0 %}
                       {% for change_by_id in change.changes %}
                         <b>{{ change_by_id.field|title }}</b>
@@ -247,7 +251,7 @@
                   </td>
                 <td>{{ change.new_record.history_user }}</td>
               </tr>
-              
+
               {% endfor %}
               <tr>
                 <td>{{ sample.created }}</td>
@@ -263,7 +267,7 @@
     </div>
 </div>
 
-  
+
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->

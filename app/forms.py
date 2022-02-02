@@ -5,14 +5,14 @@ from django.utils import timezone
 from django_select2.forms import ModelSelect2MultipleWidget
 from taggit.forms import TagWidget
 
-from .models import Note, Sample
 from .choices import (
+    BIOPSY_INFLAMED_STATUS_CHOICES,
+    BIOPSY_LOCATION_CHOICES,
+    HAEMOLYSIS_REFERENCE_CHOICES,
     SAMPLE_TYPE_CHOICES,
     SAMPLE_VOLUME_UNIT_CHOICES,
-    HAEMOLYSIS_REFERENCE_CHOICES,
-    BIOPSY_LOCATION_CHOICES,
-    BIOPSY_INFLAMED_STATUS_CHOICES,
 )
+from .models import Note, Sample
 
 
 class DateTimeInput(forms.DateTimeInput):
@@ -57,6 +57,7 @@ class SampleForm(ModelForm):
             "biopsy_inflamed_status",
             "sample_datetime",
             "processing_datetime",
+            "frozen_datetime",
             "sample_comments",
             "sample_volume",
             "sample_volume_units",
@@ -68,6 +69,7 @@ class SampleForm(ModelForm):
             "sample_volume_units": forms.Select(
                 choices=SAMPLE_VOLUME_UNIT_CHOICES, attrs={"class": "form-control"}
             ),
+            "frozen_datetime": DateTimeInput(),
             "haemolysis_reference": forms.Select(choices=HAEMOLYSIS_REFERENCE_CHOICES),
             "biopsy_location": forms.Select(choices=BIOPSY_LOCATION_CHOICES),
             "biopsy_inflamed_status": forms.Select(
@@ -88,6 +90,7 @@ class SampleForm(ModelForm):
             "haemolysis_reference": "Haemolysis Reference Palette",
             "biopsy_location": "Biopsy Location",
             "biopsy_inflamed_status": "Biopsy Inflamed Status",
+            "frozen_datetime": "Frozen Datetime (If Applicable)",
         }
 
 
