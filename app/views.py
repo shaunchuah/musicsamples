@@ -56,7 +56,11 @@ def index(request):
         samples = paginator.page(1)
     except EmptyPage:
         samples = paginator.page(paginator.num_pages)
-    context = {"sample_list": samples, "sample_count": sample_count}
+    context = {
+        "sample_list": samples,
+        "page_obj": samples,
+        "sample_count": sample_count,
+    }
     return render(request, "index.html", context)
 
 
@@ -92,6 +96,67 @@ def filter(request):
         "parameter_string": parameter_string,
     }
     return render(request, "filter.html", context)
+
+
+@login_required(login_url="/login/")
+def used_samples(request):
+    # Used samples page for samples marked as being fully used
+    sample_list = (
+        Sample.objects.all()
+        .filter(is_deleted=False)
+        .filter(is_fully_used=True)
+        .order_by("-last_modified")
+    )
+    sample_count = sample_list.count()
+    page = request.GET.get("page", 1)
+    paginator = Paginator(sample_list, SAMPLE_PAGINATION_SIZE)
+    try:
+        samples = paginator.page(page)
+    except PageNotAnInteger:
+        samples = paginator.page(1)
+    except EmptyPage:
+        samples = paginator.page(paginator.num_pages)
+    context = {
+        "sample_list": samples,
+        "page_obj": samples,
+        "sample_count": sample_count,
+    }
+    return render(request, "samples/used_samples.html", context)
+
+
+@login_required(login_url="/login/")
+def used_samples_search(request):
+    query_string = ""
+    if ("q" in request.GET) and request.GET["q"].strip():
+        query_string = request.GET.get("q")
+        sample_list = (
+            Sample.objects.filter(
+                Q(sample_id__icontains=query_string)
+                | Q(patient_id__icontains=query_string)
+                | Q(sample_location__icontains=query_string)
+                | Q(sample_sublocation__icontains=query_string)
+                | Q(sample_type__icontains=query_string)
+                | Q(sample_comments__icontains=query_string)
+            )
+            .filter(is_fully_used=True)
+            .filter(is_deleted=False)
+        )
+        sample_count = sample_list.count()
+        return render(
+            request,
+            "samples/used_samples.html",
+            {
+                "query_string": query_string,
+                "sample_list": sample_list,
+                "sample_count": sample_count,
+            },
+        )
+    else:
+        return render(
+            request,
+            "samples/used_samples.html",
+            {"query_string": "Null", "sample_count": 0},
+        )
 
 
 @login_required(login_url="/login/")
@@ -213,55 +278,6 @@ def sample_archive(request):
     )
     context = {"sample_list": sample_list}
     return render(request, "samples/sample-archive.html", context)
-
-
-@login_required(login_url="/login/")
-def used_samples(request):
-    # Used samples page for samples marked as being fully used
-    sample_list = (
-        Sample.objects.all()
-        .filter(is_deleted=False)
-        .filter(is_fully_used=True)
-        .order_by("-last_modified")
-    )
-    sample_count = sample_list.count()
-    context = {"sample_list": sample_list, "sample_count": sample_count}
-    return render(request, "samples/used_samples.html", context)
-
-
-@login_required(login_url="/login/")
-def used_samples_search(request):
-    query_string = ""
-    if ("q" in request.GET) and request.GET["q"].strip():
-        query_string = request.GET.get("q")
-        sample_list = (
-            Sample.objects.filter(
-                Q(sample_id__icontains=query_string)
-                | Q(patient_id__icontains=query_string)
-                | Q(sample_location__icontains=query_string)
-                | Q(sample_sublocation__icontains=query_string)
-                | Q(sample_type__icontains=query_string)
-                | Q(sample_comments__icontains=query_string)
-            )
-            .filter(is_fully_used=True)
-            .filter(is_deleted=False)
-        )
-        sample_count = sample_list.count()
-        return render(
-            request,
-            "samples/used_samples.html",
-            {
-                "query_string": query_string,
-                "sample_list": sample_list,
-                "sample_count": sample_count,
-            },
-        )
-    else:
-        return render(
-            request,
-            "samples/used_samples.html",
-            {"query_string": "Null", "sample_count": 0},
-        )
 
 
 @login_required(login_url="/login/")

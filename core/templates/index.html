@@ -125,64 +125,8 @@
               {% endif %}
             </tbody>
           </table>
-
-          {% if sample_list.has_other_pages %}
-          <div class="row">
-            <div class="col">
-              <ul class="pagination">
-                {% if sample_list.has_previous %}
-                <li class="page-item">
-                  <a
-                    class="page-link"
-                    href="?page={{ sample_list.previous_page_number }}"
-                    >&laquo;</a
-                  >
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                  <span class="page-link">&laquo;</span>
-                </li>
-                {% endif %}
-
-                {% if sample_list.number|add:'-4' > 1 %}
-                    <li class="page-item"><a class="page-link" href="?page={{ sample_list.number|add:'-5' }}">&hellip;</a></li>
-                {% endif %}
-
-                {% for i in sample_list.paginator.page_range %}
-                  {% if sample_list.number == i %}
-                  <li class="page-item active">
-                    <span class="page-link"
-                      >{{ i }} <span class="sr-only">(current)</span></span
-                    >
-                  </li>
-                  {% elif i > sample_list.number|add:'-5' and i < sample_list.number|add:'5' %}
-                  <li class="page-item">
-                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                  </li>
-                  {% endif %}
-                {% endfor %}
-
-                {% if sample_list.paginator.num_pages > sample_list.number|add:'4' %}
-                    <li class="page-item"><a class="page-link" href="?page={{ sample_list.number|add:'5' }}">&hellip;</a></li>
-                {% endif %}
-
-                {% if sample_list.has_next %}
-                <li class="page-item">
-                  <a
-                    class="page-link"
-                    href="?page={{ sample_list.next_page_number }}"
-                    >&raquo;</a
-                  >
-                </li>
-                {% else %}
-                <li class="page-item disabled">
-                  <span class="page-link">&raquo;</span>
-                </li>
-                {% endif %}
-              </ul>
-            </div>
-          </div>
-          {% endif %}
+          
+          {% include "layouts/pagination.html" %}
         </div>
       </div>
     </div>
