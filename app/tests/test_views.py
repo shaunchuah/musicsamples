@@ -249,16 +249,6 @@ def test_sample_detail_processing_datetime_logic(auto_login_user):
     ), "Should test processing_time calculation given sampling and processing datetime."
 
 
-def test_sample_detail_linkage_to_redcap_db(auto_login_user):
-    client, user = auto_login_user()
-    mixer.blend("app.sample", patient_id="GID-312-P")
-    path = reverse("sample_detail", kwargs={"pk": 1})
-    response = client.get(path)
-    assert (
-        response.context["gid_id"] == 312
-    ), "Should return study ID number integer value."
-
-
 def test_sample_edit_page(auto_login_user):
     client, user = auto_login_user()
     mixer.blend("app.sample", sample_id="TEST002")
