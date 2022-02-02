@@ -49,9 +49,6 @@ SampleTrek was developed to solve the problem of tracking 30,000 research sample
 
 Cryogenic QR code labels were bulk printed from a label printing company and research samples were tagged at the point of collection and registered onto SampleTrek. At specified receiving entrypoints to various lab workflows the samples were scanned in bulk to update their location (alternatively a status could be set into the location eg. "Departure Glasgow").
 
-### Electronic lab notebook with sample tagging (Deprecated as of 1/09/2021)
-
-A mini electronic lab notebook was created which allows tagging of samples used in order to facilitate collaboration and to allow easy finding of relevant data pertaining to experiments carried out on the sampls.
 
 ### Built With
 
@@ -182,12 +179,6 @@ Here are some tips for customising this to suit your workflow:
 - The templates are found in core/templates. Most functions are using a single template for a single view so you can customise particular aspects as you desire
 
 
-## SAAS version available here
-
-SAAS version of this here if you don't want to worry about configuring all the above steps: https://www.sampletrek.com/
-
-Documentation for that here: https://docs.sampletrek.com/
-
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
@@ -198,11 +189,6 @@ Contributions are what make the open source community such an amazing place to b
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-### Possible areas of development
-
-- Improve testing coverage
-- Swap out Django templates/jQuery for DRF + NuxtJS
-- Custom fields by users
 
 ## License
 
@@ -264,5 +250,4 @@ If you've used this to create something cool let me know about it!
 
 Twitter: [@chershiong](https://twitter.com/chershiong) \
 Email: cchuah@ed.ac.uk \
-Project Link: [https://github.com/shaunchuah/musicsamples](https://github.com/shaunchuah/sampletrek) \
-SAAS Version: https://www.sampletrek.com
+Project Link: [https://github.com/shaunchuah/musicsamples](https://github.com/shaunchuah/musicsamples) \
