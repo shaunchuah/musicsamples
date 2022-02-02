@@ -1,9 +1,6 @@
-from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django import forms
 from django.forms import ModelForm
 from django.utils import timezone
-from django_select2.forms import ModelSelect2MultipleWidget
-from taggit.forms import TagWidget
 
 from .choices import (
     BIOPSY_INFLAMED_STATUS_CHOICES,
@@ -12,7 +9,7 @@ from .choices import (
     SAMPLE_TYPE_CHOICES,
     SAMPLE_VOLUME_UNIT_CHOICES,
 )
-from .models import Note, Sample
+from .models import Sample
 
 
 class DateTimeInput(forms.DateTimeInput):
@@ -136,44 +133,3 @@ class ReactivateForm(ModelForm):
         fields = ["is_fully_used"]
         labels = {"is_fully_used": "Uncheck to reactivate"}
 
-
-#########################################################################
-# NOTEFORMS  ############################################################
-#########################################################################
-# SELECT2 #####
-
-# Create new note form
-# Django select2 used to enable tagging of existing samples.
-# Django taggit used for tagging of notes similar to blogging
-# CKEditor Uploading widget used for adding of notes and supporting of file/image
-# uploads - Suggest use an S3 backend to handle user media uploads.
-# You can also disable this by switching the uploading widget for the standard one
-#  - see django-ckeditor documentation.
-
-
-class NoteForm(ModelForm):
-    class Meta:
-        model = Note
-        fields = ["title", "content", "sample_tags", "tags", "is_public"]
-        widgets = {
-            "content": forms.CharField(widget=CKEditorUploadingWidget()),
-            "tags": TagWidget(attrs={"data-role": "tagsinput"}),
-            "is_public": forms.Select(choices=((False, "Private"), (True, "Shared"))),
-            "sample_tags": ModelSelect2MultipleWidget(
-                model=Sample, search_fields=["sample_id__icontains"]
-            ),
-        }
-        labels = {
-            "is_public": "Share settings:",
-            "content": "",
-        }
-
-
-class NoteDeleteForm(ModelForm):
-    # Soft deletion of notes. Restoration will probably have to be done
-    # from the django admin panel unless you want to implement a restore
-    # view similar to the above sample restoration methods.
-    class Meta:
-        model = Note
-        fields = ["is_deleted"]
-        labels = {"is_deleted": "Confirm delete?"}

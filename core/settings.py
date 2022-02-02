@@ -43,14 +43,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "widget_tweaks",
     "simple_history",
-    "ckeditor_uploader",
-    "ckeditor",
-    "taggit",
     "django_select2",
     "rest_framework",
     "rest_framework.authtoken",
     "storages",
     "django_filters",
+    "taggit",
     "app",  # Enable the inner app
 ]
 
@@ -168,49 +166,6 @@ SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", cast=int)
 SECURE_BROWSER_XSS_FILTER = config("SECURE_BROWSER_XSS_FILTER", cast=bool)
 SECURE_CONTENT_TYPE_NOSNIFF = config("SECURE_CONTENT_TYPE_NOSNIFF", cast=bool)
 
-# CKEDITOR CONFIG
-
-CKEDITOR_UPLOAD_PATH = ""
-TAGGIT_CASE_INSENSITIVE = True
-
-CKEDITOR_CONFIGS = {
-    "default": {
-        "width": "100%",
-        "height": "500px",
-        "toolbar": [
-            ["Format", "FontSize"],
-            [
-                "Bold",
-                "Italic",
-                "Underline",
-                "Strike",
-                "Subscript",
-                "Superscript",
-            ],
-            [
-                "NumberedList",
-                "BulletedList",
-                "-",
-                "Blockquote",
-                "CreateDiv",
-                "-",
-                "JustifyLeft",
-                "JustifyCenter",
-                "JustifyRight",
-                "JustifyBlock",
-                "-",
-            ],
-            [
-                "Link",
-                "Unlink",
-            ],
-            ["Image", "Table", "HorizontalRule", "Smiley", "SpecialChar"],
-            ["Undo", "Redo"],
-            ["Source", "Print"],
-        ],
-    }
-}
-
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
@@ -221,21 +176,8 @@ REST_FRAMEWORK = {
     ],
 }
 
-
-# MEDIA UPLOADS USING S3
-
-if config("USE_S3", cast=bool) is True:
-    AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME")
-    AWS_DEFAULT_ACL = None
-    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.eu-west-2.amazonaws.com"
-    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
-    PUBLIC_MEDIA_LOCATION = "media"
-    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/"
-    DEFAULT_FILE_STORAGE = "core.storage_backends.PublicMediaStorage"
-    AWS_QUERYSTRING_AUTH = False
-else:
-    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-    MEDIA_URL = "/uploads/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/uploads/"
 
 # CACHING
 
@@ -249,26 +191,8 @@ CACHES = {
     },
 }
 
-# CACHES = {
-#             "default": {
-#                 "BACKEND": "django_redis.cache.RedisCache",
-#                 "LOCATION": "redis://127.0.0.1:6379/1",
-#                 "OPTIONS": {
-#                     "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#                 }
-#             },
-#             'select2': {
-#                 "BACKEND": "django_redis.cache.RedisCache",
-#                 "LOCATION": "redis://127.0.0.1:6379/2",
-#                 "OPTIONS": {
-#                     "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#                 }
-#             }
-#         }
-
 # Set the cache backend to select2
 SELECT2_CACHE_BACKEND = "default"
-
 
 INTERNAL_IPS = ["127.0.0.1"]
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

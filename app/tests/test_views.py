@@ -9,8 +9,8 @@ from django.urls import reverse
 from mixer.backend.django import mixer
 from pytest_django.asserts import assertRaisesMessage, assertTemplateUsed
 
-from .. import views
-from ..models import Note, Sample
+from app import views
+from app.models import Sample
 
 pytestmark = pytest.mark.django_db
 
@@ -371,132 +371,6 @@ def test_sample_reactivate(auto_login_user):
         Sample.objects.get(pk=1).is_fully_used is False
     ), "Should restore the deleted sample"
     assert response.url == "/"
-
-
-# TESTS FOR NOTES #############
-
-
-def test_shared_notes_page(auto_login_user):
-    client, user = auto_login_user()
-    path = reverse("notes")
-    response = client.get(path)
-    assertTemplateUsed(response, "notes/notes-main.html")
-
-
-def test_personal_notes_page(auto_login_user):
-    client, user = auto_login_user()
-    path = reverse("note_personal")
-    response = client.get(path)
-    assertTemplateUsed(response, "notes/notes-main.html")
-
-
-def test_unable_to_get_other_user_private_note(auto_login_user, other_user):
-    client, user = auto_login_user()
-    mixer.blend(
-        "app.note", title="private", author=other_user, is_public=False
-    )  # Private note
-    assert Note.objects.count() == 1
-    path = reverse("note_detail", kwargs={"pk": 1})
-    response = client.get(path)
-    assert response.status_code == 302
-
-
-def test_get_own_private_note(auto_login_user):
-    client, user = auto_login_user()
-    mixer.blend(
-        "app.note", title="my private note", is_public=False, author=user
-    )  # Private note
-    path = reverse("note_detail", kwargs={"pk": 1})
-    response = client.get(path)
-    assert response.context["note"].title == "my private note"
-
-
-def test_get_public_note(auto_login_user, other_user):
-    client, user = auto_login_user()
-    mixer.blend(
-        "app.note", title="Public Note", author=other_user, is_public=True
-    )  # Other user note
-
-    path = reverse("note_detail", kwargs={"pk": 1})
-    response = client.get(path)
-    assert response.context["note"].title == "Public Note"
-    assert response.context["note"].author.username == "user2"
-
-
-def test_get_note_with_tags(auto_login_user):
-    client, user = auto_login_user()
-    note = mixer.blend("app.note", title="tag test", is_public=True)
-    note.tags.add("tag1")
-    path = reverse("note_tags", kwargs={"slug": "tag1"})
-    response = client.get(path)
-    assert response.context["notes"][0].title == "tag test"
-
-
-def test_get_note_by_author(auto_login_user, other_user):
-    client, user = auto_login_user()
-    mixer.blend(
-        "app.note", title="post by user2", author=other_user, is_public=True
-    )  # Other user note
-
-    path = reverse("note_authors", kwargs={"pk": other_user.id})
-    response = client.get(path)
-    assert response.context["notes"][0].title == "post by user2"
-
-
-def test_note_add(auto_login_user):
-    client, user = auto_login_user()
-    path = reverse("note_add")
-    response = client.get(path)
-    assertTemplateUsed("notes/notes-add.html")
-    response = client.post(path)
-    assert response.context["form"].is_bound is True
-
-
-def test_note_edit(auto_login_user):
-    client, user = auto_login_user()
-    mixer.blend("app.note", title="unedited title", author=user)
-    path = reverse("note_edit", kwargs={"pk": 1})
-
-    response = client.get(path)
-    assert response.context["form"].initial["title"] == "unedited title"
-
-
-def test_missing_note_edit(auto_login_user):
-    client, user = auto_login_user()
-    mixer.blend("app.note", title="unedited title", author=user)
-    path = reverse("note_edit", kwargs={"pk": 1})
-
-    response = client.post(path)
-    assert response.context["form"].initial["title"] == "unedited title"
-
-
-def test_note_delete(auto_login_user):
-    client, user = auto_login_user()
-    mixer.blend("app.note", title="soft delete this note", author=user)
-    path = reverse("note_delete", kwargs={"pk": 1})
-    response = client.get(path)
-    assertTemplateUsed(response, "notes/notes-delete.html")
-    assert response.context["note"].title == "soft delete this note"
-
-
-def test_note_search(auto_login_user):
-    client, user = auto_login_user()
-    mixer.blend("app.note", title="TEST002")
-    mixer.blend("app.note", title="TEST003")
-    mixer.blend("app.note", title="NO")
-    mixer.blend("app.note", title="DONOTRETURN")
-    path = reverse("note_search")
-    response = client.get(path + "?q=TEST")
-    assertTemplateUsed(response, "notes/notes-main.html")
-    assert (
-        "TEST" in response.context["notes"][0].title
-    ), "Should create a few objects, run a search and return 2 objects."
-    assert (
-        response.context["notes"].count() == 2
-    ), "Should create a few objects, run a search and return 2 objects."
-
-    response = client.get(path)
-    assert response.status_code == 302
 
 
 # AUTOCOMPLETE TESTS
