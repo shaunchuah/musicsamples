@@ -23,7 +23,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="{% static 'assets/img/favicon-16x16.png' %}">
 
   <title>
-    SampleTrek
+    G-Trac
   </title>
 
   <!--     Fonts and icons     -->
@@ -37,27 +37,32 @@
   <!-- Specific Page CSS goes HERE  -->
   <style type="text/css">
     #bg {
-      height:100vh;
-      width:100vw;
-      position:fixed;
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1)), url('{% static 'assets/img/bg.svg'%}');
-      background-size:cover;
-    };
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1)),
+      url('{% static 'assets/img/bg.svg'%}');
+      background-size: cover;
+    }
+
+    ;
   </style>
   {% block stylesheets %}
-  
+
   {% endblock stylesheets %}
 
 </head>
 
-<body class="white-content"> <!--add white-content to turn on light mode-->
+<body class="white-content">
+  <!--add white-content to turn on light mode-->
   <div id="bg"></div>
   <div class="container">
     {% include 'includes/messages.html' %}
-  {% block content %}{% endblock content %}
-</div>
+    {% block content %}{% endblock content %}
+  </div>
   {% include 'includes/scripts.html' %}
 
   {% include 'includes/scripts-sidebar.html' %}
 </body>
+
 </html>

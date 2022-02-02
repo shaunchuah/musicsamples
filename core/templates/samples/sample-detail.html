@@ -42,14 +42,10 @@
                     <td>Patient ID</td>
                     <td>
 
-                      {% if gid_id %}
-                        <a href="https://ecrf.igmm.ed.ac.uk/redcap_v10.0.30/DataEntry/record_home.php?pid=140&arm=1&id={{ gid_id }}" target="_blank" rel="noopener">{{ sample.patient_id }} <i class="tim-icons icon-link-72"></i></a>
-
-                      {% else %}
+                
 
                         {{ sample.patient_id }}
 
-                      {% endif %}
                     </td>
                   </tr>
                   <tr>
@@ -163,30 +159,6 @@
     </div>
 
     <div class="col-md-5">
-      <div class="card">
-        <h3 class="card-title card-header">Shared Notes</h3>
-        <div class="card-body">
-          {% if related_notes %}
-          {% for note in related_notes %}
-          <a href="/notes/{{note.id}}">{{note.title}}</a>
-          {% endfor %}
-          {% else %}
-          No notes referencing this sample.
-          {% endif %}
-        </div>
-      </div>
-      <div class="card">
-        <h3 class="card-title card-header">Private Notes</h3>
-        <div class="card-body">
-          {% if private_notes %}
-          {% for note in private_notes %}
-          <a href="/notes/{{note.id}}">{{note.title}}</a>
-          {% endfor %}
-          {% else %}
-          No notes referencing this sample.
-          {% endif %}
-        </div>
-      </div>
       <div class="card">
         <h3 class="card-title card-header">History</h3>
         <div class="card-body">

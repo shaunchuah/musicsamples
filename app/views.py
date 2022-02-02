@@ -310,12 +310,6 @@ def sample_detail(request, pk):
     sample_history = sample.history.filter(id=pk)
     changes = historical_changes(sample_history)
     first_change = sample_history.first()
-    related_notes = sample.note_set.filter(is_public=True)
-    private_notes = sample.note_set.filter(is_public=False).filter(author=request.user)
-    if sample.patient_id[0:3] == "GID":
-        gid_id = int(sample.patient_id.split("-")[1])
-    else:
-        gid_id = None
     processing_time = None
     if sample.processing_datetime is not None:
         time_difference = sample.processing_datetime - sample.sample_datetime
@@ -328,9 +322,6 @@ def sample_detail(request, pk):
             "changes": changes,
             "first": first_change,
             "processing_time": processing_time,
-            "gid_id": gid_id,
-            "related_notes": related_notes,
-            "private_notes": private_notes,
         },
     )
 
