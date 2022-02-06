@@ -1,8 +1,5 @@
-from ckeditor_uploader.fields import RichTextUploadingField
-from django.contrib.auth.models import User
 from django.db import models
 from simple_history.models import HistoricalRecords
-from taggit.managers import TaggableManager
 
 
 class Sample(models.Model):
@@ -44,23 +41,3 @@ class Sample(models.Model):
 
     class Meta:
         ordering = ["-created"]
-
-
-class Note(models.Model):
-    title = models.CharField(max_length=200, unique=True)
-    content = RichTextUploadingField(blank=True, null=True)
-    sample_tags = models.ManyToManyField(Sample, blank=True)
-    is_public = models.BooleanField(default=True)
-    is_deleted = models.BooleanField(default=False)
-    tags = TaggableManager(blank=True)
-
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notes")
-    published_date = models.DateTimeField(auto_now_add=True)
-    last_modified = models.DateTimeField(auto_now=True)
-    history = HistoricalRecords()
-
-    class Meta:
-        ordering = ["-published_date"]
-
-    def __str__(self):
-        return self.title

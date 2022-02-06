@@ -55,16 +55,6 @@ urlpatterns = [
     # path('export_csv/', views.export_csv, name='export_csv'),
     path("export_csv/gidamps", views.gidamps_export_csv, name="gidamps_export_csv"),
     path("export_excel/", views.export_excel, name="export_excel"),
-    # Notes URLs
-    path("notes/", views.notes, name="notes"),
-    path("notes/<int:pk>/", views.note_detail, name="note_detail"),
-    path("notes/add/", views.note_add, name="note_add"),
-    path("notes/<int:pk>/edit/", views.note_edit, name="note_edit"),
-    path("notes/<int:pk>/delete/", views.note_delete, name="note_delete"),
-    path("notes/personal/", views.note_personal, name="note_personal"),
-    path("notes/tag/<slug>", views.note_tags, name="note_tags"),
-    path("notes/authors/<int:pk>", views.note_authors, name="note_authors"),
-    path("notes/search/", views.note_search, name="note_search"),
     # Autocomplete API URLs
     path(
         "autocomplete/locations/",

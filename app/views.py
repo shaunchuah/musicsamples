@@ -16,19 +16,17 @@ from openpyxl.utils import get_column_letter
 from rest_framework import viewsets
 from taggit.models import Tag
 
-from .filters import SampleFilter
-from .forms import (
+from app.filters import SampleFilter
+from app.forms import (
     CheckoutForm,
     DeleteForm,
     FullyUsedForm,
-    NoteDeleteForm,
-    NoteForm,
     ReactivateForm,
     RestoreForm,
     SampleForm,
 )
-from .models import Note, Sample
-from .serializers import (
+from app.models import Sample
+from app.serializers import (
     MultipleSampleSerializer,
     SampleExportSerializer,
     SampleIsFullyUsedSerializer,
@@ -58,7 +56,11 @@ def index(request):
         samples = paginator.page(1)
     except EmptyPage:
         samples = paginator.page(paginator.num_pages)
-    context = {"sample_list": samples, "sample_count": sample_count}
+    context = {
+        "sample_list": samples,
+        "page_obj": samples,
+        "sample_count": sample_count,
+    }
     return render(request, "index.html", context)
 
 
@@ -94,6 +96,67 @@ def filter(request):
         "parameter_string": parameter_string,
     }
     return render(request, "filter.html", context)
+
+
+@login_required(login_url="/login/")
+def used_samples(request):
+    # Used samples page for samples marked as being fully used
+    sample_list = (
+        Sample.objects.all()
+        .filter(is_deleted=False)
+        .filter(is_fully_used=True)
+        .order_by("-last_modified")
+    )
+    sample_count = sample_list.count()
+    page = request.GET.get("page", 1)
+    paginator = Paginator(sample_list, SAMPLE_PAGINATION_SIZE)
+    try:
+        samples = paginator.page(page)
+    except PageNotAnInteger:
+        samples = paginator.page(1)
+    except EmptyPage:
+        samples = paginator.page(paginator.num_pages)
+    context = {
+        "sample_list": samples,
+        "page_obj": samples,
+        "sample_count": sample_count,
+    }
+    return render(request, "samples/used_samples.html", context)
+
+
+@login_required(login_url="/login/")
+def used_samples_search(request):
+    query_string = ""
+    if ("q" in request.GET) and request.GET["q"].strip():
+        query_string = request.GET.get("q")
+        sample_list = (
+            Sample.objects.filter(
+                Q(sample_id__icontains=query_string)
+                | Q(patient_id__icontains=query_string)
+                | Q(sample_location__icontains=query_string)
+                | Q(sample_sublocation__icontains=query_string)
+                | Q(sample_type__icontains=query_string)
+                | Q(sample_comments__icontains=query_string)
+            )
+            .filter(is_fully_used=True)
+            .filter(is_deleted=False)
+        )
+        sample_count = sample_list.count()
+        return render(
+            request,
+            "samples/used_samples.html",
+            {
+                "query_string": query_string,
+                "sample_list": sample_list,
+                "sample_count": sample_count,
+            },
+        )
+    else:
+        return render(
+            request,
+            "samples/used_samples.html",
+            {"query_string": "Null", "sample_count": 0},
+        )
 
 
 @login_required(login_url="/login/")
@@ -151,7 +214,7 @@ def analytics(request):
 
 
 @login_required(login_url="/login/")
-@cache_page(3 * 60)  # Cache page for 60 minutes
+@cache_page(3 * 60)  # Cache page for 3 minutes
 def gid_overview(request):
     # Analytics --> Sample Overview Table Page
     sample_categories = (
@@ -218,55 +281,6 @@ def sample_archive(request):
 
 
 @login_required(login_url="/login/")
-def used_samples(request):
-    # Used samples page for samples marked as being fully used
-    sample_list = (
-        Sample.objects.all()
-        .filter(is_deleted=False)
-        .filter(is_fully_used=True)
-        .order_by("-last_modified")
-    )
-    sample_count = sample_list.count()
-    context = {"sample_list": sample_list, "sample_count": sample_count}
-    return render(request, "samples/used_samples.html", context)
-
-
-@login_required(login_url="/login/")
-def used_samples_search(request):
-    query_string = ""
-    if ("q" in request.GET) and request.GET["q"].strip():
-        query_string = request.GET.get("q")
-        sample_list = (
-            Sample.objects.filter(
-                Q(sample_id__icontains=query_string)
-                | Q(patient_id__icontains=query_string)
-                | Q(sample_location__icontains=query_string)
-                | Q(sample_sublocation__icontains=query_string)
-                | Q(sample_type__icontains=query_string)
-                | Q(sample_comments__icontains=query_string)
-            )
-            .filter(is_fully_used=True)
-            .filter(is_deleted=False)
-        )
-        sample_count = sample_list.count()
-        return render(
-            request,
-            "samples/used_samples.html",
-            {
-                "query_string": query_string,
-                "sample_list": sample_list,
-                "sample_count": sample_count,
-            },
-        )
-    else:
-        return render(
-            request,
-            "samples/used_samples.html",
-            {"query_string": "Null", "sample_count": 0},
-        )
-
-
-@login_required(login_url="/login/")
 def sample_add(request):
     # Add mew sample page
     if request.method == "POST":
@@ -310,12 +324,6 @@ def sample_detail(request, pk):
     sample_history = sample.history.filter(id=pk)
     changes = historical_changes(sample_history)
     first_change = sample_history.first()
-    related_notes = sample.note_set.filter(is_public=True)
-    private_notes = sample.note_set.filter(is_public=False).filter(author=request.user)
-    if sample.patient_id[0:3] == "GID":
-        gid_id = int(sample.patient_id.split("-")[1])
-    else:
-        gid_id = None
     processing_time = None
     if sample.processing_datetime is not None:
         time_difference = sample.processing_datetime - sample.sample_datetime
@@ -328,9 +336,6 @@ def sample_detail(request, pk):
             "changes": changes,
             "first": first_change,
             "processing_time": processing_time,
-            "gid_id": gid_id,
-            "related_notes": related_notes,
-            "private_notes": private_notes,
         },
     )
 
@@ -499,54 +504,6 @@ def reactivate_sample(request, pk):
     return render(request, "samples/sample-reactivate.html", {"form": form})
 
 
-# @login_required(login_url="/login/")
-# def export_csv(request):
-#     # Export entire database to CSV for backup, currently not in use
-#     response = HttpResponse(content_type="text/csv")
-#     response[
-#         "Content-Disposition"
-#     ] = 'attachment; filename="music_samples_%s.csv"' % datetime.datetime.now().strftime(  # noqa E501
-#         "%Y-%m-%d"
-#     )
-#     writer = csv.writer(response)
-#     writer.writerow(
-#         [
-#             "MUSIC Sample ID",
-#             "Patient ID",
-#             "Sample Location",
-#             "Sample Type",
-#             "Sample Datetime",
-#             "Sample Comments",
-#             "Created By",
-#             "Date First Created",
-#             "Last Modified By",
-#             "Last Modified",
-#         ]
-#     )
-#     samples = (
-#         Sample.objects.all()
-#         .filter(is_deleted=False)
-#         .values_list(
-#             "sample_id",
-#             "patient_id",
-#             "sample_location",
-#             "sample_type",
-#             "sample_datetime",
-#             "sample_comments",
-#             "created_by",
-#             "created",
-#             "last_modified_by",
-#             "last_modified",
-#         )
-#     )
-#     for sample in samples:
-#         writer.writerow(sample)
-#     return response
-
-
-# Excel Exports
-
-
 @login_required(login_url="/login/")
 def export_excel(request):
     # Exports custom views based on the search string otherwise exports entire database
@@ -704,252 +661,6 @@ def gidamps_export_csv(request):
     for sample in samples:
         writer.writerow(sample)
     return response
-
-
-############################################################################
-# NOTES SECTION ############################################################
-############################################################################
-# Notes is set up much like a blogging system with the usual blogging tags
-# The main unique point is the ability to tag the ID of relevant samples
-# to allow quick access both from the notes side as well as from the
-# sample-detail side
-#
-# SHARING
-# The default option is for notes to be shared to every user of the system
-# to promote a collaborative lab environment. There is an option to mark
-# notes as 'private'.
-# The logic controlling access to private notes is found here.
-# Do note that every note is still viewable by the administrator
-#
-# FILE UPLOADS/ATTACHMENTS - **IMPORTANT** - THESE FILES ARE
-# PUBLICLY AVAILABLE OVER THE INTERNET IF YOU KNOW THE URL
-# File uploads are supported via CKEditor but will require
-# configuring some sort of S3 backend to work properly
-# See Django's documentation on handling media uploads - there are a
-# few customisation options you can consider
-
-
-@login_required(login_url="/login/")
-def notes(request):
-    # Shared Lab Notes - Find all shared notes between all the users
-    notes = Note.objects.all().filter(is_public=True).filter(is_deleted=False)
-    page = request.GET.get("page", 1)
-    paginator = Paginator(notes, 10)
-    try:
-        notes = paginator.page(page)
-    except PageNotAnInteger:
-        notes = paginator.page(1)
-    except EmptyPage:
-        notes = paginator.page(paginator.num_pages)
-    all_tags = Note.tags.all()
-    users = User.objects.all()
-    context = {
-        "notes": notes,
-        "page_title": "Shared Notes",
-        "all_tags": all_tags,
-        "users": users,
-    }
-    return render(request, "notes/notes-main.html", context)
-
-
-@login_required(login_url="/login/")
-def note_personal(request):
-    # My Notebook - Show all notes belonging to the logged in user
-    notes = Note.objects.all().filter(is_deleted=False).filter(author=request.user)
-    page = request.GET.get("page", 1)
-    paginator = Paginator(notes, 10)
-    try:
-        notes = paginator.page(page)
-    except PageNotAnInteger:
-        notes = paginator.page(1)
-    except EmptyPage:
-        notes = paginator.page(paginator.num_pages)
-    all_tags = Note.tags.all()
-    users = User.objects.all()
-    context = {
-        "notes": notes,
-        "page_title": "My Notebook",
-        "all_tags": all_tags,
-        "users": users,
-        "next_url": reverse("note_personal"),
-    }
-    return render(request, "notes/notes-main.html", context)
-
-
-@login_required(login_url="/login/")
-def note_tags(request, slug):
-    # Find all shared notes by tags and private notes depending on the
-    # logged in user
-    tag = get_object_or_404(Tag, slug=slug)
-
-    # Get all public notes with the requested tag
-    public_notes = (
-        Note.objects.filter(is_public=True).filter(is_deleted=False).filter(tags=tag)
-    )
-
-    # Get all the private notes with the requested tag if the author and
-    # logged in user is the same
-    private_notes = (
-        Note.objects.filter(is_public=False)
-        .filter(is_deleted=False)
-        .filter(author__id=request.user.id)
-        .filter(tags=tag)
-    )
-
-    notes = public_notes | private_notes
-    page = request.GET.get("page", 1)
-    paginator = Paginator(notes, 10)
-    try:
-        notes = paginator.page(page)
-    except PageNotAnInteger:
-        notes = paginator.page(1)
-    except EmptyPage:
-        notes = paginator.page(paginator.num_pages)
-    all_tags = Note.tags.all()
-    users = User.objects.all()
-    context = {
-        "notes": notes,
-        "page_title": "Tag Results: #" + slug,
-        "all_tags": all_tags,
-        "users": users,
-    }
-    return render(request, "notes/notes-main.html", context)
-
-
-@login_required(login_url="/login/")
-def note_authors(request, pk):
-    # See all the shared notes by specific authors
-    user = get_object_or_404(User, pk=pk)
-    notes = (
-        Note.objects.filter(is_public=True).filter(is_deleted=False).filter(author=pk)
-    )
-    page = request.GET.get("page", 1)
-    paginator = Paginator(notes, 10)
-    try:
-        notes = paginator.page(page)
-    except PageNotAnInteger:
-        notes = paginator.page(1)
-    except EmptyPage:
-        notes = paginator.page(paginator.num_pages)
-    all_tags = Note.tags.all()
-    users = User.objects.all()
-    context = {
-        "notes": notes,
-        "page_title": "Notes by " + user.first_name + " " + user.last_name,
-        "all_tags": all_tags,
-        "users": users,
-    }
-    return render(request, "notes/notes-main.html", context)
-
-
-@login_required(login_url="/login/")
-def note_detail(request, pk):
-    # See single note
-    note = get_object_or_404(Note, pk=pk)
-    if note.is_public:
-        secured_note = note
-    else:
-        if request.user.id == note.author.id:
-            secured_note = note
-        else:
-            messages.error(request, "This note is private. Access denied")
-            return redirect("/notes/personal")
-    note_history = note.history.filter(id=pk)
-    changes = historical_changes(note_history)
-    context = {"note": secured_note, "changes": changes}
-    return render(request, "notes/notes-detail.html", context)
-
-
-@login_required(login_url="/login/")
-def note_add(request):
-    # Adding a new note
-    if request.method == "POST":
-        form = NoteForm(request.POST)
-        if form.is_valid():
-            note = form.save(commit=False)
-            note.author = request.user
-            note.save()
-            form.save_m2m()
-            messages.success(request, "Note saved successfully.")
-            return redirect("/notes/personal/")
-        else:
-            messages.error(request, "There are some errors.")
-    else:
-        form = NoteForm()
-    return render(request, "notes/notes-add.html", {"form": form})
-
-
-@login_required(login_url="/login/")
-def note_edit(request, pk):
-    # Editing an existing note
-    note = get_object_or_404(Note, pk=pk)
-    if request.method == "POST":
-        form = NoteForm(request.POST, instance=note)
-
-        # Check user authorisation
-        if form.is_valid() and request.user.id == note.author.id:
-            form.save()
-            messages.success(request, "Note updated successfully.")
-            next_url = request.GET.get("next_url")
-            if next_url:
-                return redirect(next_url)
-            else:
-                return redirect("/notes/personal/")
-        else:
-            messages.error(request, "Unable to edit note.")
-    else:
-        form = NoteForm(instance=note)
-    return render(request, "notes/notes-edit.html", {"form": form, "note": note})
-
-
-@login_required(login_url="/login/")
-def note_delete(request, pk):
-    # Soft deleting a note
-    note = get_object_or_404(Note, pk=pk)
-    if request.method == "POST":
-        form = NoteDeleteForm(request.POST, instance=note)
-
-        # Check user authorisation
-        if form.is_valid() and request.user.id == note.author.id:
-            form.save()
-            messages.success(request, "Note deleted successfully.")
-            next_url = request.GET.get("next_url")
-            if next_url:
-                return redirect(next_url)
-            else:
-                return redirect("/notes/personal/")
-        else:
-            messages.error(request, "Unable to delete note.")
-    else:
-        form = NoteDeleteForm(instance=note)
-    return render(request, "notes/notes-delete.html", {"form": form, "note": note})
-
-
-@login_required(login_url="/login/")
-def note_search(request):
-    # Search Notes
-    all_tags = Note.tags.all()
-    users = User.objects.all()
-    query_string = ""
-    if ("q" in request.GET) and request.GET["q"].strip():
-        query_string = request.GET.get("q")
-        notes = Note.objects.filter(
-            Q(title__icontains=query_string)
-            | Q(sample_tags__sample_id__icontains=query_string)
-            | Q(content__icontains=query_string)
-        ).filter(is_deleted=False)
-        context = {
-            "notes": notes,
-            "page_title": "Search Results for: " + query_string,
-            "all_tags": all_tags,
-            "users": users,
-        }
-        return render(request, "notes/notes-main.html", context)
-    else:
-        if "HTTP_REFERER" in request.META:
-            return redirect(request.META["HTTP_REFERER"])
-        else:
-            return redirect(reverse("notes"))
 
 
 #############################################################################

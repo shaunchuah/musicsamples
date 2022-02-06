@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Sample
+from app.models import Sample
 
 
 class SampleSerializer(serializers.HyperlinkedModelSerializer):

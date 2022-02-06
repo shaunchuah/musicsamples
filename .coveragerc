@@ -13,3 +13,7 @@ omit =
     *storage_backends.py,
     *tests.py
     *venv/*
+
+[report]
+exclude_lines =
+    if settings.DEBUG

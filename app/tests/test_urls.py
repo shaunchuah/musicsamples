@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 from django.urls import reverse, resolve
-from .. import views
+from app import views
 
 
 class TestUrls(SimpleTestCase):
@@ -60,38 +60,6 @@ class TestUrls(SimpleTestCase):
         url = reverse("account")
         self.assertEqual(resolve(url).func, views.account)
 
-    def test_note_main_url_resolves(self):
-        url = reverse("notes")
-        self.assertEqual(resolve(url).func, views.notes)
-
-    def test_note_detail_url_resolves(self):
-        url = reverse("note_detail", kwargs={"pk": 1})
-        self.assertEqual(resolve(url).func, views.note_detail)
-
-    def test_note_add_url_resolves(self):
-        url = reverse("note_add")
-        self.assertEqual(resolve(url).func, views.note_add)
-
-    def test_note_edit_url_resolves(self):
-        url = reverse("note_edit", kwargs={"pk": 1})
-        self.assertEqual(resolve(url).func, views.note_edit)
-
-    def test_note_delete_url_resolves(self):
-        url = reverse("note_delete", kwargs={"pk": 1})
-        self.assertEqual(resolve(url).func, views.note_delete)
-
-    def test_note_personal_url_resolves(self):
-        url = reverse("note_personal")
-        self.assertEqual(resolve(url).func, views.note_personal)
-
-    def test_note_tags_url_resolves(self):
-        url = reverse("note_tags", kwargs={"slug": "test"})
-        self.assertEqual(resolve(url).func, views.note_tags)
-
-    def test_note_authors_url_resolves(self):
-        url = reverse("note_authors", kwargs={"pk": 1})
-        self.assertEqual(resolve(url).func, views.note_authors)
-
     def test_autocomplete_locations_url_resolves(self):
         url = reverse("autocomplete_locations")
         self.assertEqual(resolve(url).func, views.autocomplete_locations)
@@ -103,10 +71,6 @@ class TestUrls(SimpleTestCase):
     def test_autocomplete_tags_url_resolves(self):
         url = reverse("autocomplete_tags")
         self.assertEqual(resolve(url).func, views.autocomplete_tags)
-
-    def test_note_search_url_resolves(self):
-        url = reverse("note_search")
-        self.assertEqual(resolve(url).func, views.note_search)
 
     def test_barcode_url_resolves(self):
         url = reverse("barcode")
