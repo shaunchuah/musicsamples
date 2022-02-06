@@ -19,7 +19,7 @@ jobs:
       ALLOWED_HOSTS: localhost, 127.0.0.1
       DB_USER:
       DB_PASSWORD:
-      DB_NAME: mydatabase
+      DB_NAME: dev_db.sqlite
       DB_HOST: 
       DB_ENGINE: django.db.backends.sqlite3
       DB_PORT: 10
