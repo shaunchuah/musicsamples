@@ -70,7 +70,7 @@ def test_index_pagination_not_an_integer(auto_login_user):
     client, user = auto_login_user()
     number_of_samples = 10
     for i in range(number_of_samples):
-        mixer.blend("app.Sample")
+        mixer.blend("app.sample")
     path = reverse("home") + "?page=notaninteger"
     response = client.get(path)
     assertRaisesMessage(PageNotAnInteger, response)
@@ -88,7 +88,7 @@ def test_index_pagination(auto_login_user):
     client, user = auto_login_user()
     number_of_samples = 120
     for i in range(number_of_samples):
-        mixer.blend("app.Sample")
+        mixer.blend("app.sample")
     path = reverse("home") + "?page=1"
     response = client.get(path)
     assert response.context["sample_list"].paginator.num_pages == 2
@@ -378,8 +378,8 @@ def test_sample_reactivate(auto_login_user):
 
 def test_autocomplete_locations(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.Sample", sample_location="location1")
-    mixer.blend("app.Sample", sample_location="test2")
+    mixer.blend("app.sample", sample_location="location1")
+    mixer.blend("app.sample", sample_location="test2")
     path = reverse("autocomplete_locations")
     response = client.get(path + "?term=loc")
     assert "location1" in json.loads(response.content)
@@ -396,8 +396,8 @@ def test_autocomplete_locations(auto_login_user):
 
 def test_autocomplete_patient_id(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.Sample", patient_id="GID-123-P")
-    mixer.blend("app.Sample", patient_id="GID-003-P")
+    mixer.blend("app.sample", patient_id="GID-123-P")
+    mixer.blend("app.sample", patient_id="GID-003-P")
     path = reverse("autocomplete_patients")
     response = client.get(path + "?term=GID-123")
     assert "GID-123-P" in json.loads(response.content)
@@ -444,7 +444,7 @@ def test_gidamps_export_csv_view(auto_login_user):
 
 def test_filter_view(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.Sample", patient_id="GID-123-P")
+    mixer.blend("app.sample", patient_id="GID-123-P")
     path = reverse("filter")
     response = client.get(path + "?patient_id=gid-123-P")
     assert response.status_code == 200
