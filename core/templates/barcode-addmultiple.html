@@ -281,6 +281,13 @@ Dashboard
             />
           </div>
 
+          <div class="form-check">
+            <label class="form-check-label" for="id_is_marvel_study">
+              MARVEL Study Sample?
+            </label>
+            <input type="checkbox" name="is_marvel_study" class="form-check-input" id="id_is_marvel_study">
+          </div>
+
           <div class="form-group">
             <label for="id_sample_comments">Comments:</label>
             <textarea
@@ -433,6 +440,8 @@ Dashboard
         'sample_volume': $('#id_sample_volume').val(),
         'sample_volume_units': $('#id_sample_volume_units').val(),
         'freeze_thaw_count': $('#id_freeze_thaw_count').val(),
+        'is_marvel_study': $('#id_is_marvel_study').val(),
+        'frozen_datetime': $('#id_frozen_datetime').val(),
       },
       success: function (result) {
         $(".alert-success").show();
@@ -476,7 +485,7 @@ Dashboard
     $(".alert").hide();
 
     var today = new Date();
-    var date = today.getFullYear() + '-' + adjust(today.getMonth() + 1) + '-' + today.getDate();
+    var date = today.getFullYear() + '-' + adjust(today.getMonth() + 1) + '-' + adjust(today.getDate());
     var time = adjust(today.getHours()) + ":" + adjust(today.getMinutes());
     var dateTime = date + 'T' + time;
     $("#id_processing_datetime").val(dateTime);

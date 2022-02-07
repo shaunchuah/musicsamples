@@ -2300,11 +2300,7 @@ textarea.form-control {
   padding-left: 1.25rem;
 }
 
-.form-check-input {
-  position: absolute;
-  margin-top: 0.3rem;
-  margin-left: -1.25rem;
-}
+
 
 .form-check-input:disabled~.form-check-label {
   color: #6c757d;
@@ -16937,15 +16933,23 @@ hr {
 }
 
 .form-check {
-  margin-top: .5rem;
+  margin-top: 0;
+  margin-bottom: 20px;
   padding-left: 0;
+  display: flex;
+  align-items:center;
+}
+
+.form-check input[type=checkbox] {
+  width:20px;
+  height:20px;
 }
 
 .form-check .form-check-label {
   display: inline-block;
   position: relative;
   cursor: pointer;
-  padding-left: 25px;
+  padding-right: 10px;
   line-height: 18px;
   margin-bottom: 0;
   -webkit-transition: color 0.3s linear;
@@ -17009,12 +17013,7 @@ hr {
   cursor: not-allowed;
 }
 
-.form-check input[type="checkbox"],
-.radio input[type="radio"] {
-  opacity: 0;
-  position: absolute;
-  visibility: hidden;
-}
+
 
 .form-check input[type="checkbox"]:checked+.form-check-sign::after {
   opacity: 1;
