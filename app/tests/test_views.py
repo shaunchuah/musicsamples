@@ -10,6 +10,7 @@ from mixer.backend.django import mixer
 from pytest_django.asserts import assertRaisesMessage, assertTemplateUsed
 
 from app import views
+from app.factories import SampleFactory
 from app.models import Sample
 from authentication.factories import UserFactory
 
@@ -465,3 +466,100 @@ class TestMarvelSampleViews(TestCase):
         assert (
             response.status_code == 200
         ), "Should return add new sample page via GET request."
+
+    def test_add_marvel_sample(self):
+        url = reverse("sample_add")
+        form_data = {
+            "sample_id": "test001",
+            "patient_id": "patient001",
+            "sample_location": "location001",
+            "sample_type": "test_sample_type",
+            "sample_datetime": "2020-01-01T13:20:30",
+            "sample_comments": "",
+            "processing_datetime": "2020-01-01T13:20:30",
+            "sample_sublocation": "",
+            "sample_volume": "",
+            "sample_volume_units": "",
+            "freeze_thaw_count": 0,
+            "haemolysis_reference": "",
+            "biopsy_location": "",
+            "biopsy_inflamed_status": "",
+            "is_marvel_study": "true",
+        }
+        self.client.post(url, data=form_data)
+        created_sample = Sample.objects.get(sample_id="TEST001")
+        assert created_sample.is_marvel_study is True
+        assert created_sample.frozen_datetime is None
+
+    def test_add_non_marvel_sample(self):
+        url = reverse("sample_add")
+        form_data = {
+            "sample_id": "test001",
+            "patient_id": "patient001",
+            "sample_location": "location001",
+            "sample_type": "test_sample_type",
+            "sample_datetime": "2020-01-01T13:20:30",
+            "sample_comments": "",
+            "processing_datetime": "2020-01-01T13:20:30",
+            "sample_sublocation": "",
+            "sample_volume": "",
+            "sample_volume_units": "",
+            "freeze_thaw_count": 0,
+            "haemolysis_reference": "",
+            "biopsy_location": "",
+            "biopsy_inflamed_status": "",
+        }
+        self.client.post(url, data=form_data)
+        created_sample = Sample.objects.get(sample_id="TEST001")
+        assert created_sample.is_marvel_study is False
+
+    def test_add_marvel_sample_with_frozen_datetime(self):
+        url = reverse("sample_add")
+        form_data = {
+            "sample_id": "test001",
+            "patient_id": "patient001",
+            "sample_location": "location001",
+            "sample_type": "test_sample_type",
+            "sample_datetime": "2020-01-01T13:20:30",
+            "sample_comments": "",
+            "processing_datetime": "2020-01-01T13:20:30",
+            "frozen_datetime": "2020-01-01T16:20:00",
+            "sample_sublocation": "",
+            "sample_volume": "",
+            "sample_volume_units": "",
+            "freeze_thaw_count": 0,
+            "haemolysis_reference": "",
+            "biopsy_location": "",
+            "biopsy_inflamed_status": "",
+        }
+        self.client.post(url, data=form_data)
+        created_sample = Sample.objects.get(sample_id="TEST001")
+        assert created_sample.frozen_datetime is not None
+
+    def test_add_sample_unique(self):
+        SampleFactory(sample_id="TEST001")
+        url = reverse("sample_add")
+        form_data = {
+            "sample_id": "test001",
+            "patient_id": "patient001",
+            "sample_location": "location001",
+            "sample_type": "test_sample_type",
+            "sample_datetime": "2020-01-01T13:20:30",
+            "sample_comments": "",
+            "processing_datetime": "2020-01-01T13:20:30",
+            "frozen_datetime": "2020-01-01T16:20:00",
+            "sample_sublocation": "",
+            "sample_volume": "",
+            "sample_volume_units": "",
+            "freeze_thaw_count": 0,
+            "haemolysis_reference": "",
+            "biopsy_location": "",
+            "biopsy_inflamed_status": "",
+        }
+        response = self.client.post(url, data=form_data)
+        assert (
+            response.context["form"].errors["sample_id"][0]
+            == "Sample with this Sample id already exists."
+        )
+        created_sample = Sample.objects.get(sample_id="TEST001")
+        assert created_sample.patient_id != "patient001"
