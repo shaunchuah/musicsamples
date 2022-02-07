@@ -1,13 +1,9 @@
-import json
-
 import pytest
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
-from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
-from pytest_django.asserts import assertRaisesMessage, assertTemplateUsed
+from pytest_django.asserts import assertTemplateUsed
 
 from app import views
 from app.factories import SampleFactory
@@ -50,14 +46,6 @@ def auto_login_user(db, client, create_user, test_password):
 
 
 class TestHomePage:
-    def test_home_page_authenticated(self):
-        path = reverse("home")
-        request = RequestFactory().get(path)
-        User = get_user_model()
-        request.user = mixer.blend(User)
-        response = views.index(request)
-        assert response.status_code == 200, "Should show homepage when logged in."
-
     def test_home_page_unauthorized(self):
         path = reverse("home")
         request = RequestFactory().get(path)
@@ -66,34 +54,6 @@ class TestHomePage:
         assert (
             "login" in response.url
         ), "Should not show homepage and redirect to login."
-
-
-def test_index_pagination_not_an_integer(auto_login_user):
-    client, user = auto_login_user()
-    number_of_samples = 10
-    for i in range(number_of_samples):
-        mixer.blend("app.sample")
-    path = reverse("home") + "?page=notaninteger"
-    response = client.get(path)
-    assertRaisesMessage(PageNotAnInteger, response)
-    assert response.context["sample_list"].number == 1  # test page number returns as 1
-
-
-def test_index_pagination_empty_page(auto_login_user):
-    client, user = auto_login_user()
-    path = reverse("home") + "?page=2"
-    response = client.get(path)
-    assertRaisesMessage(EmptyPage, response)
-
-
-def test_index_pagination(auto_login_user):
-    client, user = auto_login_user()
-    number_of_samples = 120
-    for i in range(number_of_samples):
-        mixer.blend("app.sample")
-    path = reverse("home") + "?page=1"
-    response = client.get(path)
-    assert response.context["sample_list"].paginator.num_pages == 2
 
 
 def test_analytics_unauthorized(client):
@@ -116,67 +76,12 @@ def test_gid_overview_page(admin_client):
     assert response.status_code == 200, "Show GID overview page to authorised users."
 
 
-def test_reference_page(admin_client):
-    path = reverse("reference")
-    response = admin_client.get(path)
-    assertTemplateUsed(response, "reference.html")
-
-
 def test_account_page_unauthorized(client):
     path = reverse("account")
     response = client.get(path)
     assert (
         "login" in response.url
     ), "Should not show account page to unauthenticated users."
-
-
-def test_account_page(admin_client):
-    path = reverse("account")
-    response = admin_client.get(path)
-    assertTemplateUsed(
-        response, "account.html"
-    ), "Check account page url and returns the account.html template."
-
-
-def test_used_samples_page(admin_client):
-    path = reverse("used_samples")
-    response = admin_client.get(path)
-    assertTemplateUsed(
-        response, "samples/used_samples.html"
-    ), "Check used samples page url and returns the used_samples.html template."
-
-
-def test_barcode_main_page(admin_client):
-    path = reverse("barcode")
-    response = admin_client.get(path)
-    assertTemplateUsed(
-        response, "barcode.html"
-    ), "Check used samples page url and returns the used_samples.html template."
-
-
-def test_barcode_samples_used_page(admin_client):
-    path = reverse("barcode_samples_used")
-    response = admin_client.get(path)
-    assertTemplateUsed(
-        response, "barcode-markused.html"
-    ), "Check used samples page url and returns the used_samples.html template."
-
-
-def test_barcode_add_multiple_view(admin_client):
-    path = reverse("barcode_add_multiple")
-    response = admin_client.get(path)
-    assertTemplateUsed(
-        response, "barcode-addmultiple.html"
-    ), "Check barcode add multiple page url and returns the used_samples.html template."
-
-
-def test_archive_page(admin_client):
-    path = reverse("sample_archive")
-    response = admin_client.get(path)
-    assert (
-        response.status_code == 200
-    ), "Check archive view and url is working. (Soft deleted samples.)"
-    assertTemplateUsed(response, "samples/sample-archive.html")
 
 
 def test_error_404_template(admin_client):
@@ -375,63 +280,6 @@ def test_sample_reactivate(auto_login_user):
     assert response.url == "/"
 
 
-# AUTOCOMPLETE TESTS
-
-
-def test_autocomplete_locations(auto_login_user):
-    client, user = auto_login_user()
-    mixer.blend("app.sample", sample_location="location1")
-    mixer.blend("app.sample", sample_location="test2")
-    path = reverse("autocomplete_locations")
-    response = client.get(path + "?term=loc")
-    assert "location1" in json.loads(response.content)
-    assert "test2" not in json.loads(response.content)
-
-    response_2 = client.get(path + "?term=te")
-    assert "location1" not in json.loads(response_2.content)
-    assert "test2" in json.loads(response_2.content)
-
-    response_3 = client.get(path)
-    assert "location1" in json.loads(response_3.content)
-    assert "test2" in json.loads(response_3.content)
-
-
-def test_autocomplete_patient_id(auto_login_user):
-    client, user = auto_login_user()
-    mixer.blend("app.sample", patient_id="GID-123-P")
-    mixer.blend("app.sample", patient_id="GID-003-P")
-    path = reverse("autocomplete_patients")
-    response = client.get(path + "?term=GID-123")
-    assert "GID-123-P" in json.loads(response.content)
-    assert "GID-003-P" not in json.loads(response.content)
-
-    response_2 = client.get(path + "?term=003")
-    assert "GID-123-P" not in json.loads(response_2.content)
-    assert "GID-003-P" in json.loads(response_2.content)
-
-    response_3 = client.get(path)
-    assert "GID-123-P" in json.loads(response_3.content)
-    assert "GID-003-P" in json.loads(response_3.content)
-
-
-def test_autocomplete_tags(auto_login_user):
-    client, user = auto_login_user()
-    mixer.blend("taggit.Tag", name="tag1")
-    mixer.blend("taggit.Tag", name="Test2")
-    path = reverse("autocomplete_tags")
-    response = client.get(path + "?term=ta")
-    assert "tag1" in json.loads(response.content)
-    assert "Test2" not in json.loads(response.content)
-
-    response_2 = client.get(path + "?term=test")
-    assert "tag1" not in json.loads(response_2.content)
-    assert "Test2" in json.loads(response_2.content)
-
-    response_3 = client.get(path)
-    assert "tag1" in json.loads(response_3.content)
-    assert "Test2" in json.loads(response_3.content)
-
-
 # Test Data Export Views
 
 
@@ -453,7 +301,7 @@ def test_filter_view(auto_login_user):
     assert "GID-123-P" in response.context["sample_filter"].qs.all()[0].patient_id
 
 
-class TestMarvelSampleViews(TestCase):
+class TestViews(TestCase):
     def setUp(self):
         self.user = UserFactory()
         self.client = Client()
