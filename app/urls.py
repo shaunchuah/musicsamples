@@ -1,14 +1,16 @@
-from django.urls import path, include
-from app import views
+from django.urls import include, path
+from django.views.generic.base import TemplateView
 from rest_framework import routers
+
+from app import views
+
 from .views import (
-    SampleViewSet,
-    SampleIsFullyUsedViewSet,
+    AllSampleExportViewset,
     MultipleSampleViewSet,
     SampleExportViewset,
-    AllSampleExportViewset,
+    SampleIsFullyUsedViewSet,
+    SampleViewSet,
 )
-from django.views.generic.base import TemplateView
 
 router = routers.DefaultRouter()
 
@@ -66,7 +68,6 @@ urlpatterns = [
         views.autocomplete_patient_id,
         name="autocomplete_patients",
     ),
-    path("autocomplete/tags/", views.autocomplete_tags, name="autocomplete_tags"),
     # Django Rest Framework URLs
     path("api/", include(router.urls)),
     # QR code URLs

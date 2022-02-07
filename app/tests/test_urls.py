@@ -1,5 +1,6 @@
 from django.test import SimpleTestCase
-from django.urls import reverse, resolve
+from django.urls import resolve, reverse
+
 from app import views
 
 
@@ -48,10 +49,6 @@ class TestUrls(SimpleTestCase):
         url = reverse("sample_search")
         self.assertEqual(resolve(url).func, views.sample_search)
 
-    # def test_csv_export_url_resolves(self):
-    #     url = reverse('export_csv')
-    #     self.assertEqual(resolve(url).func, views.export_csv)
-
     def test_export_excel_url_resolves(self):
         url = reverse("export_excel")
         self.assertEqual(resolve(url).func, views.export_excel)
@@ -67,10 +64,6 @@ class TestUrls(SimpleTestCase):
     def test_autocomplete_patient_id_url_resolves(self):
         url = reverse("autocomplete_patients")
         self.assertEqual(resolve(url).func, views.autocomplete_patient_id)
-
-    def test_autocomplete_tags_url_resolves(self):
-        url = reverse("autocomplete_tags")
-        self.assertEqual(resolve(url).func, views.autocomplete_tags)
 
     def test_barcode_url_resolves(self):
         url = reverse("barcode")
