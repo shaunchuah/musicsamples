@@ -68,7 +68,7 @@ class SampleForm(ModelForm):
             "biopsy_inflamed_status": forms.Select(
                 choices=BIOPSY_INFLAMED_STATUS_CHOICES
             ),
-            "is_marvel_study": forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            "is_marvel_study": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
         labels = {
             "sample_id": "Sample ID*",

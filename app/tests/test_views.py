@@ -4,15 +4,13 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.core.paginator import EmptyPage, PageNotAnInteger
-from django.test import RequestFactory, Client, TestCase
+from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
 from pytest_django.asserts import assertRaisesMessage, assertTemplateUsed
 
 from app import views
 from app.models import Sample
-from app.factories import SampleFactory
-
 from authentication.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -460,7 +458,6 @@ class TestMarvelSampleViews(TestCase):
         self.client = Client()
         self.client.force_login(self.user, backend=None)
         self.anonymous_client = Client()
-        
 
     def test_add_sample_page(self):
         url = reverse("sample_add")

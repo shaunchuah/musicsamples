@@ -6,22 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app', '0018_auto_20211013_2355'),
+        ("app", "0018_auto_20211013_2355"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='sample',
-            options={'ordering': ['-created']},
+            name="sample",
+            options={"ordering": ["-created"]},
         ),
         migrations.AddField(
-            model_name='historicalsample',
-            name='frozen_datetime',
+            model_name="historicalsample",
+            name="frozen_datetime",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='sample',
-            name='frozen_datetime',
+            model_name="sample",
+            name="frozen_datetime",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]
