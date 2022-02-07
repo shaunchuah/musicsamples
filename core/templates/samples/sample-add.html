@@ -61,6 +61,17 @@
                 </div>
               </div>
 
+              {% elif field.name == 'is_marvel_study' %}
+              <div class="form-check">
+                <label class="form-check-label" for="id_is_marvel_study">
+                  MARVEL Study Sample?
+                </label>
+                {% render_field field class="form-check-input" %}
+                {% if field.help_text %}
+                  <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+              </div>
+
               {% else %}
 
 

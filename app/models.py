@@ -13,6 +13,7 @@ class Sample(models.Model):
 
     is_deleted = models.BooleanField(default=False)
     is_fully_used = models.BooleanField(default=False)
+    is_marvel_study = models.BooleanField(default=False)
 
     processing_datetime = models.DateTimeField(blank=True, null=True)
     frozen_datetime = models.DateTimeField(blank=True, null=True)

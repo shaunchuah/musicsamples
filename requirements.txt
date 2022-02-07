@@ -31,9 +31,11 @@ pytest-django==4.5.2
 pytest-cov==2.11.1
 mixer==7.1.2
 Faker==9.2.0
+factory_boy==3.2.1
 
 # Code quality
 # ------------------------------------------------------------------------------
 flake8==3.8.4
 black==22.1.0
 pre-commit==2.15.0
+isort==5.10.1

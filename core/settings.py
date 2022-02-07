@@ -1,6 +1,5 @@
 import os
 
-
 import sentry_sdk
 from decouple import Csv, config
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -45,7 +44,7 @@ INSTALLED_APPS = [
     "storages",
     "django_filters",
     "taggit",
-    "app"
+    "app",
 ]
 
 MIDDLEWARE = [

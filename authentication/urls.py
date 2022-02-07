@@ -3,12 +3,12 @@ from django.contrib.auth.views import LogoutView
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 
-from authentication.views import (
-    login_view,
-    generate_token,
+from authentication.views import (  # , register_user
     delete_token,
+    generate_token,
+    login_view,
     refresh_token,
-)  # , register_user
+)
 
 urlpatterns = [
     path("login/", login_view, name="login"),
@@ -62,5 +62,5 @@ urlpatterns = [
     path("get_api_token/", obtain_auth_token, name="obtain_auth_token"),
     path("generate_token/", generate_token, name="generate_token"),
     path("delete_token/", delete_token, name="delete_token"),
-    path("refresh_token/", refresh_token, name="refresh_token")
+    path("refresh_token/", refresh_token, name="refresh_token"),
 ]
