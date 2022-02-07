@@ -14,7 +14,6 @@ from django.views.decorators.cache import cache_page
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from rest_framework import viewsets
-from taggit.models import Tag
 
 from app.filters import SampleFilter
 from app.forms import (
@@ -714,25 +713,6 @@ def autocomplete_patient_id(request):
     for sample in qs:
         patients.append(sample["patient_id"])
     return JsonResponse(patients, safe=False)
-
-
-@login_required(login_url="/login/")
-def autocomplete_tags(request):
-    # Helps keep tags consistent by promoting autocompletion against
-    # existing tags in the database
-    if "term" in request.GET:
-        tags = (
-            Tag.objects.filter(name__icontains=request.GET.get("term"))
-            .order_by()
-            .values("name")
-            .distinct()
-        )
-    else:
-        tags = Tag.objects.order_by().values("name").distinct()
-    tag_list = list()
-    for tag in tags:
-        tag_list.append(tag["name"])
-    return JsonResponse(tag_list, safe=False)
 
 
 ##############################################################################
