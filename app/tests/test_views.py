@@ -1,11 +1,9 @@
 import pytest
-from django.contrib.auth.models import AnonymousUser
-from django.test import Client, RequestFactory, TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 from mixer.backend.django import mixer
 from pytest_django.asserts import assertTemplateUsed
 
-from app import views
 from app.factories import SampleFactory
 from app.models import Sample
 from authentication.factories import UserFactory
@@ -43,54 +41,6 @@ def auto_login_user(db, client, create_user, test_password):
         return client, user
 
     return make_auto_login
-
-
-class TestHomePage:
-    def test_home_page_unauthorized(self):
-        path = reverse("home")
-        request = RequestFactory().get(path)
-        request.user = AnonymousUser()
-        response = views.index(request)
-        assert (
-            "login" in response.url
-        ), "Should not show homepage and redirect to login."
-
-
-def test_analytics_unauthorized(client):
-    path = reverse("analytics")
-    response = client.get(path)
-    assert (
-        "login" in response.url
-    ), "Should not show analytics to unauthenticated users."
-
-
-def test_analytics_authorized(admin_client):
-    path = reverse("analytics")
-    response = admin_client.get(path)
-    assert response.status_code == 200, "Show analytics to authorised users."
-
-
-def test_gid_overview_page(admin_client):
-    path = reverse("gid_overview")
-    response = admin_client.get(path)
-    assert response.status_code == 200, "Show GID overview page to authorised users."
-
-
-def test_account_page_unauthorized(client):
-    path = reverse("account")
-    response = client.get(path)
-    assert (
-        "login" in response.url
-    ), "Should not show account page to unauthenticated users."
-
-
-def test_error_404_template(admin_client):
-    path = "/doesnotexist.html"
-    response = admin_client.get(path)
-    assert response.status_code == 404, "Check 404 is working."
-
-
-# TESTS FOR SAMPLES #############
 
 
 def test_add_sample_page(auto_login_user):
@@ -176,7 +126,7 @@ def test_sample_search_page(auto_login_user):
     mixer.blend("app.sample", sample_id="DONOTRETURN")
     path = reverse("sample_search")
     response = client.get(path + "?q=TEST")
-    assertTemplateUsed(response, "index.html")
+
     assert (
         response.context["sample_list"].count() == 2
     ), "Should create a few objects, run a search and return 2 objects."
@@ -197,7 +147,6 @@ def test_sample_checkout_page(auto_login_user):
     assert (
         response.context["form"].initial["sample_location"] == "location1"
     ), "Should retrieve an instance to checkout."
-    assertTemplateUsed(response, "samples/sample-checkout.html")
 
     # Checkout the sample from location1 to location2
     response = client.post(path, data={"sample_location": "location2"})
@@ -215,7 +164,6 @@ def test_sample_delete(auto_login_user):
 
     # Get the delete page first and check template is correct
     response = client.get(path)
-    assertTemplateUsed(response, "samples/sample-delete.html")
 
     # Make the delete request now and also pass a next_url to check redirection
     response = client.post(path + "?next=/samples/1/", data={"is_deleted": True})
@@ -278,9 +226,6 @@ def test_sample_reactivate(auto_login_user):
         Sample.objects.get(pk=1).is_fully_used is False
     ), "Should restore the deleted sample"
     assert response.url == "/"
-
-
-# Test Data Export Views
 
 
 def test_gidamps_export_csv_view(auto_login_user):

@@ -20,6 +20,8 @@ class TestPagination(TestCase):
         self.client.force_login(self.user, backend=None)
         self.anonymous_client = Client()
 
+    @classmethod
+    def setUpTestData(cls):
         # Set up a bank of samples and used samples
         # 2 pages of active samples and 3 pages of used samples
         # 5 total pages

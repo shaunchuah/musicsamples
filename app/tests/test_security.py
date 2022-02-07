@@ -60,8 +60,14 @@ class TestUnauthorized(TestCase):
         assert response.status_code == 302
         assert "login" in response.url
 
-    def test_sample_checkout_url_unauthorized(self):
+    def test_sample_checkout_unauthorized(self):
         path = reverse("sample_checkout", kwargs={"pk": 1})
+        response = self.client.get(path)
+        assert response.status_code == 302
+        assert "login" in response.url
+
+    def test_account_page_unauthorized(self):
+        path = reverse("account")
         response = self.client.get(path)
         assert response.status_code == 302
         assert "login" in response.url
