@@ -55,7 +55,11 @@ urlpatterns = [
     path("samples/<int:pk>/checkout/", views.sample_checkout, name="sample_checkout"),
     path("search/", views.sample_search, name="sample_search"),
     # path('export_csv/', views.export_csv, name='export_csv'),
-    path("export_csv/gidamps", views.gidamps_export_csv, name="gidamps_export_csv"),
+    path(
+        "export_csv/<str:study_name>/",
+        views.export_study_samples,
+        name="export_study_samples",
+    ),
     path("export_excel/", views.export_excel, name="export_excel"),
     # Autocomplete API URLs
     path(

@@ -3,7 +3,11 @@ from rest_framework import serializers
 from app.models import Sample
 
 
-class SampleSerializer(serializers.HyperlinkedModelSerializer):
+class SampleSerializer(serializers.ModelSerializer):
+    """
+    Serializer for updating sample locations
+    """
+
     class Meta:
         model = Sample
         fields = [
@@ -14,7 +18,11 @@ class SampleSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field = "sample_id"
 
 
-class SampleIsFullyUsedSerializer(serializers.HyperlinkedModelSerializer):
+class SampleIsFullyUsedSerializer(serializers.ModelSerializer):
+    """
+    Serializer for marking samples as used
+    """
+
     class Meta:
         model = Sample
         fields = [
@@ -24,7 +32,11 @@ class SampleIsFullyUsedSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field = "sample_id"
 
 
-class MultipleSampleSerializer(serializers.HyperlinkedModelSerializer):
+class MultipleSampleSerializer(serializers.ModelSerializer):
+    """
+    Serializer for adding multiple samples
+    """
+
     class Meta:
         model = Sample
         fields = [
@@ -50,6 +62,10 @@ class MultipleSampleSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class SampleExportSerializer(serializers.ModelSerializer):
+    """
+    Serializer for API data export
+    """
+
     class Meta:
         model = Sample
         fields = [

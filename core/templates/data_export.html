@@ -49,15 +49,53 @@
 
 <div class="row">
 <div class="col-lg-8">
-    <div class="notes card">
+    <div class="card">
       <div class="card-header">
         <h2 class="card-title">
-          GI-DAMPs CSV Export
+          Study Samples CSV Export
         </h2>
       </div>
       <div class="card-body">
-      <p>Export all samples beginning with "GID" to a CSV file for downstream applications.</p>
-      <a href="{% url 'gidamps_export_csv' %}" class="btn btn-fill btn-success">Export GIDAMPs Samples</a>
+
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <th>Study</th>
+              <th>How the samples are located</th>
+              <th>Export CSV</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GI-DAMPs</td>
+                <td>Exports all samples with patient ID beginning with "GID"</td>
+                <td><a href="{% url 'export_study_samples' study_name="gidamps" %}" class="btn btn-fill btn-success">Export GIDAMPs Samples</a></td>
+              </tr>
+              <tr>
+                <td>MUSIC (All)</td>
+                <td>Exports all samples with patient ID beginning with "MID"</td>
+                <td><a href="{% url 'export_study_samples' study_name="music" %}" class="btn btn-fill btn-success">Export MUSIC Samples</a></td>
+              </tr>
+              <tr>
+                <td>MUSIC (Edinburgh)</td>
+                <td>Exports all samples with patient ID beginning with "MID-90"</td>
+                <td><a href="{% url 'export_study_samples' study_name="music_edinburgh" %}" class="btn btn-fill btn-success">Export MUSIC (Edin) Samples</a></td>
+              </tr>
+              <tr>
+                <td>MUSIC (Glasgow)</td>
+                <td>Exports all samples with patient ID beginning with "MID-91"</td>
+                <td><a href="{% url 'export_study_samples' study_name="music_glasgow" %}" class="btn btn-fill btn-success">Export MUSIC (Glasgow) Samples</a></td>
+              </tr>
+              <tr>
+                <td>MARVEL</td>
+                <td>Exports all samples with is_marvel_study set to True</td>
+                <td><a href="{% url 'export_study_samples' study_name="marvel" %}" class="btn btn-fill btn-success">Export MARVEL Samples</a></td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+
+
       </div>
   </div>
 </div>
