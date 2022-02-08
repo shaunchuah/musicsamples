@@ -77,9 +77,9 @@ class TestUrls(SimpleTestCase):
         url = reverse("data_export")
         self.assertEqual(resolve(url).func, views.data_export)
 
-    def test_gidamps_export_csv_url(self):
-        url = reverse("gidamps_export_csv")
-        self.assertEqual(resolve(url).func, views.gidamps_export_csv)
+    def test_export_study_samples_url(self):
+        url = reverse("export_study_samples", kwargs={"study_name": "gidamps"})
+        self.assertEqual(resolve(url).func, views.export_study_samples)
 
     def test_filter_url(self):
         url = reverse("filter")
