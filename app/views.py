@@ -1,4 +1,3 @@
-import csv
 import datetime
 
 from django.contrib import messages
@@ -31,6 +30,7 @@ from app.serializers import (
     SampleIsFullyUsedSerializer,
     SampleSerializer,
 )
+from app.utils import export_csv
 
 User = get_user_model()
 
@@ -99,7 +99,6 @@ def filter(request):
 
 @login_required(login_url="/login/")
 def used_samples(request):
-    # Used samples page for samples marked as being fully used
     sample_list = (
         Sample.objects.all()
         .filter(is_deleted=False)
@@ -606,60 +605,29 @@ def export_excel(request):
 
 
 @login_required(login_url="/login/")
-def gidamps_export_csv(request):
-    # Export samples beginning with GID- to csv file
-    response = HttpResponse(content_type="text/csv")
-    response[
-        "Content-Disposition"
-    ] = 'attachment; filename="gidamps_samples_%s.csv"' % datetime.datetime.now().strftime(  # noqa E501
-        "%d-%b-%Y"
-    )
-    writer = csv.writer(response)
-    writer.writerow(
-        [
-            "sample_id",
-            "patient_id",
-            "sample_type",
-            "sample_location",
-            "sample_sublocation",
-            "sample_datetime",
-            "sample_comments",
-            "is_fully_used",
-            "processing_datetime",
-            "frozen_datetime",
-            "sample_volume",
-            "sample_volume_units",
-            "freeze_thaw_count",
-            "haemolysis_reference",
-            "biopsy_location",
-            "biopsy_inflamed_status",
-        ]
-    )
-    samples = (
-        Sample.objects.filter(is_deleted=False)
-        .filter(patient_id__startswith="GID")
-        .values_list(
-            "sample_id",
-            "patient_id",
-            "sample_type",
-            "sample_location",
-            "sample_sublocation",
-            "sample_datetime",
-            "sample_comments",
-            "is_fully_used",
-            "processing_datetime",
-            "frozen_datetime",
-            "sample_volume",
-            "sample_volume_units",
-            "freeze_thaw_count",
-            "haemolysis_reference",
-            "biopsy_location",
-            "biopsy_inflamed_status",
-        )
-    )
-    for sample in samples:
-        writer.writerow(sample)
-    return response
+def export_study_samples(request, study_name):
+    """
+    Takes a study name for export. ?study_name=music
+    Options:
+        music: patient_id starts with MID
+        music_edinburgh: patient_id starts with MID-90
+        music_glasgow: patient_id starts with MID-91
+        gidamps: patient_id starts with GID
+        marvel: is_marvel_study=True
+    """
+
+    if study_name == "music":
+        queryset = Sample.objects.filter(patient_id__startswith="MID")
+    elif study_name == "music_edinburgh":
+        queryset = Sample.objects.filter(patient_id__startswith="MID-90")
+    elif study_name == "music_glasgow":
+        queryset = Sample.objects.filter(patient_id__startswith="MID-91")
+    elif study_name == "gidamps":
+        queryset = Sample.objects.filter(patient_id__startswith="GID")
+    elif study_name == "marvel":
+        queryset = Sample.objects.filter(is_marvel_study=True)
+
+    return export_csv(queryset, study_name)
 
 
 #############################################################################
