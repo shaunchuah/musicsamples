@@ -9,7 +9,8 @@ from django.db.models.functions import Trunc
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views.decorators.cache import cache_page
+
+# from django.views.decorators.cache import cache_page
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from rest_framework import viewsets
@@ -158,7 +159,7 @@ def used_samples_search(request):
 
 
 @login_required(login_url="/login/")
-@cache_page(60 * 10)  # Cache page for 10 minutes
+# @cache_page(60 * 10)  # Cache page for 10 minutes
 def analytics(request):
     # Analytics Page
 
@@ -212,7 +213,7 @@ def analytics(request):
 
 
 @login_required(login_url="/login/")
-@cache_page(3 * 60)  # Cache page for 3 minutes
+# @cache_page(3 * 60)  # Cache page for 3 minutes
 def gid_overview(request):
     # Analytics --> Sample Overview Table Page
     sample_categories = (
