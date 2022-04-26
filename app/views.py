@@ -506,6 +506,12 @@ def reactivate_sample(request, pk):
 @login_required(login_url="/login/")
 def export_excel(request):
     # Exports custom views based on the search string otherwise exports entire database
+    def make_naive(value):
+        if value is not None:
+            return value.replace(tzinfo=None)
+        else:
+            return None
+
     query_string = ""
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
@@ -571,6 +577,7 @@ def export_excel(request):
         if sample.processing_datetime is not None:
             time_difference = sample.processing_datetime - sample.sample_datetime
             processing_time = int(time_difference.total_seconds() / 60)
+
         row_num += 1
         row = [
             sample.sample_id,
@@ -578,9 +585,9 @@ def export_excel(request):
             sample.sample_location,
             sample.sample_sublocation,
             sample.sample_type,
-            sample.sample_datetime,
-            sample.processing_datetime,
-            sample.frozen_datetime,
+            make_naive(sample.sample_datetime),
+            make_naive(sample.processing_datetime),
+            make_naive(sample.frozen_datetime),
             processing_time,
             sample.sample_volume,
             sample.sample_volume_units,
@@ -591,9 +598,9 @@ def export_excel(request):
             sample.sample_comments,
             sample.is_fully_used,
             sample.created_by,
-            sample.created,
+            make_naive(sample.created),
             sample.last_modified_by,
-            sample.last_modified,
+            make_naive(sample.last_modified),
         ]
 
         for col_num, cell_value in enumerate(row, 1):
