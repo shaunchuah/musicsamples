@@ -156,7 +156,17 @@ authorization_header = {'Authorization': f'Token {GTRAC_API_TOKEN}'}
 response = requests.get(https://samples.musicstudy.uk/api/gidamps/, headers = authorization_header, timeout=20)
 data = response.json()
       </pre>
-      </div>
+      <h3>R Example</h3>
+    <pre>
+library(httr)
+library(jsonlite)
+
+GTRAC_API_TOKEN &lt;- f"Token {GTRAC_API_TOKEN}"
+response &lt;- GET("https://samples.musicstudy.uk/api/gidamps/", add_headers(Authorization = GTRAC_API_TOKEN))
+json_result &lt;- httr::content(response, as="text")
+result &lt;- jsonlite::fromJSON(json_result)
+    </pre>
+    </div>
   </div>
 
 </div>
