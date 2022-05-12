@@ -4,9 +4,10 @@ import datetime
 from django.http import HttpResponse
 
 
-def export_csv(queryset, study_name):
+def export_csv(queryset, study_name="gtrac"):
     """
-    Takes in queryset, returns csv file
+    Takes in queryset, returns csv download response
+    study_name parameter is optional to control the name of the csv file.
     """
     current_date = datetime.datetime.now().strftime("%d-%b-%Y")
 
@@ -22,11 +23,6 @@ def export_csv(queryset, study_name):
         values = []
         for field in field_names:
             value = getattr(row, field)
-            # if callable(value):
-            #     try:
-            #         value = value() or ""
-            #     except:
-            #         value = "Error retrieving value"
             if value is None:
                 value = ""
             values.append(value)

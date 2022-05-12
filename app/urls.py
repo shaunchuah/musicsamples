@@ -28,6 +28,7 @@ urlpatterns = [
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
     path("filter/", views.filter, name="filter"),
+    path("filter/export/", views.filter_export_csv, name="filter_export_csv"),
     path("analytics/", views.analytics, name="analytics"),
     path("analytics/gid_overview", views.gid_overview, name="gid_overview"),
     path("reference/", views.reference, name="reference"),
@@ -54,7 +55,6 @@ urlpatterns = [
     ),
     path("samples/<int:pk>/checkout/", views.sample_checkout, name="sample_checkout"),
     path("search/", views.sample_search, name="sample_search"),
-    # path('export_csv/', views.export_csv, name='export_csv'),
     path(
         "export_csv/<str:study_name>/",
         views.export_study_samples,

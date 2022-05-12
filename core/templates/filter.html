@@ -17,7 +17,7 @@
             {% for field in sample_filter.form %}
 
               {% if field.name == 'sample_datetime' %}
-              
+
                 <div class="col-md-6">
                 {{ field.label_tag }}
                   <div class="d-flex flex-row align-items-center">
@@ -26,25 +26,31 @@
 
                   </div>
                 </div>
-              
+
               {% else %}
-                
+
                 <div class="col-md-3">
                   <div class="form-group">
                     {{ field.label_tag }} {% render_field field class="form-control" %}
                   </div>
                 </div>
-                
+
               {% endif %}
             {% endfor %}
             </div>
-          
+
           <div class="card-footer">
             <button type="submit" class="btn btn-fill btn-success">
               Filter
             </button>
             <a href="{% url 'filter' %}" class="btn btn-fill btn-secondary"
               >Clear</a
+            >
+
+            <a
+            href="/filter/export/?{{parameter_string}}"
+            class="btn btn-success float-lg-right"
+            ><i class="tim-icons icon-cloud-download-93"></i> Export CSV</a
             >
           </div>
         </form>
@@ -151,7 +157,7 @@
                   <span class="page-link">&laquo;</span>
                 </li>
                 {% endif %}
-                {% for i in sample_list.paginator.page_range %} 
+                {% for i in sample_list.paginator.page_range %}
                 {% if sample_list.number == i %}
                 <li class="page-item active">
                   <span class="page-link"
