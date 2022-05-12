@@ -99,6 +99,14 @@ def filter(request):
 
 
 @login_required(login_url="/login/")
+def filter_export_csv(request):
+    all_samples = Sample.objects.all()
+    sample_filter = SampleFilter(request.GET, queryset=all_samples)
+    sample_list = sample_filter.qs
+    return export_csv(sample_list)
+
+
+@login_required(login_url="/login/")
 def used_samples(request):
     sample_list = (
         Sample.objects.all()
