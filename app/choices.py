@@ -46,6 +46,7 @@ SAMPLE_TYPE_CHOICES = (
     (
         "Stool",
         (
+            ("Standard stool container", "Standard stool container"),
             ("Calprotectin", "Calprotectin"),
             ("FIT", "FIT"),
             ("OmniGut", "Omnigut"),
