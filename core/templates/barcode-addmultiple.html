@@ -440,7 +440,7 @@ Dashboard
         'sample_volume': $('#id_sample_volume').val(),
         'sample_volume_units': $('#id_sample_volume_units').val(),
         'freeze_thaw_count': $('#id_freeze_thaw_count').val(),
-        'is_marvel_study': $('#id_is_marvel_study').val(),
+        'is_marvel_study': $('#id_is_marvel_study').is(":checked"),
         'frozen_datetime': $('#id_frozen_datetime').val(),
       },
       success: function (result) {

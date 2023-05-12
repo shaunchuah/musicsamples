@@ -11,6 +11,7 @@ htmlcov/
 *.db
 *.sqlite3
 *.log
+*.sqlite
 
 # venv
 env
