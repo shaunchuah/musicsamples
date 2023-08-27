@@ -28,3 +28,19 @@ def export_csv(queryset, study_name="gtrac"):
             values.append(value)
         writer.writerow(values)
     return response
+
+
+def queryset_by_study_name(model, study_name):
+    """
+    Takes the model, pass in the study_name parameter and this will
+    return a filtered queryset
+    """
+    if study_name == "music":
+        queryset = model.objects.filter(patient_id__startswith="MID-")
+    elif study_name == "gidamps":
+        queryset = model.objects.filter(patient_id__startswith="GID-")
+    elif study_name == "minimusic":
+        queryset = model.objects.filter(sample_id__startswith="MINI-")
+    else:
+        queryset = model.objects.all()
+    return queryset

@@ -61,16 +61,16 @@ class TestPagination(TestCase):
         assert response.context["page_obj"].has_next() is False
 
     def test_filter_page_total_page_count(self):
-        url = reverse("filter") + "?page=notaninteger"
+        url = reverse("filter", kwargs={"study_name": "all"}) + "?page=notaninteger"
         response = self.client.get(url)
         assert response.context["sample_list"].paginator.num_pages == 5
 
     def test_filter_page_not_an_integer(self):
-        url = reverse("filter") + "?page=notaninteger"
+        url = reverse("filter", kwargs={"study_name": "all"}) + "?page=notaninteger"
         response = self.client.get(url)
         assert response.context["sample_list"].next_page_number() == 2
 
     def test_filter_page_empty_page(self):
-        url = reverse("filter") + "?page=10"
+        url = reverse("filter", kwargs={"study_name": "all"}) + "?page=10"
         response = self.client.get(url)
         assert response.context["sample_list"].has_next() is False

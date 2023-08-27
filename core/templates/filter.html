@@ -9,7 +9,9 @@
 <div class="row">
   <div class="col">
     <div class="card">
-      <div class="card-header"><h3 class="card-title">Filter Samples</h3></div>
+      <div class="card-header"><h3 class="card-title">Filter Samples {% if study_name %}
+        - ({{study_name}})
+        {% endif %}</h3></div>
       <div class="card-body">
         <form id="searchform" method="GET">
           {% load widget_tweaks %}
@@ -43,12 +45,18 @@
             <button type="submit" class="btn btn-fill btn-success">
               Filter
             </button>
-            <a href="{% url 'filter' %}" class="btn btn-fill btn-secondary"
+            {% if study_name %}
+            <a href="{% url 'filter' study_name=study_name %}" class="btn btn-fill btn-secondary"
               >Clear</a
             >
+            {% else %}
+            <a href="{% url 'filter' study_name='all' %}" class="btn btn-fill btn-secondary"
+              >Clear</a
+            >
+            {% endif %}
 
             <a
-            href="/filter/export/?{{parameter_string}}"
+            href="{% url 'filter_export_csv' study_name=study_name %}?{{parameter_string}}"
             class="btn btn-success float-lg-right"
             ><i class="tim-icons icon-cloud-download-93"></i> Export CSV</a
             >
@@ -63,7 +71,9 @@
   <div class="col">
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Samples</h3>
+        <h3 class="card-title">Samples {% if study_name %}
+          - ({{study_name}})
+          {% endif %}</h3>
       </div>
       <div class="card-body">
         <div class="d-flex flex-row-reverse pb-3">

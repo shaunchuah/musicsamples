@@ -31,7 +31,7 @@ from app.serializers import (
     SampleIsFullyUsedSerializer,
     SampleSerializer,
 )
-from app.utils import export_csv
+from app.utils import export_csv, queryset_by_study_name
 
 User = get_user_model()
 
@@ -65,10 +65,38 @@ def index(request):
 
 
 @login_required(login_url="/login/")
-def filter(request):
+def filter_by_study(request, study_name):
+    # Home Page
+    queryset = queryset_by_study_name(Sample, study_name)
+    sample_list = (
+        queryset.filter(is_deleted=False)
+        .filter(is_fully_used=False)
+        .order_by("-sample_datetime")
+    )
+    sample_count = sample_list.count()
+    page = request.GET.get("page", 1)
+    paginator = Paginator(sample_list, SAMPLE_PAGINATION_SIZE)
+    try:
+        samples = paginator.page(page)
+    except PageNotAnInteger:
+        samples = paginator.page(1)
+    except EmptyPage:
+        samples = paginator.page(paginator.num_pages)
+    context = {
+        "sample_list": samples,
+        "page_obj": samples,
+        "sample_count": sample_count,
+        "study_name": study_name,
+    }
+    return render(request, "index.html", context)
+
+
+@login_required(login_url="/login/")
+def filter(request, study_name):
+    queryset = queryset_by_study_name(Sample, study_name)
+
     # Perform filtering
-    all_samples = Sample.objects.all()
-    sample_filter = SampleFilter(request.GET, queryset=all_samples)
+    sample_filter = SampleFilter(request.GET, queryset=queryset)
     sample_list = sample_filter.qs
     sample_count = sample_list.count()
 
@@ -94,14 +122,15 @@ def filter(request):
         "sample_count": sample_count,
         "sample_filter": sample_filter,
         "parameter_string": parameter_string,
+        "study_name": study_name,
     }
     return render(request, "filter.html", context)
 
 
 @login_required(login_url="/login/")
-def filter_export_csv(request):
-    all_samples = Sample.objects.all()
-    sample_filter = SampleFilter(request.GET, queryset=all_samples)
+def filter_export_csv(request, study_name):
+    queryset = queryset_by_study_name(Sample, study_name)
+    sample_filter = SampleFilter(request.GET, queryset=queryset)
     sample_list = sample_filter.qs
     return export_csv(sample_list)
 
@@ -512,7 +541,9 @@ def reactivate_sample(request, pk):
 
 
 @login_required(login_url="/login/")
-def export_excel(request):
+def export_excel(request, study_name):
+    queryset = queryset_by_study_name(Sample, study_name)
+
     # Exports custom views based on the search string otherwise exports entire database
     def make_naive(value):
         if value is not None:
@@ -523,7 +554,7 @@ def export_excel(request):
     query_string = ""
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
-        samples_queryset = Sample.objects.filter(
+        samples_queryset = queryset.filter(
             Q(sample_id__icontains=query_string)
             | Q(patient_id__icontains=query_string)
             | Q(sample_location__icontains=query_string)
@@ -531,7 +562,7 @@ def export_excel(request):
             | Q(sample_comments__icontains=query_string)
         )
     else:
-        samples_queryset = Sample.objects.all().filter(is_deleted=False)
+        samples_queryset = queryset.filter(is_deleted=False)
 
     response = HttpResponse(content_type="application/ms-excel")
     response[

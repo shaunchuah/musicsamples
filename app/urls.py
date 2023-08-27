@@ -23,12 +23,22 @@ router.register(r"all", AllSampleExportViewset, "all")
 
 urlpatterns = [
     path("", views.index, name="home"),
+    # samples by study
+    path(
+        "filter/by_study/<str:study_name>/",
+        views.filter_by_study,
+        name="filter_by_study",
+    ),
     path(
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
-    path("filter/", views.filter, name="filter"),
-    path("filter/export/", views.filter_export_csv, name="filter_export_csv"),
+    path("filter/advance/<str:study_name>/", views.filter, name="filter"),
+    path(
+        "filter/export/<str:study_name>/",
+        views.filter_export_csv,
+        name="filter_export_csv",
+    ),
     path("analytics/", views.analytics, name="analytics"),
     path("analytics/gid_overview", views.gid_overview, name="gid_overview"),
     path("reference/", views.reference, name="reference"),
@@ -60,7 +70,7 @@ urlpatterns = [
         views.export_study_samples,
         name="export_study_samples",
     ),
-    path("export_excel/", views.export_excel, name="export_excel"),
+    path("export_excel/<str:study_name>/", views.export_excel, name="export_excel"),
     # Autocomplete API URLs
     path(
         "autocomplete/locations/",

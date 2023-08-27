@@ -240,7 +240,7 @@ def test_export_study_samples_view(auto_login_user):
 def test_filter_view(auto_login_user):
     client, user = auto_login_user()
     mixer.blend("app.sample", patient_id="GID-123-P")
-    path = reverse("filter")
+    path = reverse("filter", kwargs={"study_name": "gidamps"})
     response = client.get(path + "?patient_id=gid-123-P")
     assert response.status_code == 200
     assert "GID-123-P" in response.context["sample_filter"].qs.all()[0].patient_id
