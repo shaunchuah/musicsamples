@@ -35,17 +35,23 @@
         <h3 class="card-title">Samples by Study</h3>
       </div>
       <div class="card-footer">
+        <div>
         <a href="{% url 'filter_by_study' study_name='music' %}" class="btn btn-fill btn-success">MUSIC</a>
         <a href="{% url 'filter_by_study' study_name='gidamps' %}" class="btn btn-fill btn-success">GI-DAMPs</a>
         <a href="{% url 'filter_by_study' study_name='minimusic' %}" class="btn btn-fill btn-success">Mini-Music</a>
+        <a href="{% url 'filter_by_study' study_name='marvel' %}" class="btn btn-fill btn-success">MARVEL</a>
+        </div>
+        <div>
 
-        <a href="{% url 'filter' study_name='music' %}" class="btn btn-fill btn-success float-lg-right">Advanced
+        <a href="{% url 'filter' study_name='music' %}" class="btn btn-fill btn-success">Adv.
           Filtering (MUSIC)</a>
-        <a href="{% url 'filter' study_name='gidamps' %}" class="btn btn-fill btn-success float-lg-right">Advanced
+        <a href="{% url 'filter' study_name='gidamps' %}" class="btn btn-fill btn-success">Adv.
           Filtering (GI-DAMPs)</a>
-        <a href="{% url 'filter' study_name='minimusic' %}" class="btn btn-fill btn-success float-lg-right">Advanced
+        <a href="{% url 'filter' study_name='minimusic' %}" class="btn btn-fill btn-success">Adv.
           Filtering (Mini-Music)</a>
-
+          <a href="{% url 'filter' study_name='marvel' %}" class="btn btn-fill btn-success">Adv.
+            Filtering (MARVEL)</a>
+          </div>
       </div>
     </div>
   </div>

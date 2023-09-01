@@ -1,6 +1,7 @@
 import csv
 import datetime
 
+from django.db.models import Q
 from django.http import HttpResponse
 
 
@@ -41,6 +42,10 @@ def queryset_by_study_name(model, study_name):
         queryset = model.objects.filter(patient_id__startswith="GID-")
     elif study_name == "minimusic":
         queryset = model.objects.filter(sample_id__startswith="MINI-")
+    elif study_name == "marvel":
+        queryset = model.objects.filter(
+            Q(patient_id__regex=r"^[0-9]{6}$") | Q(is_marvel_study=True)
+        )
     else:
         queryset = model.objects.all()
     return queryset
