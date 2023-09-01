@@ -109,6 +109,13 @@
           {% include "layouts/pagination.html" %}
         </div>
       </div>
+      {% if user.is_superuser %}
+      <div class="card-footer">
+        <a href="{% url 'used_samples_archive_all' %}" class="btn btn-fill btn-danger"
+              >ADMIN only - Update all used samples location to used</a
+            >
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>

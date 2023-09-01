@@ -196,6 +196,36 @@ def used_samples_search(request):
 
 
 @login_required(login_url="/login/")
+def used_samples_archive_all(request):
+    """
+    This function will retrieve all used samples and remove their last location.
+    This helps to keep the database clean.
+    """
+    sample_list = (
+        Sample.objects.filter(is_deleted=False)
+        .filter(is_fully_used=True)
+        .exclude(sample_location="used")
+    )
+
+    number_of_samples = sample_list.count()
+    if (
+        number_of_samples == 0
+    ):  # if no samples need updating; skip the database update step
+        messages.error(request, "No samples to update.")
+    else:
+        for sample in sample_list:
+            sample.sample_location = "used"
+            sample.sample_sublocation = ""
+            sample.save()
+        messages.success(
+            request,
+            "Used samples locations archived successfully."
+            f" ({number_of_samples} samples updated)",
+        )
+    return redirect(reverse("used_samples"))
+
+
+@login_required(login_url="/login/")
 # @cache_page(60 * 10)  # Cache page for 10 minutes
 def analytics(request):
     # Analytics Page
