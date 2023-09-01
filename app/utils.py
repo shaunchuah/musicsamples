@@ -3,6 +3,8 @@ import datetime
 
 from django.db.models import Q
 from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
 
 
 def export_csv(queryset, study_name="gtrac"):
@@ -28,6 +30,107 @@ def export_csv(queryset, study_name="gtrac"):
                 value = ""
             values.append(value)
         writer.writerow(values)
+    return response
+
+
+def make_naive(value):
+    """
+    Takes timezone aware datetime object and returns naive datetime
+    """
+    if value is not None:
+        return value.replace(tzinfo=None)
+    else:
+        return None
+
+
+def export_excel(queryset):
+    """
+    Takes queryset in and returns excel response object
+    """
+    response = HttpResponse(content_type="application/ms-excel")
+    response[
+        "Content-Disposition"
+    ] = 'attachment; filename="samples_export_%s.xlsx"' % datetime.datetime.now().strftime(  # noqa E501
+        "%Y-%m-%d"
+    )
+    workbook = Workbook()
+    # Get active worksheet
+    worksheet = workbook.active
+    worksheet.title = "Samples"
+
+    # Define the excel column names
+    columns = [
+        "Sample ID",
+        "Patient ID",
+        "Sample Location",
+        "Sample Sublocation",
+        "Sample Type",
+        "Sampling Datetime",
+        "Processing Datetime",
+        "Frozen Datetime",
+        "Sampling to Processing Time (mins)",
+        "Sample Volume",
+        "Sample Volume Units",
+        "Freeze Thaw Count",
+        "Haemolysis Reference Category (100 and above unusable)",
+        "Biopsy Location",
+        "Biopsy Inflamed Status",
+        "Sample Comments",
+        "Sample Fully Used?",
+        "Created By",
+        "Date Created",
+        "Last Modified By",
+        "Last Modified",
+    ]
+    row_num = 1
+
+    # Write the column names in
+    for col_num, column_title in enumerate(columns, 1):
+        cell = worksheet.cell(row=row_num, column=col_num)
+        cell.value = column_title
+        # Setting a uniform column width
+        column_letter = get_column_letter(col_num)
+        column_dimensions = worksheet.column_dimensions[column_letter]
+        column_dimensions.width = 20
+
+    for sample in queryset:
+        processing_time = None
+        if sample.processing_datetime is not None:
+            time_difference = sample.processing_datetime - sample.sample_datetime
+            processing_time = int(time_difference.total_seconds() / 60)
+
+        row_num += 1
+        row = [
+            sample.sample_id,
+            sample.patient_id,
+            sample.sample_location,
+            sample.sample_sublocation,
+            sample.sample_type,
+            make_naive(sample.sample_datetime),
+            make_naive(sample.processing_datetime),
+            make_naive(sample.frozen_datetime),
+            processing_time,
+            sample.sample_volume,
+            sample.sample_volume_units,
+            sample.freeze_thaw_count,
+            sample.haemolysis_reference,
+            sample.biopsy_location,
+            sample.biopsy_inflamed_status,
+            sample.sample_comments,
+            sample.is_fully_used,
+            sample.created_by,
+            make_naive(sample.created),
+            sample.last_modified_by,
+            make_naive(sample.last_modified),
+        ]
+
+        for col_num, cell_value in enumerate(row, 1):
+            cell = worksheet.cell(row=row_num, column=col_num)
+            cell.value = cell_value
+
+    worksheet.freeze_panes = worksheet["A2"]
+    workbook.save(response)
+
     return response
 
 

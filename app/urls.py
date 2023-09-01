@@ -75,7 +75,9 @@ urlpatterns = [
         views.export_study_samples,
         name="export_study_samples",
     ),
-    path("export_excel/<str:study_name>/", views.export_excel, name="export_excel"),
+    path(
+        "export_excel/<str:study_name>/", views.export_excel_view, name="export_excel"
+    ),
     # Autocomplete API URLs
     path(
         "autocomplete/locations/",

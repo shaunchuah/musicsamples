@@ -6,13 +6,9 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Count, Q
 from django.db.models.functions import Trunc
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-
-# from django.views.decorators.cache import cache_page
-from openpyxl import Workbook
-from openpyxl.utils import get_column_letter
 from rest_framework import viewsets
 
 from app.filters import SampleFilter
@@ -31,7 +27,10 @@ from app.serializers import (
     SampleIsFullyUsedSerializer,
     SampleSerializer,
 )
-from app.utils import export_csv, queryset_by_study_name
+from app.utils import export_csv, export_excel, queryset_by_study_name
+
+# from django.views.decorators.cache import cache_page
+
 
 User = get_user_model()
 
@@ -571,16 +570,10 @@ def reactivate_sample(request, pk):
 
 
 @login_required(login_url="/login/")
-def export_excel(request, study_name):
+def export_excel_view(request, study_name):
     queryset = queryset_by_study_name(Sample, study_name)
 
     # Exports custom views based on the search string otherwise exports entire database
-    def make_naive(value):
-        if value is not None:
-            return value.replace(tzinfo=None)
-        else:
-            return None
-
     query_string = ""
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
@@ -593,91 +586,7 @@ def export_excel(request, study_name):
         )
     else:
         samples_queryset = queryset.filter(is_deleted=False)
-
-    response = HttpResponse(content_type="application/ms-excel")
-    response[
-        "Content-Disposition"
-    ] = 'attachment; filename="samples_export_%s.xlsx"' % datetime.datetime.now().strftime(  # noqa E501
-        "%Y-%m-%d"
-    )
-
-    workbook = Workbook()
-    # Get active worksheet
-    worksheet = workbook.active
-    worksheet.title = "Samples"
-
-    # Define the excel column names
-    columns = [
-        "Sample ID",
-        "Patient ID",
-        "Sample Location",
-        "Sample Sublocation",
-        "Sample Type",
-        "Sampling Datetime",
-        "Processing Datetime",
-        "Frozen Datetime",
-        "Sampling to Processing Time (mins)",
-        "Sample Volume",
-        "Sample Volume Units",
-        "Freeze Thaw Count",
-        "Haemolysis Reference Category (100 and above unusable)",
-        "Biopsy Location",
-        "Biopsy Inflamed Status",
-        "Sample Comments",
-        "Sample Fully Used?",
-        "Created By",
-        "Date Created",
-        "Last Modified By",
-        "Last Modified",
-    ]
-    row_num = 1
-
-    # Write the column names in
-    for col_num, column_title in enumerate(columns, 1):
-        cell = worksheet.cell(row=row_num, column=col_num)
-        cell.value = column_title
-        # Setting a uniform column width
-        column_letter = get_column_letter(col_num)
-        column_dimensions = worksheet.column_dimensions[column_letter]
-        column_dimensions.width = 20
-
-    for sample in samples_queryset:
-        processing_time = None
-        if sample.processing_datetime is not None:
-            time_difference = sample.processing_datetime - sample.sample_datetime
-            processing_time = int(time_difference.total_seconds() / 60)
-
-        row_num += 1
-        row = [
-            sample.sample_id,
-            sample.patient_id,
-            sample.sample_location,
-            sample.sample_sublocation,
-            sample.sample_type,
-            make_naive(sample.sample_datetime),
-            make_naive(sample.processing_datetime),
-            make_naive(sample.frozen_datetime),
-            processing_time,
-            sample.sample_volume,
-            sample.sample_volume_units,
-            sample.freeze_thaw_count,
-            sample.haemolysis_reference,
-            sample.biopsy_location,
-            sample.biopsy_inflamed_status,
-            sample.sample_comments,
-            sample.is_fully_used,
-            sample.created_by,
-            make_naive(sample.created),
-            sample.last_modified_by,
-            make_naive(sample.last_modified),
-        ]
-
-        for col_num, cell_value in enumerate(row, 1):
-            cell = worksheet.cell(row=row_num, column=col_num)
-            cell.value = cell_value
-
-    worksheet.freeze_panes = worksheet["A2"]
-    workbook.save(response)
+    response = export_excel(samples_queryset)
     return response
 
 
