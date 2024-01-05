@@ -79,6 +79,9 @@ BIOPSY_LOCATION_CHOICES = (
     ("Rectum", "Rectum"),
     ("Right colon", "Right colon"),
     ("Left colon", "Left colon"),
+    ("Oesophagus", "Oesophagus"),
+    ("Stomach", "Stomach"),
+    ("Duodenum", "Duodenum"),
 )
 
 BIOPSY_INFLAMED_STATUS_CHOICES = (
