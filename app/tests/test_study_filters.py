@@ -12,7 +12,7 @@ class TestStudyFilters(TestCase):
         self.client.force_login(self.user, backend=None)
         self.music_sample = SampleFactory(patient_id="MID-90-2")
         self.gidamps_sample = SampleFactory(patient_id="GID-203-P")
-        self.mini_music_sample = SampleFactory(sample_id="MINI-23192")
+        self.mini_music_sample = SampleFactory(patient_id="MINI-166-3")
         self.marvel_sample = SampleFactory(patient_id="239105")
 
     def test_music_study_filter(self):
