@@ -1,28 +1,23 @@
-{% extends 'layouts/base.html' %}
-
-{% block title %} Page 404 {% endblock %} 
-
+{% extends "layouts/base.html" %}
+{% block title %}
+    Page 404
+{% endblock title %}
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
-
+{% block stylesheets %}
+{% endblock stylesheets %}
 {% block content %}
-
     <div class="row">
         <div class="col-md-12">
             <div class="card card-profile">
                 <div class="card-body">
                     <h6 class="card-category text-gray">Error 500</h6>
-                    <h4 class="card-title">
-                        Server Error - Something went wrong - Please contact chershiong@gmail.com
-                    </h4>
-                    <a href="/" class="btn btn-round">Home</a>
+                    <h4 class="card-title">Server Error - Something went wrong - Please contact chershiong@gmail.com</h4>
+                    <a href="{% url "home" %}" class="btn btn-round">Home</a>
                 </div>
             </div>
         </div>
     </div>
-
-
 {% endblock content %}
-
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+{% endblock javascripts %}

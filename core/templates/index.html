@@ -1,174 +1,172 @@
-{% extends "layouts/base.html" %} {% block title %} Dashboard {% endblock %}
-
+{% extends "layouts/base.html" %}
+{% block title %}
+    Dashboard
+{% endblock title %}
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %} {% block content %}
-
-<div class="row">
-  <div class="col">
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Search Active Samples</h3>
-      </div>
-      <div class="card-body">
-        <form id="searchform" action="{% url 'sample_search' %}" method="GET">
-          <div class="form-group">
-            <input type="text" autofocus name="q" class="form-control" />
-          </div>
-          <div class="card-footer">
-            <button type="submit" class="btn btn-fill btn-success">
-              Search
-            </button>
-            <a href="{% url 'home' %}" class="btn btn-fill btn-secondary">Clear</a>
-            <a href="{% url 'filter' study_name='all' %}" class="btn btn-fill btn-success float-lg-right">Advanced
-              Filtering (All Samples)</a>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col">
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Samples by Study</h3>
-      </div>
-      <div class="card-footer">
-        <div>
-        <a href="{% url 'filter_by_study' study_name='music' %}" class="btn btn-fill btn-success">MUSIC</a>
-        <a href="{% url 'filter_by_study' study_name='gidamps' %}" class="btn btn-fill btn-success">GI-DAMPs</a>
-        <a href="{% url 'filter_by_study' study_name='minimusic' %}" class="btn btn-fill btn-success">Mini-Music</a>
-        <a href="{% url 'filter_by_study' study_name='marvel' %}" class="btn btn-fill btn-success">MARVEL</a>
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Search Active Samples</h3>
+                </div>
+                <div class="card-body">
+                    <form id="searchform" action="{% url 'sample_search' %}" method="get">
+                        <div class="form-group">
+                            <input type="text" autofocus name="q" class="form-control" />
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-fill btn-success">Search</button>
+                            <a href="{% url 'home' %}" class="btn btn-fill btn-secondary">Clear</a>
+                            <a href="{% url 'filter' study_name='all' %}"
+                               class="btn btn-fill btn-success float-lg-right">Advanced
+                            Filtering (All Samples)</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div>
-
-        <a href="{% url 'filter' study_name='music' %}" class="btn btn-fill btn-success">Adv.
-          Filtering (MUSIC)</a>
-        <a href="{% url 'filter' study_name='gidamps' %}" class="btn btn-fill btn-success">Adv.
-          Filtering (GI-DAMPs)</a>
-        <a href="{% url 'filter' study_name='minimusic' %}" class="btn btn-fill btn-success">Adv.
-          Filtering (Mini-Music)</a>
-          <a href="{% url 'filter' study_name='marvel' %}" class="btn btn-fill btn-success">Adv.
-            Filtering (MARVEL)</a>
-          </div>
-      </div>
     </div>
-  </div>
-</div>
-
-
-<div class="row">
-  <div class="col">
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Active Samples
-          {% if study_name %}
-          - ({{study_name}})
-          {% endif %}
-
-        </h3>
-      </div>
-      <div class="card-footer">
-        <a href="{% url 'sample_add' %}" class="btn btn-fill btn-success">Add New Sample</a>
-        <a href="/barcode/" class="btn btn-fill btn-success">Barcode Location Scanning</a>
-        <!--<a href="/bulkadd/" class="btn btn-success"
-          >Bulk Add Samples</a
-        >-->
-        {% if study_name %}
-        <a href="{% url 'export_excel' study_name=study_name %}?q={{query_string}}"
-          class="btn btn-success float-lg-right" data-toggle="tooltip" data-placement="bottom" data-html="true"
-          title="<strong>Tip:</strong> Customise the export by searching for the set of samples you wish to download."><i
-            class="tim-icons icon-cloud-download-93"></i> Export Current View
-          to Excel</a>
-        {% else %}
-        <a href="{% url 'export_excel' study_name='all' %}?q={{query_string}}" class="btn btn-success float-lg-right"
-          data-toggle="tooltip" data-placement="bottom" data-html="true"
-          title="<strong>Tip:</strong> Customise the export by searching for the set of samples you wish to download."><i
-            class="tim-icons icon-cloud-download-93"></i> Export Current View
-          to Excel</a>
-        {% endif %}
-
-      </div>
-      <div class="card-body">
-        <div class="d-flex flex-row-reverse pb-3">
-          Total Count: {{ sample_count }}
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Samples by Study</h3>
+                </div>
+                <div class="card-footer">
+                    <div>
+                        <a href="{% url 'filter_by_study' study_name='music' %}"
+                           class="btn btn-fill btn-success">MUSIC</a>
+                        <a href="{% url 'filter_by_study' study_name='gidamps' %}"
+                           class="btn btn-fill btn-success">GI-DAMPs</a>
+                        <a href="{% url 'filter_by_study' study_name='minimusic' %}"
+                           class="btn btn-fill btn-success">Mini-Music</a>
+                        <a href="{% url 'filter_by_study' study_name='marvel' %}"
+                           class="btn btn-fill btn-success">MARVEL</a>
+                    </div>
+                    <div>
+                        <a href="{% url 'filter' study_name='music' %}"
+                           class="btn btn-fill btn-success">Adv.
+                        Filtering (MUSIC)</a>
+                        <a href="{% url 'filter' study_name='gidamps' %}"
+                           class="btn btn-fill btn-success">Adv.
+                        Filtering (GI-DAMPs)</a>
+                        <a href="{% url 'filter' study_name='minimusic' %}"
+                           class="btn btn-fill btn-success">Adv.
+                        Filtering (Mini-Music)</a>
+                        <a href="{% url 'filter' study_name='marvel' %}"
+                           class="btn btn-fill btn-success">Adv.
+                        Filtering (MARVEL)</a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="table-responsive">
-          <table class="table tablesorter" id="mainTable">
-            <thead class="text-primary">
-              <tr>
-                <th>Sample ID</th>
-                <th>Patient ID</th>
-                <th>Sample Location</th>
-                <th>Sample Sublocation</th>
-                <th>Sample Type</th>
-                <th>Sample Datetime</th>
-                <th>Comments</th>
-                <th>View</th>
-                <th>Checkout</th>
-                <th>Edit</th>
-                <th class="text-center">Fully Used</th>
-                <th class="text-center">Delete</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% if sample_list %} {% for sample in sample_list %}
-              <tr>
-                <td>{{ sample.sample_id }}</td>
-                <td>{{ sample.patient_id }}</td>
-                <td>{{ sample.sample_location }}</td>
-                <td>
-                  {% if sample.sample_sublocation is None %}
-                  {% else %}
-                  {{ sample.sample_sublocation }}
-                  {% endif %}
-                </td>
-                <td>{{ sample.sample_type }}</td>
-                <td>{{ sample.sample_datetime|date:'d M Y H:i' }}</td>
-                <td>{{ sample.sample_comments }}</td>
-                <td>
-                  <a href="{% url 'sample_detail' pk=sample.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
-                </td>
-                <td>
-                  <a href="{% url 'sample_checkout' pk=sample.pk %}?next={{ request.get_full_path }}">
-                    <i class="tim-icons icon-cloud-upload-94"></i> Checkout
-                  </a>
-                </td>
-                <td>
-                  <a href="{% url 'sample_edit' pk=sample.pk %}?next={{ request.get_full_path }}"><i
-                      class="tim-icons icon-pencil"></i> Edit</a>
-                </td>
-                <td class="text-center">
-                  <a href="{% url 'sample_fully_used' pk=sample.pk %}"><i
-                      class="tim-icons icon-send align-center"></i></a>
-                </td>
-                <td class="text-center">
-                  <a href="{% url 'sample_delete' pk=sample.pk %}"><i
-                      class="tim-icons icon-trash-simple align-center"></i></a>
-                </td>
-              </tr>
-              {% endfor %}
-              {% else %}
-              <tr>
-                <td colspan="12" align="center">No active samples found.</td>
-              </tr>
-              {% endif %}
-            </tbody>
-          </table>
-
-          {% include "layouts/pagination.html" %}
-        </div>
-      </div>
     </div>
-  </div>
-</div>
-
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        Active Samples
+                        {% if study_name %}- ({{ study_name }}){% endif %}
+                    </h3>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'sample_add' %}" class="btn btn-fill btn-success">Add New Sample</a>
+                    <a href="{% url 'barcode' %}" class="btn btn-fill btn-success">Barcode Location Scanning</a>
+                    <!--<a href="/bulkadd/" class="btn btn-success">Bulk Add Samples</a>-->
+                    {% if study_name %}
+                        <a href="{% url 'export_excel' study_name=study_name %}?q={{ query_string }}"
+                           class="btn btn-success float-lg-right"
+                           data-toggle="tooltip"
+                           data-placement="bottom"
+                           data-html="true"
+                           title="<strong>Tip:</strong> Customise the export by searching for the set of samples you wish to download."><i class="tim-icons icon-cloud-download-93"></i> Export Current View
+                        to Excel</a>
+                    {% else %}
+                        <a href="{% url 'export_excel' study_name='all' %}?q={{ query_string }}"
+                           class="btn btn-success float-lg-right"
+                           data-toggle="tooltip"
+                           data-placement="bottom"
+                           data-html="true"
+                           title="<strong>Tip:</strong> Customise the export by searching for the set of samples you wish to download."><i class="tim-icons icon-cloud-download-93"></i> Export Current View
+                        to Excel</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-row-reverse pb-3">Total Count: {{ sample_count }}</div>
+                    <div class="table-responsive">
+                        <table class="table tablesorter" id="mainTable">
+                            <thead class="text-primary">
+                                <tr>
+                                    <th>Sample ID</th>
+                                    <th>Patient ID</th>
+                                    <th>Sample Location</th>
+                                    <th>Sample Sublocation</th>
+                                    <th>Sample Type</th>
+                                    <th>Sample Datetime</th>
+                                    <th>Comments</th>
+                                    <th>View</th>
+                                    <th>Checkout</th>
+                                    <th>Edit</th>
+                                    <th class="text-center">Fully Used</th>
+                                    <th class="text-center">Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if sample_list %}
+                                    {% for sample in sample_list %}
+                                        <tr>
+                                            <td>{{ sample.sample_id }}</td>
+                                            <td>{{ sample.patient_id }}</td>
+                                            <td>{{ sample.sample_location }}</td>
+                                            <td>
+                                                {% if sample.sample_sublocation is None %}
+                                                {% else %}
+                                                    {{ sample.sample_sublocation }}
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ sample.sample_type }}</td>
+                                            <td>{{ sample.sample_datetime|date:'d M Y H:i' }}</td>
+                                            <td>{{ sample.sample_comments }}</td>
+                                            <td>
+                                                <a href="{% url 'sample_detail' pk=sample.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'sample_checkout' pk=sample.pk %}?next={{ request.get_full_path }}">
+                                                    <i class="tim-icons icon-cloud-upload-94"></i> Checkout
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'sample_edit' pk=sample.pk %}?next={{ request.get_full_path }}"><i class="tim-icons icon-pencil"></i> Edit</a>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="{% url 'sample_fully_used' pk=sample.pk %}"><i class="tim-icons icon-send align-center"></i></a>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="{% url 'sample_delete' pk=sample.pk %}"><i class="tim-icons icon-trash-simple align-center"></i></a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="12" align="center">No active samples found.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                        {% include "layouts/pagination.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock content %}
-
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-<script>
+    <script>
   $(document).ready(function () {
     $('[data-toggle="tooltip"]').tooltip();
     $("#mainTable").tablesorter({
@@ -196,5 +194,5 @@
       },
     });
   });
-</script>
+    </script>
 {% endblock javascripts %}
