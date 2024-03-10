@@ -4,28 +4,41 @@ fail_fast: true
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
+      - id: check-json
+      - id: check-toml
+      - id: check-xml
       - id: check-yaml
+      - id: debug-statements
+      - id: check-builtin-literals
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: detect-private-key
 
-  - repo: https://github.com/psf/black
-    rev: 23.7.0
+  - repo: https://github.com/adamchainz/django-upgrade
+    rev: '1.15.0'
     hooks:
-      - id: black
+      - id: django-upgrade
+        args: ['--target-version', '4.2']
 
-  - repo: https://github.com/timothycrosley/isort
-    rev: 5.12.0
+    # Run the Ruff linter.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.3.2
     hooks:
-      - id: isort
+      # Run the Ruff linter.
+      - id: ruff
+      # Run the Ruff formatter.
+      - id: ruff-format
 
-  - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
+  - repo: https://github.com/Riverside-Healthcare/djLint
+    rev: v1.34.0
     hooks:
-      - id: flake8
-        additional_dependencies: [flake8-isort]
-
+      - id: djlint-reformat-django
+      - id: djlint-django
 ci:
   autoupdate_schedule: weekly
   skip: []
