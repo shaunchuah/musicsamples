@@ -43,11 +43,11 @@ Help lab researchers improve time to discovery and reduce time spent on logistic
 
 ### Tracking of 30,000 research samples across multiple sites and labs
 
-SampleTrek was developed to solve the problem of tracking 30,000 research samples across multiple study sites with multiple laboratory endpoints. In our use we deployed it on a single droplet/virtual private server hosted by DigitalOcean and used Amazon Web Services for handling email and database backups. Code was deployed using github and this allowed rapid deployment of new features as the need arose. Check out the study here: [MUSIC IBD Study](https://www.musicstudy.uk)
+G-Trac was developed to solve the problem of tracking 30,000 research samples across multiple study sites with multiple laboratory endpoints. In our use we deployed it on a single droplet/virtual private server hosted by DigitalOcean and used Amazon Web Services for handling email and database backups. Code was deployed using github and this allowed rapid deployment of new features as the need arose. Check out the study here: [MUSIC IBD Study](https://www.musicstudy.uk)
 
 ### QR code labelling
 
-Cryogenic QR code labels were bulk printed from a label printing company and research samples were tagged at the point of collection and registered onto SampleTrek. At specified receiving entrypoints to various lab workflows the samples were scanned in bulk to update their location (alternatively a status could be set into the location eg. "Departure Glasgow").
+Cryogenic QR code labels were bulk printed from a label printing company and research samples were tagged at the point of collection and registered onto G-Trac. At specified receiving entrypoints to various lab workflows the samples were scanned in bulk to update their location (alternatively a status could be set into the location eg. "Departure Glasgow").
 
 
 ### Built With
@@ -249,5 +249,5 @@ University of Edinburgh
 If you've used this to create something cool let me know about it!
 
 Twitter: [@chershiong](https://twitter.com/chershiong) \
-Email: cchuah@ed.ac.uk \
+Email: chershiong@gmail.com \
 Project Link: [https://github.com/shaunchuah/musicsamples](https://github.com/shaunchuah/musicsamples) \

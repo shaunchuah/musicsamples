@@ -151,7 +151,7 @@ EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
 AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
 
-DEFAULT_FROM_EMAIL = "SampleTrek <password_reset@musicstudy.uk>"
+DEFAULT_FROM_EMAIL = "G-Trac <noreply@musicstudy.uk>"
 
 # POST SSL DEPLOYMENT SETTINGS
 SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", cast=bool)
