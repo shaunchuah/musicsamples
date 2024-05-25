@@ -12,7 +12,7 @@ from unipath import Path
 sentry_sdk.init(
     dsn="https://565f64fc7bea4af39487c5f0edcdab0b@o482942.ingest.sentry.io/5533900",
     integrations=[DjangoIntegration(), RedisIntegration()],
-    traces_sample_rate=1.0,
+    traces_sample_rate=0.5,
     send_default_pii=True,
 )
 
@@ -124,7 +124,6 @@ TIME_ZONE = "GB"
 
 USE_I18N = True
 
-USE_L10N = True
 
 USE_TZ = True
 
