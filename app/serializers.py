@@ -40,6 +40,7 @@ class MultipleSampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sample
         fields = [
+            "study_name",
             "sample_id",
             "sample_location",
             "sample_sublocation",
@@ -69,6 +70,7 @@ class SampleExportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sample
         fields = [
+            "study_name",
             "sample_id",
             "patient_id",
             "sample_type",

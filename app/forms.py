@@ -8,6 +8,7 @@ from app.choices import (
     HAEMOLYSIS_REFERENCE_CHOICES,
     SAMPLE_TYPE_CHOICES,
     SAMPLE_VOLUME_UNIT_CHOICES,
+    StudyNameChoices,
 )
 from app.models import Sample
 
@@ -39,6 +40,7 @@ class SampleForm(ModelForm):
     class Meta:
         model = Sample
         fields = [
+            "study_name",
             "sample_id",
             "sample_location",
             "sample_sublocation",
@@ -57,6 +59,7 @@ class SampleForm(ModelForm):
             "freeze_thaw_count",
         ]
         widgets = {
+            "study_name": forms.Select(choices=StudyNameChoices.choices),
             "sample_type": forms.Select(choices=SAMPLE_TYPE_CHOICES),
             "sample_datetime": DateTimeInput(),
             "sample_volume_units": forms.Select(
@@ -71,6 +74,7 @@ class SampleForm(ModelForm):
             "is_marvel_study": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
         labels = {
+            "study_name": "Study Name",
             "sample_id": "Sample ID*",
             "patient_id": "Patient ID*",
             "sample_datetime": "Sampling Datetime*",

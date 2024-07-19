@@ -4,24 +4,17 @@ from random import choice
 from factory import Faker, LazyAttribute, Sequence
 from factory.django import DjangoModelFactory
 
+from app.choices import SAMPLE_TYPE_CHOICES, StudyNameChoices
 from app.models import Sample
 
 LOCATION_CHOICES = ["CIR Freezer", "WGH Endoscopy Freezer", "GGH CRF", "Lab C2.25"]
-SAMPLE_TYPE_CHOICES = [
-    "PaxGene ccfDNA tube",
-    "Standard EDTA tube",
-    "Stool",
-    "Saliva",
-    "PaxGene ccfDNA plasma child aliquot",
-    "Calprotectin",
-    "qFIT",
-]
 
 
 class SampleFactory(DjangoModelFactory):
     class Meta:
         model = Sample
 
+    study_name = LazyAttribute(lambda x: choice(StudyNameChoices.choices))
     sample_id = Sequence(lambda n: "DEMO-%05d" % n)
     patient_id = Sequence(lambda n: "DEMO-%d" % n)
     sample_location = LazyAttribute(lambda x: choice(LOCATION_CHOICES))

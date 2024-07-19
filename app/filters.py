@@ -1,10 +1,13 @@
 import django_filters
 
+from app.choices import SAMPLE_TYPE_CHOICES, StudyNameChoices
 from app.models import Sample
-from app.choices import SAMPLE_TYPE_CHOICES
 
 
 class SampleFilter(django_filters.FilterSet):
+    study_name = django_filters.ChoiceFilter(
+        label="Study Name", choices=StudyNameChoices.choices
+    )
     patient_id = django_filters.AllValuesFilter(label="Patient ID")
     sample_location = django_filters.AllValuesFilter(label="Sample Location")
     sample_sublocation = django_filters.AllValuesFilter(label="Sample Sublocation")
@@ -25,6 +28,7 @@ class SampleFilter(django_filters.FilterSet):
     class Meta:
         model = Sample
         fields = [
+            "study_name",
             "patient_id",
             "sample_location",
             "sample_sublocation",
