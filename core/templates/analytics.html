@@ -1,146 +1,123 @@
-{% extends "layouts/base.html" %} {% block title %} Dashboard {% endblock %}
-
+{% extends "layouts/base.html" %}
+{% block title %}
+    Dashboard
+{% endblock title %}
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %} {% block content %}
-<h2><i class="tim-icons icon-chart-bar-32"></i> Analytics</h2>
-<div class="row">
-  <div class="col-xl-4">
-    
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+    <h2>
+        <i class="tim-icons icon-chart-bar-32"></i> Analytics
+    </h2>
     <div class="row">
-      <div class="col">
-        <div class="card card-chart">
-          <div class="card-header">
-            <h5 class="card-category">Total Active Samples</h5>
-            <h3 class="card-title">
-              <i class="tim-icons icon-atom"></i> {{ total_active_samples }} 
-            </h3>
-            <p>out of {{ total_samples }} total lifetime samples</p>
-          </div>
+        <div class="col-xl-4">
+            <div class="row">
+                <div class="col">
+                    <div class="card card-chart">
+                        <div class="card-header">
+                            <h5 class="card-category">Total Active Samples</h5>
+                            <h3 class="card-title">
+                                <i class="tim-icons icon-atom"></i> {{ total_active_samples }}
+                            </h3>
+                            <p>out of {{ total_samples }} total lifetime samples</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Samples Overview</h3>
+                        </div>
+                        <div class="card-body">
+                            <a href="{% url 'minimusic_overview' %}"
+                               class="btn btn-fill btn-success">Mini MUSIC Overview</a>
+                            <p>CSV file containing sample types by patient ID and sampling date for Mini-MUSIC</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Sample Database Backup</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>
+                                Exports all samples to an excel file.
+                                <br />
+                                For custom exports, search and export from the dashboard page.
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'export_excel' study_name='all' %}"
+                               class="btn btn-fill btn-success">Export Database to CSV</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+        <div class="col-xl-4">
+            <div class="card card-chart">
+                <div class="card-header">
+                    <h5 class="card-category">Active Samples by Type</h5>
+                </div>
+                <div class="chart-area">
+                    <canvas id="samplestype"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-category">Active Samples by Location</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table tablesorter">
+                            <thead>
+                                <th>Sample Location</th>
+                                <th>Number of Samples</th>
+                            </thead>
+                            <tbody>
+                                {% for s in samples_by_location %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'sample_search' %}?q={{ s.sample_location }}">{{ s.sample_location }}</a>
+                                        </td>
+                                        <td>{{ s.sample_location_count }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
     <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">Samples Overview</h3>
-          </div>
-
-          <div class="card-footer">
-            <a href="/analytics/gid_overview" class="btn btn-fill btn-success"
-              >Samples Overview</a
-            >
-          </div>
+        <div class="col">
+            <div class="card card-chart">
+                <div class="card-header">
+                    <h5 class="card-category">Monthly Created Samples (Last 12 Months)</h5>
+                </div>
+                <div class="chart-area">
+                    <canvas id="monthlysamples"></canvas>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-
-    
-
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">Sample Database Backup</h3>
-          </div>
-          <div class="card-body">
-            <p>
-              Exports all samples to an excel file. <br />
-              For custom exports, search and export from the dashboard page.
-            </p>
-          </div>
-          <div class="card-footer">
-            <a href="/export_excel/" class="btn btn-fill btn-success"
-              >Export Database to Excel</a
-            >
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <div class="col-xl-4">
-    <div class="card card-chart">
-      <div class="card-header">
-        <h5 class="card-category">Active Samples by Type</h5>
-      </div>
-      <div class="chart-area">
-        <canvas id="samplestype"></canvas>
-      </div>
-    </div>
-  </div>
-
-
-  <div class="col-xl-4">
-
-    <div class="card">
-      <div class="card-header">
-        <h5 class="card-category">Active Samples by Location</h5>
-      </div>
-      <div class="card-body">
-      <div class="table-responsive">
-        <table class="table tablesorter">
-          <thead>
-            <th>Sample Location</th>
-            <th>Number of Samples</th>
-          </thead>
-
-          <tbody>
-            {% for s in samples_by_location %}
-            <tr>
-            <td>
-              <a href="{% url 'sample_search' %}?q={{ s.sample_location }}">
-                {{ s.sample_location }}
-              </a>
-            </td>
-            <td>{{ s.sample_location_count }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-
-        </table>
-      </div>
-    </div>
-
-    </div>
-
-  </div>  
-</div>
-
-<div class="row">
-
-
-  
-
-
-  <div class="col">
-    <div class="card card-chart">
-      <div class="card-header">
-        <h5 class="card-category">Monthly Created Samples (Last 12 Months)</h5>
-      </div>
-      <div class="chart-area">
-        <canvas id="monthlysamples"></canvas>
-      </div>
-    </div>
-  </div>
-  
-</div>
-
 {% endblock content %}
-
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-{% load static %}
-<script src="{% static 'assets/js/plugins/chartjs.min.js' %}"></script>
-<script src="https://d3js.org/d3-color.v1.min.js"></script>
-<script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
-<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-<script>
-
-
-
+    {% load static %}
+    <script src="{% static 'assets/js/plugins/chartjs.min.js' %}"></script>
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script>
   function calculatePoint(i, intervalSize, colorRangeInfo) {
     var { colorStart, colorEnd, useEndAsStart } = colorRangeInfo;
     return (useEndAsStart
@@ -258,6 +235,5 @@
           },
       });
     });
-</script>
-
+    </script>
 {% endblock javascripts %}

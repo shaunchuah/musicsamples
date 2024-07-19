@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "simple_history",
     "django_select2",
+    "django_pandas",
     "rest_framework",
     "rest_framework.authtoken",
     "storages",

@@ -67,11 +67,6 @@ class TestTemplates(TestCase):
         response = self.client.get(path)
         assertTemplateUsed(response, "analytics.html")
 
-    def test_gid_overview(self):
-        path = reverse("gid_overview")
-        response = self.client.get(path)
-        assertTemplateUsed(response, "gid_overview.html")
-
     def test_sample_delete(self):
         path = reverse("sample_delete", kwargs={"pk": 1})
         response = self.client.get(path)

@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Count, Q
 from django.db.models.functions import Trunc
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from rest_framework import viewsets
@@ -27,7 +27,7 @@ from app.serializers import (
     SampleIsFullyUsedSerializer,
     SampleSerializer,
 )
-from app.utils import export_csv, export_excel, queryset_by_study_name
+from app.utils import export_csv, queryset_by_study_name
 
 # from django.views.decorators.cache import cache_page
 
@@ -279,36 +279,79 @@ def analytics(request):
 
 
 @login_required(login_url="/login/")
-# @cache_page(3 * 60)  # Cache page for 3 minutes
-def gid_overview(request):
-    # Analytics --> Sample Overview Table Page
-    sample_categories = (
-        Sample.objects.filter(is_deleted=False)
-        .filter(is_fully_used=False)
-        .order_by()
-        .values("sample_type")
-        .distinct()
+def minimusic_overview(request):
+    # Analytics --> MiniMUSIC Overview
+    import pandas as pd
+    from django_pandas.io import read_frame
+
+    qs = queryset_by_study_name(Sample, "minimusic")
+    df = read_frame(qs)
+    df["sample_datetime"] = pd.to_datetime(df["sample_datetime"])
+    df["sample_date"] = df["sample_datetime"].dt.date
+
+    df = df.drop(
+        [
+            "id",
+            "sample_location",
+            "sample_sublocation",
+            "sample_datetime",
+            "sample_comments",
+            "is_deleted",
+            "is_fully_used",
+            "is_marvel_study",
+            "processing_datetime",
+            "frozen_datetime",
+            "sample_volume",
+            "sample_volume_units",
+            "freeze_thaw_count",
+            "haemolysis_reference",
+            "biopsy_location",
+            "biopsy_inflamed_status",
+            "created",
+            "created_by",
+            "last_modified",
+            "last_modified_by",
+        ],
+        axis=1,
     )
-    sample_category_list = []
-    for item in sample_categories:
-        sample_category_list.append(item["sample_type"])
-    if "q" in request.GET:
-        query = request.GET.get("q")
-        sample_list = (
-            Sample.objects.filter(is_deleted=False)
-            .filter(is_fully_used=False)
-            .filter(sample_type=query)
-            .order_by("patient_id")
-        )
-    else:
-        query = None
-        sample_list = Sample.objects.none()
-    context = {
-        "sample_list": sample_list,
-        "sample_category_list": sample_category_list,
-        "query": query,
-    }
-    return render(request, "gid_overview.html", context)
+
+    df = df.drop_duplicates()
+
+    output_df = df.pivot_table(
+        index=["patient_id", "sample_date"],
+        columns="sample_type",
+        values="sample_id",
+        aggfunc=pd.unique,
+        fill_value="None",
+    )
+
+    def retrieve_center_number(row):
+        patient_id = row.name[0]
+        patient_id = str(patient_id)
+        return str.split(patient_id, "-")[1]
+
+    output_df["center_number"] = output_df.apply(retrieve_center_number, axis=1)
+
+    def retrieve_patient_number(row):
+        patient_id = row.name[0]
+        patient_id = str(patient_id)
+        return str.split(patient_id, "-")[2]
+
+    output_df["patient_number"] = output_df.apply(retrieve_patient_number, axis=1)
+    output_df["patient_number"] = pd.to_numeric(output_df["patient_number"])
+    output_df.sort_values(
+        by=["center_number", "patient_number", "sample_date"], inplace=True
+    )
+    output_df.drop(["center_number", "patient_number"], axis=1, inplace=True)
+
+    current_date = datetime.datetime.now().strftime("%d-%b-%Y")
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = (
+        "attachment; filename=minimusic_overview_%s.csv" % (current_date)
+    )
+    output_df.to_csv(response)
+    return response
 
 
 @login_required(login_url="/login/")
@@ -586,7 +629,7 @@ def export_excel_view(request, study_name):
         )
     else:
         samples_queryset = queryset.filter(is_deleted=False)
-    response = export_excel(samples_queryset)
+    response = export_csv(samples_queryset)
     return response
 
 
@@ -639,7 +682,7 @@ def autocomplete_locations(request):
             .values("sample_location")
             .distinct()
         )
-    locations = list()
+    locations = []
     for sample in qs:
         locations.append(sample["sample_location"])
     return JsonResponse(locations, safe=False)
@@ -663,7 +706,7 @@ def autocomplete_patient_id(request):
             .values("patient_id")
             .distinct()
         )
-    patients = list()
+    patients = []
     for sample in qs:
         patients.append(sample["patient_id"])
     return JsonResponse(patients, safe=False)

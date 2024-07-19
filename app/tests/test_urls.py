@@ -13,6 +13,10 @@ class TestUrls(SimpleTestCase):
         url = reverse("analytics")
         self.assertEqual(resolve(url).func, views.analytics)
 
+    def test_minimusic_analytics_url_resolves(self):
+        url = reverse("minimusic_overview")
+        self.assertEqual(resolve(url).func, views.minimusic_overview)
+
     def test_reference_url_resolves(self):
         url = reverse("reference")
         self.assertEqual(resolve(url).func, views.reference)

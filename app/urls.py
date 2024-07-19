@@ -40,7 +40,11 @@ urlpatterns = [
         name="filter_export_csv",
     ),
     path("analytics/", views.analytics, name="analytics"),
-    path("analytics/gid_overview", views.gid_overview, name="gid_overview"),
+    path(
+        "analytics/minimusic_overview",
+        views.minimusic_overview,
+        name="minimusic_overview",
+    ),
     path("reference/", views.reference, name="reference"),
     path("account/", views.account, name="account"),
     path("data_export/", views.data_export, name="data_export"),
