@@ -1,8 +1,12 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
 
+from app.choices import StudyNameChoices
+
 
 class Sample(models.Model):
+    study_name = models.CharField(max_length=200, choices=StudyNameChoices.choices)
+
     sample_id = models.CharField(max_length=200, unique=True)
     patient_id = models.CharField(max_length=200)
     sample_location = models.CharField(max_length=200)
