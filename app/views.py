@@ -615,7 +615,7 @@ def reactivate_sample(request, pk):
 @login_required(login_url="/login/")
 def export_csv_view(request, study_name):
     """
-    Takes in study_name parameter and returns csv file with samples belonging in study_name.
+    Takes in study_name parameter and returns csv file with relevant samples.
     Study name options are: music, gidamps, marvel, minimusic
     If no study_name is passed, all samples are exported by default.
     """
