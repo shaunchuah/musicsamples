@@ -171,7 +171,7 @@ Here are some tips for customising this to suit your workflow:
 - If you do alter the model - you may wish to alter:
 
 1. SampleForm in app/forms.py
-2. export_excel function in views.py
+2. export_csv function in views.py
 3. sample-detail.html in core/templates
 
 - Dropdown select fields are configured in app/forms.py

@@ -53,9 +53,9 @@ class TestUrls(SimpleTestCase):
         url = reverse("sample_search")
         self.assertEqual(resolve(url).func, views.sample_search)
 
-    def test_export_excel_url_resolves(self):
-        url = reverse("export_excel", kwargs={"study_name": "all"})
-        self.assertEqual(resolve(url).func, views.export_excel_view)
+    def test_export_csv_url_resolves(self):
+        url = reverse("export_csv", kwargs={"study_name": "all"})
+        self.assertEqual(resolve(url).func, views.export_csv_view)
 
     def test_account_page_url_resolves(self):
         url = reverse("account")
@@ -80,10 +80,6 @@ class TestUrls(SimpleTestCase):
     def test_data_export_url_resolves(self):
         url = reverse("data_export")
         self.assertEqual(resolve(url).func, views.data_export)
-
-    def test_export_study_samples_url(self):
-        url = reverse("export_study_samples", kwargs={"study_name": "gidamps"})
-        self.assertEqual(resolve(url).func, views.export_study_samples)
 
     def test_filter_url(self):
         url = reverse("filter", kwargs={"study_name": "all"})

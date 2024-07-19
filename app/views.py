@@ -613,7 +613,12 @@ def reactivate_sample(request, pk):
 
 
 @login_required(login_url="/login/")
-def export_excel_view(request, study_name):
+def export_csv_view(request, study_name):
+    """
+    Takes in study_name parameter and returns csv file with samples belonging in study_name.
+    Study name options are: music, gidamps, marvel, minimusic
+    If no study_name is passed, all samples are exported by default.
+    """
     queryset = queryset_by_study_name(Sample, study_name)
 
     # Exports custom views based on the search string otherwise exports entire database
@@ -631,32 +636,6 @@ def export_excel_view(request, study_name):
         samples_queryset = queryset.filter(is_deleted=False)
     response = export_csv(samples_queryset)
     return response
-
-
-@login_required(login_url="/login/")
-def export_study_samples(request, study_name):
-    """
-    Takes a study name for export. ?study_name=music
-    Options:
-        music: patient_id starts with MID
-        music_edinburgh: patient_id starts with MID-90
-        music_glasgow: patient_id starts with MID-91
-        gidamps: patient_id starts with GID
-        marvel: is_marvel_study=True
-    """
-
-    if study_name == "music":
-        queryset = Sample.objects.filter(patient_id__startswith="MID")
-    elif study_name == "music_edinburgh":
-        queryset = Sample.objects.filter(patient_id__startswith="MID-90")
-    elif study_name == "music_glasgow":
-        queryset = Sample.objects.filter(patient_id__startswith="MID-91")
-    elif study_name == "gidamps":
-        queryset = Sample.objects.filter(patient_id__startswith="GID")
-    elif study_name == "marvel":
-        queryset = Sample.objects.filter(is_marvel_study=True)
-
-    return export_csv(queryset, study_name)
 
 
 #############################################################################

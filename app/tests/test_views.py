@@ -228,9 +228,9 @@ def test_sample_reactivate(auto_login_user):
     assert response.url == "/"
 
 
-def test_export_study_samples_view(auto_login_user):
+def test_export_csv_view(auto_login_user):
     client, user = auto_login_user()
-    path = reverse("export_study_samples", kwargs={"study_name": "gidamps"})
+    path = reverse("export_csv", kwargs={"study_name": "gidamps"})
     response = client.get(path)
     assert response.status_code == 200
     assert response["Content-Type"] == "text/csv"

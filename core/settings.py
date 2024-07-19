@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "simple_history",
     "django_select2",
     "django_pandas",
+    "django_extensions",
     "rest_framework",
     "rest_framework.authtoken",
     "storages",
