@@ -231,7 +231,6 @@ SOFTWARE.
 - [Django Filter](https://django-filter.readthedocs.io/en/master/)
 - [Django Simple History](https://django-simple-history.readthedocs.io/en/latest/)
 - [Django Widget Tweaks](https://pypi.org/project/django-widget-tweaks/)
-- [Open Pyxl](https://openpyxl.readthedocs.io/en/stable/)
 - [D3.js](https://d3js.org/)
 
 <!-- CONTACT -->
