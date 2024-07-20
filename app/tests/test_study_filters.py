@@ -33,8 +33,8 @@ class TestStudyFilters(TestCase):
         assert self.mini_music_sample.sample_id not in content
         assert self.marvel_sample.sample_id not in content
 
-    def test_minimusic_study_filter(self):
-        path = reverse("filter_by_study", kwargs={"study_name": "minimusic"})
+    def test_mini_music_study_filter(self):
+        path = reverse("filter_by_study", kwargs={"study_name": "mini_music"})
         response = self.client.get(path)
         content = response.content.decode()
         assert self.music_sample.sample_id not in content

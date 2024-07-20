@@ -17,12 +17,12 @@
                         <div class="form-group">
                             <input type="text" autofocus name="q" class="form-control" />
                         </div>
-                        <div class="card-footer">
+                        <div>
                             <button type="submit" class="btn btn-fill btn-success">Search</button>
                             <a href="{% url 'home' %}" class="btn btn-fill btn-secondary">Clear</a>
-                            <a href="{% url 'filter' study_name='all' %}"
+                            <a href="{% url 'filter' %}"
                                class="btn btn-fill btn-success float-lg-right">Advanced
-                            Filtering (All Samples)</a>
+                            Filtering</a>
                         </div>
                     </form>
                 </div>
@@ -37,28 +37,14 @@
                 </div>
                 <div class="card-footer">
                     <div>
-                        <a href="{% url 'filter_by_study' study_name='music' %}"
+                        <a href="{% url 'filter' %}?study_name=music"
                            class="btn btn-fill btn-success">MUSIC</a>
-                        <a href="{% url 'filter_by_study' study_name='gidamps' %}"
+                        <a href="{% url 'filter' %}?study_name=gidamps"
                            class="btn btn-fill btn-success">GI-DAMPs</a>
-                        <a href="{% url 'filter_by_study' study_name='minimusic' %}"
+                        <a href="{% url 'filter' %}?study_name=mini_music"
                            class="btn btn-fill btn-success">Mini-Music</a>
-                        <a href="{% url 'filter_by_study' study_name='marvel' %}"
+                        <a href="{% url 'filter' %}?study_name=marvel"
                            class="btn btn-fill btn-success">MARVEL</a>
-                    </div>
-                    <div>
-                        <a href="{% url 'filter' study_name='music' %}"
-                           class="btn btn-fill btn-success">Adv.
-                        Filtering (MUSIC)</a>
-                        <a href="{% url 'filter' study_name='gidamps' %}"
-                           class="btn btn-fill btn-success">Adv.
-                        Filtering (GI-DAMPs)</a>
-                        <a href="{% url 'filter' study_name='minimusic' %}"
-                           class="btn btn-fill btn-success">Adv.
-                        Filtering (Mini-Music)</a>
-                        <a href="{% url 'filter' study_name='marvel' %}"
-                           class="btn btn-fill btn-success">Adv.
-                        Filtering (MARVEL)</a>
                     </div>
                 </div>
             </div>
@@ -169,35 +155,35 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
     <script>
-  $(document).ready(function () {
-    $('[data-toggle="tooltip"]').tooltip();
-    $("#mainTable").tablesorter({
-      sortReset: true,
-      dateFormat: "ddmmyyyy",
-      headers: {
-        6: {
-          sorter: 'shortDate'
-        },
-        8: {
-          sorter: false
-        },
-        9: {
-          sorter: false
-        },
-        10: {
-          sorter: false
-        },
-        11: {
-          sorter: false
-        },
-        12: {
-          sorter: false
-        },
-        13: {
-          sorter: false
-        }
-      },
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+        $("#mainTable").tablesorter({
+            sortReset: true,
+            dateFormat: "ddmmyyyy",
+            headers: {
+                6: {
+                    sorter: 'shortDate'
+                },
+                8: {
+                    sorter: false
+                },
+                9: {
+                    sorter: false
+                },
+                10: {
+                    sorter: false
+                },
+                11: {
+                    sorter: false
+                },
+                12: {
+                    sorter: false
+                },
+                13: {
+                    sorter: false
+                }
+            },
+        });
     });
-  });
     </script>
 {% endblock javascripts %}

@@ -25,25 +25,20 @@ urlpatterns = [
     path("", views.index, name="home"),
     # samples by study
     path(
-        "filter/by_study/<str:study_name>/",
-        views.filter_by_study,
-        name="filter_by_study",
-    ),
-    path(
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
-    path("filter/advance/<str:study_name>/", views.filter, name="filter"),
+    path("filter/", views.filter, name="filter"),
     path(
-        "filter/export/<str:study_name>/",
+        "filter/export_csv/",
         views.filter_export_csv,
         name="filter_export_csv",
     ),
     path("analytics/", views.analytics, name="analytics"),
     path(
-        "analytics/minimusic_overview",
-        views.minimusic_overview,
-        name="minimusic_overview",
+        "analytics/mini_music_overview",
+        views.mini_music_overview,
+        name="mini_music_overview",
     ),
     path("reference/", views.reference, name="reference"),
     path("account/", views.account, name="account"),
