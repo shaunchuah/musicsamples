@@ -298,7 +298,6 @@ def minimusic_overview(request):
             "sample_comments",
             "is_deleted",
             "is_fully_used",
-            "is_marvel_study",
             "processing_datetime",
             "frozen_datetime",
             "sample_volume",

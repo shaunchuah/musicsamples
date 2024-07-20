@@ -23,7 +23,6 @@ class SampleFilter(django_filters.FilterSet):
         lookup_expr="icontains", label="Sample Comments"
     )
     sample_volume = django_filters.NumberFilter(label="Sample Volume")
-    is_marvel_study = django_filters.BooleanFilter(label="MARVEL Study Sample?")
 
     class Meta:
         model = Sample
@@ -37,5 +36,4 @@ class SampleFilter(django_filters.FilterSet):
             "sample_comments",
             "sample_volume",
             "sample_datetime",
-            "is_marvel_study",
         ]

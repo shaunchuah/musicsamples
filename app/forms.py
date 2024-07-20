@@ -52,7 +52,6 @@ class SampleForm(ModelForm):
             "sample_datetime",
             "processing_datetime",
             "frozen_datetime",
-            "is_marvel_study",
             "sample_comments",
             "sample_volume",
             "sample_volume_units",
@@ -71,10 +70,9 @@ class SampleForm(ModelForm):
             "biopsy_inflamed_status": forms.Select(
                 choices=BIOPSY_INFLAMED_STATUS_CHOICES
             ),
-            "is_marvel_study": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
         labels = {
-            "study_name": "Study Name",
+            "study_name": "Study Name*",
             "sample_id": "Sample ID*",
             "patient_id": "Patient ID*",
             "sample_datetime": "Sampling Datetime*",

@@ -87,7 +87,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="id_study_name">Study Name:</label>
+                            <label for="id_study_name">Study Name*:</label>
                             <select name="study_name" class="form-control" required="" id="id_study_name">
                                 <option value="" selected="">---------</option>
                                 <option value="gidamps">GI-DAMPs</option>
@@ -222,13 +222,6 @@
                                    name="frozen_datetime"
                                    class="form-control"
                                    id="id_frozen_datetime" />
-                        </div>
-                        <div class="form-check">
-                            <label class="form-check-label" for="id_is_marvel_study">MARVEL Study Sample?</label>
-                            <input type="checkbox"
-                                   name="is_marvel_study"
-                                   class="form-check-input"
-                                   id="id_is_marvel_study">
                         </div>
                         <div class="form-group">
                             <label for="id_sample_comments">Comments:</label>
@@ -366,7 +359,6 @@
         'sample_volume': $('#id_sample_volume').val(),
         'sample_volume_units': $('#id_sample_volume_units').val(),
         'freeze_thaw_count': $('#id_freeze_thaw_count').val(),
-        'is_marvel_study': $('#id_is_marvel_study').is(":checked"),
         'frozen_datetime': $('#id_frozen_datetime').val(),
       },
       success: function (result) {
