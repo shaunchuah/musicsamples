@@ -64,37 +64,8 @@ def index(request):
 
 
 @login_required(login_url="/login/")
-def filter_by_study(request, study_name):
-    # Home Page
-    queryset = queryset_by_study_name(Sample, study_name)
-    sample_list = (
-        queryset.filter(is_deleted=False)
-        .filter(is_fully_used=False)
-        .order_by("-sample_datetime")
-    )
-    sample_count = sample_list.count()
-    page = request.GET.get("page", 1)
-    paginator = Paginator(sample_list, SAMPLE_PAGINATION_SIZE)
-    try:
-        samples = paginator.page(page)
-    except PageNotAnInteger:
-        samples = paginator.page(1)
-    except EmptyPage:
-        samples = paginator.page(paginator.num_pages)
-    context = {
-        "sample_list": samples,
-        "page_obj": samples,
-        "sample_count": sample_count,
-        "study_name": study_name,
-    }
-    return render(request, "index.html", context)
-
-
-@login_required(login_url="/login/")
-def filter(request, study_name):
-    queryset = queryset_by_study_name(Sample, study_name)
-
-    # Perform filtering
+def filter(request):
+    queryset = Sample.objects.all()
     sample_filter = SampleFilter(request.GET, queryset=queryset)
     sample_list = sample_filter.qs
     sample_count = sample_list.count()
@@ -121,14 +92,13 @@ def filter(request, study_name):
         "sample_count": sample_count,
         "sample_filter": sample_filter,
         "parameter_string": parameter_string,
-        "study_name": study_name,
     }
     return render(request, "filter.html", context)
 
 
 @login_required(login_url="/login/")
-def filter_export_csv(request, study_name):
-    queryset = queryset_by_study_name(Sample, study_name)
+def filter_export_csv(request):
+    queryset = Sample.objects.all()
     sample_filter = SampleFilter(request.GET, queryset=queryset)
     sample_list = sample_filter.qs
     return export_csv(sample_list)
@@ -279,12 +249,12 @@ def analytics(request):
 
 
 @login_required(login_url="/login/")
-def minimusic_overview(request):
-    # Analytics --> MiniMUSIC Overview
+def mini_music_overview(request):
+    # Analytics --> mini_music Overview
     import pandas as pd
     from django_pandas.io import read_frame
 
-    qs = queryset_by_study_name(Sample, "minimusic")
+    qs = queryset_by_study_name(Sample, "mini_music")
     df = read_frame(qs)
     df["sample_datetime"] = pd.to_datetime(df["sample_datetime"])
     df["sample_date"] = df["sample_datetime"].dt.date
@@ -298,7 +268,6 @@ def minimusic_overview(request):
             "sample_comments",
             "is_deleted",
             "is_fully_used",
-            "is_marvel_study",
             "processing_datetime",
             "frozen_datetime",
             "sample_volume",
@@ -348,7 +317,7 @@ def minimusic_overview(request):
 
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = (
-        "attachment; filename=minimusic_overview_%s.csv" % (current_date)
+        "attachment; filename=mini_music_overview_%s.csv" % (current_date)
     )
     output_df.to_csv(response)
     return response
@@ -616,7 +585,7 @@ def reactivate_sample(request, pk):
 def export_csv_view(request, study_name):
     """
     Takes in study_name parameter and returns csv file with relevant samples.
-    Study name options are: music, gidamps, marvel, minimusic
+    Study name options are: music, gidamps, marvel, mini_music
     If no study_name is passed, all samples are exported by default.
     """
     queryset = queryset_by_study_name(Sample, study_name)

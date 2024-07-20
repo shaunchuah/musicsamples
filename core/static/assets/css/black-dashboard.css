@@ -49,6 +49,7 @@
 
 .qrcode {
   width:30%;
+  height:30%;
   margin-right:15px;
 }
 
@@ -17138,7 +17139,7 @@ hr {
 .off-canvas-sidebar .sidebar-wrapper {
   width: 100%;
   min-height: 100%;
-  
+
   z-index: 4;
   position: relative;
   overflow: auto;

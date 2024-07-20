@@ -13,9 +13,9 @@ class TestUrls(SimpleTestCase):
         url = reverse("analytics")
         self.assertEqual(resolve(url).func, views.analytics)
 
-    def test_minimusic_analytics_url_resolves(self):
-        url = reverse("minimusic_overview")
-        self.assertEqual(resolve(url).func, views.minimusic_overview)
+    def test_mini_music_analytics_url_resolves(self):
+        url = reverse("mini_music_overview")
+        self.assertEqual(resolve(url).func, views.mini_music_overview)
 
     def test_reference_url_resolves(self):
         url = reverse("reference")
@@ -82,9 +82,9 @@ class TestUrls(SimpleTestCase):
         self.assertEqual(resolve(url).func, views.data_export)
 
     def test_filter_url(self):
-        url = reverse("filter", kwargs={"study_name": "all"})
+        url = reverse("filter")
         self.assertEqual(resolve(url).func, views.filter)
 
     def test_filter_export_csv_url(self):
-        url = reverse("filter_export_csv", kwargs={"study_name": "all"})
+        url = reverse("filter_export_csv")
         self.assertEqual(resolve(url).func, views.filter_export_csv)

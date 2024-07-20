@@ -1,429 +1,353 @@
 {% extends "layouts/base.html" %}
 {% load static %}
-
 {% block title %}
-Dashboard
-{% endblock %}
-
+    Dashboard
+{% endblock title %}
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}
 {% endblock stylesheets %}
 {% block content %}
-{% if form.errors %}
-  {% for field in form %}
-    {% for error in field.errors %}
-<div class="row">
-  <div class="col-xl-9">
-    <div class="alert alert-danger">
-      <button
-        type="button"
-        aria-hidden="true"
-        class="close"
-        data-dismiss="alert"
-        aria-label="Close"
-      >
-        <i class="tim-icons icon-simple-remove"></i>
-      </button>
-      <span>{{field.label}}: {{ error|escape }}</span>
-    </div>
-  </div>
-</div>
-    {% endfor %}
-  {% endfor %}
-{% endif %}
-
-<div class="row">
-  <div class="col-xl-9">
-    <h2><i class="tim-icons icon-tag"></i> QR Scan - Mark as used</h2>
-
-    {% include 'barcode-nav.html' %}
-
-    <div class="card notes remove-top-border-radius">
-      <div class="card-header"><h3 class="card-title">Instructions</h3></div>
-      <div class="card-body">
-        <p>Welcome to the barcode scanning page for adding multiple samples.</p>
-        <p>
-          <strong>Important Note:</strong> Barcode scanners work like keyboards.
-          For most scanners, the default is to provide the 'enter' key after
-          scanning a barcode. Some scanners may need to be configured to provide
-          the 'enter' or 'tab' key on code scan. This page accepts both 'enter'
-          and 'tab' keys from barcode scanners.
-        </p>
-        <h4>Steps:</h4>
-        <ol>
-          <li>Fill in the required details</li>
-          <li>Start scanning to tag samples with those details</li>
-        </ol>
-        <p>
-          <strong>Tip:</strong> If a label won't scan, you can type in the
-          sample ID and hit enter instead.
-        </p>
-        <p>
-          <strong>Help:</strong> If you've accidentally scanned the wrong sample, you should edit it manually and check the data - trying to delete and add it again will throw an error as the ID will be noted by the database as not being unique. You can see a list of recently accessed samples in your account page at the top right.
-        </p>
-      </div>
-    </div>
-    <form autocomplete="off">
-      {% csrf_token %}
-      <div class="card">
-        <!--<div class="card-header"><h3 class="card-title">Add New Sample</h3></div>-->
-        <div class="card-body">
-          <div class="row">
-            <div class="form-group col-md-8">
-              <label for="id_sample_location">Sample Location*:</label>
-              <input
-                type="text"
-                name="sample_location"
-                maxlength="200"
-                class="form-control"
-                required
-                id="id_sample_location"
-              />
+    {% if form.errors %}
+        {% for field in form %}
+            {% for error in field.errors %}
+                <div class="row">
+                    <div class="col-xl-9">
+                        <div class="alert alert-danger">
+                            <button type="button"
+                                    aria-hidden="true"
+                                    class="close"
+                                    data-dismiss="alert"
+                                    aria-label="Close">
+                                <i class="tim-icons icon-simple-remove"></i>
+                            </button>
+                            <span>{{ field.label }}: {{ error|escape }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    {% endif %}
+    <div class="row">
+        <div class="col-xl-9">
+            <h2>
+                <i class="tim-icons icon-tag"></i> QR Scan - Mark as used
+            </h2>
+            {% include "barcode-nav.html" %}
+            <div class="card notes remove-top-border-radius">
+                <div class="card-header">
+                    <h3 class="card-title">Instructions</h3>
+                </div>
+                <div class="card-body">
+                    <p>Welcome to the barcode scanning page for adding multiple samples.</p>
+                    <p>
+                        <strong>Important Note:</strong> Barcode scanners work like keyboards.
+                        For most scanners, the default is to provide the 'enter' key after
+                        scanning a barcode. Some scanners may need to be configured to provide
+                        the 'enter' or 'tab' key on code scan. This page accepts both 'enter'
+                        and 'tab' keys from barcode scanners.
+                    </p>
+                    <h4>Steps:</h4>
+                    <ol>
+                        <li>Fill in the required details</li>
+                        <li>Start scanning to tag samples with those details</li>
+                    </ol>
+                    <p>
+                        <strong>Tip:</strong> If a label won't scan, you can type in the
+                        sample ID and hit enter instead.
+                    </p>
+                    <p>
+                        <strong>Help:</strong> If you've accidentally scanned the wrong sample, you should edit it manually and check
+                        the data - trying to delete and add it again will throw an error as the ID will be noted by the database as
+                        not being unique. You can see a list of recently accessed samples in your account page at the top right.
+                    </p>
+                </div>
             </div>
-            <div class="form-group col-md-4">
-              <label for="id_sample_sublocation">Sample Sublocation:</label>
-              <input
-                type="text"
-                name="sample_sublocation"
-                maxlength="200"
-                class="form-control"
-                id="id_sample_sublocation"
-              />
+            <form autocomplete="off">
+                {% csrf_token %}
+                <div class="card">
+                    <!--<div class="card-header"><h3 class="card-title">Add New Sample</h3></div>-->
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="form-group col-md-8">
+                                <label for="id_sample_location">Sample Location*:</label>
+                                <input type="text"
+                                       name="sample_location"
+                                       maxlength="200"
+                                       class="form-control"
+                                       required
+                                       id="id_sample_location" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="id_sample_sublocation">Sample Sublocation:</label>
+                                <input type="text"
+                                       name="sample_sublocation"
+                                       maxlength="200"
+                                       class="form-control"
+                                       id="id_sample_sublocation" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_study_name">Study Name*:</label>
+                            <select name="study_name" class="form-control" required="" id="id_study_name">
+                                <option value="" selected="">---------</option>
+                                <option value="gidamps">GI-DAMPs</option>
+                                <option value="music">MUSIC</option>
+                                <option value="mini_music">Mini-MUSIC</option>
+                                <option value="marvel">MARVEL</option>
+                                <option value="mini_marvel">Mini-MARVEL</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_patient_id">Patient ID*:</label>
+                            <input type="text"
+                                   name="patient_id"
+                                   maxlength="200"
+                                   class="form-control"
+                                   required
+                                   id="id_patient_id" />
+                        </div>
+                        <div class="form-group">
+                            <label for="id_sample_type">Sample Type*:</label>
+                            <select name="sample_type"
+                                    maxlength="200"
+                                    class="form-control"
+                                    required
+                                    id="id_sample_type">
+                                <option value="" selected>Select type</option>
+                                <optgroup label="Standard EDTA tube">
+                                    <option value="Standard EDTA tube">Standard EDTA tube</option>
+                                    <option value="EDTA plasma child aliquot">EDTA plasma child aliquot</option>
+                                </optgroup>
+                                <optgroup label="PaxGene ccfDNA tube">
+                                    <option value="PaxGene ccfDNA tube">PaxGene ccfDNA tube</option>
+                                    <option value="PaxGene ccfDNA plasma child aliquot">PaxGene ccfDNA plasma child aliquot</option>
+                                    <option value="PaxGene ccfDNA extracted cfDNA">PaxGene ccfDNA extracted cfDNA</option>
+                                </optgroup>
+                                <optgroup label="PaxGene RNA tube">
+                                    <option value="PaxGene RNA tube">PaxGene RNA tube</option>
+                                    <option value="PaxGene RNA child aliquot">PaxGene RNA child aliquot</option>
+                                </optgroup>
+                                <optgroup label="Standard Gel/Serum tube">
+                                    <option value="Standard gel tube">Standard gel tube</option>
+                                    <option value="Serum child aliquot">Serum child aliquot</option>
+                                </optgroup>
+                                <optgroup label="Tissue/Biopsy">
+                                    <option value="Formalin biopsy">Formalin biopsy</option>
+                                    <option value="RNAlater biopsy">RNAlater biopsy</option>
+                                    <option value="Paraffin tissue block">Paraffin tissue block</option>
+                                </optgroup>
+                                <optgroup label="Stool">
+                                    <option value="Standard stool container">Standard stool container</option>
+                                    <option value="Calprotectin">Calprotectin</option>
+                                    <option value="FIT">FIT</option>
+                                    <option value="OmniGut">Omnigut</option>
+                                    <option value="Stool supernatant">Stool supernatant</option>
+                                </optgroup>
+                                <optgroup label="Saliva">
+                                    <option value="Saliva">Saliva</option>
+                                </optgroup>
+                                <optgroup label="Other">
+                                    <option value="Other">Other please specify in comments</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_haemolysis_reference">Haemolysis Reference Palette:</label>
+                            <select name="haemolysis_reference"
+                                    maxlength="200"
+                                    class="form-control"
+                                    id="id_haemolysis_reference">
+                                <option value="" selected>Select category</option>
+                                <option value="0">Minimal</option>
+                                <option value="20">20 mg/dL</option>
+                                <option value="50">50 mg/dL</option>
+                                <option value="100">100 mg/dL (unusable)</option>
+                                <option value="250">250 mg/dL (unusable)</option>
+                                <option value="500">500 mg/dL (unusable)</option>
+                                <option value="1000">1000 mg/dL (unusable)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_biopsy_location">Biopsy Location:</label>
+                            <select name="biopsy_location"
+                                    maxlength="100"
+                                    class="form-control"
+                                    id="id_biopsy_location">
+                                <option value="" selected>Select biopsy location</option>
+                                <option value="Terminal ileum">Terminal ileum</option>
+                                <option value="Caecum">Caecum</option>
+                                <option value="Ascending colon">Ascending colon</option>
+                                <option value="Transverse colon">Transverse colon</option>
+                                <option value="Descending colon">Descending colon</option>
+                                <option value="Sigmoid colon">Sigmoid colon</option>
+                                <option value="Rectum">Rectum</option>
+                                <option value="Right colon">Right colon</option>
+                                <option value="Left colon">Left colon</option>
+                                <option value="Oesophagus">Oesophagus</option>
+                                <option value="Stomach">Stomach</option>
+                                <option value="Duodenum">Duodenum</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_biopsy_inflamed_status">Biopsy Inflamed Status:</label>
+                            <select name="biopsy_inflamed_status"
+                                    maxlength="100"
+                                    class="form-control"
+                                    id="id_biopsy_inflamed_status">
+                                <option value="" selected>Select inflamed status</option>
+                                <option value="inflamed">Inflamed</option>
+                                <option value="uninflamed">Uninflamed</option>
+                                <option value="healthy">Healthy</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_sample_datetime">Sampling Datetime*:</label>
+                            <input type="datetime-local"
+                                   name="sample_datetime"
+                                   class="form-control"
+                                   required
+                                   id="id_sample_datetime" />
+                        </div>
+                        <div class="form-group">
+                            <label for="id_processing_datetime">Processing Datetime:</label>
+                            <input type="datetime-local"
+                                   name="processing_datetime"
+                                   class="form-control"
+                                   id="id_processing_datetime" />
+                        </div>
+                        <div class="form-group">
+                            <label for="id_frozen_datetime">Frozen Datetime (if applicable):</label>
+                            <input type="datetime-local"
+                                   name="frozen_datetime"
+                                   class="form-control"
+                                   id="id_frozen_datetime" />
+                        </div>
+                        <div class="form-group">
+                            <label for="id_sample_comments">Comments:</label>
+                            <textarea name="sample_comments"
+                                      cols="40"
+                                      rows="10"
+                                      class="form-control"
+                                      id="id_sample_comments"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-8">
+                                <label for="id_sample_volume">Volume Remaining (est.):</label>
+                                <input type="number"
+                                       name="sample_volume"
+                                       step="0.001"
+                                       class="form-control"
+                                       id="id_sample_volume" />
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="id_sample_volume_units">Sample Volume Units:</label>
+                                <select name="sample_volume_units"
+                                        class="form-control"
+                                        maxlength="30"
+                                        id="id_sample_volume_units">
+                                    <option value="" selected>Select unit</option>
+                                    <option value="ml">ml</option>
+                                    <option value="ul">ul</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_freeze_thaw_count">No. of Freeze-Thaw Cycles:</label>
+                            <input type="number"
+                                   name="freeze_thaw_count"
+                                   value="0"
+                                   class="form-control"
+                                   required
+                                   id="id_freeze_thaw_count" />
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="sample_id">Barcode ID scanning area</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="sample_id"
+                                   placeholder="Click here and start scanning barcodes..." />
+                        </div>
+                        <div class="alert alert-success">
+                            <button type="button"
+                                    aria-hidden="true"
+                                    class="close"
+                                    data-dismiss="alert"
+                                    aria-label="Close">
+                                <i class="tim-icons icon-simple-remove"></i>
+                            </button>
+                            <span>Success - Sample Updated</span>
+                        </div>
+                        <div class="alert alert-danger">
+                            <button type="button"
+                                    aria-hidden="true"
+                                    class="close"
+                                    data-dismiss="alert"
+                                    aria-label="Close">
+                                <i class="tim-icons icon-simple-remove"></i>
+                            </button>
+                            <span>Error <span id="error_message"></span></span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Scan History</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <td>Sample ID</td>
+                                <td>Status</td>
+                                <td>Message</td>
+                            </thead>
+                            <tbody id="tbody">
+                                <tr>&nbsp;</tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-          </div>
-
-          <div class="form-group">
-            <label for="id_patient_id">Patient ID*:</label>
-            <input
-              type="text"
-              name="patient_id"
-              maxlength="200"
-              class="form-control"
-              required
-              id="id_patient_id"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="id_sample_type">Sample Type*:</label>
-            <select
-              name="sample_type"
-              maxlength="200"
-              class="form-control"
-              required
-              id="id_sample_type"
-            >
-              <option value="" selected>Select type</option>
-
-              <optgroup label="Standard EDTA tube">
-                <option value="Standard EDTA tube">Standard EDTA tube</option>
-
-                <option value="EDTA plasma child aliquot">
-                  EDTA plasma child aliquot
-                </option>
-              </optgroup>
-              <optgroup label="PaxGene ccfDNA tube">
-                <option value="PaxGene ccfDNA tube">PaxGene ccfDNA tube</option>
-
-                <option value="PaxGene ccfDNA plasma child aliquot">
-                  PaxGene ccfDNA plasma child aliquot
-                </option>
-
-                <option value="PaxGene ccfDNA extracted cfDNA">
-                  PaxGene ccfDNA extracted cfDNA
-                </option>
-              </optgroup>
-              <optgroup label="PaxGene RNA tube">
-                <option value="PaxGene RNA tube">PaxGene RNA tube</option>
-
-                <option value="PaxGene RNA child aliquot">
-                  PaxGene RNA child aliquot
-                </option>
-              </optgroup>
-              <optgroup label="Standard Gel/Serum tube">
-                <option value="Standard gel tube">Standard gel tube</option>
-
-                <option value="Serum child aliquot">Serum child aliquot</option>
-              </optgroup>
-              <optgroup label="Tissue/Biopsy">
-                <option value="Formalin biopsy">Formalin biopsy</option>
-
-                <option value="RNAlater biopsy">RNAlater biopsy</option>
-
-                <option value="Paraffin tissue block">
-                  Paraffin tissue block
-                </option>
-              </optgroup>
-              <optgroup label="Stool">
-                <option value="Standard stool container">Standard stool container</option>
-                <option value="Calprotectin">Calprotectin</option>
-
-                <option value="FIT">FIT</option>
-
-                <option value="OmniGut">Omnigut</option>
-
-                <option value="Stool supernatant">Stool supernatant</option>
-              </optgroup>
-              <optgroup label="Saliva">
-                <option value="Saliva">Saliva</option>
-              </optgroup>
-              <optgroup label="Other">
-                <option value="Other">Other please specify in comments</option>
-              </optgroup>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="id_haemolysis_reference"
-              >Haemolysis Reference Palette:</label
-            >
-            <select
-              name="haemolysis_reference"
-              maxlength="200"
-              class="form-control"
-              id="id_haemolysis_reference"
-            >
-              <option value="" selected>Select category</option>
-
-              <option value="0">Minimal</option>
-
-              <option value="20">20 mg/dL</option>
-
-              <option value="50">50 mg/dL</option>
-
-              <option value="100">100 mg/dL (unusable)</option>
-
-              <option value="250">250 mg/dL (unusable)</option>
-
-              <option value="500">500 mg/dL (unusable)</option>
-
-              <option value="1000">1000 mg/dL (unusable)</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="id_biopsy_location">Biopsy Location:</label>
-            <select
-              name="biopsy_location"
-              maxlength="100"
-              class="form-control"
-              id="id_biopsy_location"
-            >
-              <option value="" selected>Select biopsy location</option>
-              <option value="Terminal ileum">Terminal ileum</option>
-              <option value="Caecum">Caecum</option>
-              <option value="Ascending colon">Ascending colon</option>
-              <option value="Transverse colon">Transverse colon</option>
-              <option value="Descending colon">Descending colon</option>
-              <option value="Sigmoid colon">Sigmoid colon</option>
-              <option value="Rectum">Rectum</option>
-              <option value="Right colon">Right colon</option>
-              <option value="Left colon">Left colon</option>
-              <option value="Oesophagus">Oesophagus</option>
-              <option value="Stomach">Stomach</option>
-              <option value="Duodenum">Duodenum</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="id_biopsy_inflamed_status"
-              >Biopsy Inflamed Status:</label
-            >
-            <select
-              name="biopsy_inflamed_status"
-              maxlength="100"
-              class="form-control"
-              id="id_biopsy_inflamed_status"
-            >
-              <option value="" selected>Select inflamed status</option>
-
-              <option value="inflamed">Inflamed</option>
-
-              <option value="uninflamed">Uninflamed</option>
-
-              <option value="healthy">Healthy</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="id_sample_datetime">Sampling Datetime*:</label>
-            <input
-              type="datetime-local"
-              name="sample_datetime"
-              class="form-control"
-              required
-              id="id_sample_datetime"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="id_processing_datetime">Processing Datetime:</label>
-            <input
-              type="datetime-local"
-              name="processing_datetime"
-              class="form-control"
-              id="id_processing_datetime"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="id_frozen_datetime">Frozen Datetime (if applicable):</label>
-            <input
-              type="datetime-local"
-              name="frozen_datetime"
-              class="form-control"
-              id="id_frozen_datetime"
-            />
-          </div>
-
-          <div class="form-check">
-            <label class="form-check-label" for="id_is_marvel_study">
-              MARVEL Study Sample?
-            </label>
-            <input type="checkbox" name="is_marvel_study" class="form-check-input" id="id_is_marvel_study">
-          </div>
-
-          <div class="form-group">
-            <label for="id_sample_comments">Comments:</label>
-            <textarea
-              name="sample_comments"
-              cols="40"
-              rows="10"
-              class="form-control"
-              id="id_sample_comments"
-            ></textarea>
-          </div>
-
-          <div class="row">
-            <div class="form-group col-md-8">
-              <label for="id_sample_volume">Volume Remaining (est.):</label>
-              <input
-                type="number"
-                name="sample_volume"
-                step="0.001"
-                class="form-control"
-                id="id_sample_volume"
-              />
-            </div>
-
-            <div class="form-group col-md-4">
-              <label for="id_sample_volume_units">Sample Volume Units:</label>
-              <select
-                name="sample_volume_units"
-                class="form-control"
-                maxlength="30"
-                id="id_sample_volume_units"
-              >
-                <option value="" selected>Select unit</option>
-
-                <option value="ml">ml</option>
-
-                <option value="ul">ul</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="id_freeze_thaw_count">No. of Freeze-Thaw Cycles:</label>
-            <input
-              type="number"
-              name="freeze_thaw_count"
-              value="0"
-              class="form-control"
-              required
-              id="id_freeze_thaw_count"
-            />
-          </div>
         </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <div class="form-group">
-            <label for="sample_id">Barcode ID scanning area</label>
-            <input
-              type="text"
-              class="form-control"
-              id="sample_id"
-              placeholder="Click here and start scanning barcodes..."
-            />
-          </div>
-          <div class="alert alert-success">
-            <button
-              type="button"
-              aria-hidden="true"
-              class="close"
-              data-dismiss="alert"
-              aria-label="Close"
-            >
-              <i class="tim-icons icon-simple-remove"></i>
-            </button>
-            <span>Success - Sample Updated</span>
-          </div>
-          <div class="alert alert-danger">
-            <button
-              type="button"
-              aria-hidden="true"
-              class="close"
-              data-dismiss="alert"
-              aria-label="Close"
-            >
-              <i class="tim-icons icon-simple-remove"></i>
-            </button>
-            <span>Error <span id="error_message"></span></span>
-          </div>
+        <div class="col-xl-3">
+            <div class="card mt-4 ">
+                <div class="card-header">
+                    <h3 class="card-title">Haemolysis Reference Palette</h3>
+                </div>
+                <div class="card-body">
+                    <img src="{% static 'assets/img/haemolysis.jpg' %}"
+                         alt="haemolysis palette"
+                         width="275"
+                         height="825" />
+                </div>
+            </div>
         </div>
-      </div>
-    </form>
-
-    <div class="card">
-      <div class="card-header">
-        <h3 class="card-title">Scan History</h3>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table">
-            <thead>
-              <td>Sample ID</td>
-              <td>Status</td>
-              <td>Message</td>
-            </thead>
-            <tbody id="tbody">
-              <tr></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
-  </div>
-  <div class="col-xl-3">
-  <div class="card mt-4 ">
-  <div class="card-header"><h3 class="card-title">Haemolysis Reference Palette</h3></div>
-  <div class="card-body">
-    <img src="{% static 'assets/img/haemolysis.jpg' %}" />
-  </div>
-
-</div>
-</div>
-</div>
-
 {% endblock content %}
-
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-
-<script>
+    <script>
   var url_string = "/api/multiple_samples/";
   var token = "{{csrf_token}}";
 
   function submitScan() {
     $.ajax({
-      headers: { "X-CSRFToken": token },
+      headers: {
+        "X-CSRFToken": token
+      },
       url: url_string,
       method: "post",
       data: {
         'sample_id': $("#sample_id").val(),
         'sample_location': $('#id_sample_location').val(),
         'sample_sublocation': $('#id_sample_sublocation').val(),
+        'study_name': $("#id_study_name").val(),
         'patient_id': $('#id_patient_id').val(),
         'sample_type': $('#id_sample_type').val(),
         'haemolysis_reference': $('#id_haemolysis_reference').val(),
@@ -435,7 +359,6 @@ Dashboard
         'sample_volume': $('#id_sample_volume').val(),
         'sample_volume_units': $('#id_sample_volume_units').val(),
         'freeze_thaw_count': $('#id_freeze_thaw_count').val(),
-        'is_marvel_study': $('#id_is_marvel_study').is(":checked"),
         'frozen_datetime': $('#id_frozen_datetime').val(),
       },
       success: function (result) {
@@ -467,11 +390,11 @@ Dashboard
     });
   };
 
-  function adjust(v){
-    if(v>9){
+  function adjust(v) {
+    if (v > 9) {
       return v.toString();
-    }else{
-      return '0'+v.toString();
+    } else {
+      return '0' + v.toString();
     }
   };
 
@@ -564,6 +487,5 @@ Dashboard
       }
     });
   });
-</script>
-
+    </script>
 {% endblock javascripts %}

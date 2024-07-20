@@ -40,12 +40,10 @@ def queryset_by_study_name(model, study_name):
         queryset = model.objects.filter(patient_id__startswith="MID-")
     elif study_name == "gidamps":
         queryset = model.objects.filter(patient_id__startswith="GID-")
-    elif study_name == "minimusic":
+    elif study_name == "mini_music":
         queryset = model.objects.filter(patient_id__startswith="MINI-")
     elif study_name == "marvel":
-        queryset = model.objects.filter(
-            Q(patient_id__regex=r"^[0-9]{6}$") | Q(is_marvel_study=True)
-        )
+        queryset = model.objects.filter(Q(patient_id__regex=r"^[0-9]{6}$"))
     else:
         queryset = model.objects.all()
     return queryset

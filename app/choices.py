@@ -1,3 +1,5 @@
+from django.db import models
+
 SAMPLE_TYPE_CHOICES = (
     ("", "Select type"),
     (
@@ -96,3 +98,12 @@ SAMPLE_VOLUME_UNIT_CHOICES = (
     ("ml", "ml"),
     ("ul", "ul"),
 )
+
+
+class StudyNameChoices(models.TextChoices):
+    GIDAMPS = "gidamps", "GI-DAMPs"
+    MUSIC = "music", "MUSIC"
+    MINI_MUSIC = "mini_music", "Mini-MUSIC"
+    MARVEL = "marvel", "MARVEL"
+    MINI_MARVEL = "mini_marvel", "Mini-MARVEL"
+    NONE = "none", "None"

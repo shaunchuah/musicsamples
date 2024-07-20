@@ -40,6 +40,7 @@ class MultipleSampleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sample
         fields = [
+            "study_name",
             "sample_id",
             "sample_location",
             "sample_sublocation",
@@ -55,7 +56,6 @@ class MultipleSampleSerializer(serializers.ModelSerializer):
             "sample_volume",
             "sample_volume_units",
             "freeze_thaw_count",
-            "is_marvel_study",
             "frozen_datetime",
         ]
         lookup_field = "sample_id"
@@ -69,6 +69,7 @@ class SampleExportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sample
         fields = [
+            "study_name",
             "sample_id",
             "patient_id",
             "sample_type",
@@ -82,7 +83,6 @@ class SampleExportSerializer(serializers.ModelSerializer):
             "sample_volume_units",
             "freeze_thaw_count",
             "is_fully_used",
-            "is_marvel_study",
             "haemolysis_reference",
             "biopsy_location",
             "biopsy_inflamed_status",
