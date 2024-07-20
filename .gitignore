@@ -35,3 +35,4 @@ media/*
 mydatabase
 
 .vscode
+.ruff_cache
