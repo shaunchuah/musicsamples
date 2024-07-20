@@ -82,9 +82,9 @@ class TestUrls(SimpleTestCase):
         self.assertEqual(resolve(url).func, views.data_export)
 
     def test_filter_url(self):
-        url = reverse("filter", kwargs={"study_name": "all"})
+        url = reverse("filter")
         self.assertEqual(resolve(url).func, views.filter)
 
     def test_filter_export_csv_url(self):
-        url = reverse("filter_export_csv", kwargs={"study_name": "all"})
+        url = reverse("filter_export_csv")
         self.assertEqual(resolve(url).func, views.filter_export_csv)
