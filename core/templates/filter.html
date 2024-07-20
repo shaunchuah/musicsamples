@@ -58,6 +58,7 @@
                         <table class="table tablesorter" id="mainTable">
                             <thead class="text-primary">
                                 <tr>
+                                    <th>Study Name</th>
                                     <th>Sample ID</th>
                                     <th>Patient ID</th>
                                     <th>Sample Location</th>
@@ -76,6 +77,7 @@
                                 {% if sample_list %}
                                     {% for sample in sample_list %}
                                         <tr>
+                                            <td>{{ sample.get_study_name_display }}</td>
                                             <td>{{ sample.sample_id }}</td>
                                             <td>{{ sample.patient_id }}</td>
                                             <td>{{ sample.sample_location }}</td>
@@ -109,7 +111,7 @@
                                     {% endfor %}
                                 {% else %}
                                     <tr>
-                                        <td colspan="12" align="center">No active samples found.</td>
+                                        <td colspan="13" align="center">No active samples found.</td>
                                     </tr>
                                 {% endif %}
                             </tbody>
@@ -168,11 +170,8 @@
       sortReset: true,
       dateFormat: "ddmmyyyy",
       headers: {
-        5: {
+        6: {
           sorter: "shortDate"
-        },
-        7: {
-          sorter: false
         },
         8: {
           sorter: false
@@ -186,6 +185,12 @@
         11: {
           sorter: false
         },
+        12: {
+          sorter: false
+        },
+        13: {
+            sorter: false
+        }
       },
     });
   });

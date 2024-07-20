@@ -43,6 +43,7 @@ urlpatterns = [
     path("reference/", views.reference, name="reference"),
     path("account/", views.account, name="account"),
     path("data_export/", views.data_export, name="data_export"),
+    path("management/", views.management, name="management"),
     # Samples URLs
     path("samples/archive/", views.sample_archive, name="sample_archive"),
     path("used_samples/", views.used_samples, name="used_samples"),

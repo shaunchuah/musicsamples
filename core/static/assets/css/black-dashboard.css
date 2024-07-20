@@ -26,6 +26,11 @@
   text-align: center;
 }
 
+.glogo-image{
+  height: 40px;
+  object-fit: contain;
+}
+
 .form-control.search {
   border-left: 0;
   border-top: 0;

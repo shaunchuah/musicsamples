@@ -254,7 +254,7 @@ def mini_music_overview(request):
     import pandas as pd
     from django_pandas.io import read_frame
 
-    qs = queryset_by_study_name(Sample, "mini_music")
+    qs = Sample.objects.filter(study_name="mini_music")
     df = read_frame(qs)
     df["sample_datetime"] = pd.to_datetime(df["sample_datetime"])
     df["sample_date"] = df["sample_datetime"].dt.date
@@ -345,6 +345,17 @@ def account(request):
 @login_required(login_url="/login/")
 def data_export(request):
     return render(request, "data_export.html")
+
+
+@login_required(login_url="/login/")
+def management(request):
+    users = User.objects.all()
+    user_email_list = []
+    for user in users:
+        user_email_list.append(user.email)
+    user_email_list = ";".join(user_email_list)
+    context = {"user_email_list": user_email_list}
+    return render(request, "management.html", context)
 
 
 @login_required(login_url="/login/")
