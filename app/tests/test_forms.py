@@ -1,17 +1,19 @@
 import pytest
-from app import forms
+
+from app.forms import SampleForm
 
 pytestmark = pytest.mark.django_db
 
 
 class TestSampleForm:
     def test_empty_form(self):
-        form = forms.SampleForm(data={})
+        form = SampleForm(data={})
         assert form.is_valid() is False, "Form should be invalid if no data provided"
 
 
 def test_sample_add_form():
     sample_data = {
+        "study_name": "gidamps",
         "sample_id": "test001",
         "patient_id": "patient001",
         "sample_location": "location001",
@@ -27,12 +29,13 @@ def test_sample_add_form():
         "biopsy_location": "",
         "biopsy_inflamed_status": "",
     }
-    form = forms.SampleForm(data=sample_data)
+    form = SampleForm(data=sample_data)
     assert form.is_valid() is True
 
 
 def test_sample_add_form_without_processing_time():
     sample_data = {
+        "study_name": "gidamps",
         "sample_id": "test001",
         "patient_id": "patient001",
         "sample_location": "location001",
@@ -48,5 +51,5 @@ def test_sample_add_form_without_processing_time():
         "biopsy_location": "",
         "biopsy_inflamed_status": "",
     }
-    form = forms.SampleForm(data=sample_data)
+    form = SampleForm(data=sample_data)
     assert form.is_valid() is True

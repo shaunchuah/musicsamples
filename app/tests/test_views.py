@@ -60,6 +60,7 @@ def test_add_sample_post(auto_login_user):
     client, user = auto_login_user()
     path = reverse("sample_add")
     form_data = {
+        "study_name": "gidamps",
         "sample_id": "test001",
         "patient_id": "patient001",
         "sample_location": "location001",
@@ -263,6 +264,7 @@ class TestViews(TestCase):
     def test_add_marvel_sample(self):
         url = reverse("sample_add")
         form_data = {
+            "study_name": "marvel",
             "sample_id": "test001",
             "patient_id": "patient001",
             "sample_location": "location001",
@@ -287,6 +289,7 @@ class TestViews(TestCase):
     def test_add_non_marvel_sample(self):
         url = reverse("sample_add")
         form_data = {
+            "study_name": "marvel",
             "sample_id": "test001",
             "patient_id": "patient001",
             "sample_location": "location001",
@@ -309,6 +312,7 @@ class TestViews(TestCase):
     def test_add_marvel_sample_with_frozen_datetime(self):
         url = reverse("sample_add")
         form_data = {
+            "study_name": "marvel",
             "sample_id": "test001",
             "patient_id": "patient001",
             "sample_location": "location001",
@@ -333,6 +337,7 @@ class TestViews(TestCase):
         SampleFactory(sample_id="TEST001")
         url = reverse("sample_add")
         form_data = {
+            "study_name": "marvel",
             "sample_id": "test001",
             "patient_id": "patient001",
             "sample_location": "location001",
