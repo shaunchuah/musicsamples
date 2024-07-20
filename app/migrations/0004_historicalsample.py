@@ -7,7 +7,6 @@ import simple_history.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("app", "0003_sample_is_deleted"),

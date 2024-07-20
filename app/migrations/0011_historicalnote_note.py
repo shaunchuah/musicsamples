@@ -8,7 +8,6 @@ import simple_history.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("app", "0010_auto_20201210_1109"),
