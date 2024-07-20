@@ -286,6 +286,11 @@ def mini_music_overview(request):
 
     df = df.drop_duplicates()
 
+    # Remove all rows where the patient_id is not consistent with mini-music's format
+    pattern_to_match = "MINI-\d{3}-\d+"
+    filter = df["patient_id"].str.contains(pattern_to_match, regex=True)
+    df = df[filter]
+
     output_df = df.pivot_table(
         index=["patient_id", "sample_date"],
         columns="sample_type",

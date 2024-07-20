@@ -63,23 +63,13 @@
                     <a href="{% url 'sample_add' %}" class="btn btn-fill btn-success">Add New Sample</a>
                     <a href="{% url 'barcode' %}" class="btn btn-fill btn-success">Barcode Location Scanning</a>
                     <!--<a href="/bulkadd/" class="btn btn-success">Bulk Add Samples</a>-->
-                    {% if study_name %}
-                        <a href="{% url 'export_csv' study_name=study_name %}?q={{ query_string }}"
-                           class="btn btn-success float-lg-right"
-                           data-toggle="tooltip"
-                           data-placement="bottom"
-                           data-html="true"
-                           title="<strong>Tip:</strong> Customise the export by searching for the set of samples you wish to download."><i class="tim-icons icon-cloud-download-93"></i> Export Current View
-                        to CSV</a>
-                    {% else %}
-                        <a href="{% url 'export_csv' study_name='all' %}?q={{ query_string }}"
-                           class="btn btn-success float-lg-right"
-                           data-toggle="tooltip"
-                           data-placement="bottom"
-                           data-html="true"
-                           title="<strong>Tip:</strong> Customise the export by searching for the set of samples you wish to download."><i class="tim-icons icon-cloud-download-93"></i> Export Current View
-                        to CSV</a>
-                    {% endif %}
+                    <a href="{% url 'export_csv' study_name='all' %}?q={{ query_string }}"
+                       class="btn btn-success float-lg-right"
+                       data-toggle="tooltip"
+                       data-placement="bottom"
+                       data-html="true"
+                       title="<strong>Tip:</strong> Customise the export by searching for the set of samples you wish to download."><i class="tim-icons icon-cloud-download-93"></i> Export Current View
+                    to CSV</a>
                 </div>
                 <div class="card-body">
                     <div class="d-flex flex-row-reverse pb-3">Total Count: {{ sample_count }}</div>
