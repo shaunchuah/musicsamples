@@ -14,8 +14,8 @@ class TestUrls(SimpleTestCase):
         self.assertEqual(resolve(url).func, views.analytics)
 
     def test_mini_music_analytics_url_resolves(self):
-        url = reverse("mini_music_overview")
-        self.assertEqual(resolve(url).func, views.mini_music_overview)
+        url = reverse("sample_types_pivot", kwargs={"study_name": "mini_music"})
+        self.assertEqual(resolve(url).func, views.sample_types_pivot)
 
     def test_reference_url_resolves(self):
         url = reverse("reference")
