@@ -28,9 +28,8 @@ repos:
     # Ruff version.
     rev: v0.3.2
     hooks:
-      # Run the Ruff linter.
       - id: ruff
-      # Run the Ruff formatter.
+        args: [ --fix ]
       - id: ruff-format
 
   - repo: https://github.com/Riverside-Healthcare/djLint

@@ -163,7 +163,7 @@ def test_sample_used(auto_login_user):
 
     # Get the delete page first and check template is correct
     response = client.get(path)
-    assertTemplateUsed(response, "samples/sample-Used.html")
+    assertTemplateUsed(response, "samples/sample-used.html")
 
     # Make the delete request now and also pass a next_url to check redirection
     response = client.post(path, data={"is_used": True})

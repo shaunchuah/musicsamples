@@ -417,7 +417,7 @@ def sample_used(request, pk):
                 return redirect("/")
     else:
         form = UsedForm(instance=sample)
-    return render(request, "samples/sample-Used.html", {"form": form})
+    return render(request, "samples/sample-used.html", {"form": form})
 
 
 @login_required(login_url="/login/")
