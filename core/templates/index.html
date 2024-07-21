@@ -88,8 +88,7 @@
                                     <th>View</th>
                                     <th>Checkout</th>
                                     <th>Edit</th>
-                                    <th class="text-center">Fully Used</th>
-                                    <th class="text-center">Delete</th>
+                                    <th class="text-center">Used</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -121,10 +120,7 @@
                                                 <a href="{% url 'sample_edit' pk=sample.pk %}?next={{ request.get_full_path }}"><i class="tim-icons icon-pencil"></i> Edit</a>
                                             </td>
                                             <td class="text-center">
-                                                <a href="{% url 'sample_fully_used' pk=sample.pk %}"><i class="tim-icons icon-send align-center"></i></a>
-                                            </td>
-                                            <td class="text-center">
-                                                <a href="{% url 'sample_delete' pk=sample.pk %}"><i class="tim-icons icon-trash-simple align-center"></i></a>
+                                                <a href="{% url 'sample_fully_used' pk=sample.pk %}"><i class="tim-icons icon-send align-center"></i> Used</a>
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -169,9 +165,7 @@
                 12: {
                     sorter: false
                 },
-                13: {
-                    sorter: false
-                }
+
             },
         });
     });

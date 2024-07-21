@@ -108,7 +108,6 @@ def create_sample_type_pivot(qs: QuerySet, study_name: str):
             "sample_sublocation",
             "sample_datetime",
             "sample_comments",
-            "is_deleted",
             "is_used",
             "processing_datetime",
             "frozen_datetime",

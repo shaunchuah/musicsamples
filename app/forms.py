@@ -100,20 +100,6 @@ class CheckoutForm(ModelForm):
         }
 
 
-class DeleteForm(ModelForm):
-    class Meta:
-        model = Sample
-        fields = ["is_deleted"]
-        labels = {"is_deleted": "Confirm delete?"}
-
-
-class RestoreForm(ModelForm):
-    class Meta:
-        model = Sample
-        fields = ["is_deleted"]
-        labels = {"is_deleted": "Uncheck to restore"}
-
-
 class FullyUsedForm(ModelForm):
     class Meta:
         model = Sample

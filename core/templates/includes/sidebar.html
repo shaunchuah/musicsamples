@@ -61,12 +61,6 @@
                             <p>Used Samples</p>
                         </a>
                     </li>
-                    <li class="{% if 'archive' in request.path %}active{% endif %}">
-                        <a href="{% url 'sample_archive' %}">
-                            <i class="tim-icons icon-trash-simple"></i>
-                            <p>Deleted Samples</p>
-                        </a>
-                    </li>
                     {% if request.user.is_superuser %}
                         <li>
                             <a href="{% url 'management' %}">

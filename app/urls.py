@@ -45,7 +45,6 @@ urlpatterns = [
     path("data_export/", views.data_export, name="data_export"),
     path("management/", views.management, name="management"),
     # Samples URLs
-    path("samples/archive/", views.sample_archive, name="sample_archive"),
     path("used_samples/", views.used_samples, name="used_samples"),
     path("used_samples/search/", views.used_samples_search, name="used_samples_search"),
     path(
@@ -56,8 +55,6 @@ urlpatterns = [
     path("samples/add/", views.sample_add, name="sample_add"),
     path("samples/<int:pk>/", views.sample_detail, name="sample_detail"),
     path("samples/<int:pk>/edit/", views.sample_edit, name="sample_edit"),
-    path("samples/<int:pk>/delete/", views.sample_delete, name="sample_delete"),
-    path("samples/<int:pk>/restore/", views.sample_restore, name="sample_restore"),
     path(
         "samples/<int:pk>/fully_used/",
         views.sample_fully_used,
