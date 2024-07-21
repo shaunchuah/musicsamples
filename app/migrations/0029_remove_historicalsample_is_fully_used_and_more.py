@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("app", "0028_populate_is_used_from_is_fully_used_and_is_deleted"),
     ]

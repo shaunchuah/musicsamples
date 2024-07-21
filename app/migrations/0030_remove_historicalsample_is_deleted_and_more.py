@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("app", "0029_remove_historicalsample_is_fully_used_and_more"),
     ]
