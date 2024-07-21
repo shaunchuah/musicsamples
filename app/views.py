@@ -188,7 +188,7 @@ def analytics(request):
 
     total_samples = Sample.objects.all().count()
     total_active_samples = Sample.objects.all().filter(is_used=False).count()
-    samples_by_month = (
+    samples_by_month = list(
         Sample.objects.filter(sample_datetime__gte=twelve_months_previous_date)
         .order_by()
         .annotate(sample_month=Trunc("sample_datetime", "month"))
@@ -196,21 +196,32 @@ def analytics(request):
         .annotate(sample_count=Count("id"))
         .order_by("sample_month")
     )
-    samples_by_type = (
+
+    for item in samples_by_month:
+        item["sample_month_label"] = item["sample_month"].strftime("%b %Y")
+
+    samples_by_type = list(
         Sample.objects.filter(is_used=False)
         .order_by()
         .values("sample_type")
         .annotate(sample_type_count=Count("id"))
     )
+    samples_by_study = list(
+        Sample.objects.all()
+        .order_by()
+        .values("study_name")
+        .annotate(study_name_count=Count("id"))
+    )
     samples_by_location = (
         Sample.objects.filter(is_used=False)
-        .order_by()
         .values("sample_location")
         .annotate(sample_location_count=Count("id"))
+        .order_by("-sample_location_count")
     )
     context = {
         "total_samples": total_samples,
         "samples_by_month": samples_by_month,
+        "samples_by_study": samples_by_study,
         "samples_by_type": samples_by_type,
         "samples_by_location": samples_by_location,
         "total_active_samples": total_active_samples,

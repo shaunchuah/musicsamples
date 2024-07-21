@@ -31,6 +31,11 @@
   object-fit: contain;
 }
 
+.sample-location {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
 .form-control.search {
   border-left: 0;
   border-top: 0;
@@ -5274,7 +5279,7 @@ input[type="button"].btn-block {
 }
 
 .card-title {
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.75rem;
 }
 
 .card-subtitle {
