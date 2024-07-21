@@ -52,11 +52,6 @@ class TestTemplates(TestCase):
         response = self.client.get(path)
         assertTemplateUsed(response, "barcode-addmultiple.html")
 
-    def test_archive(self):
-        path = reverse("sample_archive")
-        response = self.client.get(path)
-        assertTemplateUsed(response, "samples/sample-archive.html")
-
     def test_reference(self):
         path = reverse("reference")
         response = self.client.get(path)
@@ -66,11 +61,6 @@ class TestTemplates(TestCase):
         path = reverse("analytics")
         response = self.client.get(path)
         assertTemplateUsed(response, "analytics.html")
-
-    def test_sample_delete(self):
-        path = reverse("sample_delete", kwargs={"pk": 1})
-        response = self.client.get(path)
-        assertTemplateUsed(response, "samples/sample-delete.html")
 
     def test_sample_checkout(self):
         path = reverse("sample_checkout", kwargs={"pk": 1})

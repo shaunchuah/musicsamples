@@ -156,63 +156,25 @@ def test_sample_checkout_page(auto_login_user):
     assert response.status_code == 302
 
 
-def test_sample_delete(auto_login_user):
-    client, user = auto_login_user()
-    SampleFactory(patient_id="TEST05")
-    path = reverse("sample_delete", kwargs={"pk": 1})
-
-    # Get the delete page first and check template is correct
-    response = client.get(path)
-
-    # Make the delete request now and also pass a next_url to check redirection
-    response = client.post(path + "?next=/samples/1/", data={"is_deleted": True})
-
-    assert (
-        Sample.objects.get(pk=1).is_deleted is True
-    ), "Should delete the created sample"
-    assert (
-        response.url == "/samples/1/"
-    ), "Should redirect to passed url string after deleting sample."
-
-
-def test_sample_restore(auto_login_user):
-    client, user = auto_login_user()
-    SampleFactory(is_deleted=True)
-    path = reverse("sample_restore", kwargs={"pk": 1})
-
-    # Get the restore page and check template is correct
-    response = client.get(path)
-    assertTemplateUsed(response, "samples/sample-restore.html")
-
-    # Restore the sample
-    response = client.post(path, data={"is_deleted": False})
-    assert (
-        Sample.objects.get(pk=1).is_deleted is False
-    ), "Should restore the deleted sample"
-    assert response.url == "/"
-
-
-def test_sample_fully_used(auto_login_user):
+def test_sample_used(auto_login_user):
     client, user = auto_login_user()
     SampleFactory()
-    path = reverse("sample_fully_used", kwargs={"pk": 1})
+    path = reverse("sample_used", kwargs={"pk": 1})
 
     # Get the delete page first and check template is correct
     response = client.get(path)
-    assertTemplateUsed(response, "samples/sample-fullyused.html")
+    assertTemplateUsed(response, "samples/sample-Used.html")
 
     # Make the delete request now and also pass a next_url to check redirection
-    response = client.post(path, data={"is_fully_used": True})
+    response = client.post(path, data={"is_used": True})
 
-    assert (
-        Sample.objects.get(pk=1).is_fully_used is True
-    ), "Should delete the created sample"
+    assert Sample.objects.get(pk=1).is_used is True, "Should delete the created sample"
     assert response.status_code == 302
 
 
 def test_sample_reactivate(auto_login_user):
     client, user = auto_login_user()
-    SampleFactory(is_fully_used=True)
+    SampleFactory(is_used=True)
     path = reverse("reactivate_sample", kwargs={"pk": 1})
 
     # Get the restore page and check template is correct
@@ -220,9 +182,9 @@ def test_sample_reactivate(auto_login_user):
     assertTemplateUsed(response, "samples/sample-reactivate.html")
 
     # Restore the sample
-    response = client.post(path, data={"is_fully_used": False})
+    response = client.post(path, data={"is_used": False})
     assert (
-        Sample.objects.get(pk=1).is_fully_used is False
+        Sample.objects.get(pk=1).is_used is False
     ), "Should restore the deleted sample"
     assert response.url == "/"
 

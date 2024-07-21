@@ -100,29 +100,15 @@ class CheckoutForm(ModelForm):
         }
 
 
-class DeleteForm(ModelForm):
+class UsedForm(ModelForm):
     class Meta:
         model = Sample
-        fields = ["is_deleted"]
-        labels = {"is_deleted": "Confirm delete?"}
-
-
-class RestoreForm(ModelForm):
-    class Meta:
-        model = Sample
-        fields = ["is_deleted"]
-        labels = {"is_deleted": "Uncheck to restore"}
-
-
-class FullyUsedForm(ModelForm):
-    class Meta:
-        model = Sample
-        fields = ["is_fully_used"]
-        labels = {"is_fully_used": "Mark sample as fully used?"}
+        fields = ["is_used"]
+        labels = {"is_used": "Mark sample as used?"}
 
 
 class ReactivateForm(ModelForm):
     class Meta:
         model = Sample
-        fields = ["is_fully_used"]
-        labels = {"is_fully_used": "Uncheck to reactivate"}
+        fields = ["is_used"]
+        labels = {"is_used": "Uncheck to reactivate"}

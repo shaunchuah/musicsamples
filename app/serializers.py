@@ -18,7 +18,7 @@ class SampleSerializer(serializers.ModelSerializer):
         lookup_field = "sample_id"
 
 
-class SampleIsFullyUsedSerializer(serializers.ModelSerializer):
+class SampleIsUsedSerializer(serializers.ModelSerializer):
     """
     Serializer for marking samples as used
     """
@@ -27,7 +27,7 @@ class SampleIsFullyUsedSerializer(serializers.ModelSerializer):
         model = Sample
         fields = [
             "sample_id",
-            "is_fully_used",
+            "is_used",
         ]
         lookup_field = "sample_id"
 
@@ -82,7 +82,7 @@ class SampleExportSerializer(serializers.ModelSerializer):
             "sample_volume",
             "sample_volume_units",
             "freeze_thaw_count",
-            "is_fully_used",
+            "is_used",
             "haemolysis_reference",
             "biopsy_location",
             "biopsy_inflamed_status",

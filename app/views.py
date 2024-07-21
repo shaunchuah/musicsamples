@@ -12,19 +12,12 @@ from django.urls import reverse
 from rest_framework import viewsets
 
 from app.filters import SampleFilter
-from app.forms import (
-    CheckoutForm,
-    DeleteForm,
-    FullyUsedForm,
-    ReactivateForm,
-    RestoreForm,
-    SampleForm,
-)
+from app.forms import CheckoutForm, ReactivateForm, SampleForm, UsedForm
 from app.models import Sample
 from app.serializers import (
     MultipleSampleSerializer,
     SampleExportSerializer,
-    SampleIsFullyUsedSerializer,
+    SampleIsUsedSerializer,
     SampleSerializer,
 )
 from app.utils import (
@@ -45,12 +38,7 @@ SAMPLE_PAGINATION_SIZE = 100
 @login_required(login_url="/login/")
 def index(request):
     # Home Page
-    sample_list = (
-        Sample.objects.all()
-        .filter(is_deleted=False)
-        .filter(is_fully_used=False)
-        .order_by("-sample_datetime")
-    )
+    sample_list = Sample.objects.filter(is_used=False).order_by("-sample_datetime")
     sample_count = sample_list.count()
     page = request.GET.get("page", 1)
     paginator = Paginator(sample_list, SAMPLE_PAGINATION_SIZE)
@@ -111,12 +99,7 @@ def filter_export_csv(request):
 
 @login_required(login_url="/login/")
 def used_samples(request):
-    sample_list = (
-        Sample.objects.all()
-        .filter(is_deleted=False)
-        .filter(is_fully_used=True)
-        .order_by("-last_modified")
-    )
+    sample_list = Sample.objects.filter(is_used=True).order_by("-last_modified")
     sample_count = sample_list.count()
     page = request.GET.get("page", 1)
     paginator = Paginator(sample_list, SAMPLE_PAGINATION_SIZE)
@@ -139,17 +122,13 @@ def used_samples_search(request):
     query_string = ""
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
-        sample_list = (
-            Sample.objects.filter(
-                Q(sample_id__icontains=query_string)
-                | Q(patient_id__icontains=query_string)
-                | Q(sample_location__icontains=query_string)
-                | Q(sample_sublocation__icontains=query_string)
-                | Q(sample_type__icontains=query_string)
-                | Q(sample_comments__icontains=query_string)
-            )
-            .filter(is_fully_used=True)
-            .filter(is_deleted=False)
+        sample_list = Sample.objects.filter(is_used=True).filter(
+            Q(sample_id__icontains=query_string)
+            | Q(patient_id__icontains=query_string)
+            | Q(sample_location__icontains=query_string)
+            | Q(sample_sublocation__icontains=query_string)
+            | Q(sample_type__icontains=query_string)
+            | Q(sample_comments__icontains=query_string)
         )
         sample_count = sample_list.count()
         return render(
@@ -175,11 +154,7 @@ def used_samples_archive_all(request):
     This function will retrieve all used samples and remove their last location.
     This helps to keep the database clean.
     """
-    sample_list = (
-        Sample.objects.filter(is_deleted=False)
-        .filter(is_fully_used=True)
-        .exclude(sample_location="used")
-    )
+    sample_list = Sample.objects.filter(is_used=True).exclude(sample_location="used")
 
     number_of_samples = sample_list.count()
     if (
@@ -211,16 +186,10 @@ def analytics(request):
         days=(months_ago * 365 / 12)
     )
 
-    total_samples = Sample.objects.all().filter(is_deleted=False).count()
-    total_active_samples = (
-        Sample.objects.all()
-        .filter(is_deleted=False)
-        .filter(is_fully_used=False)
-        .count()
-    )
+    total_samples = Sample.objects.all().count()
+    total_active_samples = Sample.objects.all().filter(is_used=False).count()
     samples_by_month = (
-        Sample.objects.all()
-        .filter(is_deleted=False, sample_datetime__gte=twelve_months_previous_date)
+        Sample.objects.filter(sample_datetime__gte=twelve_months_previous_date)
         .order_by()
         .annotate(sample_month=Trunc("sample_datetime", "month"))
         .values("sample_month")
@@ -228,17 +197,13 @@ def analytics(request):
         .order_by("sample_month")
     )
     samples_by_type = (
-        Sample.objects.all()
-        .filter(is_deleted=False)
-        .filter(is_fully_used=False)
+        Sample.objects.filter(is_used=False)
         .order_by()
         .values("sample_type")
         .annotate(sample_type_count=Count("id"))
     )
     samples_by_location = (
-        Sample.objects.all()
-        .filter(is_deleted=False)
-        .filter(is_fully_used=False)
+        Sample.objects.filter(is_used=False)
         .order_by()
         .values("sample_location")
         .annotate(sample_location_count=Count("id"))
@@ -275,12 +240,9 @@ def reference(request):
 @login_required(login_url="/login/")
 def account(request):
     # User account page showing last 20 recently accessed samples
-    sample_list = (
-        Sample.objects.all()
-        .filter(is_deleted=False)
-        .filter(last_modified_by=request.user.username)
-        .order_by("-last_modified")[:20]
-    )
+    sample_list = Sample.objects.filter(
+        last_modified_by=request.user.username
+    ).order_by("-last_modified")[:20]
     context = {"sample_list": sample_list}
     return render(request, "account.html", context)
 
@@ -299,16 +261,6 @@ def management(request):
     user_email_list = ";".join(user_email_list)
     context = {"user_email_list": user_email_list}
     return render(request, "management.html", context)
-
-
-@login_required(login_url="/login/")
-def sample_archive(request):
-    # Deleted samples page for samples which have been soft deleted
-    sample_list = (
-        Sample.objects.all().filter(is_deleted=True).order_by("-last_modified")
-    )
-    context = {"sample_list": sample_list}
-    return render(request, "samples/sample-archive.html", context)
 
 
 @login_required(login_url="/login/")
@@ -402,18 +354,14 @@ def sample_search(request):
     query_string = ""
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
-        sample_list = (
-            Sample.objects.filter(
-                Q(sample_id__icontains=query_string)
-                | Q(patient_id__icontains=query_string)
-                | Q(sample_location__icontains=query_string)
-                | Q(sample_sublocation__icontains=query_string)
-                | Q(sample_type__icontains=query_string)
-                | Q(sample_comments__icontains=query_string)
-            )
-            .filter(is_fully_used=False)
-            .filter(is_deleted=False)
-        )
+        sample_list = Sample.objects.filter(
+            Q(sample_id__icontains=query_string)
+            | Q(patient_id__icontains=query_string)
+            | Q(sample_location__icontains=query_string)
+            | Q(sample_sublocation__icontains=query_string)
+            | Q(sample_type__icontains=query_string)
+            | Q(sample_comments__icontains=query_string)
+        ).filter(is_used=False)
         sample_count = sample_list.count()
         return render(
             request,
@@ -452,71 +400,29 @@ def sample_checkout(request, pk):
 
 
 @login_required(login_url="/login/")
-def sample_delete(request, pk):
-    # Soft deletion method for samples
+def sample_used(request, pk):
+    # Mark sample as used
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
-        form = DeleteForm(request.POST, instance=sample)
+        form = UsedForm(request.POST, instance=sample)
         if form.is_valid():
             sample = form.save(commit=False)
             sample.last_modified_by = request.user.username
             sample.save()
-            messages.success(request, "Sample deleted.")
+            messages.success(request, "Sample marked as used.")
             next_url = request.GET.get("next")
             if next_url:
                 return redirect(next_url)
             else:
                 return redirect("/")
     else:
-        form = DeleteForm(instance=sample)
-    return render(request, "samples/sample-delete.html", {"form": form})
-
-
-@login_required(login_url="/login/")
-def sample_restore(request, pk):
-    # Restore soft-deleted sample
-    sample = get_object_or_404(Sample, pk=pk)
-    if request.method == "POST":
-        form = RestoreForm(request.POST, instance=sample)
-        if form.is_valid():
-            sample = form.save(commit=False)
-            sample.last_modified_by = request.user.username
-            sample.save()
-            messages.success(request, "Sample restored.")
-            next_url = request.GET.get("next")
-            if next_url:
-                return redirect(next_url)
-            else:
-                return redirect("/")
-    else:
-        form = RestoreForm(instance=sample)
-    return render(request, "samples/sample-restore.html", {"form": form})
-
-
-@login_required(login_url="/login/")
-def sample_fully_used(request, pk):
-    # Mark sample as fully used
-    sample = get_object_or_404(Sample, pk=pk)
-    if request.method == "POST":
-        form = FullyUsedForm(request.POST, instance=sample)
-        if form.is_valid():
-            sample = form.save(commit=False)
-            sample.last_modified_by = request.user.username
-            sample.save()
-            messages.success(request, "Sample marked as fully used.")
-            next_url = request.GET.get("next")
-            if next_url:
-                return redirect(next_url)
-            else:
-                return redirect("/")
-    else:
-        form = FullyUsedForm(instance=sample)
-    return render(request, "samples/sample-fullyused.html", {"form": form})
+        form = UsedForm(instance=sample)
+    return render(request, "samples/sample-Used.html", {"form": form})
 
 
 @login_required(login_url="/login/")
 def reactivate_sample(request, pk):
-    # Reactive sample which has been marked as fully used
+    # Reactive sample which has been marked as used
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
         form = ReactivateForm(request.POST, instance=sample)
@@ -556,7 +462,7 @@ def export_csv_view(request, study_name):
             | Q(sample_comments__icontains=query_string)
         )
     else:
-        samples_queryset = queryset.filter(is_deleted=False)
+        samples_queryset = queryset
     response = export_csv(samples_queryset)
     return response
 
@@ -571,19 +477,13 @@ def autocomplete_locations(request):
     # Helps speed up sample adding by autocompleting already existing locations
     if "term" in request.GET:
         qs = (
-            Sample.objects.filter(is_deleted=False)
-            .filter(sample_location__icontains=request.GET.get("term"))
+            Sample.objects.filter(sample_location__icontains=request.GET.get("term"))
             .order_by()
             .values("sample_location")
             .distinct()
         )
     else:
-        qs = (
-            Sample.objects.filter(is_deleted=False)
-            .order_by()
-            .values("sample_location")
-            .distinct()
-        )
+        qs = Sample.objects.all().order_by().values("sample_location").distinct()
     locations = []
     for sample in qs:
         locations.append(sample["sample_location"])
@@ -595,19 +495,13 @@ def autocomplete_patient_id(request):
     # Helps speed up sample adding by locating existing patient IDs
     if "term" in request.GET:
         qs = (
-            Sample.objects.filter(is_deleted=False)
-            .filter(patient_id__icontains=request.GET.get("term"))
+            Sample.objects.filter(patient_id__icontains=request.GET.get("term"))
             .order_by()
             .values("patient_id")
             .distinct()
         )
     else:
-        qs = (
-            Sample.objects.filter(is_deleted=False)
-            .order_by()
-            .values("patient_id")
-            .distinct()
-        )
+        qs = Sample.objects.all().order_by().values("patient_id").distinct()
     patients = []
     for sample in qs:
         patients.append(sample["patient_id"])
@@ -643,7 +537,7 @@ class SampleViewSet(viewsets.ModelViewSet):
     autoincrementing id system
     """
 
-    queryset = Sample.objects.filter(is_deleted=False)
+    queryset = Sample.objects.all()
     serializer_class = SampleSerializer
     lookup_field = "sample_id"
     filterset_fields = ["sample_type"]
@@ -654,9 +548,9 @@ class SampleViewSet(viewsets.ModelViewSet):
         )
 
 
-class SampleIsFullyUsedViewSet(viewsets.ModelViewSet):
-    queryset = Sample.objects.filter(is_deleted=False)
-    serializer_class = SampleIsFullyUsedSerializer
+class SampleIsUsedViewSet(viewsets.ModelViewSet):
+    queryset = Sample.objects.all()
+    serializer_class = SampleIsUsedSerializer
     lookup_field = "sample_id"
 
     def perform_update(self, serializer):
@@ -666,7 +560,7 @@ class SampleIsFullyUsedViewSet(viewsets.ModelViewSet):
 
 
 class MultipleSampleViewSet(viewsets.ModelViewSet):
-    queryset = Sample.objects.filter(is_deleted=False)
+    queryset = Sample.objects.all()
     serializer_class = MultipleSampleSerializer
     lookup_field = "sample_id"
 
@@ -678,15 +572,13 @@ class MultipleSampleViewSet(viewsets.ModelViewSet):
 
 
 class SampleExportViewset(viewsets.ReadOnlyModelViewSet):
-    queryset = Sample.objects.filter(is_deleted=False).filter(
-        patient_id__startswith="GID"
-    )
+    queryset = Sample.objects.filter(patient_id__startswith="GID")
     serializer_class = SampleExportSerializer
     lookup_field = "sample_id"
 
 
 class AllSampleExportViewset(viewsets.ReadOnlyModelViewSet):
-    queryset = Sample.objects.filter(is_deleted=False)
+    queryset = Sample.objects.all()
     serializer_class = SampleExportSerializer
     lookup_field = "sample_id"
 
