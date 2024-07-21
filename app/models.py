@@ -15,7 +15,6 @@ class Sample(models.Model):
     sample_datetime = models.DateTimeField()
     sample_comments = models.TextField(blank=True, null=True)
 
-    is_deleted = models.BooleanField(default=False)
     is_used = models.BooleanField(default=False)
 
     processing_datetime = models.DateTimeField(blank=True, null=True)
