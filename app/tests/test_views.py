@@ -1,7 +1,6 @@
 import pytest
 from django.test import Client, TestCase
 from django.urls import reverse
-from mixer.backend.django import mixer
 from pytest_django.asserts import assertTemplateUsed
 
 from app.factories import SampleFactory
@@ -85,7 +84,7 @@ def test_add_sample_post(auto_login_user):
 
 def test_sample_detail_page(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", sample_id="TEST001")
+    SampleFactory(sample_id="TEST001")
     path = reverse("sample_detail", kwargs={"pk": 1})
     response = client.get(path)
     assert (
@@ -95,8 +94,7 @@ def test_sample_detail_page(auto_login_user):
 
 def test_sample_detail_processing_datetime_logic(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend(
-        "app.sample",
+    SampleFactory(
         sample_datetime="2020-01-01T13:20:30+00",
         processing_datetime="2020-01-01T13:25:30+00",
     )
@@ -109,8 +107,8 @@ def test_sample_detail_processing_datetime_logic(auto_login_user):
 
 def test_sample_edit_page(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", sample_id="TEST002")
-    mixer.blend("app.sample", sample_id="TEST003")
+    SampleFactory(sample_id="TEST002")
+    SampleFactory(sample_id="TEST003")
     path = reverse("sample_edit", kwargs={"pk": 2})
     response = client.get(path)
     assertTemplateUsed(response, "samples/sample-add.html")
@@ -121,10 +119,10 @@ def test_sample_edit_page(auto_login_user):
 
 def test_sample_search_page(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", sample_id="TEST002")
-    mixer.blend("app.sample", sample_id="TEST003")
-    mixer.blend("app.sample", sample_id="NO")
-    mixer.blend("app.sample", sample_id="DONOTRETURN")
+    SampleFactory(sample_id="TEST002")
+    SampleFactory(sample_id="TEST003")
+    SampleFactory(sample_id="NO")
+    SampleFactory(sample_id="DONOTRETURN")
     path = reverse("sample_search")
     response = client.get(path + "?q=TEST")
 
@@ -140,7 +138,7 @@ def test_sample_search_page(auto_login_user):
 
 def test_sample_checkout_page(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", sample_location="location1")
+    SampleFactory(sample_location="location1")
     path = reverse("sample_checkout", kwargs={"pk": 1})
 
     # Get the sample checkout page and check template is correct
@@ -160,7 +158,7 @@ def test_sample_checkout_page(auto_login_user):
 
 def test_sample_delete(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", musicpatient_id="TEST05")
+    SampleFactory(patient_id="TEST05")
     path = reverse("sample_delete", kwargs={"pk": 1})
 
     # Get the delete page first and check template is correct
@@ -179,7 +177,7 @@ def test_sample_delete(auto_login_user):
 
 def test_sample_restore(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", is_deleted=True)
+    SampleFactory(is_deleted=True)
     path = reverse("sample_restore", kwargs={"pk": 1})
 
     # Get the restore page and check template is correct
@@ -196,7 +194,7 @@ def test_sample_restore(auto_login_user):
 
 def test_sample_fully_used(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample")
+    SampleFactory()
     path = reverse("sample_fully_used", kwargs={"pk": 1})
 
     # Get the delete page first and check template is correct
@@ -214,7 +212,7 @@ def test_sample_fully_used(auto_login_user):
 
 def test_sample_reactivate(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", is_fully_used=True)
+    SampleFactory(is_fully_used=True)
     path = reverse("reactivate_sample", kwargs={"pk": 1})
 
     # Get the restore page and check template is correct
@@ -240,7 +238,7 @@ def test_export_csv_view(auto_login_user):
 
 def test_filter_view(auto_login_user):
     client, user = auto_login_user()
-    mixer.blend("app.sample", patient_id="GID-123-P")
+    SampleFactory(patient_id="GID-123-P")
     path = reverse("filter")
     response = client.get(path + "?patient_id=gid-123-P")
     assert response.status_code == 200
