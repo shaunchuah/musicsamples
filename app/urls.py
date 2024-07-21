@@ -36,9 +36,9 @@ urlpatterns = [
     ),
     path("analytics/", views.analytics, name="analytics"),
     path(
-        "analytics/mini_music_overview",
-        views.mini_music_overview,
-        name="mini_music_overview",
+        "analytics/sample_types_pivot/<str:study_name>/",
+        views.sample_types_pivot,
+        name="sample_types_pivot",
     ),
     path("reference/", views.reference, name="reference"),
     path("account/", views.account, name="account"),

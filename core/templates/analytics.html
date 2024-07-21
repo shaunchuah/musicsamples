@@ -31,9 +31,15 @@
                             <h3 class="card-title">Samples Overview</h3>
                         </div>
                         <div class="card-body">
-                            <a href="{% url 'mini_music_overview' %}"
+                            <p>CSV file containing sample types by patient ID and sampling date</p>
+                            <a href="{% url 'sample_types_pivot' study_name='mini_music' %}"
                                class="btn btn-fill btn-success">Mini MUSIC Overview</a>
-                            <p>CSV file containing sample types by patient ID and sampling date for Mini-MUSIC</p>
+                            <a href="{% url 'sample_types_pivot' study_name='music' %}"
+                               class="btn btn-fill btn-success">MUSIC Overview</a>
+                            <a href="{% url 'sample_types_pivot' study_name='gidamps' %}"
+                               class="btn btn-fill btn-success">GI-DAMPs Overview</a>
+                            <a href="{% url 'sample_types_pivot' study_name='marvel' %}"
+                               class="btn btn-fill btn-success">Marvel Overview</a>
                         </div>
                     </div>
                 </div>

@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Count, Q
 from django.db.models.functions import Trunc
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from rest_framework import viewsets
@@ -27,7 +27,12 @@ from app.serializers import (
     SampleIsFullyUsedSerializer,
     SampleSerializer,
 )
-from app.utils import export_csv, queryset_by_study_name
+from app.utils import (
+    create_sample_type_pivot,
+    export_csv,
+    queryset_by_study_name,
+    render_dataframe_to_csv_response,
+)
 
 # from django.views.decorators.cache import cache_page
 
@@ -249,82 +254,15 @@ def analytics(request):
 
 
 @login_required(login_url="/login/")
-def mini_music_overview(request):
-    # Analytics --> mini_music Overview
-    import pandas as pd
-    from django_pandas.io import read_frame
-
-    qs = Sample.objects.filter(study_name="mini_music")
-    df = read_frame(qs)
-    df["sample_datetime"] = pd.to_datetime(df["sample_datetime"])
-    df["sample_date"] = df["sample_datetime"].dt.date
-
-    df = df.drop(
-        [
-            "id",
-            "sample_location",
-            "sample_sublocation",
-            "sample_datetime",
-            "sample_comments",
-            "is_deleted",
-            "is_fully_used",
-            "processing_datetime",
-            "frozen_datetime",
-            "sample_volume",
-            "sample_volume_units",
-            "freeze_thaw_count",
-            "haemolysis_reference",
-            "biopsy_location",
-            "biopsy_inflamed_status",
-            "created",
-            "created_by",
-            "last_modified",
-            "last_modified_by",
-        ],
-        axis=1,
-    )
-
-    df = df.drop_duplicates()
-
-    # Remove all rows where the patient_id is not consistent with mini-music's format
-    pattern_to_match = "MINI-\d{3}-\d+"
-    filter = df["patient_id"].str.contains(pattern_to_match, regex=True)
-    df = df[filter]
-
-    output_df = df.pivot_table(
-        index=["patient_id", "sample_date"],
-        columns="sample_type",
-        values="sample_id",
-        aggfunc=pd.unique,
-        fill_value="None",
-    )
-
-    def retrieve_center_number(row):
-        patient_id = row.name[0]
-        patient_id = str(patient_id)
-        return str.split(patient_id, "-")[1]
-
-    output_df["center_number"] = output_df.apply(retrieve_center_number, axis=1)
-
-    def retrieve_patient_number(row):
-        patient_id = row.name[0]
-        patient_id = str(patient_id)
-        return str.split(patient_id, "-")[2]
-
-    output_df["patient_number"] = output_df.apply(retrieve_patient_number, axis=1)
-    output_df["patient_number"] = pd.to_numeric(output_df["patient_number"])
-    output_df.sort_values(
-        by=["center_number", "patient_number", "sample_date"], inplace=True
-    )
-    output_df.drop(["center_number", "patient_number"], axis=1, inplace=True)
-
-    current_date = datetime.datetime.now().strftime("%d-%b-%Y")
-
-    response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = (
-        "attachment; filename=mini_music_overview_%s.csv" % (current_date)
-    )
-    output_df.to_csv(response)
+def sample_types_pivot(request, study_name):
+    """
+    Takes in a url with study_name being one of the five studies
+    and returns a pivot table with sample types as columns,
+    patient ID and sample date as rows.
+    """
+    qs = Sample.objects.filter(study_name=study_name)
+    output_df = create_sample_type_pivot(qs, study_name=study_name)
+    response = render_dataframe_to_csv_response(output_df, study_name=study_name)
     return response
 
 
