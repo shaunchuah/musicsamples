@@ -159,11 +159,11 @@ def test_sample_checkout_page(auto_login_user):
 def test_sample_used(auto_login_user):
     client, user = auto_login_user()
     SampleFactory()
-    path = reverse("sample_fully_used", kwargs={"pk": 1})
+    path = reverse("sample_used", kwargs={"pk": 1})
 
     # Get the delete page first and check template is correct
     response = client.get(path)
-    assertTemplateUsed(response, "samples/sample-fullyused.html")
+    assertTemplateUsed(response, "samples/sample-Used.html")
 
     # Make the delete request now and also pass a next_url to check redirection
     response = client.post(path, data={"is_used": True})

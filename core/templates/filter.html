@@ -101,7 +101,7 @@
                                                 <a href="{% url 'sample_edit' pk=sample.pk %}?next={{ request.get_full_path }}"><i class="tim-icons icon-pencil"></i> Edit</a>
                                             </td>
                                             <td class="text-center">
-                                                <a href="{% url 'sample_fully_used' pk=sample.pk %}"><i class="tim-icons icon-send align-center"></i></a>
+                                                <a href="{% url 'sample_used' pk=sample.pk %}"><i class="tim-icons icon-send align-center"></i></a>
                                             </td>
                                         </tr>
                                     {% endfor %}

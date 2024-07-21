@@ -8,7 +8,7 @@ from .views import (
     AllSampleExportViewset,
     MultipleSampleViewSet,
     SampleExportViewset,
-    SampleIsFullyUsedViewSet,
+    SampleIsUsedViewSet,
     SampleViewSet,
 )
 
@@ -16,7 +16,7 @@ router = routers.DefaultRouter()
 
 # Django Rest Framework API endpoints
 router.register(r"samples", SampleViewSet, "samples")
-router.register(r"samples_used", SampleIsFullyUsedViewSet, "samples_used")
+router.register(r"samples_used", SampleIsUsedViewSet, "samples_used")
 router.register(r"multiple_samples", MultipleSampleViewSet, "multiple_samples")
 router.register(r"gidamps", SampleExportViewset, "gidamps")
 router.register(r"all", AllSampleExportViewset, "all")
@@ -56,9 +56,9 @@ urlpatterns = [
     path("samples/<int:pk>/", views.sample_detail, name="sample_detail"),
     path("samples/<int:pk>/edit/", views.sample_edit, name="sample_edit"),
     path(
-        "samples/<int:pk>/fully_used/",
-        views.sample_fully_used,
-        name="sample_fully_used",
+        "samples/<int:pk>/used/",
+        views.sample_used,
+        name="sample_used",
     ),
     path(
         "samples/<int:pk>/reactivate_sample/",

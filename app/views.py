@@ -12,12 +12,12 @@ from django.urls import reverse
 from rest_framework import viewsets
 
 from app.filters import SampleFilter
-from app.forms import CheckoutForm, FullyUsedForm, ReactivateForm, SampleForm
+from app.forms import CheckoutForm, ReactivateForm, SampleForm, UsedForm
 from app.models import Sample
 from app.serializers import (
     MultipleSampleSerializer,
     SampleExportSerializer,
-    SampleIsFullyUsedSerializer,
+    SampleIsUsedSerializer,
     SampleSerializer,
 )
 from app.utils import (
@@ -400,29 +400,29 @@ def sample_checkout(request, pk):
 
 
 @login_required(login_url="/login/")
-def sample_fully_used(request, pk):
-    # Mark sample as fully used
+def sample_used(request, pk):
+    # Mark sample as used
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
-        form = FullyUsedForm(request.POST, instance=sample)
+        form = UsedForm(request.POST, instance=sample)
         if form.is_valid():
             sample = form.save(commit=False)
             sample.last_modified_by = request.user.username
             sample.save()
-            messages.success(request, "Sample marked as fully used.")
+            messages.success(request, "Sample marked as used.")
             next_url = request.GET.get("next")
             if next_url:
                 return redirect(next_url)
             else:
                 return redirect("/")
     else:
-        form = FullyUsedForm(instance=sample)
-    return render(request, "samples/sample-fullyused.html", {"form": form})
+        form = UsedForm(instance=sample)
+    return render(request, "samples/sample-Used.html", {"form": form})
 
 
 @login_required(login_url="/login/")
 def reactivate_sample(request, pk):
-    # Reactive sample which has been marked as fully used
+    # Reactive sample which has been marked as used
     sample = get_object_or_404(Sample, pk=pk)
     if request.method == "POST":
         form = ReactivateForm(request.POST, instance=sample)
@@ -548,9 +548,9 @@ class SampleViewSet(viewsets.ModelViewSet):
         )
 
 
-class SampleIsFullyUsedViewSet(viewsets.ModelViewSet):
+class SampleIsUsedViewSet(viewsets.ModelViewSet):
     queryset = Sample.objects.all()
-    serializer_class = SampleIsFullyUsedSerializer
+    serializer_class = SampleIsUsedSerializer
     lookup_field = "sample_id"
 
     def perform_update(self, serializer):

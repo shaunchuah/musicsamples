@@ -18,7 +18,7 @@ class SampleSerializer(serializers.ModelSerializer):
         lookup_field = "sample_id"
 
 
-class SampleIsFullyUsedSerializer(serializers.ModelSerializer):
+class SampleIsUsedSerializer(serializers.ModelSerializer):
     """
     Serializer for marking samples as used
     """

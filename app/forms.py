@@ -100,11 +100,11 @@ class CheckoutForm(ModelForm):
         }
 
 
-class FullyUsedForm(ModelForm):
+class UsedForm(ModelForm):
     class Meta:
         model = Sample
         fields = ["is_used"]
-        labels = {"is_used": "Mark sample as fully used?"}
+        labels = {"is_used": "Mark sample as used?"}
 
 
 class ReactivateForm(ModelForm):
