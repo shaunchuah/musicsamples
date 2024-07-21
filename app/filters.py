@@ -14,7 +14,7 @@ class SampleFilter(django_filters.FilterSet):
     sample_type = django_filters.ChoiceFilter(
         label="Sample Type", choices=SAMPLE_TYPE_CHOICES
     )
-    is_fully_used = django_filters.BooleanFilter(label="Used Samples?")
+    is_used = django_filters.BooleanFilter(label="Used Samples?")
     sample_datetime = django_filters.DateFromToRangeFilter(
         widget=django_filters.widgets.RangeWidget(attrs={"type": "date"}),
         label="Sample Date Range",
@@ -32,7 +32,7 @@ class SampleFilter(django_filters.FilterSet):
             "sample_location",
             "sample_sublocation",
             "sample_type",
-            "is_fully_used",
+            "is_used",
             "sample_comments",
             "sample_volume",
             "sample_datetime",

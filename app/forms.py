@@ -117,12 +117,12 @@ class RestoreForm(ModelForm):
 class FullyUsedForm(ModelForm):
     class Meta:
         model = Sample
-        fields = ["is_fully_used"]
-        labels = {"is_fully_used": "Mark sample as fully used?"}
+        fields = ["is_used"]
+        labels = {"is_used": "Mark sample as fully used?"}
 
 
 class ReactivateForm(ModelForm):
     class Meta:
         model = Sample
-        fields = ["is_fully_used"]
-        labels = {"is_fully_used": "Uncheck to reactivate"}
+        fields = ["is_used"]
+        labels = {"is_used": "Uncheck to reactivate"}

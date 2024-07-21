@@ -28,7 +28,7 @@ class TestPagination(TestCase):
         for i in range(0, SAMPLE_PAGINATION_SIZE + 10):
             SampleFactory()
         for i in range(0, (SAMPLE_PAGINATION_SIZE * 3)):
-            SampleFactory(is_fully_used=True)
+            SampleFactory(is_used=True)
 
     def test_index_page_and_pagination(self):
         url = reverse("home")

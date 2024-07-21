@@ -48,7 +48,7 @@ def index(request):
     sample_list = (
         Sample.objects.all()
         .filter(is_deleted=False)
-        .filter(is_fully_used=False)
+        .filter(is_used=False)
         .order_by("-sample_datetime")
     )
     sample_count = sample_list.count()
@@ -114,7 +114,7 @@ def used_samples(request):
     sample_list = (
         Sample.objects.all()
         .filter(is_deleted=False)
-        .filter(is_fully_used=True)
+        .filter(is_used=True)
         .order_by("-last_modified")
     )
     sample_count = sample_list.count()
@@ -148,7 +148,7 @@ def used_samples_search(request):
                 | Q(sample_type__icontains=query_string)
                 | Q(sample_comments__icontains=query_string)
             )
-            .filter(is_fully_used=True)
+            .filter(is_used=True)
             .filter(is_deleted=False)
         )
         sample_count = sample_list.count()
@@ -177,7 +177,7 @@ def used_samples_archive_all(request):
     """
     sample_list = (
         Sample.objects.filter(is_deleted=False)
-        .filter(is_fully_used=True)
+        .filter(is_used=True)
         .exclude(sample_location="used")
     )
 
@@ -213,10 +213,7 @@ def analytics(request):
 
     total_samples = Sample.objects.all().filter(is_deleted=False).count()
     total_active_samples = (
-        Sample.objects.all()
-        .filter(is_deleted=False)
-        .filter(is_fully_used=False)
-        .count()
+        Sample.objects.all().filter(is_deleted=False).filter(is_used=False).count()
     )
     samples_by_month = (
         Sample.objects.all()
@@ -230,7 +227,7 @@ def analytics(request):
     samples_by_type = (
         Sample.objects.all()
         .filter(is_deleted=False)
-        .filter(is_fully_used=False)
+        .filter(is_used=False)
         .order_by()
         .values("sample_type")
         .annotate(sample_type_count=Count("id"))
@@ -238,7 +235,7 @@ def analytics(request):
     samples_by_location = (
         Sample.objects.all()
         .filter(is_deleted=False)
-        .filter(is_fully_used=False)
+        .filter(is_used=False)
         .order_by()
         .values("sample_location")
         .annotate(sample_location_count=Count("id"))
@@ -411,7 +408,7 @@ def sample_search(request):
                 | Q(sample_type__icontains=query_string)
                 | Q(sample_comments__icontains=query_string)
             )
-            .filter(is_fully_used=False)
+            .filter(is_used=False)
             .filter(is_deleted=False)
         )
         sample_count = sample_list.count()

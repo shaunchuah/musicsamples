@@ -109,7 +109,7 @@ def create_sample_type_pivot(qs: QuerySet, study_name: str):
             "sample_datetime",
             "sample_comments",
             "is_deleted",
-            "is_fully_used",
+            "is_used",
             "processing_datetime",
             "frozen_datetime",
             "sample_volume",
