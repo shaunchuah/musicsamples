@@ -17,6 +17,15 @@
                         <div class="form-group">
                             <input type="text" autofocus name="q" class="form-control" />
                         </div>
+                        <div class="form-check">
+                            <input type="checkbox"
+                                   class="form-check-input mr-2"
+                                   id="id_include_used_samples"
+                                   name="include_used_samples"
+                                   value="True"
+                                   class="form-control" />
+                            <label for="id_include_used_samples" class="form-check-label">Include used samples?</label>
+                        </div>
                         <div>
                             <button type="submit" class="btn btn-fill btn-success">Search</button>
                             <a href="{% url 'home' %}" class="btn btn-fill btn-secondary">Clear</a>

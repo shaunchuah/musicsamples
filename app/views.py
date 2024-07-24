@@ -365,6 +365,7 @@ def sample_search(request):
     query_string = ""
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
+
         sample_list = Sample.objects.filter(
             Q(sample_id__icontains=query_string)
             | Q(patient_id__icontains=query_string)
@@ -373,6 +374,19 @@ def sample_search(request):
             | Q(sample_type__icontains=query_string)
             | Q(sample_comments__icontains=query_string)
         ).filter(is_used=False)
+
+        if ("include_used_samples" in request.GET) and request.GET[
+            "include_used_samples"
+        ].strip():
+            sample_list = Sample.objects.filter(
+                Q(sample_id__icontains=query_string)
+                | Q(patient_id__icontains=query_string)
+                | Q(sample_location__icontains=query_string)
+                | Q(sample_sublocation__icontains=query_string)
+                | Q(sample_type__icontains=query_string)
+                | Q(sample_comments__icontains=query_string)
+            )
+
         sample_count = sample_list.count()
         return render(
             request,
