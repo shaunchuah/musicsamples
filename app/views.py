@@ -615,3 +615,61 @@ def barcode_samples_used(request):
 @login_required(login_url="/login/")
 def barcode_add_multiple(request):
     return render(request, "barcode-addmultiple.html")
+
+
+@login_required(login_url="/login/")
+def music_timepoint_fix(request, timepoint):
+    """
+    timepoint options are baseline, 3_months, 6_months, 9_months, 12_months
+    """
+
+    search_dictionary = {
+        "baseline": ["baseline", "bl", "0 m", "Visit 1", "V1"],
+        "3_months": ["3m", "3 m", "Visit 2", "V2"],
+        "6_months": ["6m", "6 m", "24 w", "Visit 3"],
+        "9_months": ["9m", "9 m"],
+        "12_months": ["12m", "12 m"],
+    }
+
+    query = Q(sample_comments__icontains=search_dictionary[timepoint][0])
+    for t in search_dictionary[timepoint][1:]:
+        query |= Q(sample_comments__icontains=t)
+
+    sample_list = Sample.objects.filter(study_name="music").filter(query)
+    modified_count = 0
+    unmodified_count = 0
+    for sample in sample_list:
+        if sample.music_timepoint != timepoint:
+            sample.music_timepoint = timepoint
+            sample.save()
+            modified_count += 1
+        else:
+            unmodified_count += 1
+    messages.success(
+        request,
+        f"{timepoint} timepoint added. {modified_count} samples modified. {unmodified_count} samples unmodified.",
+    )
+    return redirect(
+        reverse("filter") + f"?study_name=music&music_timepoint={timepoint}"
+    )
+
+
+@login_required(login_url="/login/")
+def music_no_timepoint_list(request):
+    # Home Page
+    sample_list = Sample.objects.filter(study_name="music").filter(music_timepoint=None)
+    sample_count = sample_list.count()
+    page = request.GET.get("page", 1)
+    paginator = Paginator(sample_list, SAMPLE_PAGINATION_SIZE)
+    try:
+        samples = paginator.page(page)
+    except PageNotAnInteger:
+        samples = paginator.page(1)
+    except EmptyPage:
+        samples = paginator.page(paginator.num_pages)
+    context = {
+        "sample_list": samples,
+        "page_obj": samples,
+        "sample_count": sample_count,
+    }
+    return render(request, "music_no_timepoint_list.html", context)

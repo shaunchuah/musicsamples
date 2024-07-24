@@ -65,6 +65,7 @@
                                     <th>Sample Sublocation</th>
                                     <th>Sample Type</th>
                                     <th>Sample Datetime</th>
+                                    <th>Timepoint</th>
                                     <th>Comments</th>
                                     <th>View</th>
                                     <th>Checkout</th>
@@ -88,6 +89,7 @@
                                             </td>
                                             <td>{{ sample.sample_type }}</td>
                                             <td>{{ sample.sample_datetime|date:'d M Y H:i' }}</td>
+                                            <td>{{ sample.get_music_timepoint_display }}</td>
                                             <td>{{ sample.sample_comments }}</td>
                                             <td>
                                                 <a href="{% url 'sample_detail' pk=sample.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
@@ -169,9 +171,6 @@
         6: {
           sorter: "shortDate"
         },
-        8: {
-          sorter: false
-        },
         9: {
           sorter: false
         },
@@ -184,6 +183,9 @@
         12: {
           sorter: false
         },
+        13: {
+            sorter: false
+          },
       },
     });
   });

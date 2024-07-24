@@ -33,6 +33,7 @@ class SampleFilter(django_filters.FilterSet):
             "sample_sublocation",
             "sample_type",
             "is_used",
+            "music_timepoint",
             "sample_comments",
             "sample_volume",
             "sample_datetime",
