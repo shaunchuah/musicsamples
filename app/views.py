@@ -615,3 +615,58 @@ def barcode_samples_used(request):
 @login_required(login_url="/login/")
 def barcode_add_multiple(request):
     return render(request, "barcode-addmultiple.html")
+
+
+@login_required(login_url="/login/")
+def qubit_fix(request):
+    import re
+    from decimal import Decimal
+
+    sample_list = Sample.objects.filter(sample_comments__icontains="qubit")
+    modified_count = 0
+    unmodified_count = 0
+    total_analysed = 0
+    pattern = r"\d*\.\d*"
+    for sample in sample_list:
+        if sample.qubit_cfdna_ng_ul is None:
+            qubit_value = re.search(
+                pattern, sample.sample_comments
+            )  # try and extract qubit value
+            if qubit_value is not None:
+                sample.qubit_cfdna_ng_ul = Decimal(qubit_value.group())
+                sample.save()
+                modified_count += 1
+            else:
+                sample.qubit_cfdna_ng_ul = 0
+                sample.save()
+                modified_count += 1
+
+        total_analysed += 1
+
+    messages.success(
+        request,
+        f"""Qubit value added. {modified_count} samples modified.
+        {unmodified_count} samples unmodified. {total_analysed} samples analysed.""",
+    )
+    return redirect(reverse("qubit_list"))
+
+
+@login_required(login_url="/login/")
+def qubit_list(request):
+    # Home Page
+    sample_list = Sample.objects.filter(sample_comments__icontains="qubit")
+    sample_count = sample_list.count()
+    page = request.GET.get("page", 1)
+    paginator = Paginator(sample_list, 2000)
+    try:
+        samples = paginator.page(page)
+    except PageNotAnInteger:
+        samples = paginator.page(1)
+    except EmptyPage:
+        samples = paginator.page(paginator.num_pages)
+    context = {
+        "sample_list": samples,
+        "page_obj": samples,
+        "sample_count": sample_count,
+    }
+    return render(request, "qubit.html", context)
