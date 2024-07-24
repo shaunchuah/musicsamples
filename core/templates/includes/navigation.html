@@ -1,36 +1,38 @@
 <!-- Static assets -->
 {% load static %}
-
-      <!-- Navbar -->
-      <nav class="navbar navbar-expand-lg navbar-absolute navbar-transparent">
-        <div class="container-fluid">
-          <div class="navbar-wrapper">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-absolute navbar-transparent">
+    <div class="container-fluid">
+        <div class="navbar-wrapper">
             <div class="navbar-toggle d-inline">
-              <button type="button" class="navbar-toggler">
-                <span class="navbar-toggler-bar bar1"></span>
-                <span class="navbar-toggler-bar bar2"></span>
-                <span class="navbar-toggler-bar bar3"></span>
-              </button>
+                <button type="button" class="navbar-toggler">
+                    <span class="navbar-toggler-bar bar1"></span>
+                    <span class="navbar-toggler-bar bar2"></span>
+                    <span class="navbar-toggler-bar bar3"></span>
+                </button>
             </div>
-            <a class="navbar-brand" href="/"></a>
-          </div>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand" href="{% url 'home' %}"></a>
+        </div>
+        <button class="navbar-toggler"
+                type="button"
+                data-toggle="collapse"
+                data-target="#navigation"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
             <span class="navbar-toggler-bar navbar-kebab"></span>
             <span class="navbar-toggler-bar navbar-kebab"></span>
             <span class="navbar-toggler-bar navbar-kebab"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navigation">
-
+        </button>
+        <div class="collapse navbar-collapse" id="navigation">
             {% if user.is_authenticated %}
-          
-            <ul class="navbar-nav ml-auto">
-               <!--
+                <ul class="navbar-nav ml-auto">
+                    <!--
               <li class="search-bar input-group">
-                <button class="btn btn-link" id="search-button" data-toggle="modal" data-target="#searchModal"><i class="tim-icons icon-zoom-split" ></i>
+                <button class="btn btn-link" id="search-button" data-toggle="modal" data-target="#searchModal"><i class="tim-icons icon-zoom-split"></i>
                   <span class="d-lg-none d-md-block">Search</span>
                 </button>
               </li>
-              
+
                 <li class="dropdown nav-item">
                   <a href="javascript:void(0)" class="dropdown-toggle nav-link" data-toggle="dropdown">
                     <div class="notification d-none d-lg-block d-xl-block"></div>
@@ -47,43 +49,52 @@
                     <li class="nav-link"><a href="javascript:void(0)" class="nav-item dropdown-item">Another one</a></li>
                   </ul>
                 </li>
-              -->
-              
-              <li class="dropdown nav-item">
-                <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-                  
-                  
-                  {{ user.username }}
-                  <i class="tim-icons icon-settings-gear-63"></i>
-                  
-                  
-                  
-                  
-                </a>
-                <ul class="dropdown-menu dropdown-navbar">
-                  <li class="nav-link"><a href="{% url 'account' %}" class="nav-item dropdown-item">Account</a></li>
-                  <li class="nav-link"><a href="{% url 'password_change' %}" class="nav-item dropdown-item">Change Password</a></li>
-                  <li class="dropdown-divider"></li>
-                  <li class="nav-link"><a href="{% url 'logout' %}" class="nav-item dropdown-item">Log out</a></li>
+-->
+                    <li class="dropdown nav-item">
+                        <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
+                            {{ user.username }}
+                            <i class="tim-icons icon-settings-gear-63"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-navbar">
+                            <li class="nav-link">
+                                <a href="{% url 'account' %}" class="nav-item dropdown-item">Account</a>
+                            </li>
+                            <li class="nav-link">
+                                <a href="{% url 'password_change' %}" class="nav-item dropdown-item">Change
+                                Password</a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                            <li class="nav-link">
+                                <form method="post" action="{% url 'logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="nav-item dropdown-item">Log out</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
-              </li>
-              
-            </ul>            
             {% endif %}
-
-          </div>
         </div>
-      </nav>
-      <div class="modal modal-search fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="searchModal" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
+    </div>
+</nav>
+<div class="modal modal-search fade"
+     id="searchModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="searchModal"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
             <div class="modal-header">
-              <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="SEARCH">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <i class="tim-icons icon-simple-remove"></i>
-              </button>
+                <input type="text"
+                       class="form-control"
+                       id="inlineFormInputGroup"
+                       placeholder="SEARCH">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="tim-icons icon-simple-remove"></i>
+                </button>
             </div>
-          </div>
         </div>
-      </div>
-      <!-- End Navbar -->
+    </div>
+</div>
+<!-- End Navbar -->
