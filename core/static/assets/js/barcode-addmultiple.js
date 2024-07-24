@@ -14,6 +14,7 @@ function submitScan() {
       sample_location: $("#id_sample_location").val(),
       sample_sublocation: $("#id_sample_sublocation").val(),
       study_name: $("#id_study_name").val(),
+      music_timepoint: $("#id_music_timepoint").val(),
       patient_id: $("#id_patient_id").val(),
       sample_type: $("#id_sample_type").val(),
       haemolysis_reference: $("#id_haemolysis_reference").val(),
@@ -47,16 +48,22 @@ function submitScan() {
       const error_json = JSON.parse(error.responseText);
 
       for (let [key, value] of Object.entries(error_json)) {
-        // style the input to is-invalid
-        let id_string = "id_" + key;
-        document.getElementById(id_string).classList.add("is-invalid");
+        if (key == "non_field_errors") {
+          document.getElementById("non_field_errors").classList.add('mb-3');
+          document.getElementById("non_field_errors").textContent =
+            value.join(" ");
+        } else {
+          // style the input to is-invalid
+          let id_string = "id_" + key;
+          document.getElementById(id_string).classList.add("is-invalid");
 
-        // add error messages to appropriate divs;
-        let id_error_string = "id_" + key + "_error";
-        let error_message_array = value;
-        let error_message_list = error_message_array.join(" ");
-        document.getElementById(id_error_string).textContent =
-          error_message_list;
+          // add error messages to appropriate divs;
+          let id_error_string = "id_" + key + "_error";
+          let error_message_array = value;
+          let error_message_list = error_message_array.join(" ");
+          document.getElementById(id_error_string).textContent =
+            error_message_list;
+        }
       }
 
       $("#error_message").text(
@@ -98,10 +105,6 @@ $(document).ready(function () {
   var dateTime = date + "T" + time;
   $("#id_processing_datetime").val(dateTime);
 
-  // $("#sample_id").keyup(function () {
-  //   url_string = "/api/multiple_samples/";
-  // });
-
   $("#sample_id").keydown(function (e) {
     if (e.keyCode == 13 || e.keyCode == 9) {
       e.preventDefault();
@@ -120,6 +123,7 @@ $(document).ready(function () {
   $("label[for=id_biopsy_location], #id_biopsy_location").hide();
   $("label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status").hide();
   $("label[for=id_haemolysis_reference], #id_haemolysis_reference").hide();
+  $("label[for=id_music_timepoint], #id_music_timepoint").hide();
 
   // Show/Hide form fields depending on input sample type
   if (
@@ -170,6 +174,16 @@ $(document).ready(function () {
       );
     } else {
       $("label[for=id_haemolysis_reference], #id_haemolysis_reference").hide();
+    }
+  });
+  $("#id_study_name").change(function () {
+    if (
+      $("#id_study_name").val() == "music" ||
+      $("#id_study_name").val() == "mini_music"
+    ) {
+      $("label[for=id_music_timepoint], #id_music_timepoint").show();
+    } else {
+      $("label[for=id_music_timepoint], #id_music_timepoint").hide();
     }
   });
 });

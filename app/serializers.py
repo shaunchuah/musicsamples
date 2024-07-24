@@ -41,6 +41,7 @@ class MultipleSampleSerializer(serializers.ModelSerializer):
         model = Sample
         fields = [
             "study_name",
+            "music_timepoint",
             "sample_id",
             "sample_location",
             "sample_sublocation",
@@ -63,6 +64,19 @@ class MultipleSampleSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data["patient_id"] = validated_data["patient_id"].upper()
         return super(MultipleSampleSerializer, self).create(validated_data)
+
+    def validate(self, data):
+        """
+        Check that music_timepoint is not empty if study_name is music or mini_music
+        """
+
+        if data["study_name"] == "music" or data["study_name"] == "mini_music":
+            if not data["music_timepoint"]:
+                raise serializers.ValidationError(
+                    "Music Timepoint must be filled for MUSIC and Mini-MUSIC studies."
+                )
+
+        return data
 
 
 class SampleExportSerializer(serializers.ModelSerializer):

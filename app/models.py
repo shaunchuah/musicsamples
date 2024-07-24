@@ -1,7 +1,8 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from simple_history.models import HistoricalRecords
 
-from app.choices import StudyNameChoices
+from app.choices import MusicTimepointChoices, StudyNameChoices
 
 
 class Sample(models.Model):
@@ -16,6 +17,10 @@ class Sample(models.Model):
     sample_comments = models.TextField(blank=True, null=True)
 
     is_used = models.BooleanField(default=False)
+
+    music_timepoint = models.CharField(
+        max_length=50, blank=True, null=True, choices=MusicTimepointChoices.choices
+    )
 
     processing_datetime = models.DateTimeField(blank=True, null=True)
     frozen_datetime = models.DateTimeField(blank=True, null=True)
@@ -38,6 +43,17 @@ class Sample(models.Model):
     def clean(self):
         self.sample_id = self.sample_id.upper()
         self.patient_id = self.patient_id.upper()
+
+        if (
+            self.study_name == StudyNameChoices.MUSIC
+            or self.study_name == StudyNameChoices.MINI_MUSIC
+        ):
+            if self.music_timepoint is None or self.music_timepoint == "":
+                raise ValidationError(
+                    {
+                        "music_timepoint": "Music Timepoint must be filled for MUSIC and Mini-MUSIC studies."
+                    }
+                )
 
     def __str__(self):
         return self.sample_id

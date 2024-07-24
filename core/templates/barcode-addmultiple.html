@@ -69,6 +69,11 @@
                     <!--<div class="card-header"><h3 class="card-title">Add New Sample</h3></div>-->
                     <div class="card-body">
                         <div class="row">
+                            <div class="col">
+                                <div id="non_field_errors" class="text-danger text-lg"></div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="form-group col-md-8">
                                 <label for="id_sample_location">Sample Location*:</label>
                                 <input type="text"
@@ -101,6 +106,21 @@
                                 <option value="none">None</option>
                             </select>
                             <div id="id_study_name_error" class="text-danger text-lg"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_music_timepoint">Music Timepoint:</label>
+                            <select name="music_timepoint"
+                                    class="form-control"
+                                    required=""
+                                    id="id_music_timepoint">
+                                <option value="" selected="">---------</option>
+                                <option value="baseline">Baseline</option>
+                                <option value="3_months">3 Months</option>
+                                <option value="6_months">6 Months</option>
+                                <option value="9_months">9 Months</option>
+                                <option value="12_months">12 Months</option>
+                            </select>
+                            <div id="id_music_timepoint_error" class="text-danger text-lg"></div>
                         </div>
                         <div class="form-group">
                             <label for="id_patient_id">Patient ID*:</label>

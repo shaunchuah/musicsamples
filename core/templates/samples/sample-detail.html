@@ -38,6 +38,12 @@
                                     <td>Study Name</td>
                                     <td>{{ sample.get_study_name_display }}</td>
                                 </tr>
+                                {% if sample.study_name == "mini_music" or sample.study_name == "music" %}
+                                    <tr>
+                                        <td>Timepoint</td>
+                                        <td>{{ sample.get_music_timepoint_display }}</td>
+                                    </tr>
+                                {% endif %}
                                 <tr>
                                     <td>Sample ID</td>
                                     <td>{{ sample.sample_id }}</td>

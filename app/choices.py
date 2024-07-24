@@ -107,3 +107,11 @@ class StudyNameChoices(models.TextChoices):
     MARVEL = "marvel", "MARVEL"
     MINI_MARVEL = "mini_marvel", "Mini-MARVEL"
     NONE = "none", "None"
+
+
+class MusicTimepointChoices(models.TextChoices):
+    BASELINE = "baseline", "Baseline"
+    THREE_MONTHS = "3_months", "3 Months"
+    SIX_MONTHS = "6_months", "6 Months"
+    NINE_MONTHS = "9_months", "9 Months"
+    TWELVE_MONTHS = "12_months", "12 Months"
