@@ -61,5 +61,8 @@ class Sample(models.Model):
     def __str__(self):
         return self.sample_id
 
+    def natural_key(self):
+        return self.sample_id
+
     class Meta:
         ordering = ["-created"]

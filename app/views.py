@@ -701,3 +701,57 @@ def qubit_list(request):
         "sample_count": sample_count,
     }
     return render(request, "qubit.html", context)
+
+
+@login_required(login_url="/login/")
+def remap_sample_types(request):
+    sample_list = Sample.objects.all()
+
+    sample_types_mapping_dictionary = {
+        "PaxGene ccfDNA tube": "cfdna_tube",
+        "PaxGene ccfDNA plasma child aliquot": "cfdna_plasma",
+        "PaxGene RNA tube": "paxgene_rna",
+        "Standard EDTA tube": "standard_edta",
+        "EDTA plasma child aliquot": "edta_plasma",
+        "Other": "other",
+        "RNAlater biopsy": "biopsy_rnalater",
+        "OmniGut": "stool_omnigut",
+        "Stool supernatant": "stool_supernatant",
+        "Calprotectin": "stool_calprotectin",
+        "PaxGene ccfDNA extracted cfDNA": "cfdna_extracted",
+        "Formalin biopsy": "biopsy_formalin",
+        "Paraffin tissue block": "paraffin_block",
+        "Standard stool container": "stool_standard",
+        "Saliva": "saliva",
+        "PaxGene RNA child aliquot": "rna_plasma",
+    }
+
+    biopsy_location_mapping_dictionary = {
+        "Terminal ileum": "terminal_ileum",
+        "Caecum": "caecum",
+        "Ascending colon": "ascending",
+        "Transverse colon": "transverse",
+        "Descending colon": "descending",
+        "Sigmoid colon": "sigmoid",
+        "Rectum": "rectum",
+        "Right colon": "right_colon",
+        "Left colon": "left_colon",
+        "Oesophagus": "oesophagus",
+        "Stomach": "stomach",
+        "Duodenum": "duodenum",
+    }
+
+    total_analysed = 0
+    for sample in sample_list:
+        sample.sample_type = sample_types_mapping_dictionary[sample.sample_type]
+        sample.biopsy_location = biopsy_location_mapping_dictionary[
+            sample.biopsy_location
+        ]
+        sample.save()
+        total_analysed += 1
+
+    messages.success(
+        request,
+        f"""Sample types updated for {total_analysed} samples.""",
+    )
+    return redirect(reverse("qubit_list"))
