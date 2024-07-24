@@ -60,6 +60,10 @@ class MultipleSampleSerializer(serializers.ModelSerializer):
         ]
         lookup_field = "sample_id"
 
+    def create(self, validated_data):
+        validated_data["patient_id"] = validated_data["patient_id"].upper()
+        return super(MultipleSampleSerializer, self).create(validated_data)
+
 
 class SampleExportSerializer(serializers.ModelSerializer):
     """
