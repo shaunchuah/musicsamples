@@ -31,6 +31,9 @@ class Sample(models.Model):
     haemolysis_reference = models.CharField(max_length=200, blank=True, null=True)
     biopsy_location = models.CharField(max_length=100, blank=True, null=True)
     biopsy_inflamed_status = models.CharField(max_length=100, blank=True, null=True)
+    qubit_cfdna_ng_ul = models.DecimalField(
+        max_digits=10, decimal_places=3, blank=True, null=True
+    )
 
     created = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=200)

@@ -89,4 +89,14 @@ urlpatterns = [
     path(
         "barcode/add_multiple/", views.barcode_add_multiple, name="barcode_add_multiple"
     ),
+    path(
+        "qubit_fix/",
+        views.qubit_fix,
+        name="qubit_fix",
+    ),
+    path(
+        "qubit_list/",
+        views.qubit_list,
+        name="qubit_list",
+    ),
 ]

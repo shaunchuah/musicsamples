@@ -57,9 +57,12 @@
                         sample ID and hit enter instead.
                     </p>
                     <p>
-                        <strong>Help:</strong> If you've accidentally scanned the wrong sample, you should edit it manually and check
-                        the data - trying to delete and add it again will throw an error as the ID will be noted by the database as
-                        not being unique. You can see a list of recently accessed samples in your account page at the top right.
+                        <strong>Help:</strong> If you've accidentally scanned the wrong sample, you should edit it manually
+                        and check
+                        the data - trying to delete and add it again will throw an error as the ID will be noted by the
+                        database as
+                        not being unique. You can see a list of recently accessed samples in your account page at the top
+                        right.
                     </p>
                 </div>
             </div>
@@ -81,7 +84,8 @@
                                        maxlength="200"
                                        class="form-control"
                                        required
-                                       id="id_sample_location" />
+                                       id="id_sample_location"
+                                       autocomplete="off" />
                                 <div id="id_sample_location_error" class="text-danger text-lg"></div>
                             </div>
                             <div class="form-group col-md-4">
@@ -129,7 +133,8 @@
                                    maxlength="200"
                                    class="form-control"
                                    required
-                                   id="id_patient_id" />
+                                   id="id_patient_id"
+                                   autocomplete="off" />
                             <div id="id_patient_id_error" class="text-danger text-lg"></div>
                         </div>
                         <div class="form-group">
@@ -177,6 +182,16 @@
                                 </optgroup>
                             </select>
                             <div id="id_sample_type_error" class="text-danger text-lg"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_qubit_cfdna_ng_ul" style="">Qubit (ng/uL:):</label>
+                            <input type="number"
+                                   name="qubit_cfdna_ng_ul"
+                                   step="0.001"
+                                   class="form-control"
+                                   id="id_qubit_cfdna_ng_ul"
+                                   style="">
+                            <div id="id_qubit_cfdna_ng_ul_error" class="text-danger text-lg"></div>
                         </div>
                         <div class="form-group">
                             <label for="id_haemolysis_reference">Haemolysis Reference Palette:</label>
@@ -368,5 +383,7 @@
 {% endblock content %}
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
+    <script src="{% static 'assets/js/sample_add_autocomplete.js' %}"></script>
+    <script src="{% static 'assets/js/sample_show_hide_fields.js' %}"></script>
     <script src="{% static 'assets/js/barcode-addmultiple.js' %}"></script>
 {% endblock javascripts %}

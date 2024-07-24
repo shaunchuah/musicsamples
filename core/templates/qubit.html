@@ -1,0 +1,177 @@
+{% extends "layouts/base.html" %}
+{% block title %}
+    Dashboard
+{% endblock title %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Search Active Samples</h3>
+                </div>
+                <div class="card-body">
+                    <form id="searchform" action="{% url 'sample_search' %}" method="get">
+                        <div class="form-group">
+                            <input type="text" autofocus name="q" class="form-control" />
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-fill btn-success">Search</button>
+                            <a href="{% url 'home' %}" class="btn btn-fill btn-secondary">Clear</a>
+                            <a href="{% url 'filter' %}"
+                               class="btn btn-fill btn-success float-lg-right">Advanced
+                            Filtering</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Samples by Study</h3>
+                </div>
+                <div class="card-footer">
+                    <div>
+                        <a href="{% url 'filter' %}?study_name=music"
+                           class="btn btn-fill btn-success">MUSIC</a>
+                        <a href="{% url 'filter' %}?study_name=gidamps"
+                           class="btn btn-fill btn-success">GI-DAMPs</a>
+                        <a href="{% url 'filter' %}?study_name=mini_music"
+                           class="btn btn-fill btn-success">Mini-Music</a>
+                        <a href="{% url 'filter' %}?study_name=marvel"
+                           class="btn btn-fill btn-success">MARVEL</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        Active Samples
+                        {% if study_name %}- ({{ study_name }}){% endif %}
+                    </h3>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'sample_add' %}" class="btn btn-fill btn-success">Add New Sample</a>
+                    <a href="{% url 'barcode' %}" class="btn btn-fill btn-success">Barcode Location Scanning</a>
+                    <!--<a href="/bulkadd/" class="btn btn-success">Bulk Add Samples</a>-->
+                    <a href="{% url 'export_csv' study_name='all' %}?q={{ query_string }}"
+                       class="btn btn-success float-lg-right"
+                       data-toggle="tooltip"
+                       data-placement="bottom"
+                       data-html="true"
+                       title="<strong>Tip:</strong> Customise the export by searching for the set of samples you wish to download."><i class="tim-icons icon-cloud-download-93"></i> Export Current View
+                    to CSV</a>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-row-reverse pb-3">Total Count: {{ sample_count }}</div>
+                    <div class="table-responsive">
+                        <table class="table tablesorter" id="mainTable">
+                            <thead class="text-primary">
+                                <tr>
+                                    <th>Study Name</th>
+                                    <th>Sample ID</th>
+                                    <th>Patient ID</th>
+                                    <th>Sample Location</th>
+                                    <th>Sample Sublocation</th>
+                                    <th>Sample Type</th>
+                                    <th>Sample Datetime</th>
+                                    <th>Timepoint</th>
+                                    <th>Qubit</th>
+                                    <th>Comments</th>
+                                    <th>View</th>
+                                    <th>Checkout</th>
+                                    <th>Edit</th>
+                                    <th class="text-center">Used</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if sample_list %}
+                                    {% for sample in sample_list %}
+                                        <tr>
+                                            <td>{{ sample.get_study_name_display }}</td>
+                                            <td>{{ sample.sample_id }}</td>
+                                            <td>{{ sample.patient_id }}</td>
+                                            <td>{{ sample.sample_location }}</td>
+                                            <td>
+                                                {% if sample.sample_sublocation is None %}
+                                                {% else %}
+                                                    {{ sample.sample_sublocation }}
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ sample.sample_type }}</td>
+                                            <td>{{ sample.sample_datetime|date:'d M Y H:i' }}</td>
+                                            <td>{{ sample.get_music_timepoint_display }}</td>
+                                            <td>{{ sample.qubit_cfdna_ng_ul }}</td>
+                                            <td>{{ sample.sample_comments }}</td>
+                                            <td>
+                                                <a href="{% url 'sample_detail' pk=sample.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'sample_checkout' pk=sample.pk %}?next={{ request.get_full_path }}">
+                                                    <i class="tim-icons icon-cloud-upload-94"></i> Checkout
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'sample_edit' pk=sample.pk %}?next={{ request.get_full_path }}"><i class="tim-icons icon-pencil"></i> Edit</a>
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="{% url 'sample_used' pk=sample.pk %}"><i class="tim-icons icon-send align-center"></i> Used</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="13" align="center">No active samples found.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                        {% include "layouts/pagination.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script>
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+        $("#mainTable").tablesorter({
+            sortReset: true,
+            dateFormat: "ddmmyyyy",
+            headers: {
+                6: {
+                    sorter: 'shortDate'
+                },
+                13: {
+                    sorter: false
+                },
+                9: {
+                    sorter: false
+                },
+                10: {
+                    sorter: false
+                },
+                11: {
+                    sorter: false
+                },
+                12: {
+                    sorter: false
+                },
+
+            },
+        });
+    });
+    </script>
+{% endblock javascripts %}

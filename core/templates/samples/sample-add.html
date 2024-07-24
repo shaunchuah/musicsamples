@@ -1,4 +1,5 @@
 {% extends "layouts/base.html" %}
+{% load static %}
 {% block title %}
     Add Sample
 {% endblock title %}
@@ -76,63 +77,7 @@
 {% endblock content %}
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-    <script>
-    $(document).ready(function() {
-      // Javascript method's body can be found in assets/js/demos.js
-      $('input#id_sample_id').focus();
-      $('input#id_sample_location').autocomplete({
-        source: '{% url 'autocomplete_locations' %}'
-      });
-      $('input#id_patient_id').autocomplete({
-        source: '{% url 'autocomplete_patients' %}'
-      });
-
-      $('label[for=id_biopsy_location], #id_biopsy_location').hide();
-      $('label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status').hide();
-      $('label[for=id_haemolysis_reference], #id_haemolysis_reference').hide();
-
-
-      // Show/Hide form fields depending on input sample type
-      if ($('#id_sample_type').val() == 'Formalin biopsy'
-        || $('#id_sample_type').val() == 'RNAlater biopsy'
-        || $('#id_sample_type').val() == 'Paraffin tissue block') {
-          $('label[for=id_biopsy_location], #id_biopsy_location').show();
-          $('label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status').show();
-        };
-
-      if ($('#id_sample_type').val() == 'EDTA plasma child aliquot'
-        || $('#id_sample_type').val() == 'PaxGene ccfDNA plasma child aliquot'
-        || $('#id_sample_type').val() == 'PaxGene ccfDNA extracted cfDNA') {
-          $('label[for=id_haemolysis_reference], #id_haemolysis_reference').show();
-        };
-
-
-      $('#id_sample_type').change(function(){
-        if ($('#id_sample_type').val() == 'Formalin biopsy'
-        || $('#id_sample_type').val() == 'RNAlater biopsy'
-        || $('#id_sample_type').val() == 'Paraffin tissue block') {
-          $('label[for=id_biopsy_location], #id_biopsy_location').show("slow");
-          $('label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status').show("slow");
-        } else {
-          $('label[for=id_biopsy_location], #id_biopsy_location').hide();
-          $('label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status').hide();
-        };
-      });
-
-      $('#id_sample_type').change(function(){
-        if ($('#id_sample_type').val() == 'EDTA plasma child aliquot'
-        || $('#id_sample_type').val() == 'PaxGene ccfDNA plasma child aliquot'
-        || $('#id_sample_type').val() == 'PaxGene ccfDNA extracted cfDNA') {
-          $('label[for=id_haemolysis_reference], #id_haemolysis_reference').show("slow");
-        } else {
-          $('label[for=id_haemolysis_reference], #id_haemolysis_reference').hide();
-        };
-      });
-
-
-
-
-
-    });
-    </script>
+    <script src="{% static 'assets/js/sample_add_autocomplete.js' %}"></script>
+    <script src="{% static 'assets/js/sample_show_hide_fields.js' %}"></script>
+    <script src="{% static 'assets/js/sample-add.js' %}"></script>
 {% endblock javascripts %}

@@ -1,6 +1,5 @@
 const url_string = "/api/multiple_samples/";
 const token = document.getElementsByName("csrfmiddlewaretoken")[0].value;
-console.log(token);
 
 function submitScan() {
   $.ajax({
@@ -49,7 +48,7 @@ function submitScan() {
 
       for (let [key, value] of Object.entries(error_json)) {
         if (key == "non_field_errors") {
-          document.getElementById("non_field_errors").classList.add('mb-3');
+          document.getElementById("non_field_errors").classList.add("mb-3");
           document.getElementById("non_field_errors").textContent =
             value.join(" ");
         } else {
@@ -91,7 +90,6 @@ function adjust(v) {
 }
 
 $(document).ready(function () {
-  // Javascript method's body can be found in assets/js/demos.js
   $(".alert").hide();
 
   var today = new Date();
@@ -113,77 +111,4 @@ $(document).ready(function () {
   });
 
   $("input#id_sample_id").focus();
-  $("input#id_sample_location").autocomplete({
-    source: "/autocomplete/locations/",
-  });
-  $("input#id_patient_id").autocomplete({
-    source: "/autocomplete/patients/",
-  });
-
-  $("label[for=id_biopsy_location], #id_biopsy_location").hide();
-  $("label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status").hide();
-  $("label[for=id_haemolysis_reference], #id_haemolysis_reference").hide();
-  $("label[for=id_music_timepoint], #id_music_timepoint").hide();
-
-  // Show/Hide form fields depending on input sample type
-  if (
-    $("#id_sample_type").val() == "Formalin biopsy" ||
-    $("#id_sample_type").val() == "RNAlater biopsy" ||
-    $("#id_sample_type").val() == "Paraffin tissue block"
-  ) {
-    $("label[for=id_biopsy_location], #id_biopsy_location").show();
-    $(
-      "label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status"
-    ).show();
-  }
-
-  if (
-    $("#id_sample_type").val() == "EDTA plasma child aliquot" ||
-    $("#id_sample_type").val() == "PaxGene ccfDNA plasma child aliquot" ||
-    $("#id_sample_type").val() == "PaxGene ccfDNA extracted cfDNA"
-  ) {
-    $("label[for=id_haemolysis_reference], #id_haemolysis_reference").show();
-  }
-
-  $("#id_sample_type").change(function () {
-    if (
-      $("#id_sample_type").val() == "Formalin biopsy" ||
-      $("#id_sample_type").val() == "RNAlater biopsy" ||
-      $("#id_sample_type").val() == "Paraffin tissue block"
-    ) {
-      $("label[for=id_biopsy_location], #id_biopsy_location").show("slow");
-      $(
-        "label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status"
-      ).show("slow");
-    } else {
-      $("label[for=id_biopsy_location], #id_biopsy_location").hide();
-      $(
-        "label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status"
-      ).hide();
-    }
-  });
-
-  $("#id_sample_type").change(function () {
-    if (
-      $("#id_sample_type").val() == "EDTA plasma child aliquot" ||
-      $("#id_sample_type").val() == "PaxGene ccfDNA plasma child aliquot" ||
-      $("#id_sample_type").val() == "PaxGene ccfDNA extracted cfDNA"
-    ) {
-      $("label[for=id_haemolysis_reference], #id_haemolysis_reference").show(
-        "slow"
-      );
-    } else {
-      $("label[for=id_haemolysis_reference], #id_haemolysis_reference").hide();
-    }
-  });
-  $("#id_study_name").change(function () {
-    if (
-      $("#id_study_name").val() == "music" ||
-      $("#id_study_name").val() == "mini_music"
-    ) {
-      $("label[for=id_music_timepoint], #id_music_timepoint").show();
-    } else {
-      $("label[for=id_music_timepoint], #id_music_timepoint").hide();
-    }
-  });
 });
