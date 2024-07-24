@@ -39,13 +39,14 @@ class SampleForm(ModelForm):
     class Meta:
         model = Sample
         fields = [
-            "study_name",
-            "music_timepoint",
             "sample_id",
             "sample_location",
             "sample_sublocation",
+            "study_name",
+            "music_timepoint",
             "patient_id",
             "sample_type",
+            "qubit_cfdna_ng_ul",
             "haemolysis_reference",
             "biopsy_location",
             "biopsy_inflamed_status",
@@ -79,6 +80,7 @@ class SampleForm(ModelForm):
             "sample_location": "Sample Location*",
             "sample_sublocation": "Sample Sublocation",
             "sample_type": "Sample Type*",
+            "qubit_cfdna_ng_ul": "Qubit (ng/uL:)",
             "sample_comments": "Comments",
             "sample_volume": "Volume Remaining (est.)",
             "sample_volume_units": "Sample Volume Units",

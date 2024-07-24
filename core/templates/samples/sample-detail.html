@@ -147,6 +147,16 @@
                                         {% endif %}
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td>Qubit (ng/uL)</td>
+                                    <td>
+                                        {% if sample.qubit_cfdna_ng_ul is None %}
+                                            N/A
+                                        {% else %}
+                                            {{ sample.qubit_cfdna_ng_ul }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
