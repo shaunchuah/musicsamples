@@ -502,6 +502,23 @@ def autocomplete_locations(request):
 
 
 @login_required(login_url="/login/")
+def autocomplete_sublocations(request):
+    if "term" in request.GET:
+        qs = (
+            Sample.objects.filter(sample_sublocation__icontains=request.GET.get("term"))
+            .order_by()
+            .values("sample_sublocation")
+            .distinct()
+        )
+    else:
+        qs = Sample.objects.all().order_by().values("sample_sublocation").distinct()
+    sublocations = []
+    for sample in qs:
+        sublocations.append(sample["sample_sublocation"])
+    return JsonResponse(sublocations, safe=False)
+
+
+@login_required(login_url="/login/")
 def autocomplete_patient_id(request):
     # Helps speed up sample adding by locating existing patient IDs
     if "term" in request.GET:

@@ -75,6 +75,11 @@ urlpatterns = [
         name="autocomplete_locations",
     ),
     path(
+        "autocomplete/sublocations/",
+        views.autocomplete_sublocations,
+        name="autocomplete_sublocations",
+    ),
+    path(
         "autocomplete/patients/",
         views.autocomplete_patient_id,
         name="autocomplete_patients",
