@@ -89,14 +89,4 @@ urlpatterns = [
     path(
         "barcode/add_multiple/", views.barcode_add_multiple, name="barcode_add_multiple"
     ),
-    path(
-        "fix_timepoints/<str:timepoint>/",
-        views.music_timepoint_fix,
-        name="music_timepoint_fix",
-    ),
-    path(
-        "music_no_timepoints/",
-        views.music_no_timepoint_list,
-        name="music_no_timepoint_list",
-    ),
 ]

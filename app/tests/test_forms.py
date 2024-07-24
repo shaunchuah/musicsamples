@@ -57,47 +57,48 @@ def test_sample_add_form_without_processing_time():
     assert form.is_valid() is True
 
 
-def test_sample_add_form_for_music_without_music_timepoint():
-    sample_data = {
-        "study_name": "music",
-        "music_timepoint": "",
-        "sample_id": "test001",
-        "patient_id": "patient001",
-        "sample_location": "location001",
-        "sample_type": "test_sample_type",
-        "sample_datetime": "2020-01-01T13:20:30",
-        "sample_comments": "",
-        "processing_datetime": "",
-        "sample_sublocation": "",
-        "sample_volume": "",
-        "sample_volume_units": "",
-        "freeze_thaw_count": 0,
-        "haemolysis_reference": "",
-        "biopsy_location": "",
-        "biopsy_inflamed_status": "",
-    }
-    form = SampleForm(data=sample_data)
-    assert form.is_valid() is False
+# Disable form validation until music samples all have timepoints
+# def test_sample_add_form_for_music_without_music_timepoint():
+#     sample_data = {
+#         "study_name": "music",
+#         "music_timepoint": "",
+#         "sample_id": "test001",
+#         "patient_id": "patient001",
+#         "sample_location": "location001",
+#         "sample_type": "test_sample_type",
+#         "sample_datetime": "2020-01-01T13:20:30",
+#         "sample_comments": "",
+#         "processing_datetime": "",
+#         "sample_sublocation": "",
+#         "sample_volume": "",
+#         "sample_volume_units": "",
+#         "freeze_thaw_count": 0,
+#         "haemolysis_reference": "",
+#         "biopsy_location": "",
+#         "biopsy_inflamed_status": "",
+#     }
+#     form = SampleForm(data=sample_data)
+#     assert form.is_valid() is False
 
 
-def test_sample_add_form_for_mini_music_without_music_timepoint():
-    sample_data = {
-        "study_name": "mini_music",
-        "music_timepoint": "",
-        "sample_id": "test001",
-        "patient_id": "patient001",
-        "sample_location": "location001",
-        "sample_type": "test_sample_type",
-        "sample_datetime": "2020-01-01T13:20:30",
-        "sample_comments": "",
-        "processing_datetime": "",
-        "sample_sublocation": "",
-        "sample_volume": "",
-        "sample_volume_units": "",
-        "freeze_thaw_count": 0,
-        "haemolysis_reference": "",
-        "biopsy_location": "",
-        "biopsy_inflamed_status": "",
-    }
-    form = SampleForm(data=sample_data)
-    assert form.is_valid() is False
+# def test_sample_add_form_for_mini_music_without_music_timepoint():
+#     sample_data = {
+#         "study_name": "mini_music",
+#         "music_timepoint": "",
+#         "sample_id": "test001",
+#         "patient_id": "patient001",
+#         "sample_location": "location001",
+#         "sample_type": "test_sample_type",
+#         "sample_datetime": "2020-01-01T13:20:30",
+#         "sample_comments": "",
+#         "processing_datetime": "",
+#         "sample_sublocation": "",
+#         "sample_volume": "",
+#         "sample_volume_units": "",
+#         "freeze_thaw_count": 0,
+#         "haemolysis_reference": "",
+#         "biopsy_location": "",
+#         "biopsy_inflamed_status": "",
+#     }
+#     form = SampleForm(data=sample_data)
+#     assert form.is_valid() is False

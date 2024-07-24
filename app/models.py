@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.db import models
 from simple_history.models import HistoricalRecords
 
@@ -44,16 +43,17 @@ class Sample(models.Model):
         self.sample_id = self.sample_id.upper()
         self.patient_id = self.patient_id.upper()
 
-        if (
-            self.study_name == StudyNameChoices.MUSIC
-            or self.study_name == StudyNameChoices.MINI_MUSIC
-        ):
-            if self.music_timepoint is None or self.music_timepoint == "":
-                raise ValidationError(
-                    {
-                        "music_timepoint": "Music Timepoint must be filled for MUSIC and Mini-MUSIC studies."
-                    }
-                )
+        # Suspend form validation until all samples have been allocated timepoints
+        # if (
+        #     self.study_name == StudyNameChoices.MUSIC
+        #     or self.study_name == StudyNameChoices.MINI_MUSIC
+        # ):
+        #     if self.music_timepoint is None or self.music_timepoint == "":
+        #         raise ValidationError(
+        #             {
+        #                 "music_timepoint": "Music Timepoint must be filled for MUSIC and Mini-MUSIC studies."
+        #             }
+        #         )
 
     def __str__(self):
         return self.sample_id
