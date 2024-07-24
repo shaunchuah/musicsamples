@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("app", "0032_alter_historicalsample_music_timepoint_and_more"),
     ]
