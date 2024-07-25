@@ -89,7 +89,10 @@
                                             </td>
                                             <td>{{ sample.sample_type }}</td>
                                             <td>{{ sample.sample_datetime|date:'d M Y H:i' }}</td>
-                                            <td>{{ sample.get_music_timepoint_display }}</td>
+                                            <td>
+                                                {{ sample.get_music_timepoint_display }}
+                                                {{ sample.get_marvel_timepoint_display }}
+                                            </td>
                                             <td>{{ sample.sample_comments }}</td>
                                             <td>
                                                 <a href="{% url 'sample_detail' pk=sample.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>

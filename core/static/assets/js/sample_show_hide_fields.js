@@ -5,6 +5,7 @@ $(document).ready(function () {
   $("label[for=id_haemolysis_reference], #id_haemolysis_reference").hide();
   $("label[for=id_qubit_cfdna_ng_ul], #id_qubit_cfdna_ng_ul").hide();
   $("label[for=id_music_timepoint], #id_music_timepoint").hide();
+  $("label[for=id_marvel_timepoint], #id_marvel_timepoint").hide();
 
   // Show fields based on pre-existing form data
 
@@ -81,6 +82,15 @@ $(document).ready(function () {
       $("label[for=id_music_timepoint], #id_music_timepoint").show("slow");
     } else {
       $("label[for=id_music_timepoint], #id_music_timepoint").hide();
+    }
+
+    if (
+      $("#id_study_name").val() == "marvel" ||
+      $("#id_study_name").val() == "mini_marvel"
+    ) {
+      $("label[for=id_marvel_timepoint], #id_marvel_timepoint").show("slow");
+    } else {
+      $("label[for=id_marvel_timepoint], #id_marvel_timepoint").hide();
     }
   });
 });

@@ -34,6 +34,7 @@ class SampleFilter(django_filters.FilterSet):
             "sample_type",
             "is_used",
             "music_timepoint",
+            "marvel_timepoint",
             "sample_comments",
             "sample_volume",
             "sample_datetime",

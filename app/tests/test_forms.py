@@ -15,6 +15,7 @@ def test_sample_add_form():
     sample_data = {
         "study_name": "gidamps",
         "music_timepoint": "",
+        "marvel_timepoint": "",
         "sample_id": "test001",
         "patient_id": "patient001",
         "sample_location": "location001",
@@ -38,6 +39,7 @@ def test_sample_add_form_without_processing_time():
     sample_data = {
         "study_name": "gidamps",
         "music_timepoint": "",
+        "marvel_timepoint": "",
         "sample_id": "test001",
         "patient_id": "patient001",
         "sample_location": "location001",

@@ -226,6 +226,7 @@ class TestViews(TestCase):
         form_data = {
             "study_name": "marvel",
             "music_timepoint": "",
+            "marvel_timepoint": "baseline",
             "sample_id": "test001",
             "patient_id": "patient001",
             "sample_location": "location001",
@@ -251,6 +252,7 @@ class TestViews(TestCase):
         form_data = {
             "study_name": "music",
             "music_timepoint": "baseline",
+            "marvel_timepoint": "",
             "sample_id": "test001",
             "patient_id": "patient001",
             "sample_location": "location001",
@@ -274,6 +276,7 @@ class TestViews(TestCase):
         url = reverse("sample_add")
         form_data = {
             "study_name": "marvel",
+            "marvel_timepoint": "12_weeks",
             "sample_id": "test001",
             "patient_id": "patient001",
             "sample_location": "location001",
@@ -299,6 +302,7 @@ class TestViews(TestCase):
         url = reverse("sample_add")
         form_data = {
             "study_name": "marvel",
+            "marvel_timepoint": "12_weeks",
             "sample_id": "test001",
             "patient_id": "patient001",
             "sample_location": "location001",

@@ -41,7 +41,10 @@
                                 {% if sample.study_name == "mini_music" or sample.study_name == "music" %}
                                     <tr>
                                         <td>Timepoint</td>
-                                        <td>{{ sample.get_music_timepoint_display }}</td>
+                                        <td>
+                                            {{ sample.get_music_timepoint_display }}
+                                            {{ sample.get_marvel_timepoint_display }}
+                                        </td>
                                     </tr>
                                 {% endif %}
                                 <tr>

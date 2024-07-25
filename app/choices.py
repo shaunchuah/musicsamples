@@ -115,3 +115,9 @@ class MusicTimepointChoices(models.TextChoices):
     SIX_MONTHS = "6_months", "6 Months"
     NINE_MONTHS = "9_months", "9 Months"
     TWELVE_MONTHS = "12_months", "12 Months"
+
+
+class MarvelTimepointChoices(models.TextChoices):
+    BASELINE = "baseline", "Baseline"
+    TWELVE_WEEKS = "12_weeks", "12 weeks"
+    TWENTY_FOUR_WEEKS = "24_weeks", "24 weeks"

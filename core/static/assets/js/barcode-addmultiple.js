@@ -14,6 +14,7 @@ function submitScan() {
       sample_sublocation: $("#id_sample_sublocation").val(),
       study_name: $("#id_study_name").val(),
       music_timepoint: $("#id_music_timepoint").val(),
+      marvel_timepoint: $("#id_marvel_timepoint").val(),
       patient_id: $("#id_patient_id").val(),
       sample_type: $("#id_sample_type").val(),
       haemolysis_reference: $("#id_haemolysis_reference").val(),

@@ -44,6 +44,7 @@ class SampleForm(ModelForm):
             "sample_sublocation",
             "study_name",
             "music_timepoint",
+            "marvel_timepoint",
             "patient_id",
             "sample_type",
             "qubit_cfdna_ng_ul",
@@ -74,6 +75,7 @@ class SampleForm(ModelForm):
         labels = {
             "study_name": "Study Name*",
             "music_timepoint": "Music Timepoint",
+            "marvel_timepoint": "Marvel Timepoint",
             "sample_id": "Sample ID*",
             "patient_id": "Patient ID*",
             "sample_datetime": "Sampling Datetime*",

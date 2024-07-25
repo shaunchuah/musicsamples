@@ -1,7 +1,7 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
 
-from app.choices import MusicTimepointChoices, StudyNameChoices
+from app.choices import MarvelTimepointChoices, MusicTimepointChoices, StudyNameChoices
 
 
 class Sample(models.Model):
@@ -19,6 +19,9 @@ class Sample(models.Model):
 
     music_timepoint = models.CharField(
         max_length=50, blank=True, null=True, choices=MusicTimepointChoices.choices
+    )
+    marvel_timepoint = models.CharField(
+        max_length=50, blank=True, null=True, choices=MarvelTimepointChoices.choices
     )
 
     processing_datetime = models.DateTimeField(blank=True, null=True)
