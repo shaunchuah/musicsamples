@@ -743,14 +743,17 @@ def remap_sample_types_biopsy_location(request):
 
     total_analysed = 0
     for sample in sample_list:
-        sample.sample_type = sample_types_mapping_dictionary[sample.sample_type]
+        try:
+            sample.sample_type = sample_types_mapping_dictionary[sample.sample_type]
 
-        if sample.biopsy_location:
-            sample.biopsy_location = biopsy_location_mapping_dictionary[
-                sample.biopsy_location
-            ]
-        sample.save()
-        total_analysed += 1
+            if sample.biopsy_location:
+                sample.biopsy_location = biopsy_location_mapping_dictionary[
+                    sample.biopsy_location
+                ]
+            sample.save()
+            total_analysed += 1
+        except KeyError:
+            pass
 
     messages.success(
         request,
