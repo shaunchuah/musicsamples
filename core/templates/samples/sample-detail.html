@@ -42,8 +42,13 @@
                                     <tr>
                                         <td>Timepoint</td>
                                         <td>
-                                            {{ sample.get_music_timepoint_display }}
-                                            {{ sample.get_marvel_timepoint_display }}
+                                            {% if sample.music_timepoint %}
+                                                {{ sample.get_music_timepoint_display }}
+                                            {% elif sample.marvel_timepoint %}
+                                                {{ sample.get_marvel_timepoint_display }}
+                                            {% else %}
+                                                None
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endif %}
@@ -244,10 +249,10 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
     <script>
-  $(document).ready(function () {
-    // Javascript method's body can be found in assets/js/demos.js
-    demo.initDashboardPageCharts();
+    $(document).ready(function () {
+        // Javascript method's body can be found in assets/js/demos.js
+        demo.initDashboardPageCharts();
 
-  });
+    });
     </script>
 {% endblock javascripts %}

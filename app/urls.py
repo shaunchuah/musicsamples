@@ -95,29 +95,8 @@ urlpatterns = [
         "barcode/add_multiple/", views.barcode_add_multiple, name="barcode_add_multiple"
     ),
     path(
-        "qubit_fix/",
-        views.qubit_fix,
-        name="qubit_fix",
-    ),
-    path(
-        "qubit_list/",
-        views.qubit_list,
-        name="qubit_list",
-    ),
-    path(
-        "marvel_timepoint_fix/<str:timepoint>/",
-        views.marvel_timepoint_fix,
-        name="marvel_timepoint_fix",
-    ),
-    path(
-        "minimusic_timepoint_fix/<str:timepoint>/",
-        views.minimusic_timepoint_fix,
-        name="minimusic_timepoint_fix",
-    ),
-    path(
         "no_timepoint_view/<str:study_name>/",
         views.no_timepoint_view,
         name="no_timepoint_view",
     ),
-    path("remap", views.remap_sample_types_biopsy_location, name="remap"),
 ]
