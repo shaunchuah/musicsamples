@@ -1,7 +1,15 @@
 from django.db import models
 from simple_history.models import HistoricalRecords
 
-from app.choices import MarvelTimepointChoices, MusicTimepointChoices, StudyNameChoices
+from app.choices import (
+    BiopsyInflamedStatusChoices,
+    BiopsyLocationChoices,
+    HaemolysisReferenceChoices,
+    MarvelTimepointChoices,
+    MusicTimepointChoices,
+    SampleTypeChoices,
+    StudyNameChoices,
+)
 
 
 class Sample(models.Model):
@@ -11,7 +19,7 @@ class Sample(models.Model):
     patient_id = models.CharField(max_length=200)
     sample_location = models.CharField(max_length=200)
     sample_sublocation = models.CharField(max_length=200, blank=True, null=True)
-    sample_type = models.CharField(max_length=200)
+    sample_type = models.CharField(max_length=200, choices=SampleTypeChoices.choices)
     sample_datetime = models.DateTimeField()
     sample_comments = models.TextField(blank=True, null=True)
 
@@ -31,9 +39,21 @@ class Sample(models.Model):
     )
     sample_volume_units = models.CharField(max_length=30, blank=True, null=True)
     freeze_thaw_count = models.IntegerField(default=0)
-    haemolysis_reference = models.CharField(max_length=200, blank=True, null=True)
-    biopsy_location = models.CharField(max_length=100, blank=True, null=True)
-    biopsy_inflamed_status = models.CharField(max_length=100, blank=True, null=True)
+    haemolysis_reference = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        choices=HaemolysisReferenceChoices.choices,
+    )
+    biopsy_location = models.CharField(
+        max_length=100, blank=True, null=True, choices=BiopsyLocationChoices.choices
+    )
+    biopsy_inflamed_status = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        choices=BiopsyInflamedStatusChoices.choices,
+    )
     qubit_cfdna_ng_ul = models.DecimalField(
         max_digits=10, decimal_places=3, blank=True, null=True
     )

@@ -704,7 +704,7 @@ def qubit_list(request):
 
 
 @login_required(login_url="/login/")
-def remap_sample_types(request):
+def remap_sample_types_biopsy_location(request):
     sample_list = Sample.objects.all()
 
     sample_types_mapping_dictionary = {
@@ -744,9 +744,11 @@ def remap_sample_types(request):
     total_analysed = 0
     for sample in sample_list:
         sample.sample_type = sample_types_mapping_dictionary[sample.sample_type]
-        sample.biopsy_location = biopsy_location_mapping_dictionary[
-            sample.biopsy_location
-        ]
+
+        if sample.biopsy_location:
+            sample.biopsy_location = biopsy_location_mapping_dictionary[
+                sample.biopsy_location
+            ]
         sample.save()
         total_analysed += 1
 
@@ -754,4 +756,101 @@ def remap_sample_types(request):
         request,
         f"""Sample types updated for {total_analysed} samples.""",
     )
-    return redirect(reverse("qubit_list"))
+    return redirect(reverse("home"))
+
+
+@login_required(login_url="/login/")
+def marvel_timepoint_fix(request, timepoint):
+    """
+    timepoint options are baseline, 12_weeks, 24_weeks
+    """
+
+    search_dictionary = {
+        "baseline": ["baseline", "screening", "wk0", "bl", "0 m"],
+        "12_weeks": ["12w", "12 w", "week 12"],
+        "24_weeks": ["24w", "24 w", "week 24", "6m"],
+    }
+
+    query = Q(sample_comments__icontains=search_dictionary[timepoint][0])
+    for t in search_dictionary[timepoint][1:]:
+        query |= Q(sample_comments__icontains=t)
+
+    sample_list = Sample.objects.filter(study_name="marvel").filter(query)
+    modified_count = 0
+    unmodified_count = 0
+    for sample in sample_list:
+        if sample.marvel_timepoint != timepoint:
+            sample.marvel_timepoint = timepoint
+            sample.save()
+            modified_count += 1
+        else:
+            unmodified_count += 1
+    messages.success(
+        request,
+        f"{timepoint} timepoint added. {modified_count} samples modified. {unmodified_count} samples unmodified.",
+    )
+    return redirect(
+        reverse("filter") + f"?study_name=marvel&marvel_timepoint={timepoint}"
+    )
+
+
+@login_required(login_url="/login/")
+def no_timepoint_view(request, study_name):
+    """
+    Study name options are music, mini_music, marvel and mini_marvel.
+    """
+    sample_list = Sample.objects.filter(study_name=study_name).filter(
+        marvel_timepoint=None
+    )
+    sample_count = sample_list.count()
+    page = request.GET.get("page", 1)
+    paginator = Paginator(sample_list, 1000)
+    try:
+        samples = paginator.page(page)
+    except PageNotAnInteger:
+        samples = paginator.page(1)
+    except EmptyPage:
+        samples = paginator.page(paginator.num_pages)
+    context = {
+        "sample_list": samples,
+        "page_obj": samples,
+        "sample_count": sample_count,
+    }
+    return render(request, "index.html", context)
+
+
+@login_required(login_url="/login/")
+def minimusic_timepoint_fix(request, timepoint):
+    """
+    timepoint options are baseline, 3_months, 6_months, 9_months, 12_months
+    """
+
+    search_dictionary = {
+        "baseline": ["baseline", "bl", "0 m", "Visit 1", "V1"],
+        "3_months": ["3m", "3 m", "Visit 2", "V2"],
+        "6_months": ["6m", "6 m", "24 w", "Visit 3"],
+        "9_months": ["9m", "9 m"],
+        "12_months": ["12m", "12 m"],
+    }
+
+    query = Q(sample_comments__icontains=search_dictionary[timepoint][0])
+    for t in search_dictionary[timepoint][1:]:
+        query |= Q(sample_comments__icontains=t)
+
+    sample_list = Sample.objects.filter(study_name="mini_music").filter(query)
+    modified_count = 0
+    unmodified_count = 0
+    for sample in sample_list:
+        if sample.music_timepoint != timepoint:
+            sample.music_timepoint = timepoint
+            sample.save()
+            modified_count += 1
+        else:
+            unmodified_count += 1
+    messages.success(
+        request,
+        f"{timepoint} timepoint added. {modified_count} samples modified. {unmodified_count} samples unmodified.",
+    )
+    return redirect(
+        reverse("filter") + f"?study_name=mini_music&music_timepoint={timepoint}"
+    )

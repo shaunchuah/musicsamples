@@ -2,13 +2,7 @@ from django import forms
 from django.forms import ModelForm
 from django.utils import timezone
 
-from app.choices import (
-    BIOPSY_INFLAMED_STATUS_CHOICES,
-    BIOPSY_LOCATION_CHOICES,
-    HAEMOLYSIS_REFERENCE_CHOICES,
-    SAMPLE_TYPE_CHOICES,
-    SAMPLE_VOLUME_UNIT_CHOICES,
-)
+from app.choices import SAMPLE_VOLUME_UNIT_CHOICES
 from app.models import Sample
 
 
@@ -60,17 +54,11 @@ class SampleForm(ModelForm):
             "freeze_thaw_count",
         ]
         widgets = {
-            "sample_type": forms.Select(choices=SAMPLE_TYPE_CHOICES),
             "sample_datetime": DateTimeInput(),
             "sample_volume_units": forms.Select(
                 choices=SAMPLE_VOLUME_UNIT_CHOICES, attrs={"class": "form-control"}
             ),
             "frozen_datetime": DateTimeInput(),
-            "haemolysis_reference": forms.Select(choices=HAEMOLYSIS_REFERENCE_CHOICES),
-            "biopsy_location": forms.Select(choices=BIOPSY_LOCATION_CHOICES),
-            "biopsy_inflamed_status": forms.Select(
-                choices=BIOPSY_INFLAMED_STATUS_CHOICES
-            ),
         }
         labels = {
             "study_name": "Study Name*",

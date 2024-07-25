@@ -115,11 +115,16 @@
                                                     {{ sample.sample_sublocation }}
                                                 {% endif %}
                                             </td>
-                                            <td>{{ sample.sample_type }}</td>
+                                            <td>{{ sample.get_sample_type_display }}</td>
                                             <td>{{ sample.sample_datetime|date:'d M Y H:i' }}</td>
                                             <td>
-                                                {{ sample.get_music_timepoint_display }}
-                                                {{ sample.get_marvel_timepoint_display }}
+                                                {% if sample.music_timepoint %}
+                                                    {{ sample.get_music_timepoint_display }}
+                                                {% elif sample.marvel_timepoint %}
+                                                    {{ sample.get_marvel_timepoint_display }}
+                                                {% else %}
+                                                    None
+                                                {% endif %}
                                             </td>
                                             <td>{{ sample.sample_comments }}</td>
                                             <td>

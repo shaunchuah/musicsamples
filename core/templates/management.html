@@ -48,9 +48,73 @@
                     </div>
                     <div class="row">
                         <div class="col">
+                            <a href="{% url 'remap' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">Remap sample types and biopsy location</a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
                             <a href="{% url 'qubit_list' %}"
                                class="btn btn-fill btn-success"
                                target="_blank">Qubit List</a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <a href="{% url 'marvel_timepoint_fix' timepoint='baseline' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">Marvel timepoint fix baseline</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'marvel_timepoint_fix' timepoint='12_weeks' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">Marvel timepoint fix 12w</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'marvel_timepoint_fix' timepoint='24_weeks' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">Marvel timepoint fix 24w</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'no_timepoint_view' study_name='marvel' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">Marvel no timepoint list</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'no_timepoint_view' study_name='music' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">Music no timepoint list</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'no_timepoint_view' study_name='mini_music' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">Mini MUSIC no timepoint list</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'minimusic_timepoint_fix' timepoint='baseline' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">minimusic timepoint fix baseline</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'minimusic_timepoint_fix' timepoint='3_months' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">minimusic timepoint fix 3m</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'minimusic_timepoint_fix' timepoint='6_months' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">minimusic timepoint fix 6m</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'minimusic_timepoint_fix' timepoint='9_months' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">minimusic timepoint fix 9m</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'minimusic_timepoint_fix' timepoint='12_months' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">minimusic timepoint fix 12m</a>
                         </div>
                     </div>
                 </div>

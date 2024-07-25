@@ -1,6 +1,6 @@
 import django_filters
 
-from app.choices import SAMPLE_TYPE_CHOICES, StudyNameChoices
+from app.choices import SampleTypeChoices, StudyNameChoices
 from app.models import Sample
 
 
@@ -12,7 +12,7 @@ class SampleFilter(django_filters.FilterSet):
     sample_location = django_filters.AllValuesFilter(label="Sample Location")
     sample_sublocation = django_filters.AllValuesFilter(label="Sample Sublocation")
     sample_type = django_filters.ChoiceFilter(
-        label="Sample Type", choices=SAMPLE_TYPE_CHOICES
+        label="Sample Type", choices=SampleTypeChoices.choices
     )
     is_used = django_filters.BooleanFilter(label="Used Samples?")
     sample_datetime = django_filters.DateFromToRangeFilter(

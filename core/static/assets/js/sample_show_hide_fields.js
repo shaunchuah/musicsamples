@@ -11,9 +11,9 @@ $(document).ready(function () {
 
   // If biopsies show location and inflamed status field
   if (
-    $("#id_sample_type").val() == "Formalin biopsy" ||
-    $("#id_sample_type").val() == "RNAlater biopsy" ||
-    $("#id_sample_type").val() == "Paraffin tissue block"
+    $("#id_sample_type").val() == "biopsy_formalin" ||
+    $("#id_sample_type").val() == "biopsy_rnalater" ||
+    $("#id_sample_type").val() == "paraffin_block"
   ) {
     $("label[for=id_biopsy_location], #id_biopsy_location").show();
     $(
@@ -23,14 +23,14 @@ $(document).ready(function () {
 
   // If EDTA or Paxgene aliquots or extracted cfDNA, show haemolysis reference
   if (
-    $("#id_sample_type").val() == "EDTA plasma child aliquot" ||
-    $("#id_sample_type").val() == "PaxGene ccfDNA plasma child aliquot" ||
-    $("#id_sample_type").val() == "PaxGene ccfDNA extracted cfDNA"
+    $("#id_sample_type").val() == "edta_plasma" ||
+    $("#id_sample_type").val() == "cfdna_plasma" ||
+    $("#id_sample_type").val() == "cfdna_extracted"
   ) {
     $("label[for=id_haemolysis_reference], #id_haemolysis_reference").show();
   }
 
-  if ($("#id_sample_type").val() == "PaxGene ccfDNA extracted cfDNA") {
+  if ($("#id_sample_type").val() == "cfdna_extracted") {
     $("label[for=id_qubit_cfdna_ng_ul], #id_qubit_cfdna_ng_ul").show();
   }
 
@@ -38,9 +38,9 @@ $(document).ready(function () {
 
   $("#id_sample_type").change(function () {
     if (
-      $("#id_sample_type").val() == "Formalin biopsy" ||
-      $("#id_sample_type").val() == "RNAlater biopsy" ||
-      $("#id_sample_type").val() == "Paraffin tissue block"
+      $("#id_sample_type").val() == "biopsy_formalin" ||
+      $("#id_sample_type").val() == "biopsy_rnalater" ||
+      $("#id_sample_type").val() == "paraffin_block"
     ) {
       $("label[for=id_biopsy_location], #id_biopsy_location").show("slow");
       $(
@@ -56,9 +56,9 @@ $(document).ready(function () {
 
   $("#id_sample_type").change(function () {
     if (
-      $("#id_sample_type").val() == "EDTA plasma child aliquot" ||
-      $("#id_sample_type").val() == "PaxGene ccfDNA plasma child aliquot" ||
-      $("#id_sample_type").val() == "PaxGene ccfDNA extracted cfDNA"
+      $("#id_sample_type").val() == "edta_plasma" ||
+      $("#id_sample_type").val() == "cfdna_plasma" ||
+      $("#id_sample_type").val() == "cfdna_extracted"
     ) {
       $("label[for=id_haemolysis_reference], #id_haemolysis_reference").show(
         "slow"
@@ -68,7 +68,7 @@ $(document).ready(function () {
     }
   });
   $("#id_sample_type").change(function () {
-    if ($("#id_sample_type").val() == "PaxGene ccfDNA extracted cfDNA") {
+    if ($("#id_sample_type").val() == "cfdna_extracted") {
       $("label[for=id_qubit_cfdna_ng_ul], #id_qubit_cfdna_ng_ul").show("slow");
     } else {
       $("label[for=id_qubit_cfdna_ng_ul], #id_qubit_cfdna_ng_ul").hide();
