@@ -38,7 +38,6 @@
                     <h3 class="card-title">Instructions</h3>
                 </div>
                 <div class="card-body">
-                    <p>Welcome to the barcode scanning page for adding multiple samples.</p>
                     <p>
                         <strong>Important Note:</strong> Barcode scanners work like keyboards.
                         For most scanners, the default is to provide the 'enter' key after
@@ -50,19 +49,10 @@
                     <ol>
                         <li>Fill in the required details</li>
                         <li>Start scanning to tag samples with those details</li>
-                        <li>If you encounter bad request, check that all the fields are filled in with correct values.</li>
                     </ol>
                     <p>
                         <strong>Tip:</strong> If a label won't scan, you can type in the
                         sample ID and hit enter instead.
-                    </p>
-                    <p>
-                        <strong>Help:</strong> If you've accidentally scanned the wrong sample, you should edit it manually
-                        and check
-                        the data - trying to delete and add it again will throw an error as the ID will be noted by the
-                        database as
-                        not being unique. You can see a list of recently accessed samples in your account page at the top
-                        right.
                     </p>
                 </div>
             </div>
@@ -314,12 +304,13 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="form-group">
-                            <label for="sample_id">Barcode ID scanning area</label>
+                            <label for="id_sample_id">Barcode ID scanning area</label>
                             <input type="text"
                                    class="form-control"
-                                   id="sample_id"
+                                   id="id_sample_id"
                                    placeholder="Click here and start scanning barcodes..." />
                         </div>
+                        <div id="id_sample_id_error" class="text-danger text-lg"></div>
                         <div class="alert alert-success">
                             <button type="button"
                                     aria-hidden="true"

@@ -9,7 +9,7 @@ function submitScan() {
     url: url_string,
     method: "post",
     data: {
-      sample_id: $("#sample_id").val(),
+      sample_id: $("#id_sample_id").val(),
       sample_location: $("#id_sample_location").val(),
       sample_sublocation: $("#id_sample_sublocation").val(),
       study_name: $("#id_study_name").val(),
@@ -32,12 +32,12 @@ function submitScan() {
       $(".alert-success").show();
       $(".alert-success").fadeOut(1000);
       $("#tbody tr:first").before(
-        `<tr><td>${$("#sample_id").val()}</td><td>Success</td><td>Sample ${$(
-          "#sample_id"
+        `<tr><td>${$("#id_sample_id").val()}</td><td>Success</td><td>Sample ${$(
+          "#id_sample_id"
         ).val()} captured.</td></tr>`
       );
-      $("#sample_id").val("");
-      $("#sample_id").focus();
+      $("#id_sample_id").val("");
+      $("#id_sample_id").focus();
       console.log(result);
     },
     error: function (error) {
@@ -67,17 +67,17 @@ function submitScan() {
       }
 
       $("#error_message").text(
-        error.statusText + "(Scanned ID: " + $("#sample_id").val() + ")"
+        error.statusText + "(Scanned ID: " + $("#id_sample_id").val() + ")"
       );
       $(".alert-danger").show();
       $(".alert-danger").fadeOut(3000);
       $("#tbody tr:first").before(
-        `<tr><td>${$("#sample_id").val()}</td><td>Error</td><td>${
+        `<tr><td>${$("#id_sample_id").val()}</td><td>Error</td><td>${
           error.statusText
         }</td></tr>`
       );
-      $("#sample_id").val("");
-      $("#sample_id").focus();
+      $("#id_sample_id").val("");
+      $("#id_sample_id").focus();
     },
   });
 }
@@ -104,7 +104,7 @@ $(document).ready(function () {
   var dateTime = date + "T" + time;
   $("#id_processing_datetime").val(dateTime);
 
-  $("#sample_id").keydown(function (e) {
+  $("#id_sample_id").keydown(function (e) {
     if (e.keyCode == 13 || e.keyCode == 9) {
       e.preventDefault();
       submitScan();
