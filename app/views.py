@@ -802,9 +802,14 @@ def no_timepoint_view(request, study_name):
     """
     Study name options are music, mini_music, marvel and mini_marvel.
     """
-    sample_list = Sample.objects.filter(study_name=study_name).filter(
-        marvel_timepoint=None
-    )
+    if study_name == "music" or study_name == "mini_music":
+        sample_list = Sample.objects.filter(study_name=study_name).filter(
+            music_timepoint=None
+        )
+    else:
+        sample_list = Sample.objects.filter(study_name=study_name).filter(
+            marvel_timepoint=None
+        )
     sample_count = sample_list.count()
     page = request.GET.get("page", 1)
     paginator = Paginator(sample_list, 1000)
