@@ -2,7 +2,6 @@ from django import forms
 from django.forms import ModelForm
 from django.utils import timezone
 
-from app.choices import SAMPLE_VOLUME_UNIT_CHOICES
 from app.models import Sample
 
 
@@ -55,9 +54,6 @@ class SampleForm(ModelForm):
         ]
         widgets = {
             "sample_datetime": DateTimeInput(),
-            "sample_volume_units": forms.Select(
-                choices=SAMPLE_VOLUME_UNIT_CHOICES, attrs={"class": "form-control"}
-            ),
             "frozen_datetime": DateTimeInput(),
         }
         labels = {

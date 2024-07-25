@@ -154,46 +154,29 @@
                         <div class="form-group">
                             <label for="id_sample_type">Sample Type*:</label>
                             <select name="sample_type"
-                                    maxlength="200"
                                     class="form-control"
-                                    required
+                                    required=""
                                     id="id_sample_type">
-                                <option value="" selected>Select type</option>
-                                <optgroup label="Standard EDTA tube">
-                                    <option value="Standard EDTA tube">Standard EDTA tube</option>
-                                    <option value="EDTA plasma child aliquot">EDTA plasma child aliquot</option>
-                                </optgroup>
-                                <optgroup label="PaxGene ccfDNA tube">
-                                    <option value="PaxGene ccfDNA tube">PaxGene ccfDNA tube</option>
-                                    <option value="PaxGene ccfDNA plasma child aliquot">PaxGene ccfDNA plasma child aliquot</option>
-                                    <option value="PaxGene ccfDNA extracted cfDNA">PaxGene ccfDNA extracted cfDNA</option>
-                                </optgroup>
-                                <optgroup label="PaxGene RNA tube">
-                                    <option value="PaxGene RNA tube">PaxGene RNA tube</option>
-                                    <option value="PaxGene RNA child aliquot">PaxGene RNA child aliquot</option>
-                                </optgroup>
-                                <optgroup label="Standard Gel/Serum tube">
-                                    <option value="Standard gel tube">Standard gel tube</option>
-                                    <option value="Serum child aliquot">Serum child aliquot</option>
-                                </optgroup>
-                                <optgroup label="Tissue/Biopsy">
-                                    <option value="Formalin biopsy">Formalin biopsy</option>
-                                    <option value="RNAlater biopsy">RNAlater biopsy</option>
-                                    <option value="Paraffin tissue block">Paraffin tissue block</option>
-                                </optgroup>
-                                <optgroup label="Stool">
-                                    <option value="Standard stool container">Standard stool container</option>
-                                    <option value="Calprotectin">Calprotectin</option>
-                                    <option value="FIT">FIT</option>
-                                    <option value="OmniGut">Omnigut</option>
-                                    <option value="Stool supernatant">Stool supernatant</option>
-                                </optgroup>
-                                <optgroup label="Saliva">
-                                    <option value="Saliva">Saliva</option>
-                                </optgroup>
-                                <optgroup label="Other">
-                                    <option value="Other">Other please specify in comments</option>
-                                </optgroup>
+                                <option value="" selected="">---------</option>
+                                <option value="standard_edta">Standard EDTA tube</option>
+                                <option value="edta_plasma">EDTA plasma child aliquot</option>
+                                <option value="cfdna_tube">PaxGene cfDNA tube</option>
+                                <option value="cfdna_plasma">PaxGene cfDNA plasma</option>
+                                <option value="cfdna_extracted">Extracted cfDNA</option>
+                                <option value="paxgene_rna">PaxGene RNA tube</option>
+                                <option value="rna_plasma">PaxGene RNA child aliquot</option>
+                                <option value="standard_gel">Standard gel tube</option>
+                                <option value="serum">Serum</option>
+                                <option value="biopsy_formalin">Formalin biopsy</option>
+                                <option value="biopsy_rnalater">RNAlater biopsy</option>
+                                <option value="stool_standard">Standard stool</option>
+                                <option value="stool_calprotectin">Calprotectin</option>
+                                <option value="stool_qfit">qFIT</option>
+                                <option value="stool_omnigut">OmniGut</option>
+                                <option value="stool_supernatant">Stool supernatant</option>
+                                <option value="saliva">Saliva</option>
+                                <option value="paraffin_block">Paraffin block</option>
+                                <option value="other">Other - please specify in comments</option>
                             </select>
                             <div id="id_sample_type_error" class="text-danger text-lg"></div>
                         </div>

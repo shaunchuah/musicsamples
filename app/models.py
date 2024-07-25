@@ -8,6 +8,7 @@ from app.choices import (
     MarvelTimepointChoices,
     MusicTimepointChoices,
     SampleTypeChoices,
+    SampleVolumeUnitChoices,
     StudyNameChoices,
 )
 
@@ -37,7 +38,9 @@ class Sample(models.Model):
     sample_volume = models.DecimalField(
         max_digits=10, decimal_places=3, blank=True, null=True
     )
-    sample_volume_units = models.CharField(max_length=30, blank=True, null=True)
+    sample_volume_units = models.CharField(
+        max_length=30, blank=True, null=True, choices=SampleVolumeUnitChoices.choices
+    )
     freeze_thaw_count = models.IntegerField(default=0)
     haemolysis_reference = models.CharField(
         max_length=200,

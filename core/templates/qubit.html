@@ -107,7 +107,7 @@
                                                     {{ sample.sample_sublocation }}
                                                 {% endif %}
                                             </td>
-                                            <td>{{ sample.sample_type }}</td>
+                                            <td>{{ sample.get_sample_type_display }}</td>
                                             <td>{{ sample.sample_datetime|date:'d M Y H:i' }}</td>
                                             <td>{{ sample.get_music_timepoint_display }}</td>
                                             <td>{{ sample.qubit_cfdna_ng_ul }}</td>
