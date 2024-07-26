@@ -99,6 +99,4 @@ urlpatterns = [
         views.no_timepoint_view,
         name="no_timepoint_view",
     ),
-    path("paraffin_fix/", views.paraffin_fix, name="paraffin_fix"),
-    path("paraffin_list/", views.paraffin_list, name="paraffin_list"),
 ]
