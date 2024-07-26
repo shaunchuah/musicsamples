@@ -62,6 +62,27 @@
                     </div>
                 </div>
             </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <a href="{% url 'export_users' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">Export Users</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'export_historical_samples' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">Export Historical Samples</a>
+                        </div>
+                        <div class="col">
+                            <a href="{% url 'export_samples' %}"
+                               class="btn btn-fill btn-success"
+                               target="_blank">Export Samples</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock content %}

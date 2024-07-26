@@ -25,7 +25,10 @@ def export_csv(queryset, study_name="gtrac"):
     for row in queryset:
         values = []
         for field in field_names:
-            value = getattr(row, field)
+            try:
+                value = getattr(row, field)
+            except AttributeError:
+                value = ""
             if value is None:
                 value = ""
             values.append(value)

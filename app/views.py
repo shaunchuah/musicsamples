@@ -676,3 +676,21 @@ def no_timepoint_view(request, study_name):
         "sample_count": sample_count,
     }
     return render(request, "index.html", context)
+
+
+@login_required(login_url="/login/")
+def export_users(request):
+    queryset = User.objects.all()
+    return export_csv(queryset, study_name="users")
+
+
+@login_required(login_url="/login/")
+def export_samples(request):
+    queryset = Sample.objects.all()
+    return export_csv(queryset, study_name="samples")
+
+
+@login_required(login_url="/login/")
+def export_historical_samples(request):
+    queryset = Sample.history.all()
+    return export_csv(queryset, study_name="historicalsamples")

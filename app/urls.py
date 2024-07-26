@@ -99,4 +99,11 @@ urlpatterns = [
         views.no_timepoint_view,
         name="no_timepoint_view",
     ),
+    path("export_users/", views.export_users, name="export_users"),
+    path("export_samples/", views.export_samples, name="export_samples"),
+    path(
+        "export_historical_samples/",
+        views.export_historical_samples,
+        name="export_historical_samples",
+    ),
 ]
