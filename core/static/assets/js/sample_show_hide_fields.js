@@ -4,6 +4,7 @@ $(document).ready(function () {
   $("label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status").hide();
   $("label[for=id_haemolysis_reference], #id_haemolysis_reference").hide();
   $("label[for=id_qubit_cfdna_ng_ul], #id_qubit_cfdna_ng_ul").hide();
+  $("label[for=id_paraffin_block_key], #id_paraffin_block_key").hide();
   $("label[for=id_music_timepoint], #id_music_timepoint").hide();
   $("label[for=id_marvel_timepoint], #id_marvel_timepoint").hide();
 
@@ -19,6 +20,10 @@ $(document).ready(function () {
     $(
       "label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status"
     ).show();
+  }
+
+  if ($("#id_sample_type").val() == "paraffin_block") {
+    $("label[for=id_paraffin_block_key], #id_paraffin_block_key").show();
   }
 
   // If EDTA or Paxgene aliquots or extracted cfDNA, show haemolysis reference
@@ -51,6 +56,16 @@ $(document).ready(function () {
       $(
         "label[for=id_biopsy_inflamed_status], #id_biopsy_inflamed_status"
       ).hide();
+    }
+  });
+
+  $("#id_sample_type").change(function () {
+    if ($("#id_sample_type").val() == "paraffin_block") {
+      $("label[for=id_paraffin_block_key], #id_paraffin_block_key").show(
+        "slow"
+      );
+    } else {
+      $("label[for=id_paraffin_block_key], #id_paraffin_block_key").hide();
     }
   });
 

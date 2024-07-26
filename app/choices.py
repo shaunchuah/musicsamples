@@ -13,13 +13,13 @@ class SampleTypeChoices(models.TextChoices):
     SERUM = "serum", "Serum"
     BIOPSY_FORMALIN = "biopsy_formalin", "Formalin biopsy"
     BIOPSY_RNALATER = "biopsy_rnalater", "RNAlater biopsy"
+    PARAFFIN_BLOCK = "paraffin_block", "Paraffin block"
     STOOL_STANDARD = "stool_standard", "Standard stool"
     STOOL_CALPROTECTIN = "stool_calprotectin", "Calprotectin"
     STOOL_QFIT = "stool_qfit", "qFIT"
     STOOL_OMNIGUT = "stool_omnigut", "OmniGut"
     STOOL_SUPERNATANT = "stool_supernatant", "Stool supernatant"
     SALIVA = "saliva", "Saliva"
-    PARAFFIN_BLOCK = "paraffin_block", "Paraffin block"
     OTHER = "other", "Other - please specify in comments"
 
 

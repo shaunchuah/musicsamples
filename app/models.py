@@ -60,6 +60,7 @@ class Sample(models.Model):
     qubit_cfdna_ng_ul = models.DecimalField(
         max_digits=10, decimal_places=3, blank=True, null=True
     )
+    paraffin_block_key = models.CharField(max_length=10, blank=True, null=True)
 
     created = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=200)

@@ -42,6 +42,7 @@ class SampleForm(ModelForm):
             "sample_type",
             "qubit_cfdna_ng_ul",
             "haemolysis_reference",
+            "paraffin_block_key",
             "biopsy_location",
             "biopsy_inflamed_status",
             "sample_datetime",
@@ -74,6 +75,7 @@ class SampleForm(ModelForm):
             "haemolysis_reference": "Haemolysis Reference Palette",
             "biopsy_location": "Biopsy Location",
             "biopsy_inflamed_status": "Biopsy Inflamed Status",
+            "paraffin_block_key": "Paraffin Block Key",
             "frozen_datetime": "Frozen Datetime (If Applicable)",
         }
 

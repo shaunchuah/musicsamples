@@ -159,13 +159,13 @@
                                 <option value="serum">Serum</option>
                                 <option value="biopsy_formalin">Formalin biopsy</option>
                                 <option value="biopsy_rnalater">RNAlater biopsy</option>
+                                <option value="paraffin_block">Paraffin block</option>
                                 <option value="stool_standard">Standard stool</option>
                                 <option value="stool_calprotectin">Calprotectin</option>
                                 <option value="stool_qfit">qFIT</option>
                                 <option value="stool_omnigut">OmniGut</option>
                                 <option value="stool_supernatant">Stool supernatant</option>
                                 <option value="saliva">Saliva</option>
-                                <option value="paraffin_block">Paraffin block</option>
                                 <option value="other">Other - please specify in comments</option>
                             </select>
                             <div id="id_sample_type_error" class="text-danger text-lg"></div>
@@ -196,6 +196,14 @@
                                 <option value="1000">1000 mg/dL (unusable)</option>
                             </select>
                             <div id="id_haemolysis_reference_error" class="text-danger text-lg"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_paraffin_block_key">Paraffin Block Key:</label>
+                            <input type="text"
+                                   name="paraffin_block_key"
+                                   maxlength="10"
+                                   class="form-control"
+                                   id="id_paraffin_block_key">
                         </div>
                         <div class="form-group">
                             <label for="id_biopsy_location">Biopsy Location:</label>
