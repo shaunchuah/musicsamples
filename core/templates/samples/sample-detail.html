@@ -141,7 +141,7 @@
                                         {% if sample.biopsy_location is None %}
                                             N/A
                                         {% else %}
-                                            {{ sample.biopsy_location }}
+                                            {{ sample.get_biopsy_location_display }}
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -151,7 +151,7 @@
                                         {% if sample.biopsy_inflamed_status is None %}
                                             N/A
                                         {% else %}
-                                            {{ sample.biopsy_inflamed_status }}
+                                            {{ sample.get_biopsy_inflamed_status_display }}
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -162,6 +162,16 @@
                                             N/A
                                         {% else %}
                                             {{ sample.qubit_cfdna_ng_ul }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Paraffin Block Key</td>
+                                    <td>
+                                        {% if sample.paraffin_block_key is None %}
+                                            N/A
+                                        {% else %}
+                                            {{ sample.paraffin_block_key }}
                                         {% endif %}
                                     </td>
                                 </tr>
