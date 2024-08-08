@@ -46,51 +46,6 @@
     </div>
     <div class="row">
         <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Study Samples CSV Export</h2>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <th>Study</th>
-                                <th>Export CSV</th>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>GI-DAMPs</td>
-                                    <td>
-                                        <a href="{% url 'export_csv' study_name="gidamps" %}"
-                                           class="btn btn-fill btn-success">Export GIDAMPs
-                                        Samples</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>MUSIC</td>
-                                    <td>
-                                        <a href="{% url 'export_csv' study_name="music" %}"
-                                           class="btn btn-fill btn-success">Export MUSIC
-                                        Samples</a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>MARVEL</td>
-                                    <td>
-                                        <a href="{% url 'export_csv' study_name="marvel" %}"
-                                           class="btn btn-fill btn-success">Export MARVEL
-                                        Samples</a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-lg-8">
             <div class="notes card">
                 <div class="card-header">
                     <h2 class="card-title">API Endpoints</h2>
@@ -103,15 +58,6 @@
                             <pre>https://samples.musicstudy.uk/api/all/</pre></a>
                         <strong>Warning: This API will be slow as it exports every single sample in G-Trac.</strong>
                         Suggest download the data once to a json file rather than accessing the API repeatedly.
-                    </p>
-                    <h3>GI-DAMPs</h3>
-                    <p>
-                        <a href="{% url 'gidamps-list' %}" target="_blank">
-                            <pre>https://samples.musicstudy.uk/api/gidamps/</pre></a>
-                    </p>
-                    <p>
-                        This endpoint will return every sample in json format that has a patient ID beginning with "GID" (including
-                        used samples).
                     </p>
                     <h3>Single Sample Lookup</h3>
                     <p>

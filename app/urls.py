@@ -7,7 +7,6 @@ from app import views
 from .views import (
     AllSampleExportViewset,
     MultipleSampleViewSet,
-    SampleExportViewset,
     SampleIsUsedViewSet,
     SampleViewSet,
 )
@@ -18,12 +17,10 @@ router = routers.DefaultRouter()
 router.register(r"samples", SampleViewSet, "samples")
 router.register(r"samples_used", SampleIsUsedViewSet, "samples_used")
 router.register(r"multiple_samples", MultipleSampleViewSet, "multiple_samples")
-router.register(r"gidamps", SampleExportViewset, "gidamps")
 router.register(r"all", AllSampleExportViewset, "all")
 
 urlpatterns = [
     path("", views.index, name="home"),
-    # samples by study
     path(
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),

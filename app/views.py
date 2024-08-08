@@ -613,12 +613,6 @@ class MultipleSampleViewSet(viewsets.ModelViewSet):
         )
 
 
-class SampleExportViewset(viewsets.ReadOnlyModelViewSet):
-    queryset = Sample.objects.filter(patient_id__startswith="GID")
-    serializer_class = SampleExportSerializer
-    lookup_field = "sample_id"
-
-
 class AllSampleExportViewset(viewsets.ReadOnlyModelViewSet):
     queryset = Sample.objects.all()
     serializer_class = SampleExportSerializer
