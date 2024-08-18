@@ -10,6 +10,21 @@ $(document).ready(function () {
 
   // Show fields based on pre-existing form data
 
+  // If music or minimusic show timepoint
+  if (
+    $("#id_study_name").val() == "music" ||
+    $("#id_study_name").val() == "mini_music"
+  ) {
+    $("label[for=id_music_timepoint], #id_music_timepoint").show();
+  }
+
+  if (
+    $("#id_study_name").val() == "marvel" ||
+    $("#id_study_name").val() == "mini_marvel"
+  ) {
+    $("label[for=id_music_timepoint], #id_marvel_timepoint").show();
+  }
+
   // If biopsies show location and inflamed status field
   if (
     $("#id_sample_type").val() == "biopsy_formalin" ||

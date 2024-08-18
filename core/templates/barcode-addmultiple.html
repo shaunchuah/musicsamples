@@ -208,24 +208,34 @@
                         </div>
                         <div class="form-group">
                             <label for="id_biopsy_location">Biopsy Location:</label>
-                            <select name="biopsy_location"
-                                    maxlength="100"
-                                    class="form-control"
-                                    id="id_biopsy_location">
-                                <option value="" selected>Select biopsy location</option>
-                                <option value="Terminal ileum">Terminal ileum</option>
-                                <option value="Caecum">Caecum</option>
-                                <option value="Ascending colon">Ascending colon</option>
-                                <option value="Transverse colon">Transverse colon</option>
-                                <option value="Descending colon">Descending colon</option>
-                                <option value="Sigmoid colon">Sigmoid colon</option>
-                                <option value="Rectum">Rectum</option>
-                                <option value="Right colon">Right colon</option>
-                                <option value="Left colon">Left colon</option>
-                                <option value="Oesophagus">Oesophagus</option>
-                                <option value="Stomach">Stomach</option>
-                                <option value="Duodenum">Duodenum</option>
-                            </select>
+                            <select name="biopsy_location" class="form-control" id="id_biopsy_location" style="display: none;">
+                                <option value="" selected="">---------</option>
+                              
+                                <option value="terminal_ileum">Terminal ileum</option>
+                              
+                                <option value="caecum">Caecum</option>
+                              
+                                <option value="ascending">Ascending colon</option>
+                              
+                                <option value="transverse">Transverse colon</option>
+                              
+                                <option value="descending">Descending colon</option>
+                              
+                                <option value="sigmoid">Sigmoid colon</option>
+                              
+                                <option value="rectum">Rectum</option>
+                              
+                                <option value="right_colon">Right colon</option>
+                              
+                                <option value="left_colon">Left colon</option>
+                              
+                                <option value="oesophagus">Oesophagus</option>
+                              
+                                <option value="stomach">Stomach</option>
+                              
+                                <option value="duodenum">Duodenum</option>
+                              
+                              </select>
                             <div id="id_biopsy_location_error" class="text-danger text-lg"></div>
                         </div>
                         <div class="form-group">
