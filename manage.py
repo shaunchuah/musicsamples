@@ -1,15 +1,10 @@
 #!/usr/bin/env python
-"""
-License: MIT
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 import os
 import sys
 
 
 def main():
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
