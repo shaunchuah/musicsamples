@@ -26,18 +26,12 @@ class Sample(models.Model):
 
     is_used = models.BooleanField(default=False)
 
-    music_timepoint = models.CharField(
-        max_length=50, blank=True, null=True, choices=MusicTimepointChoices.choices
-    )
-    marvel_timepoint = models.CharField(
-        max_length=50, blank=True, null=True, choices=MarvelTimepointChoices.choices
-    )
+    music_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MusicTimepointChoices.choices)
+    marvel_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MarvelTimepointChoices.choices)
 
     processing_datetime = models.DateTimeField(blank=True, null=True)
     frozen_datetime = models.DateTimeField(blank=True, null=True)
-    sample_volume = models.DecimalField(
-        max_digits=10, decimal_places=3, blank=True, null=True
-    )
+    sample_volume = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
     sample_volume_units = models.CharField(
         max_length=30, blank=True, null=True, choices=SampleVolumeUnitChoices.choices
     )
@@ -48,18 +42,14 @@ class Sample(models.Model):
         null=True,
         choices=HaemolysisReferenceChoices.choices,
     )
-    biopsy_location = models.CharField(
-        max_length=100, blank=True, null=True, choices=BiopsyLocationChoices.choices
-    )
+    biopsy_location = models.CharField(max_length=100, blank=True, null=True, choices=BiopsyLocationChoices.choices)
     biopsy_inflamed_status = models.CharField(
         max_length=100,
         blank=True,
         null=True,
         choices=BiopsyInflamedStatusChoices.choices,
     )
-    qubit_cfdna_ng_ul = models.DecimalField(
-        max_digits=10, decimal_places=3, blank=True, null=True
-    )
+    qubit_cfdna_ng_ul = models.DecimalField(max_digits=10, decimal_places=3, blank=True, null=True)
     paraffin_block_key = models.CharField(max_length=10, blank=True, null=True)
 
     created = models.DateTimeField(auto_now_add=True)

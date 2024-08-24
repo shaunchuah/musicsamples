@@ -85,12 +85,8 @@ urlpatterns = [
     path("api/", include(router.urls)),
     # QR code URLs
     path("barcode/", views.barcode, name="barcode"),
-    path(
-        "barcode/samples_used/", views.barcode_samples_used, name="barcode_samples_used"
-    ),
-    path(
-        "barcode/add_multiple/", views.barcode_add_multiple, name="barcode_add_multiple"
-    ),
+    path("barcode/samples_used/", views.barcode_samples_used, name="barcode_samples_used"),
+    path("barcode/add_multiple/", views.barcode_add_multiple, name="barcode_add_multiple"),
     path(
         "no_timepoint_view/<str:study_name>/",
         views.no_timepoint_view,

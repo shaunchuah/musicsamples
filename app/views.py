@@ -157,9 +157,7 @@ def used_samples_archive_all(request):
     sample_list = Sample.objects.filter(is_used=True).exclude(sample_location="used")
 
     number_of_samples = sample_list.count()
-    if (
-        number_of_samples == 0
-    ):  # if no samples need updating; skip the database update step
+    if number_of_samples == 0:  # if no samples need updating; skip the database update step
         messages.error(request, "No samples to update.")
     else:
         for sample in sample_list:
@@ -168,8 +166,7 @@ def used_samples_archive_all(request):
             sample.save()
         messages.success(
             request,
-            "Used samples locations archived successfully."
-            f" ({number_of_samples} samples updated)",
+            "Used samples locations archived successfully." f" ({number_of_samples} samples updated)",
         )
     return redirect(reverse("used_samples"))
 
@@ -182,9 +179,7 @@ def analytics(request):
     # Get last 12 months date
     current_date = datetime.datetime.now(datetime.timezone.utc)
     months_ago = 12
-    twelve_months_previous_date = current_date - datetime.timedelta(
-        days=(months_ago * 365 / 12)
-    )
+    twelve_months_previous_date = current_date - datetime.timedelta(days=(months_ago * 365 / 12))
 
     total_samples = Sample.objects.all().count()
     total_active_samples = Sample.objects.all().filter(is_used=False).count()
@@ -201,16 +196,10 @@ def analytics(request):
         item["sample_month_label"] = item["sample_month"].strftime("%b %Y")
 
     samples_by_type = list(
-        Sample.objects.filter(is_used=False)
-        .order_by()
-        .values("sample_type")
-        .annotate(sample_type_count=Count("id"))
+        Sample.objects.filter(is_used=False).order_by().values("sample_type").annotate(sample_type_count=Count("id"))
     )
     samples_by_study = list(
-        Sample.objects.all()
-        .order_by()
-        .values("study_name")
-        .annotate(study_name_count=Count("id"))
+        Sample.objects.all().order_by().values("study_name").annotate(study_name_count=Count("id"))
     )
     samples_by_location = (
         Sample.objects.filter(is_used=False)
@@ -251,9 +240,7 @@ def reference(request):
 @login_required(login_url="/login/")
 def account(request):
     # User account page showing last 20 recently accessed samples
-    sample_list = Sample.objects.filter(
-        last_modified_by=request.user.username
-    ).order_by("-last_modified")[:20]
+    sample_list = Sample.objects.filter(last_modified_by=request.user.username).order_by("-last_modified")[:20]
     context = {"sample_list": sample_list}
     return render(request, "account.html", context)
 
@@ -375,9 +362,7 @@ def sample_search(request):
             | Q(sample_comments__icontains=query_string)
         ).filter(is_used=False)
 
-        if ("include_used_samples" in request.GET) and request.GET[
-            "include_used_samples"
-        ].strip():
+        if ("include_used_samples" in request.GET) and request.GET["include_used_samples"].strip():
             sample_list = Sample.objects.filter(
                 Q(sample_id__icontains=query_string)
                 | Q(patient_id__icontains=query_string)
@@ -398,9 +383,7 @@ def sample_search(request):
             },
         )
     else:
-        return render(
-            request, "index.html", {"query_string": "Null", "sample_count": 0}
-        )
+        return render(request, "index.html", {"query_string": "Null", "sample_count": 0})
 
 
 @login_required(login_url="/login/")
@@ -648,13 +631,9 @@ def no_timepoint_view(request, study_name):
     Study name options are music, mini_music, marvel and mini_marvel.
     """
     if study_name == "music" or study_name == "mini_music":
-        sample_list = Sample.objects.filter(study_name=study_name).filter(
-            music_timepoint=None
-        )
+        sample_list = Sample.objects.filter(study_name=study_name).filter(music_timepoint=None)
     else:
-        sample_list = Sample.objects.filter(study_name=study_name).filter(
-            marvel_timepoint=None
-        )
+        sample_list = Sample.objects.filter(study_name=study_name).filter(marvel_timepoint=None)
     sample_count = sample_list.count()
     page = request.GET.get("page", 1)
     paginator = Paginator(sample_list, 1000)

@@ -75,9 +75,7 @@ class MultipleSampleSerializer(serializers.ModelSerializer):
 
         if data["study_name"] == "music" or data["study_name"] == "mini_music":
             if not data["music_timepoint"]:
-                raise serializers.ValidationError(
-                    "Music Timepoint must be filled for MUSIC and Mini-MUSIC studies."
-                )
+                raise serializers.ValidationError("Music Timepoint must be filled for MUSIC and Mini-MUSIC studies.")
 
         if data["study_name"] == "marvel" or data["study_name"] == "mini_marvel":
             if not data["marvel_timepoint"]:

@@ -31,9 +31,7 @@ class MultipleSamplesTest(APITestCase):
             "biopsy_location": "",
             "biopsy_inflamed_status": "",
         }
-        response = self.client.post(
-            "/api/multiple_samples/", sample_data, format="json"
-        )
+        response = self.client.post("/api/multiple_samples/", sample_data, format="json")
         assert response.status_code == 400  # bad request
         assert response.data["study_name"][0].code == "invalid_choice"
 
@@ -55,9 +53,7 @@ class MultipleSamplesTest(APITestCase):
             "biopsy_location": "",
             "biopsy_inflamed_status": "",
         }
-        response = self.client.post(
-            "/api/multiple_samples/", sample_data, format="json"
-        )
+        response = self.client.post("/api/multiple_samples/", sample_data, format="json")
         assert response.status_code == 201
         assert response.data["patient_id"] == "PATIENT001"
 
@@ -81,9 +77,7 @@ class MultipleSamplesTest(APITestCase):
             "biopsy_location": "",
             "biopsy_inflamed_status": "",
         }
-        response = self.client.post(
-            "/api/multiple_samples/", sample_data, format="json"
-        )
+        response = self.client.post("/api/multiple_samples/", sample_data, format="json")
         assert response.status_code == 400  # bad request
         assert response.data["non_field_errors"][0].code == "invalid"
 
@@ -107,9 +101,7 @@ class MultipleSamplesTest(APITestCase):
             "biopsy_location": "",
             "biopsy_inflamed_status": "",
         }
-        response = self.client.post(
-            "/api/multiple_samples/", sample_data, format="json"
-        )
+        response = self.client.post("/api/multiple_samples/", sample_data, format="json")
         assert response.status_code == 400  # bad request
         assert response.data["non_field_errors"][0].code == "invalid"
 
@@ -133,9 +125,7 @@ class MultipleSamplesTest(APITestCase):
             "biopsy_location": "",
             "biopsy_inflamed_status": "",
         }
-        response = self.client.post(
-            "/api/multiple_samples/", sample_data, format="json"
-        )
+        response = self.client.post("/api/multiple_samples/", sample_data, format="json")
         assert response.status_code == 400  # bad request
         assert response.data["non_field_errors"][0].code == "invalid"
 
@@ -159,8 +149,6 @@ class MultipleSamplesTest(APITestCase):
             "biopsy_location": "",
             "biopsy_inflamed_status": "",
         }
-        response = self.client.post(
-            "/api/multiple_samples/", sample_data, format="json"
-        )
+        response = self.client.post("/api/multiple_samples/", sample_data, format="json")
         assert response.status_code == 400  # bad request
         assert response.data["non_field_errors"][0].code == "invalid"

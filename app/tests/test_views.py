@@ -46,13 +46,9 @@ def test_add_sample_page(auto_login_user):
     client, user = auto_login_user()
     path = reverse("sample_add")
     response = client.get(path)
-    assert (
-        response.status_code == 200
-    ), "Should return add new sample page via GET request."
+    assert response.status_code == 200, "Should return add new sample page via GET request."
     response = client.post(path)
-    assert (
-        response.status_code == 200
-    ), "Should return add new sample page via POST request without form data."
+    assert response.status_code == 200, "Should return add new sample page via POST request without form data."
 
 
 def test_add_sample_post(auto_login_user):
@@ -76,9 +72,7 @@ def test_add_sample_post(auto_login_user):
         "biopsy_inflamed_status": "",
     }
     response = client.post(path, data=form_data)
-    assert (
-        Sample.objects.get(pk=1).patient_id == "PATIENT001"
-    )  # should return patient_id as uppercase as well
+    assert Sample.objects.get(pk=1).patient_id == "PATIENT001"  # should return patient_id as uppercase as well
     assert response.status_code == 302
 
 
@@ -131,9 +125,7 @@ def test_sample_search_page(auto_login_user):
     ), "Should create a few objects, run a search and return 2 objects."
 
     response = client.get(path)
-    assert (
-        response.context["query_string"] == "Null"
-    ), "Should return no objects with empty query string."
+    assert response.context["query_string"] == "Null", "Should return no objects with empty query string."
 
 
 def test_sample_checkout_page(auto_login_user):
@@ -183,9 +175,7 @@ def test_sample_reactivate(auto_login_user):
 
     # Restore the sample
     response = client.post(path, data={"is_used": False})
-    assert (
-        Sample.objects.get(pk=1).is_used is False
-    ), "Should restore the deleted sample"
+    assert Sample.objects.get(pk=1).is_used is False, "Should restore the deleted sample"
     assert response.url == "/"
 
 
@@ -217,9 +207,7 @@ class TestViews(TestCase):
     def test_add_sample_page(self):
         url = reverse("sample_add")
         response = self.client.get(url)
-        assert (
-            response.status_code == 200
-        ), "Should return add new sample page via GET request."
+        assert response.status_code == 200, "Should return add new sample page via GET request."
 
     def test_add_marvel_sample(self):
         url = reverse("sample_add")
@@ -320,9 +308,6 @@ class TestViews(TestCase):
             "biopsy_inflamed_status": "",
         }
         response = self.client.post(url, data=form_data)
-        assert (
-            response.context["form"].errors["sample_id"][0]
-            == "Sample with this Sample id already exists."
-        )
+        assert response.context["form"].errors["sample_id"][0] == "Sample with this Sample id already exists."
         created_sample = Sample.objects.get(sample_id="TEST001")
         assert created_sample.patient_id != "patient001"
