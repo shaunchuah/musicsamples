@@ -1,6 +1,6 @@
 asgiref
 autopep8==1.5.4
-dj-database-url==0.5.0
+dj-database-url==2.2.0
 Django==5.0.8
 django-simple-history==3.3.0
 django-widget-tweaks==1.4.8
