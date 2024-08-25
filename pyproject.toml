@@ -31,6 +31,3 @@ exclude = [
     "venv/",
     "**/migrations/*.py",
     ]
-
-[tool.coverage.run]
-omit = ["*/migrations/*", "*/tests/*"]
