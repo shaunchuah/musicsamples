@@ -1,26 +1,14 @@
-/*!
+#bg {
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.1)), url('/static/assets/img/bg.svg');
+  background-size: cover;
+}
 
-=========================================================
-* Black Dashboard - v1.0.1
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/black-dashboard
-* Copyright 2019 Creative Tim (https://www.creative-tim.com)
-
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
-/* My Custom CSS */
 .glogo {
-  padding: 20px 8px 0px 8px;
-  line-height: 40px;
-  margin: 0px 15px;
+  padding-left:30px;
+  padding-top: 20px;
   color: white;
   font-size: 1.25rem;
   text-align: center;
@@ -68,7 +56,8 @@
 }
 
 .login-container {
-  min-width:400px;
+  width:450px;
+  max-width:450px;
   padding: 50px;
   margin-right: auto;
   margin-left: auto;
@@ -3934,7 +3923,7 @@ input[type="button"].btn-block {
 .dropdown-item {
   display: block;
   width: 100%;
-  padding: 0.25rem 1rem;
+  padding: 1rem 1rem;
   clear: both;
   font-weight: 400;
   color: #212529;
@@ -5256,6 +5245,7 @@ input[type="button"].btn-block {
   background-clip: border-box;
   border: 0.0625rem solid rgba(34, 42, 66, 0.05);
   border-radius: 0.2857rem;
+  padding: 5px;
 }
 
 .card>hr {
@@ -14168,7 +14158,7 @@ fieldset[disabled] .btn-link.active {
 .dropdown-menu {
   border: 0;
   box-shadow: 0px 10px 50px 0px rgba(0, 0, 0, 0.2);
-  border-radius: 0.1428rem;
+  border-radius: 0.5rem;
   -webkit-transition: all 150ms linear;
   -moz-transition: all 150ms linear;
   -o-transition: all 150ms linear;
@@ -14318,8 +14308,8 @@ fieldset[disabled] .btn-link.active {
 .dropdown-menu .dropdown-item,
 .bootstrap-select .dropdown-menu.inner li a {
   font-size: 0.75rem;
-  padding-top: 0rem;
-  padding-bottom: .15rem;
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
   margin-top: 5px;
   -webkit-transition: all 150ms linear;
   -moz-transition: all 150ms linear;
@@ -16093,7 +16083,7 @@ img {
     -webkit-box-shadow: none;
     box-shadow: none;
     width: auto;
-    margin: 0px 1rem;
+    margin: 0px 0px;
     margin-top: 0px;
   }
 
