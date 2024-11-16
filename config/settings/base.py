@@ -1,38 +1,30 @@
 import os
+from pathlib import Path
 
-import sentry_sdk
-from decouple import Csv, config
-from sentry_sdk.integrations.django import DjangoIntegration
-from sentry_sdk.integrations.redis import RedisIntegration
-from unipath import Path
-
-# import dj_database_url
+import environ
+from decouple import config
 
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PROJECT_DIR = Path(__file__).parent
+BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 
-SECRET_KEY = config("SECRET_KEY")
-DEBUG = config("DEBUG", cast=bool, default=False)
+env = environ.Env()
+env.read_env(str(BASE_DIR / ".env"))
 
-if not DEBUG:
-    sentry_sdk.init(
-        dsn="https://565f64fc7bea4af39487c5f0edcdab0b@o482942.ingest.sentry.io/5533900",
-        integrations=[DjangoIntegration(), RedisIntegration()],
-        traces_sample_rate=0.5,
-        send_default_pii=True,
-    )
+SECRET_KEY = env(
+    "SECRET_KEY",
+    default="Wwy2cId28vACTsIOqIWuFpfHVv0l3VqyeJUHm602d0Iu5RyyhhY4vm3CseqFxm0L",
+)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
-
-INSTALLED_APPS = [
+DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+]
+
+THIRD_PARTY_APPS = [
     "widget_tweaks",
     "simple_history",
     "django_select2",
@@ -42,9 +34,14 @@ INSTALLED_APPS = [
     "storages",
     "django_filters",
     "taggit",
+]
+
+LOCAL_APPS = [
     "app",
     "authentication",
 ]
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -58,15 +55,20 @@ MIDDLEWARE = [
     "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
-ROOT_URLCONF = "core.urls"
+ROOT_URLCONF = "config.urls"
+WSGI_APPLICATION = "config.wsgi.application"
 LOGIN_REDIRECT_URL = "home"  # Route defined in app/urls.py
 LOGOUT_REDIRECT_URL = "home"  # Route defined in app/urls.py
-TEMPLATE_DIR = os.path.join(BASE_DIR, "core/templates")  # ROOT dir for templates
+LOGIN_URL = "login"
+
+# TEMPLATES
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#templates
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [TEMPLATE_DIR],
+        "DIRS": [str(BASE_DIR / "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -79,19 +81,18 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "core.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
     "default": {
-        "ENGINE": config("DB_ENGINE"),
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USER"),
-        "PASSWORD": config("DB_PASSWORD"),
-        "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT", cast=int),
+        "ENGINE": env("DB_ENGINE"),
+        "NAME": env("DB_NAME"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASSWORD"),
+        "HOST": env("DB_HOST"),
+        "PORT": env("DB_PORT", cast=int),
     }
 }
 
@@ -114,20 +115,29 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
 
+
+# INTERNATIONALIZATION
+# ------------------------------------------------------------------------------
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = "GB"
+TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATIC_URL = "/static/"
 
-# Extra places for collectstatic to find static files.
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+# STATIC
+# ------------------------------------------------------------------------------
+STATIC_ROOT = str(BASE_DIR / "staticfiles")
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [str(BASE_DIR / "static")]
+
+
+# MEDIA
+# ------------------------------------------------------------------------------
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/uploads/"
+
+
 #############################################################
 #############################################################
 EMAIL_BACKEND = config("EMAIL_BACKEND")
@@ -137,19 +147,9 @@ EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = config("EMAIL_PORT", cast=int)
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
 
-AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
 
 DEFAULT_FROM_EMAIL = "G-Trac <noreply@musicstudy.uk>"
 
-# POST SSL DEPLOYMENT SETTINGS
-SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", cast=bool)
-SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE", cast=bool)
-CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", cast=bool)
-SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", cast=int)
-SECURE_BROWSER_XSS_FILTER = config("SECURE_BROWSER_XSS_FILTER", cast=bool)
-SECURE_CONTENT_TYPE_NOSNIFF = config("SECURE_CONTENT_TYPE_NOSNIFF", cast=bool)
-SESSION_COOKIE_AGE = 604800  # 1 week in seconds
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
@@ -162,20 +162,7 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
 }
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "/uploads/"
 
-# CACHING
-
-CACHES = {
-    "default": {
-        "BACKEND": config("DEFAULT_CACHE_BACKEND"),
-        "LOCATION": config("DEFAULT_CACHE_LOCATION"),
-        "OPTIONS": {
-            "CLIENT_CLASS": config("CLIENT_CLASS"),
-        },
-    },
-}
 
 SELECT2_CACHE_BACKEND = "default"
 INTERNAL_IPS = ["127.0.0.1"]

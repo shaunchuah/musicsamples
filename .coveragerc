@@ -7,7 +7,6 @@ omit =
     *wsgi.py,
     manage.py,
     *__init__.py,
-    gunicorn-cfg.py,
     *asgi.py,
     *config.py,
     *storage_backends.py,

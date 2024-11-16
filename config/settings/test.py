@@ -1,4 +1,4 @@
-from .settings import *  # noqa
+from .base import *  # noqa
 
 DATABASES = {
     "default": {
@@ -14,3 +14,5 @@ PASSWORD_HASHERS = [
 ]
 
 DEBUG = False
+
+ALLOWED_HOSTS = ["testserver"]  # noqa: S104
