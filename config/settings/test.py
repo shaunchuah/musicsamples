@@ -13,6 +13,6 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.MD5PasswordHasher",
 ]
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["testserver"]  # noqa: S104
