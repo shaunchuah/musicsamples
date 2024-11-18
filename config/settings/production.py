@@ -1,4 +1,3 @@
-
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.redis import RedisIntegration
@@ -9,6 +8,9 @@ from .base import env
 DEBUG = False
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["samples.musicstudy.uk"])
 
+# Sentry
+# ------------------------------------------------------------------------------
+# Only used for production monitoring
 sentry_sdk.init(
     dsn="https://565f64fc7bea4af39487c5f0edcdab0b@o482942.ingest.sentry.io/5533900",
     integrations=[DjangoIntegration(), RedisIntegration()],
@@ -22,23 +24,14 @@ sentry_sdk.init(
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db/production.sqlite3",  # noqa: F405
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": env("DB_NAME"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASSWORD"),
+        "HOST": env("DB_HOST"),
+        "PORT": env("DB_PORT"),
         "ATOMIC_REQUESTS": True,
-        "OPTIONS": {
-            "init_command": (
-                "PRAGMA foreign_keys=ON;"
-                "PRAGMA journal_mode = WAL;"
-                "PRAGMA synchronous = NORMAL;"
-                "PRAGMA busy_timeout = 5000;"
-                "PRAGMA temp_store = MEMORY;"
-                "PRAGMA mmap_size = 134217728;"
-                "PRAGMA journal_size_limit = 67108864;"
-                "PRAGMA cache_size = 2000;"
-            ),
-            "transaction_mode": "IMMEDIATE",
-        },
-    },
+    }
 }
 
 # CACHES
@@ -89,5 +82,23 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
 )
 
 
+# AWS
+# ------------------------------------------------------------------------------
+# Used for SES service only at this time. Previously S3 was also used.
 AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY")
+AWS_REGION_NAME = "eu-west-2"
+
+# EMAIL
+# ------------------------------------------------------------------------------
+EMAIL_BACKEND = "anymail.backends.amazon_ses.EmailBackend"
+
+ANYMAIL = {
+    "AMAZON_SES_CLIENT_PARAMS": {
+        "aws_access_key_id": AWS_ACCESS_KEY_ID,
+        "aws_secret_access_key": AWS_SECRET_ACCESS_KEY,
+        "region_name": AWS_REGION_NAME,
+    },
+}
+
+SITE_URL = "https://samples.musicstudy.uk"

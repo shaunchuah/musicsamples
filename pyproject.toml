@@ -18,7 +18,7 @@ indent_size = 2
 
 [tool.pytest.ini_options]
 addopts = "--reuse-db --cov=. --cov-report term:skip-covered --cov-report=html"
-DJANGO_SETTINGS_MODULE = "config.test_settings"
+DJANGO_SETTINGS_MODULE = "config.settings.test"
 python_files = [
     "tests.py",
     "test_*.py",
