@@ -32,15 +32,5 @@ EMAIL_HOST = "localhost"
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-port
 EMAIL_PORT = 1025
 
-# DATABASES
-# ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "mydatabase",  # noqa: F405
-        "ATOMIC_REQUESTS": True,
-    },
-}
 
 SITE_URL = "http://127.0.0.1:8000"

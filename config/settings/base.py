@@ -13,6 +13,21 @@ SECRET_KEY = env(
     default="Wwy2cId28vACTsIOqIWuFpfHVv0l3VqyeJUHm602d0Iu5RyyhhY4vm3CseqFxm0L",
 )
 
+# DATABASES
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#databases
+DATABASES = {
+    "default": {
+        "ENGINE": env("DB_ENGINE"),
+        "NAME": env("DB_NAME"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASSWORD"),
+        "HOST": env("DB_HOST"),
+        "PORT": env("DB_PORT"),
+        "ATOMIC_REQUESTS": True,
+    }
+}
+
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",

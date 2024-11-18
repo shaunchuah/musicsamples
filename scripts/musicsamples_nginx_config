@@ -1,0 +1,20 @@
+server {
+	server_name samples.musicstudy.uk;	
+
+	location = /favicon.ico {access_log off; log_not_found off; }
+	location /static/ {
+		alias /home/sampletrek/app/musicsamples/staticfiles/;
+	}
+	
+	if ($http_host !~* ^(samples.musicstudy.uk)$ ) {
+		return 444;
+	}
+	location / {
+		include proxy_params;
+		proxy_pass http://unix:/run/gunicorn.sock;
+		proxy_connect_timeout 300;
+		proxy_send_timeout 300;
+		proxy_read_timeout 300;
+		send_timeout 300;
+	}
+}
