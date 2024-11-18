@@ -4,7 +4,6 @@ set -e
 
 cd ~/app/musicsamples/
 echo "Begin app update..."
-git stash
 echo "Pulling from github..."
 git pull || exit 1
 echo "Activating python virtual environment..."

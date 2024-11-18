@@ -60,7 +60,7 @@ jobs:
         SSH_HOST: ${{ secrets.SAMPLETREK_SSH_HOST }}
     
     - name: Pull latest version from GitHub
-      run: ssh deploy 'cd /home/sampletrek/app/musicsamples && git pull' 
+      run: ssh deploy 'cd /home/sampletrek/app/musicsamples && git stash && git pull' 
 
     - name: Make deployment script executable
       run: ssh deploy 'echo ${{ secrets.SAMPLETREK_SUDO }} | sudo -S chmod +x /home/sampletrek/app/musicsamples/scripts/github_deploy_django.sh'
