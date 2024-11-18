@@ -46,7 +46,6 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "storages",
     "django_filters",
-    "taggit",
 ]
 
 LOCAL_APPS = [
