@@ -108,6 +108,14 @@ You will need to make the scripts executable and configure a cron job to run the
 
 The scripts backup the database to the local VM first and then syncs it across to S3. VM needs aws-cli installed for this to work. If you're not comfortable with this then I would suggest a managed database instance.
 
+## Database Transfer
+
+Use Django's dumpdata and loaddata as follows:
+
+`python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.Permission -e taggit > dump.json`
+
+You will need to exclude contenttypes and auth.permission to switch between databases.
+
 ### Scaling Deployment
 
 If you want to scale this app I would:
