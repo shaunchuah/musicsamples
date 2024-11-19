@@ -132,9 +132,9 @@ def edit_profile_view(request):
     return render(request, "accounts/edit_user.html", context)
 
 
-@login_required
+@staff_member_required
 def user_list_view(request):
-    users = User.objects.filter(is_superuser=False)
+    users = User.objects.filter(is_superuser=False).order_by("email")
     context = {"users": users}
     return render(request, "accounts/user_list.html", context)
 
