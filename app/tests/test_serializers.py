@@ -9,7 +9,7 @@ User = get_user_model()
 
 class MultipleSamplesTest(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_superuser(username="testowy", password="test")
+        self.user = User.objects.create_superuser(username="test_superuser", email="test@test.com", password="test")
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 

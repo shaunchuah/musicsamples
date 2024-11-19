@@ -1,4 +1,5 @@
 {% load static %}
+
 <div class="sidebar" data="blue">
     <div class="sidebar-wrapper">
         <div class="glogo">
@@ -61,6 +62,14 @@
                             <p>Used Samples</p>
                         </a>
                     </li>
+                    {% if request.user.is_staff %}
+                        <li class="{% if request.path == '/users/' %}active{% endif %}">
+                            <a href="{% url 'user_list' %}">
+                                <i class="tim-icons icon-single-02"></i>
+                                <p>Users</p>
+                            </a>
+                        </li>
+                    {% endif %}
                     {% if request.user.is_superuser %}
                         <li>
                             <a href="{% url 'management' %}">

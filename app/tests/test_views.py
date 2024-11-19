@@ -21,6 +21,8 @@ def create_user(db, django_user_model, test_password):
         kwargs["password"] = test_password
         if "username" not in kwargs:
             kwargs["username"] = "testuser1"
+        if "email" not in kwargs:
+            kwargs["email"] = "testuser1@test.com"
         return django_user_model.objects.create_user(**kwargs)
 
     return make_user
@@ -28,7 +30,7 @@ def create_user(db, django_user_model, test_password):
 
 @pytest.fixture
 def other_user(db, django_user_model):
-    return django_user_model.objects.create(username="user2", password="user2")
+    return django_user_model.objects.create(username="user2", email="user2@test.com", password="user2")
 
 
 @pytest.fixture

@@ -1,0 +1,33 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}
+  Welcome to G-Trac
+{% endblock title %}
+{% block content %}
+  <p style="font-family: Helvetica, sans-serif;
+            font-size: 16px;
+            font-weight: normal;
+            margin: 0;
+            margin-bottom: 16px">Dear {{ user.first_name }} {{ user.last_name }},</p>
+  <p style="font-family: Helvetica, sans-serif;
+            font-size: 16px;
+            font-weight: normal;
+            margin: 0;
+            margin-bottom: 16px">Welcome to G-Trac. Your new account has been created.</p>
+  <p style="font-family: Helvetica, sans-serif;
+            font-size: 16px;
+            font-weight: normal;
+            margin: 0;
+            margin-bottom: 16px">
+    To set your password, please visit the following link: <a href="{{ password_reset_url }}">{{ password_reset_url }}</a>
+  </p>
+  <p style="font-family: Helvetica, sans-serif;
+            font-size: 16px;
+            font-weight: normal;
+            margin: 0;
+            margin-bottom: 16px">
+    Best wishes,
+    <br />
+    G-Trac
+  </p>
+{% endblock content %}

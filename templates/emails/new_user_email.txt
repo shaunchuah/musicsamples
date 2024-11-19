@@ -1,0 +1,8 @@
+Dear {{ user.first_name }} {{ user.last_name }},
+
+Welcome to G-Trac. Your new account has been created.
+
+To set your password, please visit the following link: {{ password_reset_url}}
+
+Best wishes,
+G-Trac
