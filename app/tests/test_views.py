@@ -5,7 +5,7 @@ from pytest_django.asserts import assertTemplateUsed
 
 from app.factories import SampleFactory
 from app.models import Sample
-from authentication.factories import UserFactory
+from users.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 

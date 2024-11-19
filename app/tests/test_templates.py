@@ -3,7 +3,7 @@ from django.urls import reverse
 from pytest_django.asserts import assertTemplateUsed
 
 from app.factories import SampleFactory
-from authentication.factories import UserFactory
+from users.factories import UserFactory
 
 
 class TestTemplates(TestCase):

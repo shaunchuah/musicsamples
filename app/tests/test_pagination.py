@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from app.factories import SampleFactory
 from app.views import SAMPLE_PAGINATION_SIZE
-from authentication.factories import UserFactory
+from users.factories import UserFactory
 
 
 class TestPagination(TestCase):

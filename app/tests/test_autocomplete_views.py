@@ -4,7 +4,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 from app.factories import SampleFactory
-from authentication.factories import UserFactory
+from users.factories import UserFactory
 
 
 class TestAutocomplete(TestCase):

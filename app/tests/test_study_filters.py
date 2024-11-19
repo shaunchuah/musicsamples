@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from app.choices import StudyNameChoices
 from app.factories import SampleFactory
-from authentication.factories import UserFactory
+from users.factories import UserFactory
 
 
 class TestStudyFilters(TestCase):
