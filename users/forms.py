@@ -5,7 +5,10 @@ User = get_user_model()
 
 
 class LoginForm(forms.Form):
-    email = forms.EmailField(widget=forms.EmailInput(attrs={"placeholder": "Email", "class": "form-control"}))
+    # email = forms.EmailField(widget=forms.EmailInput(attrs={"placeholder": "Email", "class": "form-control"}))
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={"placeholder": "Email", "value": "", "class": "form-control"})
+    )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={"placeholder": "Password", "value": "", "class": "form-control"})
     )
