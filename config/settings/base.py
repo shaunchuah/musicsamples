@@ -46,6 +46,7 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "storages",
     "django_filters",
+    "oauth2_provider",
 ]
 
 LOCAL_APPS = [
@@ -153,3 +154,11 @@ REST_FRAMEWORK = {
 SELECT2_CACHE_BACKEND = "default"
 INTERNAL_IPS = ["127.0.0.1"]
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+
+OAUTH2_PROVIDER = {
+    "OIDC_ENABLED": True,
+    "SCOPES": {
+        "openid": "OpenID Connect scope",
+    },
+}
