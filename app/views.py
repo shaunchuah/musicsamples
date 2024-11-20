@@ -240,7 +240,7 @@ def reference(request):
 @login_required(login_url="/login/")
 def account(request):
     # User account page showing last 20 recently accessed samples
-    sample_list = Sample.objects.filter(last_modified_by=request.user.username).order_by("-last_modified")[:20]
+    sample_list = Sample.objects.filter(last_modified_by=request.user.email).order_by("-last_modified")[:20]
     context = {"sample_list": sample_list}
     return render(request, "account.html", context)
 
@@ -268,8 +268,8 @@ def sample_add(request):
         form = SampleForm(request.POST)
         if form.is_valid():
             sample = form.save(commit=False)
-            sample.created_by = request.user.username
-            sample.last_modified_by = request.user.username
+            sample.created_by = request.user.email
+            sample.last_modified_by = request.user.email
             sample.save()
             messages.success(request, "Sample registered successfully.")
             return redirect(reverse("sample_add"))
@@ -329,7 +329,7 @@ def sample_edit(request, pk):
         form = SampleForm(request.POST, instance=sample)
         if form.is_valid():
             sample = form.save(commit=False)
-            sample.last_modified_by = request.user.username
+            sample.last_modified_by = request.user.email
             sample.save()
             messages.success(request, "Sample updated successfully.")
             next_url = request.GET.get("next")
@@ -394,7 +394,7 @@ def sample_checkout(request, pk):
         form = CheckoutForm(request.POST, instance=sample)
         if form.is_valid():
             sample = form.save(commit=False)
-            sample.last_modified_by = request.user.username
+            sample.last_modified_by = request.user.email
             sample.save()
             messages.success(request, "Sample updated successfully.")
             next_url = request.GET.get("next")
@@ -415,7 +415,7 @@ def sample_used(request, pk):
         form = UsedForm(request.POST, instance=sample)
         if form.is_valid():
             sample = form.save(commit=False)
-            sample.last_modified_by = request.user.username
+            sample.last_modified_by = request.user.email
             sample.save()
             messages.success(request, "Sample marked as used.")
             next_url = request.GET.get("next")
@@ -436,7 +436,7 @@ def reactivate_sample(request, pk):
         form = ReactivateForm(request.POST, instance=sample)
         if form.is_valid():
             sample = form.save(commit=False)
-            sample.last_modified_by = request.user.username
+            sample.last_modified_by = request.user.email
             sample.save()
             messages.success(request, "Sample restored.")
             next_url = request.GET.get("next")
@@ -569,7 +569,7 @@ class SampleViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(
-            last_modified_by=self.request.user.username,
+            last_modified_by=self.request.user.email,
         )
 
 
@@ -580,7 +580,7 @@ class SampleIsUsedViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(
-            last_modified_by=self.request.user.username,
+            last_modified_by=self.request.user.email,
         )
 
 
@@ -591,8 +591,8 @@ class MultipleSampleViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(
-            created_by=self.request.user.username,
-            last_modified_by=self.request.user.username,
+            created_by=self.request.user.email,
+            last_modified_by=self.request.user.email,
         )
 
 

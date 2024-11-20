@@ -19,8 +19,6 @@ def test_password():
 def create_user(db, django_user_model, test_password):
     def make_user(**kwargs):
         kwargs["password"] = test_password
-        if "username" not in kwargs:
-            kwargs["username"] = "testuser1"
         if "email" not in kwargs:
             kwargs["email"] = "testuser1@test.com"
         return django_user_model.objects.create_user(**kwargs)
@@ -30,7 +28,7 @@ def create_user(db, django_user_model, test_password):
 
 @pytest.fixture
 def other_user(db, django_user_model):
-    return django_user_model.objects.create(username="user2", email="user2@test.com", password="user2")
+    return django_user_model.objects.create(email="user2@test.com", password="user2")
 
 
 @pytest.fixture
@@ -38,7 +36,7 @@ def auto_login_user(db, client, create_user, test_password):
     def make_auto_login(user=None):
         if user is None:
             user = create_user()
-        client.login(username=user.username, password=test_password)
+        client.login(username=user.email, password=test_password)
         return client, user
 
     return make_auto_login
@@ -146,7 +144,7 @@ def test_sample_checkout_page(auto_login_user):
     assert (
         Sample.objects.get(pk=1).sample_location == "location2"
     ), "Should checkout the sample location from location1 to location2."
-    assert Sample.objects.get(pk=1).last_modified_by == "testuser1"
+    assert Sample.objects.get(pk=1).last_modified_by == "testuser1@test.com"
     assert response.status_code == 302
 
 

@@ -20,9 +20,9 @@ def login_view(request):
 
     if request.method == "POST":
         if form.is_valid():
-            username = form.cleaned_data.get("username")
+            email = form.cleaned_data.get("email")
             password = form.cleaned_data.get("password")
-            user = authenticate(username=username, password=password)
+            user = authenticate(email=email, password=password)
             if user is not None:
                 login(request, user)
                 return redirect("/")
@@ -64,11 +64,10 @@ def new_user_view(request):
                 form.save(commit=False)
                 first_name = form.cleaned_data.get("first_name")
                 last_name = form.cleaned_data.get("last_name")
-                username = form.cleaned_data.get("username")
                 email = form.cleaned_data.get("email")
                 password = generate_random_password()
                 user = User.objects.create_user(
-                    username=username, email=email, password=password, first_name=first_name, last_name=last_name
+                    email=email, password=password, first_name=first_name, last_name=last_name
                 )
                 user.save()
 
