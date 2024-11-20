@@ -47,6 +47,7 @@ THIRD_PARTY_APPS = [
     "storages",
     "django_filters",
     "oauth2_provider",
+    "corsheaders",
 ]
 
 LOCAL_APPS = [
@@ -57,6 +58,7 @@ LOCAL_APPS = [
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -159,6 +161,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 OAUTH2_PROVIDER = {
     "OIDC_ENABLED": True,
     "SCOPES": {
+        "read": "Read scope",
+        "write": "Write scope",
         "openid": "OpenID Connect scope",
     },
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://0.0.0.0:4180",
+    "http://localhost:4180",
+    "http://127.0.0.1:4180",
+]
