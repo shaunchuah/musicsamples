@@ -2,11 +2,12 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import get_object_or_404, render
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
 from rest_framework.response import Response
 
 from datasets.models import Dataset
+from datasets.permissions import CustomDjangoModelPermission
 from datasets.serializers import DatasetSerializer
 from datasets.utils import export_json_field
 
@@ -20,7 +21,7 @@ class DatasetCreateUpdateView(CreateAPIView):
 
     queryset = Dataset.objects.all()
     serializer_class = DatasetSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdminUser]
     renderer_classes = [BrowsableAPIRenderer, JSONRenderer]
 
     def create(self, request, *args, **kwargs):
@@ -57,6 +58,7 @@ def dataset_export_csv(request, dataset_name):
 class RetrieveDatasetAPIView(RetrieveAPIView):
     lookup_field = "name"
     queryset = Dataset.objects.all()
+    permission_classes = [CustomDjangoModelPermission]
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
