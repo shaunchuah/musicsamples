@@ -48,11 +48,13 @@ THIRD_PARTY_APPS = [
     "django_filters",
     "oauth2_provider",
     "corsheaders",
+    "guardian",
 ]
 
 LOCAL_APPS = [
     "app",
     "users",
+    "datasets",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -114,6 +116,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "guardian.backends.ObjectPermissionBackend",
+)
 
 # INTERNATIONALIZATION
 # ------------------------------------------------------------------------------
@@ -133,7 +139,7 @@ STATICFILES_DIRS = [str(BASE_DIR / "static")]
 # MEDIA
 # ------------------------------------------------------------------------------
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "/uploads/"
+MEDIA_URL = "/files/"
 
 
 # EMAIL
@@ -165,6 +171,7 @@ OAUTH2_PROVIDER = {
         "write": "Write scope",
         "openid": "OpenID Connect scope",
     },
+    "ERROR_RESPONSE_WITH_SCOPES": True,
 }
 
 CORS_ALLOWED_ORIGINS = [
@@ -172,3 +179,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:4180",
     "http://127.0.0.1:4180",
 ]
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB

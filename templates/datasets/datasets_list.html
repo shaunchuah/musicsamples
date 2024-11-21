@@ -1,0 +1,84 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+    Dashboard
+{% endblock title %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Search Datasets</h3>
+                </div>
+                <div class="card-body">
+                    <form id="searchform" action="" method="get">
+                        <div class="form-group">
+                            <input type="text" autofocus name="q" class="form-control" />
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-fill btn-success">Search</button>
+                            <a href="{% url 'datasets:list' %}" class="btn btn-fill btn-secondary">Clear</a>
+                            <a href="" class="btn btn-fill btn-success float-lg-right">Advanced
+                            Filtering</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        Datasets
+                        {% if study_name %}- ({{ study_name }}){% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-row-reverse pb-3">Total Count: {{ datasets|length }}</div>
+                    <div class="table-responsive">
+                        <table class="table tablesorter" id="mainTable">
+                        <thead class="text-primary">
+                                <tr>
+                                    <th>Study Name</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>API URL</th>
+                                    <th>CSV File</th>
+                                    <th>Last Updated</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if datasets %}
+                                    {% for dataset in datasets %}
+                                        <tr>
+                                            <td>{{ dataset.get_study_name_display }}</td>
+                                            <td>{{ dataset.name }}</td>
+                                            <td>{{ dataset.description }}</td>
+                                            <td><a href="{% url 'datasets:retrieve' dataset.name %}">{{ site_url }}{% url 'datasets:retrieve' dataset.name %}</a></td>
+                                            <td><a href="{% url 'datasets:export_csv' dataset.name %}" target="_blank">Download CSV </a></td>
+                                            <td>{{ dataset.last_modified }}</td>
+                                            <td>{{ dataset.created }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="7" align="center">No datasets found.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                        {% include "layouts/pagination.html" %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block javascripts %}
+{% endblock javascripts %}

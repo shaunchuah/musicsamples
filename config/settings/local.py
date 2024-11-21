@@ -6,7 +6,7 @@ from .base import INSTALLED_APPS
 # ------------------------------------------------------------------------------
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "testserver"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "testserver", "host.docker.internal"]
 
 
 # CACHES

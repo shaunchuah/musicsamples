@@ -1,23 +1,28 @@
-{% extends "layouts/base.html" %}
+{% extends 'layouts/auth.html' %}
+
 {% block title %}
-    Page 404
+    500 Internal Server Error
 {% endblock title %}
-<!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}
-{% endblock stylesheets %}
 {% block content %}
     <div class="row">
-        <div class="col-md-12">
-            <div class="card card-profile">
-                <div class="card-body">
-                    <h6 class="card-category text-gray">Error 500</h6>
-                    <h4 class="card-title">Server Error - Something went wrong - Please contact chershiong@gmail.com</h4>
-                    <a href="{% url "home" %}" class="btn btn-round">Home</a>
+        <div class="col d-flex justify-content-center align-items-center"
+             style="height: 60vh">
+            <div class="login-container">
+                <div class="d-flex justify-content-center mb-4">
+                    <svg data-slot="icon"
+                         height="60"
+                         fill="none"
+                         stroke-width="1.5"
+                         stroke="#ef4444"
+                         viewBox="0 0 24 24"
+                         xmlns="http://www.w3.org/2000/svg"
+                         aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                    </svg>
                 </div>
+                <h3 class="title text-center">Error 500 Internal Server Error</h3>
+                <p>Something went wrong. Please contact shaun.chuah@glasgow.ac.uk.</p>
             </div>
         </div>
     </div>
 {% endblock content %}
-<!-- Specific Page JS goes HERE  -->
-{% block javascripts %}
-{% endblock javascripts %}

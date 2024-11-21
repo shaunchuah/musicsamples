@@ -53,6 +53,14 @@
                         <p>Data Export</p>
                     </a>
                 </li>
+                {% if perms.datasets.view_dataset %}
+                    <li class="{% if request.path == '/datasets/' %}active{% endif %}">
+                        <a href="{% url 'datasets:list' %}">
+                            <i class="tim-icons icon-paper"></i>
+                            <p>Datasets</p>
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
             <div class="mt-5">
                 <ul class="nav">

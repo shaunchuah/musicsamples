@@ -16,3 +16,5 @@ PASSWORD_HASHERS = [
 DEBUG = True
 
 ALLOWED_HOSTS = ["testserver"]  # noqa: S104
+
+SITE_URL = "http://testserver"
