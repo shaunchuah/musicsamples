@@ -14,11 +14,12 @@ User = get_user_model()
 pytestmark = pytest.mark.django_db
 
 
-class TestDatasetApiViews:
-    def setup_method(self):
+class TestDatasetApiViews(TestCase):
+    def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(email="testuser@test.com", password="12345")
-        self.client.login(username="testuser@test.com", password="12345")
+        # need to be admin to create datasets
+        self.user_with_permission = User.objects.create_superuser(email="privileged@user.com", password="12345")
+        self.client.login(username="privileged@user.com", password="12345")
         self.json_object = json.dumps({"key": "value"})
 
     def test_create_dataset_api_view(self):
