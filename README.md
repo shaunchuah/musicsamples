@@ -112,7 +112,7 @@ The scripts backup the database to the local VM first and then syncs it across t
 
 Use Django's dumpdata and loaddata as follows:
 
-`python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.Permission -e taggit > dump.json`
+`python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.Permission > dump.json`
 
 You will need to exclude contenttypes and auth.permission to switch between databases.
 

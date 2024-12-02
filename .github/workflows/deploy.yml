@@ -11,7 +11,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.11, 3.12]
+        python-version: [3.12]
     env:
       SECRET_KEY: githubactionstestingkey
       DB_ENGINE: django.db.backends.sqlite3
@@ -60,16 +60,16 @@ jobs:
         SSH_HOST: ${{ secrets.SAMPLETREK_SSH_HOST }}
     
     - name: Pull latest version from GitHub
-      run: ssh deploy 'cd /home/sampletrek/app/musicsamples && git stash && git pull' 
+      run: ssh deploy 'cd ${{ secrets.INSTALLATION_DIRECTORY }} && git pull' 
 
     - name: Make deployment script executable
-      run: ssh deploy 'echo ${{ secrets.SAMPLETREK_SUDO }} | sudo -S chmod +x /home/sampletrek/app/musicsamples/scripts/github_deploy_django.sh'
+      run: ssh deploy 'chmod +x ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
     
     - name: Run django deployment script
-      run: ssh deploy '/home/sampletrek/app/musicsamples/scripts/github_deploy_django.sh'
+      run: ssh deploy '${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
 
     - name: Restart gunicorn
-      run: ssh deploy 'echo ${{ secrets.SAMPLETREK_SUDO }} | sudo -S systemctl restart gunicorn'
+      run: ssh deploy 'systemctl restart gunicorn'
 
     - name: Restart nginx
-      run: ssh deploy 'echo ${{ secrets.SAMPLETREK_SUDO }} | sudo -S systemctl restart nginx'
+      run: ssh deploy 'systemctl restart nginx'
