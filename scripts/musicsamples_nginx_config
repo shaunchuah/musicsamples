@@ -1,5 +1,6 @@
 server {
-	server_name samples.musicstudy.uk;	
+	server_name samples.musicstudy.uk;
+	client_max_body_size 100M;
 
 	location = /favicon.ico {access_log off; log_not_found off; }
 	location /static/ {
