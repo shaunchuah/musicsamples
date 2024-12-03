@@ -6,6 +6,12 @@
   background-size: cover;
 }
 
+pre {
+  background-color: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+}
+
 .glogo {
   padding-left:30px;
   padding-top: 20px;

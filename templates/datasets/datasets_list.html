@@ -1,84 +1,111 @@
 {% extends "layouts/base.html" %}
 
 {% block title %}
-    Dashboard
+    Datasets
 {% endblock title %}
-<!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}
 {% endblock stylesheets %}
 {% block content %}
+    <h2>
+        <i class="tim-icons icon-paper"></i> Datasets
+    </h2>
     <div class="row">
-        <div class="col">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Search Datasets</h3>
-                </div>
-                <div class="card-body">
-                    <form id="searchform" action="" method="get">
-                        <div class="form-group">
-                            <input type="text" autofocus name="q" class="form-control" />
+        <div class="col-md-6">
+            {% if datasets %}
+                <div class="row">
+                    {% for dataset in datasets %}
+                        <div class="col-xl-6 d-flex align-items-stretch">
+                            <div class="card">
+                                <div class="card-header">
+                                    {{ dataset.get_study_name_display }}
+                                    <h3 class="card-title">{{ dataset.name }}</h3>
+                                </div>
+                                <div class="card-body">
+                                    Description:
+                                    <p>{{ dataset.description }}</p>
+                                </div>
+                                <div class="card-footer">
+                                    API URL (JSON):
+                                    <p>
+                                        <a href="{% url 'datasets:retrieve' dataset.name %}"
+                                           target="_blank">{{ site_url }}{% url 'datasets:retrieve' dataset.name %}</a>
+                                       
+                                    </p>
+                                    CSV File:
+                                    <p>
+                                        <a href="{% url 'datasets:export_csv' dataset.name %}" target="_blank">Download CSV</a>
+                                    </p>
+                                    <p>Last Updated: {{ dataset.last_modified|date:'d M Y H:i' }}</p>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <button type="submit" class="btn btn-fill btn-success">Search</button>
-                            <a href="{% url 'datasets:list' %}" class="btn btn-fill btn-secondary">Clear</a>
-                            <a href="" class="btn btn-fill btn-success float-lg-right">Advanced
-                            Filtering</a>
-                        </div>
-                    </form>
+                    {% endfor %}
                 </div>
-            </div>
+            {% else %}
+                <div>No datasets yet.</div>
+            {% endif %}
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <div class="card">
+        <div class="col-md-6">
+            <div class="notes card">
                 <div class="card-header">
-                    <h3 class="card-title">
-                        Datasets
-                        {% if study_name %}- ({{ study_name }}){% endif %}
-                    </h3>
+                    <h2 class="card-title">Datasets API User Guide</h2>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex flex-row-reverse pb-3">Total Count: {{ datasets|length }}</div>
-                    <div class="table-responsive">
-                        <table class="table tablesorter" id="mainTable">
-                        <thead class="text-primary">
-                                <tr>
-                                    <th>Study Name</th>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <th>API URL</th>
-                                    <th>CSV File</th>
-                                    <th>Last Updated</th>
-                                    <th>Created</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% if datasets %}
-                                    {% for dataset in datasets %}
-                                        <tr>
-                                            <td>{{ dataset.get_study_name_display }}</td>
-                                            <td>{{ dataset.name }}</td>
-                                            <td>{{ dataset.description }}</td>
-                                            <td><a href="{% url 'datasets:retrieve' dataset.name %}">{{ site_url }}{% url 'datasets:retrieve' dataset.name %}</a></td>
-                                            <td><a href="{% url 'datasets:export_csv' dataset.name %}" target="_blank">Download CSV </a></td>
-                                            <td>{{ dataset.last_modified }}</td>
-                                            <td>{{ dataset.created }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                {% else %}
-                                    <tr>
-                                        <td colspan="7" align="center">No datasets found.</td>
-                                    </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                        {% include "layouts/pagination.html" %}
-                    </div>
+                    <p>These endpoints allow for programmatic access to the datasets held on G-Trac.</p>
+                    <h3>Authentication</h3>
+                    <p>
+                        API authentication is performed using your token which can be generated <a href="{% url 'data_export' %}">here</a>.
+                        To authenticate with the endpoint, include the following http header with your request:
+                        <pre>Authorization: Token {{ request.user.auth_token }}</pre>
+                    </p>
+                    <h3>Python Example</h3>
+                    <pre>
+# This is a basic example - do not commit this code to git.
+
+import requests
+import pandas as pd
+
+# Set the API_URL for the dataset you want to access
+API_URL = 'https://samples.musicstudy.uk/datasets/api/retrieve/gidamps_demographics/'
+
+GTRAC_API_TOKEN = '{{ request.user.auth_token }}'
+
+# The better way would be to read this token from an external file
+# and add that file to .gitignore.
+#
+# Here's an example if you have a file called credentials.json:
+# import json
+# with open('./credentials.json', 'r') as f:
+#     credentials = json.load(f)
+# GTRAC_API_TOKEN = credentials['GTRAC_API_TOKEN']
+
+authorization_header = {'Authorization': f'Token {GTRAC_API_TOKEN}'}
+response = requests.get(API_URL, headers = authorization_header, timeout=30)
+data = response.json()
+df = pd.DataFrame(data)
+      </pre>
+                    <h3>R Example</h3>
+                    <pre>
+library(httr)
+library(jsonlite)
+
+GTRAC_API_TOKEN &lt;- "Token {{ request.user.auth_token }}"
+# Again the advice here is to read this token in from an external file.
+
+response &lt;- GET("https://samples.musicstudy.uk/api/gidamps/", add_headers(Authorization = GTRAC_API_TOKEN))
+json_result &lt;- httr::content(response, as="text")
+result &lt;- jsonlite::fromJSON(json_result)
+</pre>
+                    <h3>Dagster</h3>
+                    <p>
+                        Dagster is our data orchestrator which pulls data from the various databases, cleans it and stores it here in G-Trac. You can view it here:
+                        <a href="https://dagster.musicstudy.uk/" target="_blank">https://dagster.musicstudy.uk/</a>. Please contact Shaun for the username and password. Data is refreshed every Monday to Friday at 11pm.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 {% endblock content %}
 {% block javascripts %}
+   
 {% endblock javascripts %}

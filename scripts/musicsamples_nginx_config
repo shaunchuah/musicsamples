@@ -3,9 +3,6 @@ server {
 	client_max_body_size 100M;
 
 	location = /favicon.ico {access_log off; log_not_found off; }
-	location /static/ {
-		alias /root/musicsamples/staticfiles/;
-	}
 	
 	if ($http_host !~* ^(samples.musicstudy.uk)$ ) {
 		return 444;
