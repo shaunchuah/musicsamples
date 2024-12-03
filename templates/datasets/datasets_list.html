@@ -89,12 +89,15 @@ df = pd.DataFrame(data)
 library(httr)
 library(jsonlite)
 
-GTRAC_API_TOKEN &lt;- "Token {{ request.user.auth_token }}"
-# Again the advice here is to read this token in from an external file.
+# Set the API_URL for the dataset you want to access
+API_URL &lt;- 'https://samples.musicstudy.uk/datasets/api/retrieve/gidamps_demographics/'
 
-response &lt;- GET("https://samples.musicstudy.uk/api/gidamps/", add_headers(Authorization = GTRAC_API_TOKEN))
-json_result &lt;- httr::content(response, as="text")
-result &lt;- jsonlite::fromJSON(json_result)
+# Again the advice here is to read this token in from an external file.
+GTRAC_API_TOKEN &lt;- "Token {{ request.user.auth_token }}"
+
+response &lt;- httr::GET(API_URL, add_headers(Authorization = GTRAC_API_TOKEN))
+json_result &lt;- httr::content(response, as="text", encoding="utf-8")
+df &lt;- jsonlite::fromJSON(json_result)
 </pre>
                     <h3>Dagster</h3>
                     <p>
