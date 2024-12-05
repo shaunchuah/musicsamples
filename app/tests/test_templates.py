@@ -20,12 +20,12 @@ class TestTemplates(TestCase):
     def test_index_page(self):
         url = reverse("home")
         response = self.client.get(url)
-        assertTemplateUsed(response, "index.html")
+        assertTemplateUsed(response, "dashboard.html")
 
     def test_sample_search(self):
         path = reverse("sample_search")
         response = self.client.get(path)
-        assertTemplateUsed(response, "index.html")
+        assertTemplateUsed(response, "dashboard.html")
 
     def test_account_page(self):
         path = reverse("account")

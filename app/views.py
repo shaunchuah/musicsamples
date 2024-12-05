@@ -53,7 +53,7 @@ def index(request):
         "page_obj": samples,
         "sample_count": sample_count,
     }
-    return render(request, "index.html", context)
+    return render(request, "dashboard.html", context)
 
 
 @login_required(login_url="/login/")
@@ -383,7 +383,7 @@ def sample_search(request):
             },
         )
     else:
-        return render(request, "index.html", {"query_string": "Null", "sample_count": 0})
+        return render(request, "dashboard.html", {"query_string": "Null", "sample_count": 0})
 
 
 @login_required(login_url="/login/")
@@ -648,7 +648,7 @@ def no_timepoint_view(request, study_name):
         "page_obj": samples,
         "sample_count": sample_count,
     }
-    return render(request, "index.html", context)
+    return render(request, "dashboard.html", context)
 
 
 @login_required(login_url="/login/")
