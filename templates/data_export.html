@@ -35,10 +35,10 @@
                 <div class="card-footer">
                     <!--<button type="submit" class="btn btn-fill btn-primary">Save</button>-->
                     {% if request.user.auth_token %}
-                        <a href="{% url 'refresh_token' %}" class="btn btn-fill btn-success">Renew Token</a>
-                        <a href="{% url 'delete_token' %}" class="btn btn-fill btn-danger">Delete Token</a>
+                        <a href="{% url 'refresh_token' %}?next={{ request.path }}" class="btn btn-fill">Renew Token</a>
+                        <a href="{% url 'delete_token' %}?next={{ request.path }}" class="btn btn-fill btn-danger">Delete Token</a>
                     {% else %}
-                        <a href="{% url 'generate_token' %}" class="btn btn-fill btn-success">Generate Token</a>
+                        <a href="{% url 'generate_token' %}?next={{ request.path }}" class="btn btn-fill">Generate Token</a>
                     {% endif %}
                 </div>
             </div>

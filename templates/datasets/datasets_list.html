@@ -10,7 +10,7 @@
         <i class="tim-icons icon-paper"></i> Datasets
     </h2>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-8">
             {% if datasets %}
                 <div class="row">
                     {% for dataset in datasets %}
@@ -50,10 +50,8 @@
                                                  xmlns="http://www.w3.org/2000/svg"
                                                  aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                               
                                             </svg>
                                         </a>
-                                        
                                     </p>
                                 </div>
                             </div>
@@ -64,20 +62,40 @@
                 <div>No datasets yet.</div>
             {% endif %}
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="notes card">
                 <div class="card-header">
                     <h2 class="card-title">Datasets API User Guide</h2>
                 </div>
-                <div class="card-body">
+                <div class="card-body" x-data="{ 'api_url': '' }">
                     <p>These endpoints allow for programmatic access to the datasets held on G-Trac.</p>
                     <h3>Authentication</h3>
                     <p>
-                        API authentication is performed using your token which can be generated <a href="{% url 'data_export' %}">here</a>.
+                        API authentication is performed using token authentication.
+                        <pre>Your API token is: {% if request.user.auth_token %}{{ request.user.auth_token }}{% else %}No token yet. Create one using the button below.{% endif %}</pre>
+                        {% if request.user.auth_token %}
+                            <a href="{% url 'refresh_token' %}?next={{ request.path }}" class="btn btn-sm">Renew Token</a>
+                            <a href="{% url 'delete_token' %}?next={{ request.path }}" class="btn btn-sm btn-danger">Delete Token</a>
+                        {% else %}
+                            <a href="{% url 'generate_token' %}?next={{ request.path }}" class="btn btn-sm btn-success">Generate Token</a>
+                        {% endif %}
+                    </p>
+                    <p>
                         To authenticate with the endpoint, include the following http header with your request:
                         <pre>Authorization: Token {{ request.user.auth_token }}</pre>
                     </p>
-                    <h3>Python Example</h3>
+                    <h3>Code Examples</h3>
+                    <p>Select your dataset to update the code example below:</p>
+                    <div class="form-group mb-4">
+                        <select name="api_url" class="form-control" id="id_api_url" x-model="api_url">
+                            <option value="" selected="">---------</option>
+                            {% for dataset in datasets %}
+                                <option value="{{ site_url }}{% url 'datasets:retrieve' dataset.name %}">{{ dataset.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div id="id_study_name_error" class="text-danger text-lg"></div>
+                    </div>
+                    <h3>Python</h3>
                     <pre>
 # This is a basic example - do not commit this code to git.
 
@@ -85,7 +103,7 @@ import requests
 import pandas as pd
 
 # Set the API_URL for the dataset you want to access
-API_URL = 'https://samples.musicstudy.uk/datasets/api/retrieve/gidamps_demographics/'
+API_URL = '<span x-text="api_url"></span>'
 
 GTRAC_API_TOKEN = '{{ request.user.auth_token }}'
 
@@ -103,13 +121,13 @@ response = requests.get(API_URL, headers = authorization_header, timeout=30)
 data = response.json()
 df = pd.DataFrame(data)
       </pre>
-                    <h3>R Example</h3>
+                    <h3>R</h3>
                     <pre>
 library(httr)
 library(jsonlite)
 
 # Set the API_URL for the dataset you want to access
-API_URL &lt;- 'https://samples.musicstudy.uk/datasets/api/retrieve/gidamps_demographics/'
+API_URL &lt;- '<span x-text="api_url"></span>'
 
 # Again the advice here is to read this token in from an external file.
 GTRAC_API_TOKEN &lt;- "Token {{ request.user.auth_token }}"

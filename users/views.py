@@ -37,14 +37,20 @@ def login_view(request):
 @login_required
 def generate_token(request):
     Token.objects.get_or_create(user=request.user)
-    return redirect(reverse("data_export"))
+    if "next" in request.GET:
+        return redirect(request.GET["next"])
+    else:
+        return redirect(reverse("data_export"))
 
 
 @login_required
 def delete_token(request):
     token = get_object_or_404(Token, user=request.user)
     token.delete()
-    return redirect(reverse("data_export"))
+    if "next" in request.GET:
+        return redirect(request.GET["next"])
+    else:
+        return redirect(reverse("data_export"))
 
 
 @login_required
@@ -52,7 +58,10 @@ def refresh_token(request):
     token = get_object_or_404(Token, user=request.user)
     token.delete()
     Token.objects.get_or_create(user=request.user)
-    return redirect(reverse("data_export"))
+    if "next" in request.GET:
+        return redirect(request.GET["next"])
+    else:
+        return redirect(reverse("data_export"))
 
 
 @staff_member_required
