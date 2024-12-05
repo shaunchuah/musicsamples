@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="Description"
+              content="Sample management system for lab research." />
+        <link rel="apple-touch-icon"
+              sizes="180x180"
+              href="{% static 'apple-touch-icon.png' %}" />
+        <link rel="icon"
+              type="image/png"
+              sizes="32x32"
+              href="{% static 'favicon-32x32.png' %}" />
+        <link rel="icon"
+              type="image/png"
+              sizes="16x16"
+              href="{% static 'favicon-16x16.png' %}" />
+        <link rel="manifest" href="{% static 'site.webmanifest' %}" />
+        <title>G-Trac - Audit</title>
+        <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800"
+              rel="stylesheet" />
+        <link href="{% static 'assets/css/nucleo-icons.css' %}" rel="stylesheet" />
+        <link href="{% static 'assets/css/black-dashboard.css' %}" rel="stylesheet" />
+    </head>
+    <body class="white-content">
+        <div class="container">
+            {% include 'includes/messages.html' %}
+            {% block content %}
+            {% endblock content %}
+        </div>
+        {% include 'includes/scripts.html' %}
+        {% include 'includes/scripts-sidebar.html' %}
+    </body>
+</html>

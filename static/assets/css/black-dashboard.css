@@ -6,6 +6,20 @@
   background-size: cover;
 }
 
+.btn-dataset {
+  border: 0;
+  background: none;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 0;
+  padding-right: 0;
+  margin: 0;
+  color: #6b7280;
+  display: flex;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out, border-radius .15s ease;
+  width: 100%;
+}
+
 pre {
   background-color: #f9fafb;
   padding: 16px;
@@ -14665,7 +14679,6 @@ fieldset[disabled] .btn-link.active {
 
 .footer .nav {
   display: inline-block;
-  float: left;
   margin-bottom: 0;
   padding-left: 30px;
   list-style: none;
@@ -19895,7 +19908,6 @@ Created using IcoMoon - icomoon.io
   display: inline-block;
   font: normal normal normal 1em/1 'Nucleo';
   vertical-align: middle;
-  speak: none;
   text-transform: none;
   /* Better Font Rendering */
   -webkit-font-smoothing: antialiased;

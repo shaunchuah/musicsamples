@@ -27,15 +27,34 @@
                                 <div class="card-footer">
                                     API URL (JSON):
                                     <p>
-                                        <a href="{% url 'datasets:retrieve' dataset.name %}"
-                                           target="_blank">{{ site_url }}{% url 'datasets:retrieve' dataset.name %}</a>
-                                       
+                                        <a href="{% url 'datasets:retrieve' dataset.name %}" target="_blank">{{ site_url }}{% url 'datasets:retrieve' dataset.name %}</a>
                                     </p>
                                     CSV File:
                                     <p>
                                         <a href="{% url 'datasets:export_csv' dataset.name %}" target="_blank">Download CSV</a>
                                     </p>
-                                    <p>Last Updated: {{ dataset.last_modified|date:'d M Y H:i' }}</p>
+                                    <p>
+                                        Last Updated: {{ dataset.last_modified|date:'d M Y H:i' }} |
+                                        Access Count: {{ dataset.datasetaccesshistory_set.all|length }} |
+                                        <a class="btn-dataset d-inline"
+                                           href="{% url 'datasets:access_history' dataset.name %}"
+                                           target="_blank">
+                                            <span>Access History</span>
+                                            <svg width="14"
+                                                 height="14"
+                                                 data-slot="icon"
+                                                 fill="none"
+                                                 stroke-width="1.5"
+                                                 stroke="currentColor"
+                                                 viewBox="0 0 24 24"
+                                                 xmlns="http://www.w3.org/2000/svg"
+                                                 aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                               
+                                            </svg>
+                                        </a>
+                                        
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -110,5 +129,4 @@ df &lt;- jsonlite::fromJSON(json_result)
     </div>
 {% endblock content %}
 {% block javascripts %}
-   
 {% endblock javascripts %}

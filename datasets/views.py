@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
 from rest_framework.response import Response
 
-from datasets.models import Dataset
+from datasets.models import Dataset, DatasetAccessHistory
 from datasets.permissions import CustomDjangoModelPermission
 from datasets.serializers import DatasetSerializer
 from datasets.utils import export_json_field
@@ -43,7 +43,7 @@ class DatasetCreateUpdateView(CreateAPIView):
 @login_required
 @permission_required("datasets.view_dataset", raise_exception=True)
 def list_datasets(request):
-    datasets = Dataset.objects.all()
+    datasets = Dataset.objects.all().prefetch_related("datasetaccesshistory_set")
     site_url = settings.SITE_URL
     return render(request, "datasets/datasets_list.html", {"datasets": datasets, "site_url": site_url})
 
@@ -52,6 +52,7 @@ def list_datasets(request):
 @permission_required("datasets.view_dataset", raise_exception=True)
 def dataset_export_csv(request, dataset_name):
     dataset = get_object_or_404(Dataset, name=dataset_name)
+    DatasetAccessHistory.objects.create(dataset=dataset, user=request.user, access_type="CSV")
     return export_json_field(dataset.name, dataset.json)
 
 
@@ -62,4 +63,17 @@ class RetrieveDatasetAPIView(RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
+        DatasetAccessHistory.objects.create(dataset=instance, user=request.user, access_type="JSON")
         return Response(instance.json)
+
+
+@login_required
+@permission_required("datasets.view_dataset", raise_exception=True)
+def dataset_access_history(request, dataset_name):
+    dataset = Dataset.objects.get(name=dataset_name)
+    dataset_access_history = DatasetAccessHistory.objects.filter(dataset=dataset).order_by("-accessed")
+    return render(
+        request,
+        "datasets/dataset_access_history.html",
+        {"dataset_access_history": dataset_access_history, "dataset": dataset},
+    )

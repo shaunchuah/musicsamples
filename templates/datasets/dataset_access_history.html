@@ -1,0 +1,24 @@
+{% extends "layouts/audit.html" %}
+
+{% block title %}
+    Dataset Access History
+{% endblock title %}
+{% block content %}
+    <div class="row">
+        <div class="col d-flex justify-content-center align-items-center">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h3 class="card-title">Access History for {{ dataset.name }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">Access Count: {{ dataset_access_history|length }}</div>
+                    {% for access_history in dataset_access_history %}
+                        <div>
+                            <b>{{ access_history.user }}</b> accessed {{ access_history.dataset }} on <b>{{ access_history.accessed|date:'d M Y H:i' }}</b> via {{ access_history.access_type }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -375,7 +375,7 @@ def sample_search(request):
         sample_count = sample_list.count()
         return render(
             request,
-            "index.html",
+            "dashboard.html",
             {
                 "query_string": query_string,
                 "sample_list": sample_list,
