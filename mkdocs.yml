@@ -1,0 +1,21 @@
+site_name: G-Trac Datasets
+site_url: 'https://shaunchuah.github.io/musicsamples'
+dev_addr: '127.0.0.1:8080'
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Data Dictionary: data_dictionary.md
+  - Pipeline:
+     - pipeline/index.md
+     - pipeline/gidamps.md
+     - pipeline/music.md
+     - pipeline/mini_music.md
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      use_pygments: true
+      auto_title: true
+      linenums: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite

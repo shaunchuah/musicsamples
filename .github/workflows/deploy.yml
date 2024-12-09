@@ -2,11 +2,10 @@ name: Main Branch Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -17,33 +16,33 @@ jobs:
       DB_ENGINE: django.db.backends.sqlite3
       DB_USER:
       DB_PASSWORD:
-      DB_NAME: ':memory:'
-      DB_HOST: 
+      DB_NAME: ":memory:"
+      DB_HOST:
       DB_PORT:
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Run ruff
-      uses: chartboost/ruff-action@v1
-      with:
-        args: 'format --check'
-    - name: Run Tests and Coverage Report
-      run: |
-        pytest
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run ruff
+        uses: chartboost/ruff-action@v1
+        with:
+          args: "format --check"
+      - name: Run Tests and Coverage Report
+        run: |
+          pytest
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Set up SSH
-      run: |
+      - name: Set up SSH
+        run: |
           mkdir -p ~/.ssh/
           echo "$SSH_KEY" > ~/.ssh/staging.key
           chmod 600 ~/.ssh/staging.key
@@ -54,22 +53,44 @@ jobs:
             IdentityFile ~/.ssh/staging.key
             StrictHostKeyChecking no
           END
-      env:
-        SSH_USER: ${{ secrets.SAMPLETREK_SSH_USER }}
-        SSH_KEY: ${{ secrets.SAMPLETREK_SSH_KEY }}
-        SSH_HOST: ${{ secrets.SAMPLETREK_SSH_HOST }}
-    
-    - name: Pull latest version from GitHub
-      run: ssh deploy 'cd ${{ secrets.INSTALLATION_DIRECTORY }} && git pull' 
+        env:
+          SSH_USER: ${{ secrets.SAMPLETREK_SSH_USER }}
+          SSH_KEY: ${{ secrets.SAMPLETREK_SSH_KEY }}
+          SSH_HOST: ${{ secrets.SAMPLETREK_SSH_HOST }}
 
-    - name: Make deployment script executable
-      run: ssh deploy 'chmod +x ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
-    
-    - name: Run django deployment script
-      run: ssh deploy '${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
+      - name: Pull latest version from GitHub
+        run: ssh deploy 'cd ${{ secrets.INSTALLATION_DIRECTORY }} && git pull'
 
-    - name: Restart gunicorn
-      run: ssh deploy 'systemctl restart gunicorn'
+      - name: Make deployment script executable
+        run: ssh deploy 'chmod +x ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
 
-    - name: Restart nginx
-      run: ssh deploy 'systemctl restart nginx'
+      - name: Run django deployment script
+        run: ssh deploy '${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
+
+      - name: Restart gunicorn
+        run: ssh deploy 'systemctl restart gunicorn'
+
+      - name: Restart nginx
+        run: ssh deploy 'systemctl restart nginx'
+
+  deploy_docs:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - uses: actions/cache@v4
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+      - run: pip install mkdocs-material
+      - run: mkdocs gh-deploy --force

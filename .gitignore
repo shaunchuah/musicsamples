@@ -37,3 +37,4 @@ mydatabase
 .vscode
 .ruff_cache
 node_modules/
+site/
