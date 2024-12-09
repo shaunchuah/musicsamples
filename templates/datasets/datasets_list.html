@@ -65,19 +65,26 @@
         <div class="col-md-4">
             <div class="notes card">
                 <div class="card-header">
-                    <h2 class="card-title">Datasets API User Guide</h2>
+                    <h2 class="card-title">Datasets User Guide</h2>
                 </div>
                 <div class="card-body" x-data="{ 'api_url': '' }">
+                    <p><span class="d-block">Full documentation is available here:</span>
+                        <a href="https://shaunchuah.github.io/musicsamples/" target="_blank" class="d-inline-block btn btn-secondary">Documentation (opens in new window)</a>
+                    </p>
+                    <h3>API User Guide</h3>
                     <p>These endpoints allow for programmatic access to the datasets held on G-Trac.</p>
                     <h3>Authentication</h3>
                     <p>
                         API authentication is performed using token authentication.
                         <pre>Your API token is: {% if request.user.auth_token %}{{ request.user.auth_token }}{% else %}No token yet. Create one using the button below.{% endif %}</pre>
                         {% if request.user.auth_token %}
-                            <a href="{% url 'refresh_token' %}?next={{ request.path }}" class="btn btn-sm">Renew Token</a>
-                            <a href="{% url 'delete_token' %}?next={{ request.path }}" class="btn btn-sm btn-danger">Delete Token</a>
+                            <a href="{% url 'refresh_token' %}?next={{ request.path }}"
+                               class="btn btn-sm">Renew Token</a>
+                            <a href="{% url 'delete_token' %}?next={{ request.path }}"
+                               class="btn btn-sm btn-danger">Delete Token</a>
                         {% else %}
-                            <a href="{% url 'generate_token' %}?next={{ request.path }}" class="btn btn-sm btn-success">Generate Token</a>
+                            <a href="{% url 'generate_token' %}?next={{ request.path }}"
+                               class="btn btn-sm btn-success">Generate Token</a>
                         {% endif %}
                     </p>
                     <p>
