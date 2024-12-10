@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from datasets.models import Dataset, DatasetAccessHistory
+from datasets.models import Dataset, DatasetAccessHistory, DataSourceStatusCheck
 
 
 @admin.register(Dataset)
@@ -11,3 +11,8 @@ class DatasetAdmin(admin.ModelAdmin):
 @admin.register(DatasetAccessHistory)
 class DatasetAccessHistoryAdmin(admin.ModelAdmin):
     list_display = ["user", "dataset", "accessed", "access_type"]
+
+
+@admin.register(DataSourceStatusCheck)
+class DataSourceStatusCheckAdmin(admin.ModelAdmin):
+    list_display = ["data_source", "response_status", "error_message", "checked_at"]

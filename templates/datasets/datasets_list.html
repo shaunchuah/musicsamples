@@ -34,12 +34,12 @@
                                         <a href="{% url 'datasets:export_csv' dataset.name %}" target="_blank">Download CSV</a>
                                     </p>
                                     <p>
-                                        Last Updated: {{ dataset.last_modified|date:'d M Y H:i' }} |
-                                        Access Count: {{ dataset.datasetaccesshistory_set.all|length }} |
+                                        Last updated: {{ dataset.last_modified|date:'d M Y H:i' }} |
+                                        Access count: {{ dataset.datasetaccesshistory_set.all|length }} |
                                         <a class="btn-dataset d-inline"
                                            href="{% url 'datasets:access_history' dataset.name %}"
                                            target="_blank">
-                                            <span>Access History</span>
+                                            <span>Access history</span>
                                             <svg width="14"
                                                  height="14"
                                                  data-slot="icon"
@@ -61,6 +61,44 @@
             {% else %}
                 <div>No datasets yet.</div>
             {% endif %}
+            <!-- Connection Status -->
+            {% if data_source_status_checks %}
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Data Source Connection Status</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="row px-3">
+                                    {% for check in data_source_status_checks %}
+                                        {% if check.response_status == 200 %}
+                                            <div class="status_card mb-2 mr-2">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="status_dot mr-2"></div>
+                                                    <div class="status_title">{{ check.data_source }}</div>
+                                                </div>
+                                                <div class="status_subtitle">Last checked: {{ check.checked_at|date:'d M Y H:i' }}</div>
+                                                <div class="status_text">200 OK.</div>
+                                            </div>
+                                        {% else %}
+                                            <div class="status_card mb-2 mr-2">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="status_dot_error mr-2"></div>
+                                                    <div class="status_title">{{ check.data_source }}</div>
+                                                </div>
+                                                <div class="status_subtitle">Last checked: {{ check.checked_at|date:'d M Y H:i' }}</div>
+                                                <div class="status_text_error">Error {{ check.response_status }}: {{ check.error_message }}</div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <!-- End Connection Status-->
         </div>
         <div class="col-md-4">
             <div class="notes card">
@@ -68,8 +106,11 @@
                     <h2 class="card-title">Datasets User Guide</h2>
                 </div>
                 <div class="card-body" x-data="{ 'api_url': '' }">
-                    <p><span class="d-block">Full documentation is available here:</span>
-                        <a href="https://shaunchuah.github.io/musicsamples/" target="_blank" class="d-inline-block btn btn-secondary">Documentation (opens in new window)</a>
+                    <p>
+                        <span class="d-block">Full documentation is available here:</span>
+                        <a href="https://shaunchuah.github.io/musicsamples/"
+                           target="_blank"
+                           class="d-inline-block btn btn-secondary">Documentation (opens in new window)</a>
                     </p>
                     <h3>API User Guide</h3>
                     <p>These endpoints allow for programmatic access to the datasets held on G-Trac.</p>

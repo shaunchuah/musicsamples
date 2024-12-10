@@ -6,9 +6,9 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
 from rest_framework.response import Response
 
-from datasets.models import Dataset, DatasetAccessHistory
+from datasets.models import Dataset, DatasetAccessHistory, DataSourceStatusCheck
 from datasets.permissions import CustomDjangoModelPermission
-from datasets.serializers import DatasetSerializer
+from datasets.serializers import DatasetSerializer, DataSourceStatusCheckSerializer
 from datasets.utils import export_json_field
 
 
@@ -40,12 +40,30 @@ class DatasetCreateUpdateView(CreateAPIView):
         return Response(serializer.data)
 
 
+class DataSourceStatusCheckView(CreateAPIView):
+    """
+    DataSourceStatusCheckView is a view that handles the creation of DataSourceStatusCheck objects.
+    Permissions:
+        Only users with admin privileges can access this view.
+    """
+
+    queryset = DataSourceStatusCheck.objects.all()
+    serializer_class = DataSourceStatusCheckSerializer
+    permission_classes = [IsAdminUser]
+    renderer_classes = [BrowsableAPIRenderer, JSONRenderer]
+
+
 @login_required
 @permission_required("datasets.view_dataset", raise_exception=True)
 def list_datasets(request):
     datasets = Dataset.objects.all().prefetch_related("datasetaccesshistory_set")
+    data_source_status_checks = DataSourceStatusCheck.objects.all()
     site_url = settings.SITE_URL
-    return render(request, "datasets/datasets_list.html", {"datasets": datasets, "site_url": site_url})
+    return render(
+        request,
+        "datasets/datasets_list.html",
+        {"datasets": datasets, "data_source_status_checks": data_source_status_checks, "site_url": site_url},
+    )
 
 
 @login_required

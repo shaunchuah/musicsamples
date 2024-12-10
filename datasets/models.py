@@ -40,3 +40,13 @@ class DatasetAccessHistory(models.Model):
 
     def __str__(self):
         return f"{self.user} accessed {self.dataset} on {self.accessed.strftime('%Y-%m-%d %H:%M:%S')}"
+
+
+class DataSourceStatusCheck(models.Model):
+    data_source = models.CharField(max_length=255)  # could be API server or S3 file
+    response_status = models.IntegerField()
+    error_message = models.TextField(blank=True, null=True)
+    checked_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"API check for {self.data_source} at {self.checked_at.strftime('%Y-%m-%d %H:%M:%S')}"

@@ -6,6 +6,48 @@
   background-size: cover;
 }
 
+.status_dot {
+  width: 15px;
+  height: 15px;
+  background-color: #22c55e;
+  border-radius: 50%;
+}
+
+.status_dot_error {
+  width: 15px;
+  height: 15px;
+  background-color: #ef4444;
+  border-radius: 50%;
+}
+
+.status_title {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.status_card {
+  border: 1px solid #e5e7eb;
+  padding: 12px;
+  border-radius: 8px;
+  width:250px;
+}
+
+.status_subtitle {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.status_text {
+  margin-top: 8px;
+  font-size: 1rem;
+}
+
+.status_text_error {
+  margin-top: 8px;
+  font-size: 1rem;
+  color: #ef4444;
+}
+
 .btn-dataset {
   border: 0;
   background: none;
