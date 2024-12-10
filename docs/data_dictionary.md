@@ -20,3 +20,4 @@ As a standard style guide, all variables in datasets will follow the snake_case 
 |montreal_upper_gi|bool|1 or 0|Upper GI disease modifier (+/- L4)|
 |montreal_uc_severity|string|`S1`, `S2`, `S3`|S1: Mild activity, S2: Moderate activity, S3: Severe activity (search Montreal UC for full definitions)|
 |montreal_uc_extent|string|`E1`, `E2`, `E3`|E1: proctitis only, E2: left-sided disease, E3: extensive|
+|new_diagnosis_of_ibd|string|`yes`, `no`|This field previously known as incident_case in mini-music and bl_new_diagnosis in gi-damps|

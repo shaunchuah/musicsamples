@@ -88,7 +88,7 @@
                                                     <div class="status_title">{{ check.data_source }}</div>
                                                 </div>
                                                 <div class="status_subtitle">Last checked: {{ check.checked_at|date:'d M Y H:i' }}</div>
-                                                <div class="status_text_error">Error {{ check.response_status }}: {{ check.error_message }}</div>
+                                                <div class="status_text_error">{{ check.error_message }}</div>
                                             </div>
                                         {% endif %}
                                     {% endfor %}
