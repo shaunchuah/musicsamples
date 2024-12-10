@@ -38,3 +38,5 @@ mydatabase
 .ruff_cache
 node_modules/
 site/
+*-wal
+*-shm

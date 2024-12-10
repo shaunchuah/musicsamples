@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
+from django.db.models import Max
 from django.shortcuts import get_object_or_404, render
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAdminUser
@@ -57,12 +58,21 @@ class DataSourceStatusCheckView(CreateAPIView):
 @permission_required("datasets.view_dataset", raise_exception=True)
 def list_datasets(request):
     datasets = Dataset.objects.all().prefetch_related("datasetaccesshistory_set")
-    data_source_status_checks = DataSourceStatusCheck.objects.all()
     site_url = settings.SITE_URL
+
+    # Data Source Status Checks
+    data_source_status_checks = DataSourceStatusCheck.objects.all()
+    latest_status_checks = (
+        data_source_status_checks.values("data_source").annotate(latest_checked_at=Max("checked_at")).order_by()
+    )
+    latest_status_checks = DataSourceStatusCheck.objects.filter(
+        checked_at__in=[item["latest_checked_at"] for item in latest_status_checks]
+    )
+
     return render(
         request,
         "datasets/datasets_list.html",
-        {"datasets": datasets, "data_source_status_checks": data_source_status_checks, "site_url": site_url},
+        {"datasets": datasets, "data_source_status_checks": latest_status_checks, "site_url": site_url},
     )
 
 
