@@ -1,11 +1,26 @@
 # MUSIC
 
-## music_raw_dataframe
+```py title="assets/music.py"
+import numpy as np
+import pandas as pd
+import requests
+from dagster import (
+    AssetExecutionContext,
+    EnvVar,
+    MaterializeResult,
+    MetadataValue,
+    asset,
+)
 
-The raw dataframe is fetched from RedCap and transformed to extract baseline drug exposure into usable variables. Unnecessary columns are dropped before further data cleaning.
+from music_dagster.resources import GTracResource
 
-```py
-def music_raw_dataframe() -> pd.DataFrame:
+
+@asset(
+    io_manager_key="io_manager",
+    description="Fetches MUSIC data from IGMM RedCap Server, re-engineers baseline drug columns, and drops unused columns",
+    group_name="music",
+)
+def music_raw_dataframe(context: AssetExecutionContext) -> pd.DataFrame:
     MUSIC_API_TOKEN = EnvVar("MUSIC_API_TOKEN").get_value()
     music_redcap_url = "https://ecrf.igmm.ed.ac.uk/api/"
     redcap_api_data = {
@@ -456,18 +471,20 @@ def music_raw_dataframe() -> pd.DataFrame:
     df.dropna(
         axis=1, how="all", inplace=True
     )  # Drop all columns where every value is empty
-
+    rows, columns = df.shape
+    context.add_output_metadata(
+        {
+            "dagster/row_count": rows,
+            "column_count": columns,
+        }
+    )
     return df
-```
 
-## music_reshaped_dataframe
 
-The raw dataframe from RedCap contains many redundant rows due to the use of `redcap_repeat_instrument`. This function extracts and reshapes the data to ensure each participant has only one row per timepoint.
-
-Note: Saliva data can also be found in rows where `redcap_repeat_instrument` is blank, not just where it is labeled as `saliva_sampling`.
-
-```py
-def music_reshaped_dataframe(music_raw_dataframe: pd.DataFrame) -> pd.DataFrame:
+@asset(description="Stage 1 Cleaning - Reshape dataframe.", group_name="music")
+def music_reshaped_dataframe(
+    context: AssetExecutionContext, music_raw_dataframe: pd.DataFrame
+) -> pd.DataFrame:
     df = music_raw_dataframe
 
     # Split the initial df into 3 components; 1 with lab tests, 1 with saliva samples and 1 with the rest
@@ -579,15 +596,24 @@ def music_reshaped_dataframe(music_raw_dataframe: pd.DataFrame) -> pd.DataFrame:
     df = df[df["withdrawn"] != "0"]  # surprisingly withdrawn is coded as 0 for yes
     df.drop(columns=["withdrawn"], inplace=True)
 
+    rows, columns = df.shape
+    context.add_output_metadata(
+        {
+            "dagster/row_count": rows,
+            "column_count": columns,
+        }
+    )
+
     return df
-```
 
-## music_cleaned_dataframe
 
-This section performs the main data cleaning operations for the music dataset.
-
-```py
-def music_cleaned_dataframe(music_reshaped_dataframe: pd.DataFrame) -> pd.DataFrame:
+@asset(
+    description="Stage 2 Cleaning - Fixing all column and cell values",
+    group_name="music",
+)
+def music_cleaned_dataframe(
+    context: AssetExecutionContext, music_reshaped_dataframe: pd.DataFrame
+) -> pd.DataFrame:
     df = music_reshaped_dataframe
 
     df.rename(
@@ -655,7 +681,7 @@ def music_cleaned_dataframe(music_reshaped_dataframe: pd.DataFrame) -> pd.DataFr
             "cucq32q45": "cucq_31",
             "cucq32q46": "cucq_32",
             "cucq32_rev_date": "cucq_date",
-            "comment_if_any_of_these_qu": "cucq_comments",
+            "comment_if_any_of_these_qu": "proms_comments",
             "sccaicomplications___0": "sccai_no_complications",
             "sccaicomplications___1": "sccai_arthralgia",
             "sccaicomplications___2": "sccai_uveitis",
@@ -1382,16 +1408,27 @@ def music_cleaned_dataframe(music_reshaped_dataframe: pd.DataFrame) -> pd.DataFr
         )
     )
 
+    # Data harmonization
+    df.rename(columns={"study_group_name": "study_group"}, inplace=True)
+    df["study_id"] = df["study_id"].apply(lambda x: f"MID-{x}")
+
+    rows, columns = df.shape
+    context.add_output_metadata(
+        {
+            "dagster/row_count": rows,
+            "column_count": columns,
+            "columns": df.columns.to_list(),
+            "preview": MetadataValue.md(df.head(3).to_markdown()),
+        }
+    )
     return df
 
-```
 
-## music_demographics_dataframe
-
-This function extracts a focused subset of the main music dataframe, focusing on the rows corresponding to the first timepoint (timepoint_1) to provide demographic information. Use this dataframe to generate demographic table information.
-
-```py
+@asset(
+    description="Creates abbreviated music demographics dataframe", group_name="music"
+)
 def music_demographics_dataframe(
+    context: AssetExecutionContext,
     music_cleaned_dataframe: pd.DataFrame,
 ) -> pd.DataFrame:
     df = music_cleaned_dataframe
@@ -1403,7 +1440,7 @@ def music_demographics_dataframe(
         "redcap_event_name",
         "age",
         "sex",
-        "study_group_name",
+        "study_group",
         "diagnosis_comments",
         "date_of_diagnosis",
         "age_at_diagnosis",
@@ -1531,5 +1568,65 @@ def music_demographics_dataframe(
     ]
     demographics_df = demographics_df[demographics_columns]
 
+    rows, columns = demographics_df.shape
+    context.add_output_metadata(
+        {
+            "dagster/row_count": rows,
+            "column_count": columns,
+            "columns": demographics_df.columns.to_list(),
+            "preview": MetadataValue.md(demographics_df.head().to_markdown()),
+        }
+    )
+
     return demographics_df
+
+
+@asset(
+    group_name="music",
+    description="Stores MUSIC abbreviated demographics data in GTrac Dataset model",
+)
+def store_music_demographics_in_gtrac(
+    music_demographics_dataframe: pd.DataFrame, gtrac: GTracResource
+) -> MaterializeResult:
+    df = music_demographics_dataframe
+    json = df.to_json(orient="records")
+
+    data = {
+        "study_name": "music",
+        "name": "music_demographics",
+        "description": "Abbreviated version of the main MUSIC dataframe consisting of selected demographics columns. Use this to make demographics table. Each row represents a single participant at timepoint 1.",
+        "json": json,
+    }
+
+    response = gtrac.submit_data(data)
+    return MaterializeResult(
+        metadata={
+            "status_code": str(response.status_code),
+        }
+    )
+
+
+@asset(
+    group_name="music",
+    description="Stores main MUSIC dataframe in GTrac Dataset model",
+)
+def store_music_main_in_gtrac(
+    music_cleaned_dataframe: pd.DataFrame, gtrac: GTracResource
+) -> MaterializeResult:
+    df = music_cleaned_dataframe
+    json = df.to_json(orient="records")
+    data = {
+        "study_name": "music",
+        "name": "music_main",
+        "description": "Main dataframe for MUSIC participants. Each row represents a single participant at a single timepoint. ['study_id', 'redcap_event_name'] is the primary key.",
+        "json": json,
+    }
+    response = gtrac.submit_data(data)
+    return MaterializeResult(
+        metadata={
+            "status_code": str(response.status_code),
+        }
+    )
+
+
 ```

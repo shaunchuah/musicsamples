@@ -1,10 +1,137 @@
-# GI-DAMPS
+# GI-DAMPs
 
-## gidamps_cleaned_dataframe
+```py title="assets/gidamps.py"
+import datetime
 
-```py
-def gidamps_cleaned_dataframe(gidamps_raw_dataframe: pd.DataFrame) -> pd.DataFrame:
+import numpy as np
+import pandas as pd
+import requests
+from dagster import (
+    AssetExecutionContext,
+    EnvVar,
+    MaterializeResult,
+    MetadataValue,
+    asset,
+)
 
+from music_dagster.resources import GTracResource
+
+
+@asset(
+    io_manager_key="io_manager",
+    description="Fetches GI-DAMPs data from IGMM RedCap Server",
+    group_name="gidamps",
+)
+def gidamps_raw_dataframe() -> pd.DataFrame:
+    """
+    Fetches raw data from the GIDAMPS REDCap API and returns it as a pandas DataFrame.
+    The function performs the following steps:
+    1. Retrieves the GIDAMPS API token from environment variables.
+    2. Defines the REDCap API URL and the data payload for the API request.
+    3. Sends a POST request to the REDCap API to fetch the data.
+    4. Converts the JSON response into a pandas DataFrame.
+    5. Drops specific columns from the DataFrame that are not needed.
+    Returns:
+        pd.DataFrame: A pandas DataFrame containing the raw data from the GIDAMPS REDCap API.
+    """
+
+    GIDAMPS_API_TOKEN = EnvVar("GIDAMPS_API_TOKEN").get_value()
+    gidamps_redcap_url = "https://ecrf.igmm.ed.ac.uk/api/"
+    redcap_api_data = {
+        "token": f"{GIDAMPS_API_TOKEN}",
+        "content": "record",
+        "action": "export",
+        "format": "json",
+        "type": "flat",
+        "csvDelimiter": "",
+        "rawOrLabel": "raw",
+        "rawOrLabelHeaders": "raw",
+        "exportCheckboxLabel": "false",
+        "exportSurveyFields": "false",
+        "exportDataAccessGroups": "false",
+        "returnFormat": "json",
+    }
+    response = requests.post(gidamps_redcap_url, data=redcap_api_data)
+    response.raise_for_status()
+    data = response.json()
+    df = pd.DataFrame.from_records(data)
+    df.drop(
+        columns=[
+            "email",
+            "chi_no",
+            "consent",
+            "initial",
+            "dob",
+            "legacy_study_id",
+            "patient_details_complete",
+            "pd_gi_participant_category",
+            "registration_location",
+            "date_enrolledconsent",
+            "data_entry_date",
+            "study_group",
+            "study_group_hc",
+            "blood_experiment",
+            "faecal_experiment",
+            "biopsy_experiment",
+            "bloodtestdate_as_lbt",
+            "blood_sample_collected___5",
+            "blood_sample_collected___6",
+            "blood_sample_collected___3",
+            "blood_sample_collected___4",
+            "blood_sample_collected___100",
+            "blood_sample_collected___200",
+            "blood_sample_collected___99",
+            "blood_sample_collected___2",
+            "blood_sample_collected___1",
+            "blood_sample_collected____1000",
+            "blood_sample_optinal_set___1",
+            "blood_sample_optinal_set____1000",
+            "blood_sample_additional___1",
+            "blood_sample_additional___2",
+            "blood_sample_additional____1000",
+            "faecal_test_date",
+            "faecal_sample_collected___1",
+            "faecal_sample_collected___2",
+            "faecal_sample_collected___3",
+            "faecal_sample_collected___4",
+            "faecal_sample_collected___99",
+            "faecal_sample_collected____1000",
+            "sampls_date_experiment4",
+            "biopsy_sample_collected___1",
+            "biopsy_sample_collected___2",
+            "biopsy_sample_collected___99",
+            "biopsy_sample_collected____1000",
+            "sampling_complete",
+            "baseline_eims____1000",
+            "sccai_complications____1000",
+            "hbicomplications____1000",
+            "adalimumab_test",
+            "infliximab_test",
+            "vedolizumab_test",
+            "ustekinumab_test",
+            "drug_level_uste",
+            "drug_level_antibody_uste",
+            "drug_level_vedo",
+            "drug_level_antibody_vedo",
+            "endoscopy_yn",
+            "endoscopy_type____1000",
+            "gidamps_participant_questionnaire_complete",
+            "baseline_mont_cd_loc____1000",
+            "baseline_mont_cd_beh____1000",
+            "radiology",
+            "ibd_background_clinician_complete",
+        ],
+        inplace=True,
+    )
+    return df
+
+
+@asset(
+    description="Data cleaning - Renames columns and maps values.", group_name="gidamps"
+)
+def gidamps_cleaned_dataframe(
+    context: AssetExecutionContext, gidamps_raw_dataframe: pd.DataFrame
+) -> pd.DataFrame:
     """
     Cleans and transforms the raw GIDAMPS dataframe.
     This function performs the following operations:
@@ -20,12 +147,11 @@ def gidamps_cleaned_dataframe(gidamps_raw_dataframe: pd.DataFrame) -> pd.DataFra
     Returns:
         pd.DataFrame: The cleaned and transformed dataframe.
     """
-
     df = gidamps_raw_dataframe
 
     df.rename(
         columns={
-            "bl_new_diagnosis": "new_diagnosis",
+            "bl_new_diagnosis": "new_diagnosis_of_ibd",
             "smokeryn1": "smoking_status",
             "bmi_height": "height",
             "bmi_weight": "weight",
@@ -117,7 +243,7 @@ def gidamps_cleaned_dataframe(gidamps_raw_dataframe: pd.DataFrame) -> pd.DataFra
         "baseline_recruitment_type",
         "sex",
         "ibd_status",
-        "new_diagnosis",
+        "new_diagnosis_of_ibd",
         "smoking_status",
         "sccai_general_well_being",
         "sccai_bowel_frequency_day",
@@ -245,10 +371,10 @@ def gidamps_cleaned_dataframe(gidamps_raw_dataframe: pd.DataFrame) -> pd.DataFra
         }
     )
 
-    df["new_diagnosis"] = df["new_diagnosis"].map(
+    df["new_diagnosis_of_ibd"] = df["new_diagnosis_of_ibd"].map(
         {
-            1: "new_dx",
-            0: "existing_dx",
+            1: "yes",
+            0: "no",
         }
     )
 
@@ -389,46 +515,60 @@ def gidamps_cleaned_dataframe(gidamps_raw_dataframe: pd.DataFrame) -> pd.DataFra
         if "136-" in x
         else ("dundee" if "138-" in x else "edinburgh")
     )
+    # Data Harmonization
+    df.rename(columns={"study_group_name": "study_group"}, inplace=True)
 
     df.replace(r"^\s*$", np.nan, regex=True, inplace=True)
+
+    rows, columns = df.shape
+    context.add_output_metadata(
+        {
+            "dagster/row_count": rows,
+            "column_count": columns,
+            "columns": df.columns.to_list(),
+            "preview": MetadataValue.md(df.head(10).to_markdown()),
+        }
+    )
 
     return df
 
 
-```
-
-## gidamps_demographics_dataframe
-
-```py
+@asset(description="Creates demographics dataframe", group_name="gidamps")
 def gidamps_demographics_dataframe(
+    context: AssetExecutionContext,
     gidamps_cleaned_dataframe: pd.DataFrame,
 ) -> pd.DataFrame:
-
     """
-    Filters the given GIDAMPS cleaned dataframe to produce 
-    a demographics dataframe.
-    This function removes rows where the 'redcap_repeat_instrument' column 
-    has the values 'sampling' or 'cucq32'.
+    Filters the given GIDAMPS cleaned dataframe to produce a demographics dataframe.
+    This function removes rows where the 'redcap_repeat_instrument' column has the values 'sampling' or 'cucq32'.
     It also drops columns that contain only NaN values.
     """
-
     df = gidamps_cleaned_dataframe
     demographics_df = df[df["redcap_repeat_instrument"] != "sampling"]
     demographics_df = demographics_df[
         demographics_df["redcap_repeat_instrument"] != "cucq32"
     ]
     demographics_df.dropna(axis=1, how="all", inplace=True)
+
+    rows, columns = demographics_df.shape
+    context.add_output_metadata(
+        {
+            "dagster/row_count": rows,
+            "column_count": columns,
+            "columns": demographics_df.columns.to_list(),
+            "preview": MetadataValue.md(demographics_df.head(10).to_markdown()),
+        }
+    )
     return demographics_df
 
 
-
-```
-
-## gidamps_sampling_dataframe
-
-```py
-def gidamps_sampling_dataframe(gidamps_cleaned_dataframe: pd.DataFrame) -> pd.DataFrame:
-
+@asset(
+    description="Creates sampling dataframe",
+    group_name="gidamps",
+)
+def gidamps_sampling_dataframe(
+    context: AssetExecutionContext, gidamps_cleaned_dataframe: pd.DataFrame
+) -> pd.DataFrame:
     """
     Processes and merges different subsets of a given DataFrame based on specific conditions.
     Args:
@@ -475,6 +615,64 @@ def gidamps_sampling_dataframe(gidamps_cleaned_dataframe: pd.DataFrame) -> pd.Da
     merged_df = pd.merge(
         merged_df, cucq_df, how="left", on=["study_id", "sampling_date"]
     )
+
+    rows, columns = merged_df.shape
+    context.add_output_metadata(
+        {
+            "dagster/row_count": rows,
+            "column_count": columns,
+            "columns": merged_df.columns.to_list(),
+            "preview": MetadataValue.md(merged_df.head(10).to_markdown()),
+        }
+    )
     return merged_df
-    
+
+
+@asset(
+    group_name="gidamps",
+    description="Stores GIDAMPS demographic data in GTrac Dataset model",
+)
+def store_demographic_data_in_gtrac(
+    gidamps_demographics_dataframe: pd.DataFrame, gtrac: GTracResource
+) -> MaterializeResult:
+    df = gidamps_demographics_dataframe
+    json = df.to_json(orient="records")
+
+    data = {
+        "study_name": "gidamps",
+        "name": "gidamps_demographics",
+        "description": "Demographic data from the GIDAMPS study. Each row represents a single participant.",
+        "json": json,
+    }
+
+    response = gtrac.submit_data(data)
+    return MaterializeResult(
+        metadata={
+            "status_code": str(response.status_code),
+        }
+    )
+
+
+@asset(
+    group_name="gidamps",
+    description="Stores GIDAMPS sampling data in GTrac Dataset model",
+)
+def store_sampling_data_in_gtrac(
+    gidamps_sampling_dataframe: pd.DataFrame, gtrac: GTracResource
+) -> MaterializeResult:
+    df = gidamps_sampling_dataframe
+    json = df.to_json(orient="records")
+    data = {
+        "study_name": "gidamps",
+        "name": "gidamps_sampling",
+        "description": "Sampling data from the GIDAMPS study. Each row represents a single sampling event. There may be multiple sampling events per participant.",
+        "json": json,
+    }
+    response = gtrac.submit_data(data)
+    return MaterializeResult(
+        metadata={
+            "status_code": str(response.status_code),
+        }
+    )
+
 ```

@@ -1,4 +1,4 @@
-# Data Dictionary
+# Unified Data Dictionary
 
 This standardized data dictionary is used for datasets within G-Trac. Only the common variables across datasets are standardized as shown below. Each study dataset will also include its own study-specific data fields.
 
