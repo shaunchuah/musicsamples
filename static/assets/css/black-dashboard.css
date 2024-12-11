@@ -20,6 +20,23 @@
   border-radius: 50%;
 }
 
+
+.monitor_dot {
+  width: 7px;
+  height: 30px;
+  background-color: #22c55e;
+  border-radius: 5px;
+  margin-right: 2px;
+}
+
+.monitor_dot_error {
+  width: 7px;
+  height: 30;
+  background-color: #ef4444;
+  border-radius: 5px;
+  margin-right: 2px;
+}
+
 .status_title {
   font-size: 1.25rem;
   font-weight: 500;
@@ -29,7 +46,7 @@
   border: 1px solid #e5e7eb;
   padding: 12px;
   border-radius: 8px;
-  width:250px;
+  width:300px;
 }
 
 .status_subtitle {

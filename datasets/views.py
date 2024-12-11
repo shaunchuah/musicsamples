@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Max
+from django.db.models import Max, OuterRef, Subquery
 from django.shortcuts import get_object_or_404, render
 from rest_framework.generics import CreateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAdminUser
@@ -69,10 +69,20 @@ def list_datasets(request):
         checked_at__in=[item["latest_checked_at"] for item in latest_status_checks]
     )
 
+    # Select the 30 most recent checks for each unique data_source
+    latest_checks = DataSourceStatusCheck.objects.filter(data_source=OuterRef("data_source")).order_by("-checked_at")
+    last_30_checks = latest_checks[:30]
+    graph_data = DataSourceStatusCheck.objects.filter(id__in=Subquery(last_30_checks.values("id")))
+
     return render(
         request,
         "datasets/datasets_list.html",
-        {"datasets": datasets, "data_source_status_checks": latest_status_checks, "site_url": site_url},
+        {
+            "datasets": datasets,
+            "data_source_status_checks": latest_status_checks,
+            "site_url": site_url,
+            "graph_data": graph_data,
+        },
     )
 
 

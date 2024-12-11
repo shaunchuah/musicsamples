@@ -80,6 +80,20 @@
                                                 </div>
                                                 <div class="status_subtitle">Last checked: {{ check.checked_at|date:'d M Y H:i' }}</div>
                                                 <div class="status_text">200 OK.</div>
+                                                <!--Monitoring Graph-->
+                                                <div class="d-flex pt-1">
+                                                    {% for data_point in graph_data %}
+                                                        {% if data_point.data_source == check.data_source %}
+                                                            {% if data_point.response_status == 200 %}
+                                                                <div class="monitor_dot"></div>
+                                                            {% else %}
+                                                                <div class="monitor_dot_error"></div>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                                <div class="status_subtitle mt-1 d-flex flex-row-reverse">Last 30 days</div>
+                                                <!--End Monitoring Graph-->
                                             </div>
                                         {% else %}
                                             <div class="status_card mb-2 mr-2">
@@ -89,6 +103,19 @@
                                                 </div>
                                                 <div class="status_subtitle">Last checked: {{ check.checked_at|date:'d M Y H:i' }}</div>
                                                 <div class="status_text_error">{{ check.error_message }}</div>
+                                                <!--Monitoring Graph-->
+                                                <div class="d-flex pt-1">
+                                                    {% for data_point in graph_data %}
+                                                        {% if data_point.data_source == check.data_source %}
+                                                            {% if data_point.response_status == 200 %}
+                                                                <div class="monitor_dot"></div>
+                                                            {% else %}
+                                                                <div class="monitor_dot_error"></div>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                                <!--End Monitoring Graph-->
                                             </div>
                                         {% endif %}
                                     {% endfor %}
