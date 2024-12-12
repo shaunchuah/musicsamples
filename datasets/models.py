@@ -19,6 +19,16 @@ class Dataset(models.Model):
         return self.name
 
 
+class DatasetAnalytics(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    data = models.JSONField(blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+
 class DatasetAccessTypeChoices(models.TextChoices):
     CSV = "CSV", "CSV"
     JSON = "JSON", "JSON"

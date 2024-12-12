@@ -8,9 +8,9 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
 from rest_framework.response import Response
 
-from datasets.models import Dataset, DatasetAccessHistory, DataSourceStatusCheck
+from datasets.models import Dataset, DatasetAccessHistory, DatasetAnalytics, DataSourceStatusCheck
 from datasets.permissions import CustomDjangoModelPermission
-from datasets.serializers import DatasetSerializer, DataSourceStatusCheckSerializer
+from datasets.serializers import DatasetAnalyticsSerializer, DatasetSerializer, DataSourceStatusCheckSerializer
 from datasets.utils import export_json_field
 
 User = get_user_model()
@@ -37,6 +37,34 @@ class DatasetCreateUpdateView(CreateAPIView):
 
     def update(self, request, *args, **kwargs):
         instance = Dataset.objects.get(name=request.data["name"])
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
+
+
+class DatasetAnalyticsCreateUpdateView(CreateAPIView):
+    """
+    View for creating or updating DatasetAnalytics instances.
+    This view creates a new DatasetAnalytics instance or updates an existing one depending on
+    whether a DatasetAnalytics with the given 'name' already exists.
+    """
+
+    queryset = DatasetAnalytics.objects.all()
+    serializer_class = DatasetAnalyticsSerializer
+    permission_classes = [IsAdminUser]
+    renderer_classes = [BrowsableAPIRenderer, JSONRenderer]
+
+    def create(self, request, *args, **kwargs):
+        try:
+            DatasetAnalytics.objects.get(name=request.data["name"])
+            return self.update(request, *args, **kwargs)
+        except DatasetAnalytics.DoesNotExist:
+            return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        instance = DatasetAnalytics.objects.get(name=request.data["name"])
         serializer = self.get_serializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
