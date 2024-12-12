@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Max, OuterRef, Subquery
 from django.shortcuts import get_object_or_404, render
@@ -11,6 +12,8 @@ from datasets.models import Dataset, DatasetAccessHistory, DataSourceStatusCheck
 from datasets.permissions import CustomDjangoModelPermission
 from datasets.serializers import DatasetSerializer, DataSourceStatusCheckSerializer
 from datasets.utils import export_json_field
+
+User = get_user_model()
 
 
 class DatasetCreateUpdateView(CreateAPIView):
@@ -74,6 +77,9 @@ def list_datasets(request):
     last_30_checks = latest_checks[:30]
     graph_data = DataSourceStatusCheck.objects.filter(id__in=Subquery(last_30_checks.values("id")))
 
+    # User Access List
+    user_access_list = User.objects.filter(groups__name="datasets").order_by("first_name")
+
     return render(
         request,
         "datasets/datasets_list.html",
@@ -82,6 +88,7 @@ def list_datasets(request):
             "data_source_status_checks": latest_status_checks,
             "site_url": site_url,
             "graph_data": graph_data,
+            "user_access_list": user_access_list,
         },
     )
 

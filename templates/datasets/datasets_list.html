@@ -10,7 +10,7 @@
         <i class="tim-icons icon-paper"></i> Datasets
     </h2>
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-lg-8">
             {% if datasets %}
                 <div class="row">
                     {% for dataset in datasets %}
@@ -127,7 +127,7 @@
             {% endif %}
             <!-- End Connection Status-->
         </div>
-        <div class="col-md-4">
+        <div class="col-lg-4">
             <div class="notes card">
                 <div class="card-header">
                     <h2 class="card-title">Datasets User Guide</h2>
@@ -211,13 +211,44 @@ response &lt;- httr::GET(API_URL, add_headers(Authorization = GTRAC_API_TOKEN))
 json_result &lt;- httr::content(response, as="text", encoding="utf-8")
 df &lt;- jsonlite::fromJSON(json_result)
 </pre>
-                    <h3>Dagster</h3>
-                    <p>
-                        Dagster is our data orchestrator which pulls data from the various databases, cleans it and stores it here in G-Trac. You can view it here:
-                        <a href="https://dagster.musicstudy.uk/" target="_blank">https://dagster.musicstudy.uk/</a>. Please contact Shaun for the username and password. Data is refreshed every Monday to Friday at 11pm.
-                    </p>
                 </div>
             </div>
+            <!-- User Access List -->
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Datasets Access List</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <table  class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    {% for user in user_access_list %}
+                                        <tr>
+                                            <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                            <td>
+                                                <a href="mailto:{{ user.email }}" target="_blank">{{ user.email }}</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                            <h3 class="card-title">Dagster</h3>
+                            <p>
+                                Dagster is the data orchestrator which pulls data from the various databases, cleans it and stores it in G-Trac.
+                                <a href="https://dagster.musicstudy.uk/" target="_blank">https://dagster.musicstudy.uk/</a>. If you wish to troubleshoot a pipeline, please contact Shaun for the username and password. Data is refreshed every Monday to Friday night.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End User Access List-->
         </div>
     </div>
 {% endblock content %}
