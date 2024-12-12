@@ -28,6 +28,9 @@ class DatasetAnalytics(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = "Dataset analytics"
+
 
 class DatasetAccessTypeChoices(models.TextChoices):
     CSV = "CSV", "CSV"
@@ -50,6 +53,9 @@ class DatasetAccessHistory(models.Model):
 
     def __str__(self):
         return f"{self.user} accessed {self.dataset} on {self.accessed.strftime('%Y-%m-%d %H:%M:%S')}"
+
+    class Meta:
+        verbose_name_plural = "Dataset access histories"
 
 
 class DataSourceStatusCheck(models.Model):

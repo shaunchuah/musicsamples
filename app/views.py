@@ -26,6 +26,7 @@ from app.utils import (
     queryset_by_study_name,
     render_dataframe_to_csv_response,
 )
+from datasets.models import DatasetAnalytics
 
 # from django.views.decorators.cache import cache_page
 
@@ -207,6 +208,27 @@ def analytics(request):
         .annotate(sample_location_count=Count("id"))
         .order_by("-sample_location_count")
     )
+
+    # GI-DAMPs analytics
+    try:
+        gidamps_participants_by_center = DatasetAnalytics.objects.get(name="gidamps_participants_by_center").data
+        gidamps_participants_by_study_group = DatasetAnalytics.objects.get(
+            name="gidamps_participants_by_study_group"
+        ).data
+        gidamps_participants_by_recruitment_setting = DatasetAnalytics.objects.get(
+            name="gidamps_participants_by_recruitment_setting"
+        ).data
+        gidamps_participants_by_new_diagnosis_of_ibd = DatasetAnalytics.objects.get(
+            name="gidamps_participants_by_new_diagnosis_of_ibd"
+        ).data
+        gidamps_montreal_classification = DatasetAnalytics.objects.get(name="gidamps_montreal_classification").data
+    except DatasetAnalytics.DoesNotExist:
+        gidamps_participants_by_center = None
+        gidamps_participants_by_study_group = None
+        gidamps_participants_by_recruitment_setting = None
+        gidamps_participants_by_new_diagnosis_of_ibd = None
+        gidamps_montreal_classification = None
+
     context = {
         "total_samples": total_samples,
         "samples_by_month": samples_by_month,
@@ -214,6 +236,11 @@ def analytics(request):
         "samples_by_type": samples_by_type,
         "samples_by_location": samples_by_location,
         "total_active_samples": total_active_samples,
+        "gidamps_participants_by_center": gidamps_participants_by_center,
+        "gidamps_participants_by_study_group": gidamps_participants_by_study_group,
+        "gidamps_participants_by_recruitment_setting": gidamps_participants_by_recruitment_setting,
+        "gidamps_participants_by_new_diagnosis_of_ibd": gidamps_participants_by_new_diagnosis_of_ibd,
+        "gidamps_montreal_classification": gidamps_montreal_classification,
     }
     return render(request, "analytics.html", context)
 
