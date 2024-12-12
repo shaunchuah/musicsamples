@@ -234,6 +234,8 @@ def gidamps_cleaned_dataframe(
             "q5_gi_yes": "giq_strenous_exercise_last_48h_text",
             "q4_gi": "giq_do_you_drink_alcohol",
             "q4_gi_yes": "giq_alcohol_consumption",
+            "sccai_total_calculation": "sccai_total",
+            "hbi_total_calculation": "hbi_total",
         },
         inplace=True,
     )

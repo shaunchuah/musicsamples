@@ -31,6 +31,7 @@ theme:
     - navigation.instant.progress
 nav:
   - Home: index.md
+  - Issues: issues.md
   - Data Dictionary: 
      - data_dictionary/index.md
      - data_dictionary/abbreviations.md

@@ -53,7 +53,7 @@ def music_raw_dataframe(context: AssetExecutionContext) -> pd.DataFrame:
     data = response.json()
     df = pd.DataFrame.from_records(data)
 
-    df["baseline_5asa"] = df.apply(
+    df["baseline_asa"] = df.apply(
         lambda row: 1
         if "21"
         in [
@@ -511,7 +511,7 @@ def music_reshaped_dataframe(
     # Deduplicating columns
     lab_sampling_df.drop(
         columns=[
-            "baseline_5asa",
+            "baseline_asa",
             "baseline_aza",
             "baseline_mp",
             "baseline_uste",
@@ -648,6 +648,7 @@ def music_cleaned_dataframe(
             "creatinine_lab": "creatinine",
             "sodium_lab": "sodium",
             "potassium_lab": "potassium",
+            "egfr_lab": "egfr",
             "cucq32q1": "cucq_1",
             "cucq32q2": "cucq_2",
             "cucq32q3": "cucq_3",
@@ -1550,7 +1551,7 @@ def music_demographics_dataframe(
         "fh_4_age_at_diagnosis",
         "fh_4_diagnosis",
         "fh_comments",
-        "baseline_5asa",
+        "baseline_asa",
         "baseline_mtx",
         "baseline_ifx",
         "baseline_ada",
