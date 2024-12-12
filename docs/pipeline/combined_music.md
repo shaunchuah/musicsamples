@@ -41,31 +41,4 @@ def combined_music_mini_music_dataframe(
     )
     return df
 
-
-@asset(
-    group_name="combined_music_mini_music",
-    description="Stores combined dataframe in G-Trac",
-)
-def store_combined_music_in_gtrac(
-    combined_music_mini_music_dataframe: pd.DataFrame, gtrac: GTracResource
-) -> MaterializeResult:
-    df = combined_music_mini_music_dataframe
-    json = df.to_json(orient="records")
-    data = {
-        "study_name": "music",
-        "name": "combined_music",
-        "description": (
-            "Combined music and mini-music dataframes. "
-            "Consider dropping timepoint_4 and timepoint_5 to harmonize "
-            "the longitudinal timepoints between both studies. "
-            "Demographic data can be generated from timepoint_1 rows."
-        ),
-        "json": json,
-    }
-    response = gtrac.submit_data(data)
-    return MaterializeResult(
-        metadata={
-            "status_code": str(response.status_code),
-        }
-    )
 ```

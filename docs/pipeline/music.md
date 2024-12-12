@@ -1605,28 +1605,4 @@ def store_music_demographics_in_gtrac(
         }
     )
 
-
-@asset(
-    group_name="music",
-    description="Stores main MUSIC dataframe in GTrac Dataset model",
-)
-def store_music_main_in_gtrac(
-    music_cleaned_dataframe: pd.DataFrame, gtrac: GTracResource
-) -> MaterializeResult:
-    df = music_cleaned_dataframe
-    json = df.to_json(orient="records")
-    data = {
-        "study_name": "music",
-        "name": "music_main",
-        "description": "Main dataframe for MUSIC participants. Each row represents a single participant at a single timepoint. ['study_id', 'redcap_event_name'] is the primary key.",
-        "json": json,
-    }
-    response = gtrac.submit_data(data)
-    return MaterializeResult(
-        metadata={
-            "status_code": str(response.status_code),
-        }
-    )
-
-
 ```

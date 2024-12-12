@@ -1202,27 +1202,4 @@ def mini_music_cleaned_dataframe(
 
     return df
 
-
-@asset(
-    group_name="mini_music",
-    description="Stores Mini-MUSIC dataframe in GTrac Dataset model",
-)
-def store_mini_music_main_in_gtrac(
-    mini_music_cleaned_dataframe: pd.DataFrame, gtrac: GTracResource
-) -> MaterializeResult:
-    df = mini_music_cleaned_dataframe
-    json = df.to_json(orient="records")
-    data = {
-        "study_name": "mini_music",
-        "name": "mini_music_main",
-        "description": "Main dataframe for Mini-MUSIC participants. Each row represents a single participant at a single timepoint.",
-        "json": json,
-    }
-    response = gtrac.submit_data(data)
-    return MaterializeResult(
-        metadata={
-            "status_code": str(response.status_code),
-        }
-    )
-
 ```

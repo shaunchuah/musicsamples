@@ -50,4 +50,3 @@ Here is a reference of common abbreviations seen.
 |upa         |Upadacitinib                                                                                                                                              |
 |uste        |Ustekinumab                                                                                                                                               |
 |vedo        |Vedolizumab                                                                                                                                               |
-|wcc         |White cell count                                                                                                                                          |
