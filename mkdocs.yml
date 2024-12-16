@@ -1,8 +1,9 @@
-site_name: G-Trac Datasets
+site_name: Orca
 site_url: 'https://shaunchuah.github.io/musicsamples'
 dev_addr: '127.0.0.1:8080'
 theme:
   name: material
+  
   palette:
 
     # Palette toggle for automatic mode
@@ -31,6 +32,8 @@ theme:
     - navigation.instant.progress
 nav:
   - Home: index.md
+  - Attribution Policy: attribution_policy.md
+  - Dataset Governance: dataset_governance.md
   - Issues: issues.md
   - Data Dictionary: 
      - data_dictionary/index.md

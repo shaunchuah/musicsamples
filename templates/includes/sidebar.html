@@ -48,7 +48,7 @@
                     </a>
                 </li>
                 {% if perms.datasets.view_dataset %}
-                    <li class="{% if request.path == '/datasets/' %}active{% endif %}">
+                    <li class="{% if 'datasets' in request.path %}active{% endif %}">
                         <a href="{% url 'datasets:list' %}">
                             <i class="tim-icons icon-paper"></i>
                             <p>Datasets</p>

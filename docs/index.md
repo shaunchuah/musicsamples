@@ -1,5 +1,5 @@
-# Welcome to G-Trac Datasets
+# Welcome to Orca
 
-This documentation serves as a comprehensive guide to help you utilize the datasets effectively.
+Meet our friendly Orca, your companion in navigating the data waves. Orca is a collaborative data platform that unifies diverse scientific and clinical datasets. Just as orcas work together in pods to achieve their goals, our platform harnesses the power of teamwork to accelerate scientific discovery and innovation. This documentation guides you through effectively utilizing our integrated datasets.
 
-The pipeline section provides a detailed reference for the raw pipeline code, enabling you to trace the transformations applied to raw variables from the source database.
+![Orca](orca_logo_min.png)
