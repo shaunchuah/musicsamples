@@ -8,7 +8,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from datasets.models import Dataset
+from datasets.models import Dataset, DatasetAnalytics
 
 User = get_user_model()
 pytestmark = pytest.mark.django_db
@@ -100,3 +100,53 @@ class TestDatasetDjangoViewsUnauthorized(TestCase):
         response = self.client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert b"Forbidden" in response.content
+
+
+class TestDatasetAnalyticsApiViews(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user_with_permission = User.objects.create_superuser(email="privileged@user.com", password="12345")
+        self.client.login(username="privileged@user.com", password="12345")
+        self.analytics_data = {
+            "name": "test_analytics",
+            "data": {"stats": "test_stats"},
+        }
+
+    def test_create_dataset_analytics(self):
+        url = reverse("datasets:analytics")
+        response = self.client.post(url, self.analytics_data, format="json")
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert DatasetAnalytics.objects.count() == 1
+        analytics = DatasetAnalytics.objects.get(name="test_analytics")
+        assert analytics.data == self.analytics_data["data"]
+
+    def test_update_dataset_analytics(self):
+        # Create initial analytics
+        DatasetAnalytics.objects.create(
+            name="test_analytics",
+            data={"stats": "initial_stats"},
+        )
+
+        # Update data
+        updated_data = self.analytics_data.copy()
+        updated_data["data"] = {"stats": "updated_stats"}
+
+        url = reverse("datasets:analytics")
+        response = self.client.post(url, updated_data, format="json")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert DatasetAnalytics.objects.count() == 1
+        analytics = DatasetAnalytics.objects.get(name="test_analytics")
+        assert analytics.data == {"stats": "updated_stats"}
+
+    def test_create_dataset_analytics_unauthorized(self):
+        # Create non-admin user
+        self.client.logout()
+        User.objects.create_user(email="regular@user.com", password="12345")
+        self.client.login(username="regular@user.com", password="12345")
+
+        url = reverse("datasets:analytics")
+        response = self.client.post(url, self.analytics_data, format="json")
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
