@@ -2,12 +2,12 @@
 omit = 
     *apps.py,
     *migrations/*,
-    *settings*,
     *tests/*,
     *wsgi.py,
     manage.py,
     *__init__.py,
     *asgi.py,
+    config/*,
     *config.py,
     *storage_backends.py,
     *tests.py
