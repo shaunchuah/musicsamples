@@ -1,10 +1,12 @@
 # G-Trac
 
-Open source lab sample inventory tracking system created with [Django](https://www.djangoproject.com) to support clinical research in Scotland.
+G-Trac started as an open source sample tracking system created with [Django](https://www.djangoproject.com) to support translational research in Scotland. As of end-2024, we are using it as a frontend for our Orca data platform.
 
 ## Goals
 
-Help lab researchers improve time to discovery and reduce time spent on logistics by providing tooling to manage a large amount of samples
+1. Reduce time spent on sampling logistics
+2. Provide a unified data access layer for researchers to access their data
+3. Dynamic intelligence and analytics platform to direct future research efforts
 
 ## About The Project
 
@@ -16,53 +18,69 @@ G-Trac was developed to solve the problem of tracking 30,000 research samples ac
 
 Cryogenic QR code labels were bulk printed from a label printing company and research samples were tagged at the point of collection and registered onto G-Trac. At specified receiving entrypoints to various lab workflows the samples were scanned in bulk to update their location (alternatively a status could be set into the location eg. "Departure Glasgow").
 
-### Built With
+## Requirements
 
 - [Django](https://www.djangoproject.com/)
-- [Postgres](https://www.postgresql.org/)
-- [UI kit from Creative Tim - includes Bootstrap/JQuery](https://www.creative-tim.com/product/black-dashboard-django)
+- [Python 3.12](https://www.python.org/)
 
 ## Getting Started
 
-To get a local copy up and running follow these steps. Rename development_example.env to .env to get development values set up.
-
-This requires a level of comfort and familiarity with python/django/linux/postgres web deployment. If you run into difficulty, you could consider hiring a django full stack developer to help. We had a hard look at available commercial LIMS systems and due to various reasons they were found to be lacking (data not located in UK, pricey, hard to customise and adapt to changing experimental workflows).
-
-## Prerequisites
-
-- Python 3.11.9
+To get a local copy up and running follow these steps. You need to have Python pre-installed on your machine. Rename `example.env` to `.env` to get development values set up.
 
 ## Installation
 
 ### 1. Clone the repo
 
-   ```sh
-   git clone https://github.com/shaunchuah/musicsamples.git
-   ```
+```sh
+git clone https://github.com/shaunchuah/musicsamples.git
+```
 
 ### 2. Setup a virtual environment for Django
 
-  ```sh
-  cd musicsamples
-  virtualenv venv/
+```sh
+cd musicsamples
 
-  # Activate the virtual environment
+# Create a virtual environment
+python -m venv venv 
 
-  source venv/bin/activate # for linux
-  ./venv/Scripts/activate # for windows
+source venv/bin/activate # for mac/linux
+./venv/Scripts/activate # for windows
 
-  # Install required dependencies
+# Install required dependencies
+pip install -r requirements.txt
+```
 
-  pip install -r requirements.txt
-  ```
+### 3. Get Django up and running
 
-### 3. Setup Django database and create a super user
+First, copy the example.env file to .env and edit the values to suit your local development environment.
 
-   ```sh
-   python manage.py migrate
-   python manage.py createsuperuser
-   python manage.py runserver
-   ```
+```sh
+cp example.env .env
+```
+
+Edit the .env file with your desired values.
+
+Run Django migrations, create superuser and startup the dev server:
+
+```sh
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+Set up pre-commit hooks:
+
+```sh
+pre-commit install
+```
+
+### 4. Orca Documentation
+
+To view Orca documentation, you can use the following command:
+
+```sh
+mkdocs serve
+```
 
 ## Deployment
 
@@ -72,20 +90,25 @@ The following would be a simple deployment for a small group onto a single serve
 
 ### Suggested Server Software Requirements
 
-- Ubuntu 20.04
+- Ubuntu 24.04
 - Python
-- Postgres
+- SQLite
 - Nginx
 - Gunicorn
 - Redis
 
+### External Service Dependency
+
+- AWS Simple Email Service for transactional emails
+- AWS S3 Bucket for database backups
+
 ### Suggested production deployment
 
-1. Ubuntu VPS instance (DigitalOcean, Linode, Lightsail etc. many options) - we used 20.04 LTS on DigitalOcean
-2. Fork this repository. Install python, postgres into your VPS and set it up (alternatively connecting to a managed database service might be easier although more costly)
-3. Setup nginx and gunicorn (static requests through nginx, dynamic requests redirected to gunicorn serving Django). [Useful guide here](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04).
-4. Set up an account on AWS for password reset emails or an alternative email provider of your choice
-5. Set up redis for caching (required for sample tagging to work properly - [https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04))
+1. Ubuntu VPS (DigitalOcean, Linode, Lightsail etc. many options) - we use 24.04 LTS on DigitalOcean, comes with Python 3.12 installed already
+2. Install python if required
+3. Setup nginx and gunicorn (static requests through nginx, dynamic requests redirected to gunicorn serving Django). [Useful guide here](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-18-04). Sample config files are in the scripts directory.
+4. Set up an AWS account for transactional emails and S3.
+5. Set up redis for caching - [https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04))
 6. Clone the repo into a folder of your choice and remember to run:
 
    ```sh
@@ -96,17 +119,34 @@ The following would be a simple deployment for a small group onto a single serve
 
 7. **Edit .env file to a production configuration**
 8. Start up the whole stack and it should hopefully be working!
-9. Now that it's working - setup SSL encryption on your server using letsencrypt
-10. Harden your production .env file
-11. Edit `scripts/github_deploy_django.sh` and `.github/workflows/deploy.yml` to suit your server for automated deployments
+9. Set up SSL encryption on your server using letsencrypt
+10. Edit `scripts/github_deploy_django.sh` and `.github/workflows/deploy.yml` to suit your server for automated deployments
 
 ### Database Backups
 
-Since this is not a managed Postgres instance, 2 scripts are included to backup Postgres to AWS `scripts/db_backup_example.sh` and `scripts/db_sync.sh`.
+The stack has been simplified to use sqlite3 for ease of deployment. Backup is simple as well, copy the db.sqlite3 file to S3 storage. An example script is included in `scripts/db_backup_example.sh`.
 
-You will need to make the scripts executable and configure a cron job to run the scripts.
+As a side note, you will need to make the scripts executable and configure a cron job to run the scripts.
 
-The scripts backup the database to the local VM first and then syncs it across to S3. VM needs aws-cli installed for this to work. If you're not comfortable with this then I would suggest a managed database instance.
+To make the script executable:
+
+```sh
+chmod +x scripts/db_backup_example.sh
+```
+
+To configure a cron job:
+
+```sh
+crontab -e
+```
+
+Add the following line to the crontab file:
+
+```sh
+0 0 * * * /path/to/your/script/db_backup_example.sh 
+```
+
+This copies production database to S3 at midnight every day
 
 ## Database Transfer
 
@@ -116,87 +156,27 @@ Use Django's dumpdata and loaddata as follows:
 
 You will need to exclude contenttypes and auth.permission to switch between databases.
 
-### Scaling Deployment
+## Project Architecture
 
-If you want to scale this app I would:
-
-- Create a Dockerfile
-- Separate out the database instance to AWS RDS or Postgres
-- Edit GitHub Actions config to automate building Docker images and pushing it to a container registry
-
-## Customisation
-
-### Project Architecture Overview
-
-- app: main application logic
-- authentication: all authentication handling/views here
-- core: settings.py and templates/css/js lives here
-- media: local media folder for development
-
-### Customisation Tips
-
-Here are some tips for customising this to suit your workflow:
-
-- The main logic sits in the app folder
-- Modify the main model in app/models.py - add fields that you want to QC on - think of it like an excel spreadsheet with column headers that you specify here
-- If you do alter the model - you may wish to alter:
-
-1. SampleForm in app/forms.py
-2. export_csv function in views.py
-3. sample-detail.html in core/templates
-
-- Dropdown select fields are configured in app/forms.py
-- Most of the view logic is in app/views.py. I have written this mostly in function based views to make it explicit and easy to identify where you wish to alter the workflow rather than class based views. I appreciated this means the views.py file is more verbose but hopefully this helps you customise this to fit what you're trying to achieve.
-- The templates are found in core/templates. Most functions are using a single template for a single view so you can customise particular aspects as you desire
-
-## Contributing
-
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+- app: main G-Trac sample tracking logic
+- users: all authentication handling/views here
+- datasets: frontend for orca data platform
 
 ## License
 
 Distributed under the MIT License.
 
-MIT License
-
-Copyright (c) 2021 Shaun Chuah.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
 ## Author
 
 Dr Shaun Chuah \
-Clinical Research Fellow in Gastroenterology \
-Centre for Inflammation Research \
-Queen's Medical Research Institute \
-University of Edinburgh
+Clinical Senior Research Fellow \
+School of Infectiona and Immunity \
+University of Glasgow
 
 ## Contact
 
 If you've used this to create something cool let me know about it!
 
 Twitter: [@chershiong](https://twitter.com/chershiong) \
-Email: [chershiong@gmail.com](mailto:chershiong@gmail.com) \
+Email: [shaun.chuah@glasgow.ac.uk](mailto:shaun.chuah@glasgow.ac.uk) \
 Project Link: [https://github.com/shaunchuah/musicsamples](https://github.com/shaunchuah/musicsamples)
