@@ -1,11 +1,10 @@
 site_name: Orca
-site_url: 'https://shaunchuah.github.io/musicsamples'
-dev_addr: '127.0.0.1:8080'
+site_url: "https://shaunchuah.github.io/musicsamples"
+dev_addr: "127.0.0.1:8080"
 theme:
   name: material
-  
-  palette:
 
+  palette:
     # Palette toggle for automatic mode
     - media: "(prefers-color-scheme)"
       toggle:
@@ -14,7 +13,7 @@ theme:
 
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
-      scheme: default 
+      scheme: default
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
@@ -35,19 +34,19 @@ nav:
   - Attribution Policy: attribution_policy.md
   - Dataset Governance: dataset_governance.md
   - Issues: issues.md
-  - Data Dictionary: 
-     - data_dictionary/index.md
-     - data_dictionary/abbreviations.md
-     - data_dictionary/gidamps_columns.md
-     - data_dictionary/music_columns.md
-     - data_dictionary/mini_music_columns.md
+  - Data Dictionary:
+      - data_dictionary/index.md
+      - data_dictionary/abbreviations.md
+      - data_dictionary/gidamps_columns.md
+      - data_dictionary/music_columns.md
+      - data_dictionary/mini_music_columns.md
 
   - Pipeline:
-     - pipeline/index.md
-     - pipeline/gidamps.md
-     - pipeline/music.md
-     - pipeline/mini_music.md
-     - pipeline/combined_music.md
+      - pipeline/index.md
+      - pipeline/gidamps.md
+      - pipeline/music.md
+      - pipeline/mini_music.md
+      - pipeline/combined_music.md
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
