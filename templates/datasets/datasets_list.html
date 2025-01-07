@@ -11,56 +11,54 @@
     </h2>
     <div class="row">
         <div class="col-lg-8">
-            {% if datasets %}
-                <div class="row">
-                    {% for dataset in datasets %}
-                        <div class="col-xl-6 d-flex align-items-stretch">
-                            <div class="card">
-                                <div class="card-header">
-                                    {{ dataset.get_study_name_display }}
-                                    <h3 class="card-title">{{ dataset.name }}</h3>
-                                </div>
-                                <div class="card-body">
-                                    Description:
-                                    <p>{{ dataset.description }}</p>
-                                </div>
-                                <div class="card-footer">
-                                    API URL (JSON):
-                                    <p>
-                                        <a href="{% url 'datasets:retrieve' dataset.name %}" target="_blank">{{ site_url }}{% url 'datasets:retrieve' dataset.name %}</a>
-                                    </p>
-                                    CSV File:
-                                    <p>
-                                        <a href="{% url 'datasets:export_csv' dataset.name %}" target="_blank">Download CSV</a>
-                                    </p>
-                                    <p>
-                                        Last updated: {{ dataset.last_modified|date:'d M Y H:i' }} |
-                                        Access count: {{ dataset.datasetaccesshistory_set.all|length }} |
-                                        <a class="btn-dataset d-inline"
-                                           href="{% url 'datasets:access_history' dataset.name %}"
-                                           target="_blank">
-                                            <span>Access history</span>
-                                            <svg width="14"
-                                                 height="14"
-                                                 data-slot="icon"
-                                                 fill="none"
-                                                 stroke-width="1.5"
-                                                 stroke="currentColor"
-                                                 viewBox="0 0 24 24"
-                                                 xmlns="http://www.w3.org/2000/svg"
-                                                 aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                            </svg>
-                                        </a>
-                                    </p>
-                                </div>
+            <div class="row">
+                {% for dataset in datasets %}
+                    <div class="col-xl-6 d-flex align-items-stretch">
+                        <div class="card">
+                            <div class="card-header">
+                                {{ dataset.get_study_name_display }}
+                                <h3 class="card-title">{{ dataset.name }}</h3>
+                            </div>
+                            <div class="card-body">
+                                Description:
+                                <p>{{ dataset.description }}</p>
+                            </div>
+                            <div class="card-footer">
+                                API URL (JSON):
+                                <p>
+                                    <a href="{% url 'datasets:retrieve' dataset.name %}" target="_blank">{{ site_url }}{% url 'datasets:retrieve' dataset.name %}</a>
+                                </p>
+                                CSV File:
+                                <p>
+                                    <a href="{% url 'datasets:export_csv' dataset.name %}" target="_blank">Download CSV</a>
+                                </p>
+                                <p>
+                                    Last updated: {{ dataset.last_modified|date:'d M Y H:i' }} |
+                                    Access count: {{ dataset.datasetaccesshistory_set.all|length }} |
+                                    <a class="btn-dataset d-inline"
+                                       href="{% url 'datasets:access_history' dataset.name %}"
+                                       target="_blank">
+                                        <span>Access history</span>
+                                        <svg width="14"
+                                             height="14"
+                                             data-slot="icon"
+                                             fill="none"
+                                             stroke-width="1.5"
+                                             stroke="currentColor"
+                                             viewBox="0 0 24 24"
+                                             xmlns="http://www.w3.org/2000/svg"
+                                             aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                        </svg>
+                                    </a>
+                                </p>
                             </div>
                         </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div>No datasets yet.</div>
-            {% endif %}
+                    </div>
+                {% empty %}
+                    No datasets yet.
+                {% endfor %}
+            </div>
             <!-- Connection Status -->
             {% if data_source_status_checks %}
                 <div class="row">
@@ -229,7 +227,7 @@ df &lt;- jsonlite::fromJSON(json_result)
                         </div>
                         <div class="card-body">
                             <div class="mb-4">
-                                <table  class="table">
+                                <table class="table">
                                     <thead>
                                         <tr>
                                             <th>Name</th>
