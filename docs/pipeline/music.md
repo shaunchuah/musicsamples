@@ -1413,6 +1413,68 @@ def music_cleaned_dataframe(
     df.rename(columns={"study_group_name": "study_group"}, inplace=True)
     df["study_id"] = df["study_id"].apply(lambda x: f"MID-{x}")
 
+    # Endoscopic Mucosal Healing Data
+    # Merge endoscopic scores into single column
+    df["sescd_noncalc"] = pd.to_numeric(df["sescd_noncalc"], errors="coerce")
+    df["sescd_calc"] = df["sescd_calc"].fillna(df["sescd_noncalc"])
+
+    df["uceis_noncalc"] = pd.to_numeric(df["uceis_noncalc"], errors="coerce")
+    df["uceis_calc"] = df["uceis_calc"].fillna(df["uceis_noncalc"])
+
+    df.rename(
+        {
+            "sescd_calc": "sescd",
+            "uceis_calc": "uceis",
+            "mayo_endoscopic_findings": "mayo_endoscopic_score",
+        },
+        axis=1,
+        inplace=True,
+    )
+    df.drop({"sescd_noncalc", "uceis_noncalc"}, axis=1, inplace=True)
+
+    # Map and rename endo_healing and cmh columns
+
+    df["endo_healing"] = df["endo_healing"].map(
+        {
+            "1": "yes",
+            "2": "no",
+        }
+    )
+
+    df["cmh"] = df["cmh"].map({"1": "yes", "2": "no", "3": "partial"})
+
+    df.rename(
+        {
+            "endo_healing": "endoscopic_mucosal_healing",
+            "cmh": "complete_mucosal_healing",
+        },
+        axis=1,
+        inplace=True,
+    )
+
+    # Create new columns for endoscopic outcome at 3 months and 12 months
+    # and fill it in timepoint 1 to use for demographics
+
+    timepoint_2_mapping_df = df[df["redcap_event_name"] == "timepoint_2"][
+        ["study_id", "endoscopic_mucosal_healing", "complete_mucosal_healing"]
+    ]
+    df["endoscopic_mucosal_healing_at_3_6_months"] = df["study_id"].map(
+        timepoint_2_mapping_df.set_index("study_id")["endoscopic_mucosal_healing"]
+    )
+    df["complete_mucosal_healing_at_3_6_months"] = df["study_id"].map(
+        timepoint_2_mapping_df.set_index("study_id")["complete_mucosal_healing"]
+    )
+
+    timepoint_5_mapping_df = df[df["redcap_event_name"] == "timepoint_5"][
+        ["study_id", "endoscopic_mucosal_healing", "complete_mucosal_healing"]
+    ]
+    df["endoscopic_mucosal_healing_at_12_months"] = df["study_id"].map(
+        timepoint_5_mapping_df.set_index("study_id")["endoscopic_mucosal_healing"]
+    )
+    df["complete_mucosal_healing_at_12_months"] = df["study_id"].map(
+        timepoint_5_mapping_df.set_index("study_id")["complete_mucosal_healing"]
+    )
+
     rows, columns = df.shape
     context.add_output_metadata(
         {
@@ -1566,6 +1628,14 @@ def music_demographics_dataframe(
         "surgical_history_1_procedure",
         "surgical_history_2_procedure",
         "surgical_history_3_procedure",
+        "sescd",
+        "uceis",
+        "mayo_endoscopic_score",
+        "physician_endoscopic_severity",
+        "endoscopic_mucosal_healing_at_3_6_months",
+        "complete_mucosal_healing_at_3_6_months",
+        "endoscopic_mucosal_healing_at_12_months",
+        "complete_mucosal_healing_at_12_months",
     ]
     demographics_df = demographics_df[demographics_columns]
 
@@ -1580,30 +1650,5 @@ def music_demographics_dataframe(
     )
 
     return demographics_df
-
-
-@asset(
-    group_name="music",
-    description="Stores MUSIC abbreviated demographics data in GTrac Dataset model",
-)
-def store_music_demographics_in_gtrac(
-    music_demographics_dataframe: pd.DataFrame, gtrac: GTracResource
-) -> MaterializeResult:
-    df = music_demographics_dataframe
-    json = df.to_json(orient="records")
-
-    data = {
-        "study_name": "music",
-        "name": "music_demographics",
-        "description": "Abbreviated version of the main MUSIC dataframe consisting of selected demographics columns. Use this to make demographics table. Each row represents a single participant at timepoint 1.",
-        "json": json,
-    }
-
-    response = gtrac.submit_data(data)
-    return MaterializeResult(
-        metadata={
-            "status_code": str(response.status_code),
-        }
-    )
 
 ```

@@ -1,4 +1,4 @@
-# Mini-MUSIC Columns
+# Mini-MUSIC
 
 ```py
 [

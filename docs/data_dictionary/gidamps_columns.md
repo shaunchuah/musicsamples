@@ -1,4 +1,4 @@
-# GI-DAMPs Columns
+# GI-DAMPs
 
 ```py
 [
