@@ -167,7 +167,7 @@ def used_samples_archive_all(request):
             sample.save()
         messages.success(
             request,
-            "Used samples locations archived successfully." f" ({number_of_samples} samples updated)",
+            f"Used samples locations archived successfully. ({number_of_samples} samples updated)",
         )
     return redirect(reverse("used_samples"))
 
