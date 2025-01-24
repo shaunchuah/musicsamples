@@ -55,9 +55,9 @@ jobs:
             StrictHostKeyChecking no
           END
         env:
-          SSH_USER: ${{ secrets.SAMPLETREK_SSH_USER }}
-          SSH_KEY: ${{ secrets.SAMPLETREK_SSH_KEY }}
-          SSH_HOST: ${{ secrets.SAMPLETREK_SSH_HOST }}
+          SSH_USER: ${{ secrets.PROD_SSH_USER }}
+          SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
+          SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
 
       - name: Pull latest version from GitHub
         run: ssh deploy 'cd ${{ secrets.INSTALLATION_DIRECTORY }} && git pull'
