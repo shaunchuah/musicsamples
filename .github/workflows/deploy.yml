@@ -69,10 +69,10 @@ jobs:
         run: ssh deploy '${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
 
       - name: Restart gunicorn
-        run: ssh deploy 'systemctl restart gunicorn'
+        run: ssh deploy 'sudo systemctl restart gunicorn'
 
       - name: Restart nginx
-        run: ssh deploy 'systemctl restart nginx'
+        run: ssh deploy 'sudo systemctl restart nginx'
 
   deploy_docs:
     needs: build
