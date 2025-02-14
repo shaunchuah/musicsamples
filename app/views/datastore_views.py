@@ -28,6 +28,16 @@ def datastore_create_view(request):
 
 def datastore_download_view(request, id):
     file = get_object_or_404(DataStore, id=id)
+    download_url = azure_generate_download_link(file, download=True)
+    if download_url:
+        return redirect(download_url)
+    else:
+        messages.error(request, "Failed to generate download link.")
+        return redirect("datastore_list")
+
+
+def datastore_view(request, id):
+    file = get_object_or_404(DataStore, id=id)
     download_url = azure_generate_download_link(file)
     if download_url:
         return redirect(download_url)

@@ -12,11 +12,12 @@ def azure_get_blob_service_client():
     )
 
 
-def azure_generate_download_link(file):
+def azure_generate_download_link(file, download=False):
     """
     Pass in the file object stored on Azure Blob Storage.
     The blob path is constructed as <study_name>/<category>/<filename>.
-    Generates a SAS token valid for 1 hour with read permission and attachment disposition.
+    Generates a SAS token valid for 1 hour with read permission and,
+    if download is True, an attachment disposition.
     """
     container_name = settings.AZURE_CONTAINER_NAME
     blob_name = f"{file.file.name}"
@@ -24,15 +25,18 @@ def azure_generate_download_link(file):
     expiration_time = datetime.utcnow() + timedelta(hours=1)
 
     try:
-        sas_token = generate_blob_sas(
-            account_name=settings.AZURE_ACCOUNT_NAME,
-            container_name=container_name,
-            blob_name=blob_name,
-            account_key=settings.AZURE_ACCOUNT_KEY,
-            permission=BlobSasPermissions(read=True),
-            expiry=expiration_time,
-            content_disposition="attachment",
-        )
+        sas_kwargs = {
+            "account_name": settings.AZURE_ACCOUNT_NAME,
+            "container_name": container_name,
+            "blob_name": blob_name,
+            "account_key": settings.AZURE_ACCOUNT_KEY,
+            "permission": BlobSasPermissions(read=True),
+            "expiry": expiration_time,
+        }
+        if download:
+            sas_kwargs["content_disposition"] = "attachment"
+
+        sas_token = generate_blob_sas(**sas_kwargs)
     except Exception as e:
         logging.error(e)
         return None

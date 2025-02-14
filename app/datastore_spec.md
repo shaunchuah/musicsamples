@@ -42,3 +42,7 @@ Files are accessed via a connection string.
 3. A URL is generated for uploading to Azure, ensuring the filename matches the Django record.
 4. The file is uploaded to Azure Blob Storage.
 5. Upon completion, Django is notified to confirm successful upload.
+
+## Important Notes
+
+- Once a file is uploaded, it cannot be edited.

@@ -102,4 +102,5 @@ urlpatterns = [
     path("datastore/dashboard/", views.DataStoreListView.as_view(), name="datastore_list"),
     path("datastore/upload/", views.datastore_create_view, name="datastore_create"),
     path("datastore/download/<int:id>/", views.datastore_download_view, name="datastore_download"),
+    path("datastore/view/<int:id>/", views.datastore_view, name="datastore_view"),
 ]
