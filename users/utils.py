@@ -20,7 +20,7 @@ def send_welcome_email(user, request):
     domain = request.get_host()  # domain_name eg 127.0.0.1:8000
     password_reset_url = reverse("password_reset")
     full_reset_url = f"{protocol}://{domain}{password_reset_url}"
-    email_subject = "Welcome to SampleTrek"
+    email_subject = "Welcome to G-Trac"
     context = {
         "user": user,
         "password_reset_url": full_reset_url,

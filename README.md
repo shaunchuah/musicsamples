@@ -126,7 +126,11 @@ The following would be a simple deployment for a small group onto a single serve
 
 The stack has been simplified to use sqlite3 for ease of deployment. Backup is simple as well, copy the db.sqlite3 file to S3 storage. An example script is included in `scripts/db_backup_example.sh`.
 
-As a side note, you will need to make the scripts executable and configure a cron job to run the scripts.
+#### Notes
+
+1. You will need to install either AWS CLI or Azure CLI and login from the server first.
+2. Make the right backup script executable
+3. Configure cron job to run the script at the desired time
 
 To make the script executable:
 
