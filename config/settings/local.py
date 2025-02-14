@@ -8,6 +8,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "testserver", "host.docker.internal"]
 
+# AZURE STORAGE CONFIGURATION
+# ------------------------------------------------------------------------------
+AZURE_ACCOUNT_KEY = env("AZURE_ACCOUNT_KEY")
+AZURE_STORAGE_CONNECTION_STRING = env("AZURE_STORAGE_CONNECTION_STRING")
+AZURE_ACCOUNT_NAME = "gutresearch"
+AZURE_CONTAINER_NAME = "gtrac-store-dev"
+
 
 # STORAGES
 # ------------------------------------------------------------------------------
@@ -16,8 +23,8 @@ STORAGES = {
     "default": {
         "BACKEND": "storages.backends.azure_storage.AzureStorage",
         "OPTIONS": {
-            "azure_container": "gtrac-store-dev",
-            "connection_string": env("AZURE_STORAGE_CONNECTION_STRING"),
+            "azure_container": AZURE_CONTAINER_NAME,
+            "connection_string": AZURE_STORAGE_CONNECTION_STRING,
         },
     },
     "staticfiles": {

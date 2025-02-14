@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from django.utils import timezone
+from django_select2 import forms as s2forms
 
 from app.models import DataStore, Sample
 
@@ -108,36 +109,40 @@ class ReactivateForm(ModelForm):
         labels = {"is_used": "Uncheck to reactivate"}
 
 
+class SampleSelectionWidget(s2forms.ModelSelect2MultipleWidget):
+    search_fields = [
+        "sample_id__icontains",
+    ]
+
+
 class DataStoreForm(ModelForm):
     class Meta:
         model = DataStore
         fields = [
+            "file",
             "category",
             "study_name",
             "music_timepoint",
             "marvel_timepoint",
-            "file_date",
-            "comments",
             "sample_id",
             "patient_id",
-            "file",
-            # "file_type",
+            "comments",
         ]
         labels = {
             "category": "Category*",
             "study_name": "Study Name*",
             "music_timepoint": "Music Timepoint",
             "marvel_timepoint": "Marvel Timepoint",
-            "file_date": "Sample Date (if applicable)",
             "comments": "Comments",
             "sample_id": "Associated Sample IDs (optional)",
             "patient_id": "Associated Patient ID (optional)",
             # "file_type": "File Type",
         }
         widgets = {
-            "file_date": DateInput(),
+            "file_date": DateInput,
+            # "sample_id": SampleSelectionWidget,
         }
 
     def __init__(self, *args, **kwargs):
         super(DataStoreForm, self).__init__(*args, **kwargs)
-        self.fields["file"].widget.attrs = {"class": "form-control custom-file-input"}
+        self.fields["file"].widget.attrs = {"class": "form-control-file custom-file-input"}

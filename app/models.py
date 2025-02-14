@@ -118,9 +118,8 @@ class DataStore(models.Model):
     # Files may also be directly related to patients
     music_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MusicTimepointChoices.choices)
     marvel_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MarvelTimepointChoices.choices)
-    file_date = models.DateField(blank=True, null=True)
     comments = models.TextField(blank=True, null=True)
-    sample_id = models.ManyToManyField(Sample, blank=True, related_name="files")
+    sample_id = models.ForeignKey(Sample, null=True, blank=True, on_delete=models.SET_NULL, related_name="files")
     patient_id = models.CharField(max_length=200, blank=True, null=True)
 
     file = models.FileField(upload_to=file_upload_path, blank=True, null=True)

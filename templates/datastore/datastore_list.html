@@ -82,7 +82,7 @@
           to CSV</a>
         </div>
         <div class="card-body">
-          <div class="d-flex flex-row-reverse pb-3">Total Count: -tba-</div>
+          <div class="d-flex flex-row-reverse pb-3">Total Count: {{ datastores.count }}</div>
           <div class="table-responsive">
             <table class="table tablesorter" id="mainTable">
               <thead class="text-primary">
@@ -97,8 +97,8 @@
                   <th>Upload Date</th>
                   <th>Timepoint</th>
                   <th>Comments</th>
-                  <th>View</th>
-                  <th>Edit</th>
+                  <th>Download</th>
+                  <th>Edit Metadata</th>
                   <th>Delete</th>
                 </tr>
               </thead>
@@ -111,7 +111,7 @@
                       <td>{{ file.formatted_file_name }}</td>
                       <td>{{ file.sample_id }}</td>
                       <td>{{ file.patient_id }}</td>
-                      <td>{{ file.size }}</td>
+                      <td>{{ file.size|filesizeformat }}</td>
                       <td>{{ file.file_type }}</td>
                       <td>{{ file.upload_finished_at|date:'d M Y H:i' }}</td>
                       <td>
@@ -125,7 +125,7 @@
                       </td>
                       <td>{{ file.comments }}</td>
                       <td>
-                        <a href=""><i class="tim-icons icon-zoom-split"></i> View</a>
+                        <a href="{% url 'datastore_download' id=file.id %}"><i class="tim-icons icon-cloud-download-93"></i> Download</a>
                       </td>
                       <td>
                         <a href=""><i class="tim-icons icon-pencil"></i> Edit</a>

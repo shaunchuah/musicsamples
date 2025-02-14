@@ -100,5 +100,6 @@ urlpatterns = [
         name="export_historical_samples",
     ),
     path("datastore/dashboard/", views.DataStoreListView.as_view(), name="datastore_list"),
-    path("datastore/upload/", views.DataStoreCreateView.as_view(), name="datastore_create"),
+    path("datastore/upload/", views.datastore_create_view, name="datastore_create"),
+    path("datastore/download/<int:id>/", views.datastore_download_view, name="datastore_download"),
 ]
