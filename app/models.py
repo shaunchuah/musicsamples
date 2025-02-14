@@ -143,11 +143,13 @@ class DataStore(models.Model):
 
     @property
     def url(self):
-        return self.file.url
+        if self.file:
+            return self.file.url
 
     @property
     def size(self):
-        return self.file.size
+        if self.file:
+            return self.file.size
 
     def __str__(self):
         return self.formatted_file_name
@@ -164,7 +166,7 @@ class DataStore(models.Model):
             self.original_file_name = self.file.name
             self.formatted_file_name = file_generate_name(self.original_file_name, self.study_name)
             self.file.name = self.formatted_file_name
-            super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
         # TODO: when doing asynchronous upload, we might need to generate the formatted url and file name
 
     class Meta:

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
-from app.models import Sample
+from app.models import DataStore, Sample
 
 
 @admin.register(Sample)
@@ -14,3 +14,8 @@ class SampleAdmin(SimpleHistoryAdmin):
         "sample_sublocation",
         "sample_comments",
     ]
+
+
+@admin.register(DataStore)
+class DataStoreAdmin(admin.ModelAdmin):
+    list_display = ["study_name", "category", "original_file_name", "file_type", "upload_finished_at", "uploaded_by"]
