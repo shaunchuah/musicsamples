@@ -99,4 +99,5 @@ urlpatterns = [
         views.export_historical_samples,
         name="export_historical_samples",
     ),
+    path("datastore/dashboard/", views.DataStoreListView.as_view(), name="datastore_list"),
 ]

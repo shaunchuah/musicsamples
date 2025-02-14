@@ -81,3 +81,9 @@ class MarvelTimepointChoices(models.TextChoices):
     BASELINE = "baseline", "Baseline"
     TWELVE_WEEKS = "12_weeks", "12 weeks"
     TWENTY_FOUR_WEEKS = "24_weeks", "24 weeks"
+
+
+class FileCategoryChoices(models.TextChoices):
+    UNCATEGORISED = "uncategorised", "Uncategorised"
+    ENDOSCOPY_VIDEOS = "endoscopy_videos", "Endoscopy Videos"
+    HISTOLOGY_SLIDES = "histology_slides", "Histology Slides"

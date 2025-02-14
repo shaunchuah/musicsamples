@@ -47,6 +47,12 @@
                         <p>Data Export</p>
                     </a>
                 </li>
+                <li class="{% if 'datastore' in request.path %}active{% endif %}">
+                    <a href="{% url 'datastore_list' %}">
+                        <i class="tim-icons icon-app"></i>
+                        <p>DataStore</p>
+                    </a>
+                </li>
                 {% if perms.datasets.view_dataset %}
                     <li class="{% if 'datasets' in request.path %}active{% endif %}">
                         <a href="{% url 'datasets:list' %}">

@@ -1,9 +1,11 @@
+from django.conf import settings
 from django.test import Client, TestCase
 from django.urls import reverse
 
 from app.factories import SampleFactory
-from app.views import SAMPLE_PAGINATION_SIZE
 from users.factories import UserFactory
+
+SAMPLE_PAGINATION_SIZE = settings.SAMPLE_PAGINATION_SIZE
 
 
 class TestPagination(TestCase):
