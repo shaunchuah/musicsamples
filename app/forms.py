@@ -2,7 +2,11 @@ from django import forms
 from django.forms import ModelForm
 from django.utils import timezone
 
-from app.models import Sample
+from app.models import DataStore, Sample
+
+
+class DateInput(forms.DateInput):
+    input_type = "date"
 
 
 class DateTimeInput(forms.DateTimeInput):
@@ -102,3 +106,38 @@ class ReactivateForm(ModelForm):
         model = Sample
         fields = ["is_used"]
         labels = {"is_used": "Uncheck to reactivate"}
+
+
+class DataStoreForm(ModelForm):
+    class Meta:
+        model = DataStore
+        fields = [
+            "category",
+            "study_name",
+            "music_timepoint",
+            "marvel_timepoint",
+            "file_date",
+            "comments",
+            "sample_id",
+            "patient_id",
+            "file",
+            # "file_type",
+        ]
+        labels = {
+            "category": "Category*",
+            "study_name": "Study Name*",
+            "music_timepoint": "Music Timepoint",
+            "marvel_timepoint": "Marvel Timepoint",
+            "file_date": "Sample Date (if applicable)",
+            "comments": "Comments",
+            "sample_id": "Associated Sample IDs (optional)",
+            "patient_id": "Associated Patient ID (optional)",
+            # "file_type": "File Type",
+        }
+        widgets = {
+            "file_date": DateInput(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(DataStoreForm, self).__init__(*args, **kwargs)
+        self.fields["file"].widget.attrs = {"class": "form-control custom-file-input"}

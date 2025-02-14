@@ -18,4 +18,16 @@ class SampleAdmin(SimpleHistoryAdmin):
 
 @admin.register(DataStore)
 class DataStoreAdmin(admin.ModelAdmin):
-    list_display = ["study_name", "category", "original_file_name", "file_type", "upload_finished_at", "uploaded_by"]
+    list_display = [
+        "study_name",
+        "category",
+        "original_file_name",
+        "formatted_file_name",
+        "size",
+        "file_type",
+        "upload_finished_at",
+        "uploaded_by",
+        "comments",
+        "music_timepoint",
+        "marvel_timepoint",
+    ]

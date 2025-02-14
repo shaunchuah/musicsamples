@@ -1,3 +1,4 @@
+import datetime
 import pathlib
 from uuid import uuid4
 
@@ -90,13 +91,13 @@ class Sample(models.Model):
         ordering = ["-created"]
 
 
-def file_upload_path(instance):
+def file_upload_path(instance, filename):
     """
     Returns the path for Azure uploads
     In this case "category/<file>"
     """
     # Both filename and instance.file_name should have the same values
-    return f"{instance.category}/{instance.file_name}"
+    return f"{instance.category}/{instance.formatted_file_name}"
 
 
 def file_generate_name(original_file_name: str, study_name: str) -> str:
@@ -117,17 +118,17 @@ class DataStore(models.Model):
     # Files may also be directly related to patients
     music_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MusicTimepointChoices.choices)
     marvel_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MarvelTimepointChoices.choices)
-    file_date = models.DateField()
+    file_date = models.DateField(blank=True, null=True)
     comments = models.TextField(blank=True, null=True)
     sample_id = models.ManyToManyField(Sample, blank=True, related_name="files")
     patient_id = models.CharField(max_length=200, blank=True, null=True)
 
     file = models.FileField(upload_to=file_upload_path, blank=True, null=True)
     category = models.CharField(max_length=200, choices=FileCategoryChoices.choices)
-    file_type = models.CharField(max_length=255)  # File Extension
 
-    original_file_name = models.TextField()
-    formatted_file_name = models.TextField()
+    file_type = models.CharField(max_length=255, blank=True)  # File Extension
+    original_file_name = models.TextField(blank=True)
+    formatted_file_name = models.TextField(blank=True)
 
     upload_finished_at = models.DateTimeField(blank=True, null=True)
     uploaded_by = models.ForeignKey(
@@ -155,7 +156,9 @@ class DataStore(models.Model):
         return self.formatted_file_name
 
     def clean(self):
-        self.patient_id = self.patient_id.upper()
+        if self.patient_id:
+            self.patient_id = self.patient_id.upper()
+        super().clean()
 
     def save(self, *args, **kwargs):
         if self.file:
@@ -166,6 +169,7 @@ class DataStore(models.Model):
             self.original_file_name = self.file.name
             self.formatted_file_name = file_generate_name(self.original_file_name, self.study_name)
             self.file.name = self.formatted_file_name
+            self.upload_finished_at = datetime.datetime.now()
         super().save(*args, **kwargs)
         # TODO: when doing asynchronous upload, we might need to generate the formatted url and file name
 
