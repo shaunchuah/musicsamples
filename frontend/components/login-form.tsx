@@ -19,7 +19,7 @@ export function LoginForm({
       const result = await signIn("credentials", {
         email: formData.get("email"),
         password: formData.get("password"),
-        callbackUrl: "/dashboard",
+        callbackUrl: "/samples/dashboard",
         redirect: true,
       });
 

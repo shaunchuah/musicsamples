@@ -1,6 +1,7 @@
 // middleware.ts
 import { withAuth } from "next-auth/middleware"
 import { NextResponse } from "next/server"
+import { useSession } from "next-auth/react";
 
 export default withAuth(
   function middleware(req) {
