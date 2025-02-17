@@ -1,6 +1,7 @@
 from django.urls import include, path
 from django.views.generic.base import TemplateView
 from rest_framework import routers
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from app import views
 
@@ -103,4 +104,6 @@ urlpatterns = [
     path("datastore/upload/", views.datastore_create_view, name="datastore_create"),
     path("datastore/download/<int:id>/", views.datastore_download_view, name="datastore_download"),
     path("datastore/view/<int:id>/", views.datastore_view, name="datastore_view"),
+    path("api/v2/auth/login/", views.login_view, name="login"),
+    path("api/v2/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
