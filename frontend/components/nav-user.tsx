@@ -8,7 +8,7 @@ import {
   LogOut,
   Sparkles,
 } from "lucide-react";
-
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -88,11 +88,11 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <BadgeCheck />
-                Account
+                <Link href="/account">Account</Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCard />
-                Change Password
+                <Link href="/account/change_password">Change Password</Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

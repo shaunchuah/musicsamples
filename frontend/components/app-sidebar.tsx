@@ -20,6 +20,7 @@ import {
 
 import { useSession } from "next-auth/react";
 import NavLogo from "./nav-logo";
+import { usePathname } from "next/navigation";
 
 // This is sample data.
 const data = {
@@ -53,17 +54,7 @@ const data = {
         },
       ],
     },
-    {
-      title: "Files",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Dashboard",
-          url: "/files/dashboard",
-        },
-      ],
-    },
+
     {
       title: "Datasets",
       url: "#",
@@ -71,7 +62,7 @@ const data = {
       items: [
         {
           title: "Dashboard",
-          url: "#",
+          url: "/datasets/dashboard",
         },
         {
           title: "Documentation",
@@ -86,7 +77,7 @@ const data = {
       items: [
         {
           title: "Users",
-          url: "users",
+          url: "/admin/users",
         },
         {
           title: "Django Admin",
@@ -102,13 +93,26 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession();
 
+  const pathname = usePathname();
+  const navMainWithActive = React.useMemo(() => {
+    return data.navMain.map((section) => ({
+      ...section,
+      isActive: pathname.startsWith(section.url) ||
+                section.items?.some(item => item.url === pathname),
+      items: section.items?.map(item => ({
+        ...item,
+        isActive: item.url === pathname
+      }))
+    }));
+  }, [pathname]);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <NavLogo />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navMainWithActive} />
       </SidebarContent>
       <SidebarFooter>
         {session?.user && (
