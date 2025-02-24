@@ -1,15 +1,45 @@
 "use client";
 
 import { GalleryVerticalEnd } from "lucide-react"
-
 import { LoginForm } from "@/components/login-form"
 import { useSession } from "next-auth/react"
-import { redirect } from "next/navigation"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
 export default function LoginPage() {
-  const { data:session } = useSession()
-  if (session) {
-    redirect("/main/samples/dashboard") }
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkAuthAndRedirect = async () => {
+      if (status === "authenticated" && session?.accessToken) {
+        try {
+          const response = await fetch('/api/auth/verify/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              token: session.accessToken
+            })
+          });
+
+          if (response.ok) {
+            router.push("/samples/dashboard")
+          }
+        } catch (error) {
+          console.error('Error verifying token:', error);
+        }
+      }
+    }
+
+    checkAuthAndRedirect();
+  }, [status, session, router])
+
+  // Show loading state while checking session
+  if (status === "loading") {
+    return <div>Loading...</div>
+  }
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">

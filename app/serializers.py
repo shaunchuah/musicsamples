@@ -18,6 +18,17 @@ class SampleSerializer(serializers.ModelSerializer):
         lookup_field = "sample_id"
 
 
+class SampleV2Serializer(serializers.ModelSerializer):
+    """
+    Serializer for NextJS Fronend
+    """
+
+    class Meta:
+        model = Sample
+        fields = "__all__"
+        lookup_field = "sample_id"
+
+
 class SampleIsUsedSerializer(serializers.ModelSerializer):
     """
     Serializer for marking samples as used

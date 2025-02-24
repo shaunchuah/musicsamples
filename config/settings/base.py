@@ -64,6 +64,7 @@ THIRD_PARTY_APPS = [
     "oauth2_provider",
     "corsheaders",
     "guardian",
+    "django_extensions",
 ]
 
 LOCAL_APPS = [

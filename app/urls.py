@@ -1,16 +1,11 @@
 from django.urls import include, path
 from django.views.generic.base import TemplateView
 from rest_framework import routers
-from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 from app import views
 
-from .views import (
-    AllSampleExportViewset,
-    MultipleSampleViewSet,
-    SampleIsUsedViewSet,
-    SampleViewSet,
-)
+from .views import AllSampleExportViewset, MultipleSampleViewSet, SampleIsUsedViewSet, SampleV2ViewSet, SampleViewSet
 
 router = routers.DefaultRouter()
 
@@ -19,6 +14,9 @@ router.register(r"samples", SampleViewSet, "samples")
 router.register(r"samples_used", SampleIsUsedViewSet, "samples_used")
 router.register(r"multiple_samples", MultipleSampleViewSet, "multiple_samples")
 router.register(r"all", AllSampleExportViewset, "all")
+
+router_v2 = routers.DefaultRouter()
+router_v2.register(r"samples", SampleV2ViewSet, "samples")
 
 urlpatterns = [
     path("", views.index, name="home"),
@@ -106,4 +104,6 @@ urlpatterns = [
     path("datastore/view/<int:id>/", views.datastore_view, name="datastore_view"),
     path("api/v2/auth/login/", views.login_view, name="login"),
     path("api/v2/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/v2/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
+    path("api/v2/", include(router_v2.urls)),
 ]
