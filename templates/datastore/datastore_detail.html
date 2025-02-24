@@ -1,0 +1,185 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+  Dashboard
+{% endblock title %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+  {% if form.errors %}
+    {% for field in form %}
+      {% for error in field.errors %}
+        <div class="row">
+          <div class="col-md-5">
+            <div class="alert alert-danger">
+              <button type="button"
+                      aria-hidden="true"
+                      class="close"
+                      data-dismiss="alert"
+                      aria-label="Close">
+                <i class="tim-icons icon-simple-remove"></i>
+              </button>
+              <span>{{ field.label }}: {{ error|escape }}</span>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
+  <div class="row">
+    <div class="col-md-7">
+      <div class="card">
+        <h3 class="card-header card-title">File Details</h3>
+        <div class="card-body">
+          <p>
+            These details cannot be changed once a file is uploaded. If you wish to change the details you will need to reupload the file.
+          </p>
+          <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td>File Name</td>
+                  <td>{{ file.formatted_file_name }}</td>
+                </tr>
+                <tr>
+                  <td>Category</td>
+                  <td>{{ file.category }}</td>
+                </tr>
+                <tr>
+                  <td>Study Name</td>
+                  <td>{{ file.get_study_name_display }}</td>
+                </tr>
+                {% if file.study_name == "mini_music" or file.study_name == "music" %}
+                  <tr>
+                    <td>Timepoint</td>
+                    <td>
+                      {% if file.music_timepoint %}
+                        {{ file.get_music_timepoint_display }}
+                      {% elif file.marvel_timepoint %}
+                        {{ file.get_marvel_timepoint_display }}
+                      {% else %}
+                        None
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endif %}
+                <tr>
+                  <td>Sample ID</td>
+                  <td>{{ file.sample_id }}</td>
+                </tr>
+                <tr>
+                  <td>Patient ID</td>
+                  <td>{{ file.patient_id }}</td>
+                </tr>
+                <tr>
+                  <td>Comments</td>
+                  <td>{{ file.sample_comments }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="card-title card-header">Metadata</h3>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td>File Size</td>
+                  <td>{{ file.size|filesizeformat }}</td>
+                </tr>
+                <tr>
+                  <td>File Type</td>
+                  <td>{{ file.file_type }}</td>
+                </tr>
+                <tr>
+                  <td>File URL</td>
+                  <td>{{ file.url }}</td>
+                </tr>
+                <tr>
+                  <td>Blob Name</td>
+                  <td>{{ file.file.name }}</td>
+                </tr>
+                <tr>
+                  <td>Original File Name</td>
+                  <td>{{ file.original_file_name }}</td>
+                </tr>
+                <tr>
+                  <td>Formatted File Name</td>
+                  <td>{{ file.formatted_file_name }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card">
+        <h3 class="card-title card-header">History</h3>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td>Uploaded At</td>
+                  <td>{{ file.upload_finished_at }}</td>
+                </tr>
+                <tr>
+                  <td>Uploaded By</td>
+                  <td>{{ file.uploaded_by }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <table class="table" id="history_table">
+              <thead>
+                <tr>
+                  <th>date/time</th>
+                  <th>change made</th>
+                  <th>responsible</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for change in changes %}
+                  <tr>
+                    <td>{{ change.new_record.history_date|date:"D j M Y, H:i" }}</td>
+                    <td>
+                      {% if change.changed_fields|length > 0 %}
+                        {% for change_by_id in change.changes %}
+                          <b>{{ change_by_id.field|title }}</b>
+                          from
+                          {% if change_by_id.old %}
+                            <b>{{ change_by_id.old }}</b>
+                          {% else %}
+                            <b>blank field</b>
+                          {% endif %}
+                          to
+                          <b>{{ change_by_id.new }}</b>
+                          <br />
+                        {% endfor %}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
+                    <td>{{ change.new_record.history_user }}</td>
+                  </tr>
+                {% endfor %}
+                <tr>
+                  <td>{{ file.upload_finished_at }}</td>
+                  <td>First Created</td>
+                  <td>{{ file.uploaded_by }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+{% endblock javascripts %}

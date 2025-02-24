@@ -61,12 +61,12 @@
         </div>
         <div class="card-footer">
           <a href="{% url 'datastore_create' %}" class="btn btn-fill btn-success">Upload New File</a>
-          <a href="{% url 'export_csv' study_name='all' %}?q={{ query_string }}"
+          <a href="{% url 'datastore_search_export_csv' %}?q={{ query_string }}"
              class="btn btn-success float-lg-right"
              data-toggle="tooltip"
              data-placement="bottom"
              data-html="true"
-             title="Tip: Customise the export by searching for the set of samples you wish to download."><i class="tim-icons icon-cloud-download-93"></i> Export Current View
+             title="Tip: Customise the export by searching for the set of file metadata you wish to download."><i class="tim-icons icon-cloud-download-93"></i> Export Current View
           to CSV</a>
         </div>
         <div class="card-body">
@@ -86,7 +86,7 @@
                   <th>Timepoint</th>
                   <th>Sample ID</th>
                   <th>Download</th>
-                  <th>View File</th>
+                  <th>View Metadata</th>
                   <th>Delete</th>
                 </tr>
               </thead>
@@ -114,12 +114,16 @@
                       <td>{{ file.sample_id }}</td>
                       <td>
                         <a href="{% url 'datastore_download' id=file.id %}"><i class="tim-icons icon-cloud-download-93"></i> Download</a>
+                        <a href="{% url 'datastore_azure_view' id=file.id %}" target="_blank"><i class="tim-icons icon-zoom-split"></i> View on Azure</a>
                       </td>
                       <td>
-                        <a href="{% url 'datastore_view' id=file.id %}" target="_blank"><i class="tim-icons icon-zoom-split"></i> View</a>
+                        <a href="{% url 'datastore_read' id=file.id %}"><i class="tim-icons icon-zoom-split"></i> View</a>
                       </td>
                       <td class="text-center">
-                        <a href="{% url 'datastore_delete' id=file.id %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
+                        <a href="#"
+                           data-toggle="modal"
+                           data-target="#deleteConfirmModal"
+                           data-href="{% url 'datastore_delete' id=file.id %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
                       </td>
                     </tr>
                   {% endfor %}
@@ -132,6 +136,41 @@
             </table>
             {% include "layouts/pagination.html" %}
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade"
+       id="deleteConfirmModal"
+       tabindex="-1"
+       role="dialog"
+       aria-labelledby="deleteConfirmModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Delete</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">
+              <svg width="24"
+                   height="24"
+                   data-slot="icon"
+                   fill="none"
+                   stroke-width="1.5"
+                   stroke="currentColor"
+                   viewBox="0 0 24 24"
+                   xmlns="http://www.w3.org/2000/svg"
+                   aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            </span>
+          </button>
+        </div>
+        <div class="modal-body">Are you sure you want to delete this file?</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <a href="#" class="btn btn-danger" id="confirmDeleteBtn">Delete</a>
         </div>
       </div>
     </div>
@@ -166,6 +205,11 @@
           },
 
         },
+      });
+
+      $('#deleteConfirmModal').on('show.bs.modal', function(e) {
+        var url = $(e.relatedTarget).data('href');
+        $('#confirmDeleteBtn').attr('href', url);
       });
     });
   </script>

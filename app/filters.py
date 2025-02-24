@@ -36,6 +36,8 @@ class SampleFilter(django_filters.FilterSet):
 
 
 class DataStoreFilter(django_filters.FilterSet):
+    patient_id = django_filters.AllValuesFilter(label="Patient ID")
+
     class Meta:
         model = DataStore
         fields = [

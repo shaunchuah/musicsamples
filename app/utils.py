@@ -7,16 +7,20 @@ from django.http import HttpResponse
 from django_pandas.io import read_frame
 
 
-def export_csv(queryset, study_name="gtrac"):
+def export_csv(queryset, file_prefix="gtrac", file_name="samples"):
     """
     Takes in queryset, returns csv download response
-    study_name parameter is optional to control the name of the csv file.
+    file_prefix: optional, default is gtrac to control the name of the csv file.
+    file_name: optional, default is samples
+
+    By default takes in a queryset and returns gtrac_samples_<current_date>.csv
     """
     current_date = datetime.datetime.now().strftime("%d-%b-%Y")
 
     response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = 'attachment; filename="%s_samples_%s.csv"' % (
-        study_name,
+    response["Content-Disposition"] = 'attachment; filename="%s_%s_%s.csv"' % (
+        file_prefix,
+        file_name,
         current_date,
     )
     writer = csv.writer(response)

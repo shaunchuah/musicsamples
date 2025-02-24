@@ -498,16 +498,16 @@ def export_csv_view(request, study_name):
 @login_required(login_url="/login/")
 def export_users(request):
     queryset = User.objects.all()
-    return export_csv(queryset, study_name="users")
+    return export_csv(queryset, file_prefix="users")
 
 
 @login_required(login_url="/login/")
 def export_samples(request):
     queryset = Sample.objects.all()
-    return export_csv(queryset, study_name="samples")
+    return export_csv(queryset, file_prefix="samples")
 
 
 @login_required(login_url="/login/")
 def export_historical_samples(request):
     queryset = Sample.history.all()
-    return export_csv(queryset, study_name="historicalsamples")
+    return export_csv(queryset, file_prefix="historicalsamples")

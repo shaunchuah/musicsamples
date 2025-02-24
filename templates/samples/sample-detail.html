@@ -1,268 +1,269 @@
 {% extends "layouts/base.html" %}
+
 {% block title %}
-    Dashboard
+  Dashboard
 {% endblock title %}
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}
 {% endblock stylesheets %}
 {% block content %}
-    {% if form.errors %}
-        {% for field in form %}
-            {% for error in field.errors %}
-                <div class="row">
-                    <div class="col-md-5">
-                        <div class="alert alert-danger">
-                            <button type="button"
-                                    aria-hidden="true"
-                                    class="close"
-                                    data-dismiss="alert"
-                                    aria-label="Close">
-                                <i class="tim-icons icon-simple-remove"></i>
-                            </button>
-                            <span>{{ field.label }}: {{ error|escape }}</span>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        {% endfor %}
-    {% endif %}
-    <div class="row">
-        <div class="col-md-7">
-            <div class="card">
-                <h3 class="card-header card-title">Sample Details</h3>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <tbody>
-                                <tr>
-                                    <td>Study Name</td>
-                                    <td>{{ sample.get_study_name_display }}</td>
-                                </tr>
-                                {% if sample.study_name == "mini_music" or sample.study_name == "music" %}
-                                    <tr>
-                                        <td>Timepoint</td>
-                                        <td>
-                                            {% if sample.music_timepoint %}
-                                                {{ sample.get_music_timepoint_display }}
-                                            {% elif sample.marvel_timepoint %}
-                                                {{ sample.get_marvel_timepoint_display }}
-                                            {% else %}
-                                                None
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endif %}
-                                <tr>
-                                    <td>Sample ID</td>
-                                    <td>{{ sample.sample_id }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Patient ID</td>
-                                    <td>{{ sample.patient_id }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Sample Location</td>
-                                    <td>{{ sample.sample_location }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Sample Sublocation</td>
-                                    <td>{{ sample.sample_sublocation }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Sample Type</td>
-                                    <td>{{ sample.get_sample_type_display }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Sample Datetime</td>
-                                    <td>{{ sample.sample_datetime }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Sample Comments</td>
-                                    <td>{{ sample.sample_comments }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <h3 class="card-header card-title">Sample Processing</h3>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <tbody>
-                                <tr>
-                                    <td>Sample Processing Datetime</td>
-                                    <td>{{ sample.processing_datetime }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Frozen Datetime</td>
-                                    <td>{{ sample.frozen_datetime }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Sample Used?</td>
-                                    <td>{{ sample.is_used }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Time Between Sampling and Processing</td>
-                                    <td>
-                                        {% if processing_time is None %}
-                                            N/A
-                                        {% else %}
-                                            {{ processing_time }} minutes
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Sample Volume Remaining</td>
-                                    <td>
-                                        {% if sample.sample_volume is None %}
-                                            N/A
-                                        {% else %}
-                                            {{ sample.sample_volume }} {{ sample.sample_volume_units }}
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Freeze Thaw Count</td>
-                                    <td>{{ sample.freeze_thaw_count }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Haemolysis Reference Category (100 and above unusable)</td>
-                                    <td>
-                                        {% if sample.haemolysis_reference is None %}
-                                            N/A
-                                        {% else %}
-                                            {{ sample.haemolysis_reference }} mg/dL
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Biopsy Location</td>
-                                    <td>
-                                        {% if sample.biopsy_location is None %}
-                                            N/A
-                                        {% else %}
-                                            {{ sample.get_biopsy_location_display }}
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Biopsy Inflamed Status</td>
-                                    <td>
-                                        {% if sample.biopsy_inflamed_status is None %}
-                                            N/A
-                                        {% else %}
-                                            {{ sample.get_biopsy_inflamed_status_display }}
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Qubit (ng/uL)</td>
-                                    <td>
-                                        {% if sample.qubit_cfdna_ng_ul is None %}
-                                            N/A
-                                        {% else %}
-                                            {{ sample.qubit_cfdna_ng_ul }}
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Paraffin Block Key</td>
-                                    <td>
-                                        {% if sample.paraffin_block_key is None %}
-                                            N/A
-                                        {% else %}
-                                            {{ sample.paraffin_block_key }}
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <a href="{% url 'sample_edit' pk=sample.pk %}?next={{ request.get_full_path }}"
-                       class="btn btn-fill btn-success">Edit</a>
-                </div>
+  {% if form.errors %}
+    {% for field in form %}
+      {% for error in field.errors %}
+        <div class="row">
+          <div class="col-md-5">
+            <div class="alert alert-danger">
+              <button type="button"
+                      aria-hidden="true"
+                      class="close"
+                      data-dismiss="alert"
+                      aria-label="Close">
+                <i class="tim-icons icon-simple-remove"></i>
+              </button>
+              <span>{{ field.label }}: {{ error|escape }}</span>
             </div>
+          </div>
         </div>
-        <div class="col-md-5">
-            <div class="card">
-                <h3 class="card-title card-header">History</h3>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <tbody>
-                                <tr>
-                                    <td>First Registered</td>
-                                    <td>{{ sample.created }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Created By</td>
-                                    <td>{{ sample.created_by }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Last Modified</td>
-                                    <td>{{ sample.last_modified }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Modified By</td>
-                                    <td>{{ sample.last_modified_by }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <table class="table" id="history_table">
-                            <thead>
-                                <tr>
-                                    <th>date/time</th>
-                                    <th>change made</th>
-                                    <th>responsible</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for change in changes %}
-                                    <tr>
-                                        <td>{{ change.new_record.history_date|date:"D j M Y, H:i" }}</td>
-                                        <td>
-                                            {% if change.changed_fields|length > 0 %}
-                                                {% for change_by_id in change.changes %}
-                                                    <b>{{ change_by_id.field|title }}</b>
-                                                    from
-                                                    {% if change_by_id.old %}
-                                                        <b>{{ change_by_id.old }}</b>
-                                                    {% else %}
-                                                        <b>blank field</b>
-                                                    {% endif %}
-                                                    to
-                                                    <b>{{ change_by_id.new }}</b>
-                                                    <br>
-                                                {% endfor %}
-                                            {% else %}
-                                                -
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ change.new_record.history_user }}</td>
-                                    </tr>
-                                {% endfor %}
-                                <tr>
-                                    <td>{{ sample.created }}</td>
-                                    <td>First Created</td>
-                                    <td>{{ sample.created_by }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
+  <div class="row">
+    <div class="col-md-7">
+      <div class="card">
+        <h3 class="card-header card-title">Sample Details</h3>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td>Study Name</td>
+                  <td>{{ sample.get_study_name_display }}</td>
+                </tr>
+                {% if sample.study_name == "mini_music" or sample.study_name == "music" %}
+                  <tr>
+                    <td>Timepoint</td>
+                    <td>
+                      {% if sample.music_timepoint %}
+                        {{ sample.get_music_timepoint_display }}
+                      {% elif sample.marvel_timepoint %}
+                        {{ sample.get_marvel_timepoint_display }}
+                      {% else %}
+                        None
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endif %}
+                <tr>
+                  <td>Sample ID</td>
+                  <td>{{ sample.sample_id }}</td>
+                </tr>
+                <tr>
+                  <td>Patient ID</td>
+                  <td>{{ sample.patient_id }}</td>
+                </tr>
+                <tr>
+                  <td>Sample Location</td>
+                  <td>{{ sample.sample_location }}</td>
+                </tr>
+                <tr>
+                  <td>Sample Sublocation</td>
+                  <td>{{ sample.sample_sublocation }}</td>
+                </tr>
+                <tr>
+                  <td>Sample Type</td>
+                  <td>{{ sample.get_sample_type_display }}</td>
+                </tr>
+                <tr>
+                  <td>Sample Datetime</td>
+                  <td>{{ sample.sample_datetime }}</td>
+                </tr>
+                <tr>
+                  <td>Sample Comments</td>
+                  <td>{{ sample.sample_comments }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+        <h3 class="card-header card-title">Sample Processing</h3>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td>Sample Processing Datetime</td>
+                  <td>{{ sample.processing_datetime }}</td>
+                </tr>
+                <tr>
+                  <td>Frozen Datetime</td>
+                  <td>{{ sample.frozen_datetime }}</td>
+                </tr>
+                <tr>
+                  <td>Sample Used?</td>
+                  <td>{{ sample.is_used }}</td>
+                </tr>
+                <tr>
+                  <td>Time Between Sampling and Processing</td>
+                  <td>
+                    {% if processing_time is None %}
+                      N/A
+                    {% else %}
+                      {{ processing_time }} minutes
+                    {% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Sample Volume Remaining</td>
+                  <td>
+                    {% if sample.sample_volume is None %}
+                      N/A
+                    {% else %}
+                      {{ sample.sample_volume }} {{ sample.sample_volume_units }}
+                    {% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Freeze Thaw Count</td>
+                  <td>{{ sample.freeze_thaw_count }}</td>
+                </tr>
+                <tr>
+                  <td>Haemolysis Reference Category (100 and above unusable)</td>
+                  <td>
+                    {% if sample.haemolysis_reference is None %}
+                      N/A
+                    {% else %}
+                      {{ sample.haemolysis_reference }} mg/dL
+                    {% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Biopsy Location</td>
+                  <td>
+                    {% if sample.biopsy_location is None %}
+                      N/A
+                    {% else %}
+                      {{ sample.get_biopsy_location_display }}
+                    {% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Biopsy Inflamed Status</td>
+                  <td>
+                    {% if sample.biopsy_inflamed_status is None %}
+                      N/A
+                    {% else %}
+                      {{ sample.get_biopsy_inflamed_status_display }}
+                    {% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Qubit (ng/uL)</td>
+                  <td>
+                    {% if sample.qubit_cfdna_ng_ul is None %}
+                      N/A
+                    {% else %}
+                      {{ sample.qubit_cfdna_ng_ul }}
+                    {% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Paraffin Block Key</td>
+                  <td>
+                    {% if sample.paraffin_block_key is None %}
+                      N/A
+                    {% else %}
+                      {{ sample.paraffin_block_key }}
+                    {% endif %}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="{% url 'sample_edit' pk=sample.pk %}?next={{ request.get_full_path }}"
+             class="btn btn-fill btn-success">Edit</a>
+        </div>
+      </div>
     </div>
+    <div class="col-md-5">
+      <div class="card">
+        <h3 class="card-title card-header">History</h3>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td>First Registered</td>
+                  <td>{{ sample.created }}</td>
+                </tr>
+                <tr>
+                  <td>Created By</td>
+                  <td>{{ sample.created_by }}</td>
+                </tr>
+                <tr>
+                  <td>Last Modified</td>
+                  <td>{{ sample.last_modified }}</td>
+                </tr>
+                <tr>
+                  <td>Modified By</td>
+                  <td>{{ sample.last_modified_by }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <table class="table" id="history_table">
+              <thead>
+                <tr>
+                  <th>date/time</th>
+                  <th>change made</th>
+                  <th>responsible</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for change in changes %}
+                  <tr>
+                    <td>{{ change.new_record.history_date|date:"D j M Y, H:i" }}</td>
+                    <td>
+                      {% if change.changed_fields|length > 0 %}
+                        {% for change_by_id in change.changes %}
+                          <b>{{ change_by_id.field|title }}</b>
+                          from
+                          {% if change_by_id.old %}
+                            <b>{{ change_by_id.old }}</b>
+                          {% else %}
+                            <b>blank field</b>
+                          {% endif %}
+                          to
+                          <b>{{ change_by_id.new }}</b>
+                          <br />
+                        {% endfor %}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
+                    <td>{{ change.new_record.history_user }}</td>
+                  </tr>
+                {% endfor %}
+                <tr>
+                  <td>{{ sample.created }}</td>
+                  <td>First Created</td>
+                  <td>{{ sample.created_by }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock content %}
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-    <script>
-    $(document).ready(function () {
-        // Javascript method's body can be found in assets/js/demos.js
-        demo.initDashboardPageCharts();
+  <script>
+    $(document).ready(function() {
+      // Javascript method's body can be found in assets/js/demos.js
+      demo.initDashboardPageCharts();
 
     });
-    </script>
+  </script>
 {% endblock javascripts %}

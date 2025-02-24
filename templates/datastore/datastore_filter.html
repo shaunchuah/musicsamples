@@ -28,7 +28,7 @@
               <button type="submit" class="btn btn-fill btn-success">Filter</button>
               <a href="{% url 'datastore_filter' %}"
                  class="btn btn-fill btn-secondary">Clear</a>
-            <a href="{% url 'filter_export_csv' %}?{{ parameter_string }}"
+            <a href="{% url 'datastore_filter_export_csv' %}?{{ parameter_string }}"
                class="btn btn-success float-lg-right"><i class="tim-icons icon-cloud-download-93"></i>
           Export CSV</a>
         </div>
@@ -93,7 +93,7 @@
                       <a href="{% url 'datastore_download' id=file.id %}"><i class="tim-icons icon-cloud-download-93"></i> Download</a>
                     </td>
                     <td>
-                      <a href="{% url 'datastore_view' id=file.id %}" target="_blank"><i class="tim-icons icon-zoom-split"></i> View</a>
+                      <a href="{% url 'datastore_azure_view' id=file.id %}" target="_blank"><i class="tim-icons icon-zoom-split"></i> View</a>
                     </td>
                     <td class="text-center">
                       <a href="{% url 'datastore_delete' id=file.id %}"><i class="tim-icons icon-send align-center"></i> Delete</a>

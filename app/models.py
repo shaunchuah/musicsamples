@@ -1,6 +1,5 @@
 import datetime
 import pathlib
-from uuid import uuid4
 
 from django.conf import settings
 from django.db import models
@@ -95,25 +94,21 @@ def file_generate_name(original_file_name: str, study_name: str, study_id: str =
     extension = pathlib.Path(original_file_name).suffix
     file_name = pathlib.Path(original_file_name).stem
     if not study_id:
-        return f"{study_name}_{uuid4().hex[:7]}_{file_name}{extension}"
-    return f"{study_name}_{study_id}_{uuid4().hex[:7]}_{file_name}{extension}"
+        return f"{study_name}_{file_name}{extension}"
+    return f"{study_name}_{study_id}_{file_name}{extension}"
 
 
 class DataStore(models.Model):
     # Metadata Fields
+    category = models.CharField(max_length=200, choices=FileCategoryChoices.choices)
     study_name = models.CharField(max_length=200, choices=StudyNameChoices.choices)
-
-    # Optional Metadata Fields
-    # Files may or may not be directly related to samples
-    # Files may also be directly related to patients
+    patient_id = models.CharField(max_length=200, blank=True, null=True)
     music_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MusicTimepointChoices.choices)
     marvel_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MarvelTimepointChoices.choices)
     comments = models.TextField(blank=True, null=True)
     sample_id = models.ForeignKey(Sample, null=True, blank=True, on_delete=models.SET_NULL, related_name="files")
-    patient_id = models.CharField(max_length=200, blank=True, null=True)
 
     file = models.FileField(upload_to=file_upload_path, blank=True, null=True)
-    category = models.CharField(max_length=200, choices=FileCategoryChoices.choices)
 
     file_type = models.CharField(max_length=255, blank=True)  # File Extension
     original_file_name = models.TextField(blank=True)
