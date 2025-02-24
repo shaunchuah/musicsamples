@@ -45,3 +45,20 @@ def azure_generate_download_link(file, download=False):
         f"https://{settings.AZURE_ACCOUNT_NAME}.blob.core.windows.net/{container_name}/{blob_name}?{sas_token}"
     )
     return download_url
+
+
+def azure_delete_file(file):
+    """
+    Pass in the file
+    """
+    blob_service_client = azure_get_blob_service_client()
+    container_name = settings.AZURE_CONTAINER_NAME
+    blob_name = f"{file.file.name}"
+
+    try:
+        blob_client = blob_service_client.get_blob_client(container=container_name, blob=blob_name)
+        blob_client.delete_blob()
+    except Exception as e:
+        logging.error(e)
+        return None
+    return True

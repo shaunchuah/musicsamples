@@ -1,7 +1,7 @@
 import django_filters
 
 from app.choices import SampleTypeChoices, StudyNameChoices
-from app.models import Sample
+from app.models import DataStore, Sample
 
 
 class SampleFilter(django_filters.FilterSet):
@@ -32,4 +32,16 @@ class SampleFilter(django_filters.FilterSet):
             "sample_comments",
             "sample_volume",
             "sample_datetime",
+        ]
+
+
+class DataStoreFilter(django_filters.FilterSet):
+    class Meta:
+        model = DataStore
+        fields = [
+            "category",
+            "study_name",
+            "patient_id",
+            "music_timepoint",
+            "marvel_timepoint",
         ]

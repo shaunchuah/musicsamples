@@ -14,23 +14,14 @@
           <h3 class="card-title">Search DataStore</h3>
         </div>
         <div class="card-body">
-          <form id="searchform" action="{% url 'sample_search' %}" method="get">
+          <form id="searchform" action="{% url 'datastore_search' %}" method="get">
             <div class="form-group">
               <input type="text" autofocus name="q" class="form-control" />
             </div>
-            <div class="form-check">
-              <input type="checkbox"
-                     class="form-check-input mr-2"
-                     id="id_include_used_samples"
-                     name="include_used_samples"
-                     value="True"
-                     class="form-control" />
-              <label for="id_include_used_samples" class="form-check-label">Include used samples?</label>
-            </div>
             <div>
               <button type="submit" class="btn btn-fill btn-success">Search</button>
-              <a href="{% url 'home' %}" class="btn btn-fill btn-secondary">Clear</a>
-              <a href="{% url 'filter' %}"
+              <a href="{% url 'datastore_list' %}" class="btn btn-fill btn-secondary">Clear</a>
+              <a href="{% url 'datastore_filter' %}"
                  class="btn btn-fill btn-success float-lg-right">Advanced
               Filtering</a>
             </div>
@@ -47,15 +38,15 @@
         </div>
         <div class="card-footer">
           <div>
-            <a href="{% url 'filter' %}?study_name=music"
+            <a href="{% url 'datastore_filter' %}?study_name=music"
                class="btn btn-fill btn-success">MUSIC</a>
-            <a href="{% url 'filter' %}?study_name=gidamps"
+            <a href="{% url 'datastore_filter' %}?study_name=gidamps"
                class="btn btn-fill btn-success">GI-DAMPs</a>
-            <a href="{% url 'filter' %}?study_name=mini_music"
+            <a href="{% url 'datastore_filter' %}?study_name=mini_music"
                class="btn btn-fill btn-success">Mini-Music</a>
-            <a href="{% url 'filter' %}?study_name=marvel"
+            <a href="{% url 'datastore_filter' %}?study_name=marvel"
                class="btn btn-fill btn-success">MARVEL</a>
-            <a href="{% url 'filter' %}?study_name=fate_cd"
+            <a href="{% url 'datastore_filter' %}?study_name=fate_cd"
                class="btn btn-fill btn-success">FATE-CD</a>
           </div>
         </div>
@@ -66,10 +57,7 @@
     <div class="col">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">
-            Files
-            {% if study_name %}- ({{ study_name }}){% endif %}
-          </h3>
+          <h3 class="card-title">Files</h3>
         </div>
         <div class="card-footer">
           <a href="{% url 'datastore_create' %}" class="btn btn-fill btn-success">Upload New File</a>
@@ -82,21 +70,21 @@
           to CSV</a>
         </div>
         <div class="card-body">
-          <div class="d-flex flex-row-reverse pb-3">Total Count: {{ datastores.count }}</div>
+          <div class="d-flex flex-row-reverse pb-3">Total Count: {{ datastores|length }}</div>
           <div class="table-responsive">
             <table class="table tablesorter" id="mainTable">
               <thead class="text-primary">
                 <tr>
-                  <th>Study Name</th>
                   <th>Category</th>
-                  <th>File Name</th>
-                  <th>Sample ID</th>
+                  <th>Study Name</th>
                   <th>Patient ID</th>
+                  <th>File Name</th>
+                  <th>Comments</th>
                   <th>Size</th>
                   <th>Type</th>
                   <th>Upload Date</th>
                   <th>Timepoint</th>
-                  <th>Comments</th>
+                  <th>Sample ID</th>
                   <th>Download</th>
                   <th>View File</th>
                   <th>Delete</th>
@@ -106,11 +94,11 @@
                 {% if datastores %}
                   {% for file in datastores %}
                     <tr>
-                      <td>{{ file.get_study_name_display }}</td>
                       <td>{{ file.get_category_display }}</td>
-                      <td>{{ file.formatted_file_name }}</td>
-                      <td>{{ file.sample_id }}</td>
+                      <td>{{ file.get_study_name_display }}</td>
                       <td>{{ file.patient_id }}</td>
+                      <td>{{ file.formatted_file_name }}</td>
+                      <td>{{ file.comments }}</td>
                       <td>{{ file.size|filesizeformat }}</td>
                       <td>{{ file.file_type }}</td>
                       <td>{{ file.upload_finished_at|date:'d M Y H:i' }}</td>
@@ -123,7 +111,7 @@
                           None
                         {% endif %}
                       </td>
-                      <td>{{ file.comments }}</td>
+                      <td>{{ file.sample_id }}</td>
                       <td>
                         <a href="{% url 'datastore_download' id=file.id %}"><i class="tim-icons icon-cloud-download-93"></i> Download</a>
                       </td>
@@ -131,7 +119,7 @@
                         <a href="{% url 'datastore_view' id=file.id %}" target="_blank"><i class="tim-icons icon-zoom-split"></i> View</a>
                       </td>
                       <td class="text-center">
-                        <a href=""><i class="tim-icons icon-send align-center"></i> Delete</a>
+                        <a href="{% url 'datastore_delete' id=file.id %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
                       </td>
                     </tr>
                   {% endfor %}

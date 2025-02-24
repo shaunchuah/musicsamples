@@ -69,18 +69,6 @@ class Sample(models.Model):
         self.sample_id = self.sample_id.upper()
         self.patient_id = self.patient_id.upper()
 
-        # Suspend form validation until all samples have been allocated timepoints
-        # if (
-        #     self.study_name == StudyNameChoices.MUSIC
-        #     or self.study_name == StudyNameChoices.MINI_MUSIC
-        # ):
-        #     if self.music_timepoint is None or self.music_timepoint == "":
-        #         raise ValidationError(
-        #             {
-        #                 "music_timepoint": "Music Timepoint must be filled for MUSIC and Mini-MUSIC studies."
-        #             }
-        #         )
-
     def __str__(self):
         return self.sample_id
 
@@ -100,13 +88,15 @@ def file_upload_path(instance, filename):
     return f"{instance.category}/{instance.formatted_file_name}"
 
 
-def file_generate_name(original_file_name: str, study_name: str) -> str:
+def file_generate_name(original_file_name: str, study_name: str, study_id: str = None) -> str:
     """
     Takes filename, study_name and returns a formatted filename with unique hash
     """
     extension = pathlib.Path(original_file_name).suffix
     file_name = pathlib.Path(original_file_name).stem
-    return f"{study_name}_{file_name}_{uuid4().hex[:7]}{extension}"
+    if not study_id:
+        return f"{study_name}_{uuid4().hex[:7]}_{file_name}{extension}"
+    return f"{study_name}_{study_id}_{uuid4().hex[:7]}_{file_name}{extension}"
 
 
 class DataStore(models.Model):
@@ -166,7 +156,7 @@ class DataStore(models.Model):
             # generates a new file name and saves the file with the new name
             self.file_type = self.file.name.split(".")[-1]
             self.original_file_name = self.file.name
-            self.formatted_file_name = file_generate_name(self.original_file_name, self.study_name)
+            self.formatted_file_name = file_generate_name(self.original_file_name, self.study_name, self.patient_id)
             self.file.name = self.formatted_file_name
             self.upload_finished_at = datetime.datetime.now()
         super().save(*args, **kwargs)
