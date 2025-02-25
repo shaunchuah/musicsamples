@@ -1,132 +1,132 @@
 {% extends "layouts/base.html" %}
+
 {% block title %}
-    Account
+  Account
 {% endblock title %}
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}
 {% endblock stylesheets %}
 {% block content %}
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Account</h3>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-2">
-                        <div class="col-4">First Name:</div>
-                        <div class="col-8">{{ request.user.first_name }}</div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-4">Last Name:</div>
-                        <div class="col-8">{{ request.user.last_name }}</div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-4">Email:</div>
-                        <div class="col-8">{{ request.user.email }}</div>
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <!--<button type="submit" class="btn btn-fill btn-primary">Save</button>-->
-                    <a href="{% url 'edit_profile' %}" class="btn btn-fill btn-success">Update Profile</a>
-                    <a href="{% url 'password_change' %}" class="btn btn-fill btn-success">Change Password</a>
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Account</h3>
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Recent Activity</h3>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table tablesorter">
-                            <thead class="text-primary">
-                                <tr>
-                                    <th>Sample ID</th>
-                                    <th>Patient ID</th>
-                                    <th>Sample Location</th>
-                                    <th>Sample Type</th>
-                                    <th>Sample Datetime</th>
-                                    <th>View</th>
-                                    <th>Checkout</th>
-                                    <th>Edit</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% if sample_list %}
-                                    {% for sample in sample_list %}
-                                        <tr>
-                                            <td>{{ sample.sample_id }}</td>
-                                            <td>{{ sample.patient_id }}</td>
-                                            <td>{{ sample.sample_location }}</td>
-                                            <td>{{ sample.get_sample_type_display }}</td>
-                                            <td>{{ sample.sample_datetime }}</td>
-                                            <td>
-                                                <a href="{% url 'sample_detail' pk=sample.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
-                                            </td>
-                                            <td>
-                                                <a href="{% url 'sample_checkout' pk=sample.pk %}?next={{ request.get_full_path }}">
-                                                    <i class="tim-icons icon-cloud-upload-94"></i> Checkout
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href="{% url 'sample_edit' pk=sample.pk %}?next={{ request.get_full_path }}"><i class="tim-icons icon-pencil"></i> Edit</a>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                {% else %}
-                                    <tr>
-                                        <td colspan="8" align="center">No samples found.</td>
-                                    </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
-                        {% if sample_list.has_other_pages %}
-                            <div class="row">
-                                <div class="col">
-                                    <ul class="pagination">
-                                        {% if sample_list.has_previous %}
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page={{ sample_list.previous_page_number }}">«</a>
-                                            </li>
-                                        {% else %}
-                                            <li class="page-item disabled">
-                                                <span class="page-link">«</span>
-                                            </li>
-                                        {% endif %}
-                                        {% for i in sample_list.paginator.page_range %}
-                                            {% if sample_list.number == i %}
-                                                <li class="page-item active">
-                                                    <span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
-                                                </li>
-                                            {% else %}
-                                                <li class="page-item">
-                                                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
-                                                </li>
-                                            {% endif %}
-                                        {% endfor %}
-                                        {% if sample_list.has_next %}
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page={{ sample_list.next_page_number }}">»</a>
-                                            </li>
-                                        {% else %}
-                                            <li class="page-item disabled">
-                                                <span class="page-link">»</span>
-                                            </li>
-                                        {% endif %}
-                                    </ul>
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+        <div class="card-body">
+          <div class="row mb-2">
+            <div class="col-4">First Name:</div>
+            <div class="col-8">{{ request.user.first_name }}</div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-4">Last Name:</div>
+            <div class="col-8">{{ request.user.last_name }}</div>
+          </div>
+          <div class="row">
+            <div class="col-4">Email:</div>
+            <div class="col-8">{{ request.user.email }}</div>
+          </div>
         </div>
+        <div class="card-footer">
+          <!--<button type="submit" class="btn btn-fill btn-primary">Save</button>-->
+          <a href="{% url 'edit_profile' %}" class="btn btn-fill btn-success">Update Profile</a>
+          <a href="{% url 'password_change' %}" class="btn btn-fill btn-success">Change Password</a>
+        </div>
+      </div>
     </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Recent Activity</h3>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table tablesorter">
+              <thead class="text-primary">
+                <tr>
+                  <th>Sample ID</th>
+                  <th>Study ID</th>
+                  <th>Sample Location</th>
+                  <th>Sample Type</th>
+                  <th>Sample Datetime</th>
+                  <th>View</th>
+                  <th>Checkout</th>
+                  <th>Edit</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if sample_list %}
+                  {% for sample in sample_list %}
+                    <tr>
+                      <td>{{ sample.sample_id }}</td>
+                      <td>{{ sample.study_id }}</td>
+                      <td>{{ sample.sample_location }}</td>
+                      <td>{{ sample.get_sample_type_display }}</td>
+                      <td>{{ sample.sample_datetime }}</td>
+                      <td>
+                        <a href="{% url 'sample_detail' pk=sample.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
+                      </td>
+                      <td>
+                        <a href="{% url 'sample_checkout' pk=sample.pk %}?next={{ request.get_full_path }}">
+                          <i class="tim-icons icon-cloud-upload-94"></i> Checkout
+                        </a>
+                      </td>
+                      <td>
+                        <a href="{% url 'sample_edit' pk=sample.pk %}?next={{ request.get_full_path }}"><i class="tim-icons icon-pencil"></i> Edit</a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="8" align="center">No samples found.</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+            {% if sample_list.has_other_pages %}
+              <div class="row">
+                <div class="col">
+                  <ul class="pagination">
+                    {% if sample_list.has_previous %}
+                      <li class="page-item">
+                        <a class="page-link" href="?page={{ sample_list.previous_page_number }}">«</a>
+                      </li>
+                    {% else %}
+                      <li class="page-item disabled">
+                        <span class="page-link">«</span>
+                      </li>
+                    {% endif %}
+                    {% for i in sample_list.paginator.page_range %}
+                      {% if sample_list.number == i %}
+                        <li class="page-item active">
+                          <span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+                        </li>
+                      {% else %}
+                        <li class="page-item">
+                          <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                        </li>
+                      {% endif %}
+                    {% endfor %}
+                    {% if sample_list.has_next %}
+                      <li class="page-item">
+                        <a class="page-link" href="?page={{ sample_list.next_page_number }}">»</a>
+                      </li>
+                    {% else %}
+                      <li class="page-item disabled">
+                        <span class="page-link">»</span>
+                      </li>
+                    {% endif %}
+                  </ul>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock content %}
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}

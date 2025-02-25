@@ -6,8 +6,8 @@ from app.models import DataStore, Sample
 
 class SampleFilter(django_filters.FilterSet):
     study_name = django_filters.ChoiceFilter(label="Study Name", choices=StudyNameChoices.choices)
-    patient_id = django_filters.AllValuesFilter(label="Patient ID")
     sample_location = django_filters.AllValuesFilter(label="Sample Location")
+    study_id__name = django_filters.AllValuesFilter(label="Study ID")
     sample_sublocation = django_filters.AllValuesFilter(label="Sample Sublocation")
     sample_type = django_filters.ChoiceFilter(label="Sample Type", choices=SampleTypeChoices.choices)
     is_used = django_filters.BooleanFilter(label="Used Samples?")
@@ -22,7 +22,7 @@ class SampleFilter(django_filters.FilterSet):
         model = Sample
         fields = [
             "study_name",
-            "patient_id",
+            "study_id__name",
             "sample_location",
             "sample_sublocation",
             "sample_type",
@@ -36,14 +36,11 @@ class SampleFilter(django_filters.FilterSet):
 
 
 class DataStoreFilter(django_filters.FilterSet):
-    patient_id = django_filters.AllValuesFilter(label="Patient ID")
-
     class Meta:
         model = DataStore
         fields = [
             "category",
             "study_name",
-            "patient_id",
             "music_timepoint",
             "marvel_timepoint",
         ]

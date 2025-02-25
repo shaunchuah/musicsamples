@@ -11,10 +11,10 @@ class TestStudyFilters(TestCase):
         self.user = UserFactory()
         self.client = Client()
         self.client.force_login(self.user, backend=None)
-        self.music_sample = SampleFactory(study_name=StudyNameChoices.MUSIC, patient_id="MID-90-2")
-        self.gidamps_sample = SampleFactory(study_name=StudyNameChoices.GIDAMPS, patient_id="GID-203-P")
-        self.mini_music_sample = SampleFactory(study_name=StudyNameChoices.MINI_MUSIC, patient_id="MINI-166-3")
-        self.marvel_sample = SampleFactory(study_name=StudyNameChoices.MARVEL, patient_id="239105")
+        self.music_sample = SampleFactory(study_name=StudyNameChoices.MUSIC, study_id__name="MID-90-2")
+        self.gidamps_sample = SampleFactory(study_name=StudyNameChoices.GIDAMPS, study_id__name="GID-203-P")
+        self.mini_music_sample = SampleFactory(study_name=StudyNameChoices.MINI_MUSIC, study_id__name="MINI-166-3")
+        self.marvel_sample = SampleFactory(study_name=StudyNameChoices.MARVEL, study_id__name="239105")
 
     def test_gidamps_study_filter(self):
         path = reverse("filter") + "?study_name=gidamps"

@@ -15,7 +15,7 @@ function submitScan() {
       study_name: $("#id_study_name").val(),
       music_timepoint: $("#id_music_timepoint").val(),
       marvel_timepoint: $("#id_marvel_timepoint").val(),
-      patient_id: $("#id_patient_id").val(),
+      study_id: $("#id_study_id").val(),
       sample_type: $("#id_sample_type").val(),
       qubit_cfdna_ng_ul: $("#id_qubit_cfdna_ng_ul").val(),
       haemolysis_reference: $("#id_haemolysis_reference").val(),

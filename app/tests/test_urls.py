@@ -53,9 +53,9 @@ class TestUrls(SimpleTestCase):
         url = reverse("autocomplete_locations")
         self.assertEqual(resolve(url).func, views.autocomplete_locations)
 
-    def test_autocomplete_patient_id_url_resolves(self):
+    def test_autocomplete_study_id_url_resolves(self):
         url = reverse("autocomplete_patients")
-        self.assertEqual(resolve(url).func, views.autocomplete_patient_id)
+        self.assertEqual(resolve(url).func, views.autocomplete_study_id)
 
     def test_barcode_url_resolves(self):
         url = reverse("barcode")

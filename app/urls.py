@@ -5,15 +5,14 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 from app import views
 
-from .views import AllSampleExportViewset, MultipleSampleViewSet, SampleIsUsedViewSet, SampleV2ViewSet, SampleViewSet
+from .views import MultipleSampleViewSet, SampleIsUsedViewSet, SampleLocationViewSet, SampleV2ViewSet
 
 router = routers.DefaultRouter()
 
 # Django Rest Framework API endpoints
-router.register(r"samples", SampleViewSet, "samples")
+router.register(r"sample_location", SampleLocationViewSet, "sample_location")
 router.register(r"samples_used", SampleIsUsedViewSet, "samples_used")
 router.register(r"multiple_samples", MultipleSampleViewSet, "multiple_samples")
-router.register(r"all", AllSampleExportViewset, "all")
 
 router_v2 = routers.DefaultRouter()
 router_v2.register(r"samples", SampleV2ViewSet, "samples")
@@ -77,7 +76,7 @@ urlpatterns = [
     ),
     path(
         "autocomplete/patients/",
-        views.autocomplete_patient_id,
+        views.autocomplete_study_id,
         name="autocomplete_patients",
     ),
     # Django Rest Framework URLs

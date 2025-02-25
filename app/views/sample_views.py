@@ -118,7 +118,7 @@ def used_samples_search(request):
         query_string = request.GET.get("q")
         sample_list = Sample.objects.filter(is_used=True).filter(
             Q(sample_id__icontains=query_string)
-            | Q(patient_id__icontains=query_string)
+            | Q(study_id__name__icontains=query_string)
             | Q(sample_location__icontains=query_string)
             | Q(sample_sublocation__icontains=query_string)
             | Q(sample_type__icontains=query_string)
@@ -283,7 +283,7 @@ def management(request):
 
 @login_required(login_url="/login/")
 def sample_add(request):
-    # Add mew sample page
+    # Add new sample page
     if request.method == "POST":
         form = SampleForm(request.POST)
         if form.is_valid():
@@ -375,7 +375,7 @@ def sample_search(request):
 
         sample_list = Sample.objects.filter(
             Q(sample_id__icontains=query_string)
-            | Q(patient_id__icontains=query_string)
+            | Q(study_id__name__icontains=query_string)
             | Q(sample_location__icontains=query_string)
             | Q(sample_sublocation__icontains=query_string)
             | Q(sample_type__icontains=query_string)
@@ -385,7 +385,7 @@ def sample_search(request):
         if ("include_used_samples" in request.GET) and request.GET["include_used_samples"].strip():
             sample_list = Sample.objects.filter(
                 Q(sample_id__icontains=query_string)
-                | Q(patient_id__icontains=query_string)
+                | Q(study_id__name__icontains=query_string)
                 | Q(sample_location__icontains=query_string)
                 | Q(sample_sublocation__icontains=query_string)
                 | Q(sample_type__icontains=query_string)
@@ -484,7 +484,7 @@ def export_csv_view(request, study_name):
         query_string = request.GET.get("q")
         samples_queryset = queryset.filter(
             Q(sample_id__icontains=query_string)
-            | Q(patient_id__icontains=query_string)
+            | Q(study_id__name__icontains=query_string)
             | Q(sample_location__icontains=query_string)
             | Q(sample_type__icontains=query_string)
             | Q(sample_comments__icontains=query_string)

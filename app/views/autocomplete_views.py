@@ -4,12 +4,11 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework import viewsets
 
-from app.models import Sample
+from app.models import Sample, StudyIdentifier
 from app.serializers import (
     MultipleSampleSerializer,
-    SampleExportSerializer,
     SampleIsUsedSerializer,
-    SampleSerializer,
+    SampleLocationSerializer,
 )
 
 #############################################################################
@@ -53,20 +52,15 @@ def autocomplete_sublocations(request):
 
 
 @login_required(login_url="/login/")
-def autocomplete_patient_id(request):
+def autocomplete_study_id(request):
     # Helps speed up sample adding by locating existing patient IDs
     if "term" in request.GET:
-        qs = (
-            Sample.objects.filter(patient_id__icontains=request.GET.get("term"))
-            .order_by()
-            .values("patient_id")
-            .distinct()
-        )
+        qs = StudyIdentifier.objects.filter(name__icontains=request.GET.get("term")).values("name")
     else:
-        qs = Sample.objects.all().order_by().values("patient_id").distinct()
+        qs = StudyIdentifier.objects.all().values("name")
     patients = []
-    for sample in qs:
-        patients.append(sample["patient_id"])
+    for study_id in qs:
+        patients.append(study_id["name"])
     return JsonResponse(patients, safe=False)
 
 
@@ -92,7 +86,7 @@ def autocomplete_patient_id(request):
 # track all their locations.
 
 
-class SampleViewSet(viewsets.ModelViewSet):
+class SampleLocationViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows samples to be viewed and edited
     Lookup field set to the barcode ID instead of the default Django
@@ -100,7 +94,7 @@ class SampleViewSet(viewsets.ModelViewSet):
     """
 
     queryset = Sample.objects.all()
-    serializer_class = SampleSerializer
+    serializer_class = SampleLocationSerializer
     lookup_field = "sample_id"
     filterset_fields = ["sample_type"]
 
@@ -131,19 +125,6 @@ class MultipleSampleViewSet(viewsets.ModelViewSet):
             created_by=self.request.user.email,
             last_modified_by=self.request.user.email,
         )
-
-
-class AllSampleExportViewset(viewsets.ReadOnlyModelViewSet):
-    queryset = Sample.objects.all()
-    serializer_class = SampleExportSerializer
-    lookup_field = "sample_id"
-
-    def get_queryset(self):
-        queryset = self.queryset
-        patient_id_starts_with = self.request.query_params.get("patient_id_starts_with")
-        if patient_id_starts_with is not None:
-            queryset = queryset.filter(patient_id__istartswith=patient_id_starts_with)
-        return queryset
 
 
 @login_required(login_url="/login/")

@@ -17,7 +17,7 @@ class MultipleSamplesTest(APITestCase):
         sample_data = {
             "study_name": "",
             "sample_id": "test001",
-            "patient_id": "patient001",
+            "study_id": "patient001",
             "sample_location": "location001",
             "sample_type": "cfdna_plasma",
             "sample_datetime": "2020-01-01T13:20:30",
@@ -35,11 +35,11 @@ class MultipleSamplesTest(APITestCase):
         assert response.status_code == 400  # bad request
         assert response.data["study_name"][0].code == "invalid_choice"
 
-    def test_patient_id_uppercase(self):
+    def test_study_id_uppercase(self):
         sample_data = {
             "study_name": "gidamps",
             "sample_id": "test001",
-            "patient_id": "patient001",
+            "study_id": "patient001",
             "sample_location": "location001",
             "sample_type": "cfdna_plasma",
             "sample_datetime": "2020-01-01T13:20:30",
@@ -55,7 +55,7 @@ class MultipleSamplesTest(APITestCase):
         }
         response = self.client.post("/api/multiple_samples/", sample_data, format="json")
         assert response.status_code == 201
-        assert response.data["patient_id"] == "PATIENT001"
+        assert response.data["study_id"] == "PATIENT001"
 
     def test_music_sample_without_timepoint(self):
         sample_data = {
@@ -63,7 +63,7 @@ class MultipleSamplesTest(APITestCase):
             "music_timepoint": "",
             "marvel_timepoint": "",
             "sample_id": "test001",
-            "patient_id": "patient001",
+            "study_id": "patient001",
             "sample_location": "location001",
             "sample_type": "cfdna_plasma",
             "sample_datetime": "2020-01-01T13:20:30",
@@ -87,7 +87,7 @@ class MultipleSamplesTest(APITestCase):
             "music_timepoint": "",
             "marvel_timepoint": "",
             "sample_id": "test001",
-            "patient_id": "patient001",
+            "study_id": "patient001",
             "sample_location": "location001",
             "sample_type": "cfdna_plasma",
             "sample_datetime": "2020-01-01T13:20:30",
@@ -111,7 +111,7 @@ class MultipleSamplesTest(APITestCase):
             "music_timepoint": "",
             "marvel_timepoint": "",
             "sample_id": "test001",
-            "patient_id": "patient001",
+            "study_id": "patient001",
             "sample_location": "location001",
             "sample_type": "cfdna_plasma",
             "sample_datetime": "2020-01-01T13:20:30",
@@ -135,7 +135,7 @@ class MultipleSamplesTest(APITestCase):
             "music_timepoint": "",
             "marvel_timepoint": "",
             "sample_id": "test001",
-            "patient_id": "patient001",
+            "study_id": "patient001",
             "sample_location": "location001",
             "sample_type": "cfdna_plasma",
             "sample_datetime": "2020-01-01T13:20:30",

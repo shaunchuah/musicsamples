@@ -18,11 +18,28 @@ from app.choices import (
 )
 
 
+class StudyIdentifier(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+    study_name = models.CharField(max_length=200, choices=StudyNameChoices.choices, blank=True, null=True)
+    group = models.CharField(max_length=200, blank=True, null=True)
+    sex = models.CharField(max_length=10, blank=True, null=True)
+    age = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Study Identifier"
+        verbose_name_plural = "Study Identifiers"
+        ordering = ["name"]
+
+
 class Sample(models.Model):
     study_name = models.CharField(max_length=200, choices=StudyNameChoices.choices)
-
+    study_id = models.ForeignKey(
+        StudyIdentifier, on_delete=models.PROTECT, related_name="samples", null=True, blank=True
+    )
     sample_id = models.CharField(max_length=200, unique=True)
-    patient_id = models.CharField(max_length=200)
     sample_location = models.CharField(max_length=200)
     sample_sublocation = models.CharField(max_length=200, blank=True, null=True)
     sample_type = models.CharField(max_length=200, choices=SampleTypeChoices.choices)
@@ -66,7 +83,6 @@ class Sample(models.Model):
 
     def clean(self):
         self.sample_id = self.sample_id.upper()
-        self.patient_id = self.patient_id.upper()
 
     def __str__(self):
         return self.sample_id
@@ -139,11 +155,6 @@ class DataStore(models.Model):
 
     def __str__(self):
         return self.formatted_file_name
-
-    def clean(self):
-        if self.patient_id:
-            self.patient_id = self.patient_id.upper()
-        super().clean()
 
     class Meta:
         ordering = ["-upload_finished_at"]

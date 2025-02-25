@@ -3,7 +3,7 @@ from django.forms import ModelForm
 from django.utils import timezone
 from django_select2 import forms as s2forms
 
-from app.models import DataStore, Sample
+from app.models import DataStore, Sample, StudyIdentifier
 
 
 class DateInput(forms.DateInput):
@@ -27,10 +27,10 @@ def currentTime():
 
 class SampleForm(ModelForm):
     # Main sample registration form
+    study_id = forms.CharField(label="Study ID*", required=True)
     processing_datetime = forms.DateTimeField(
         label="Processing Datetime",
         widget=DateTimeInput(),
-        initial=currentTime,
         required=False,
     )
 
@@ -43,7 +43,7 @@ class SampleForm(ModelForm):
             "study_name",
             "music_timepoint",
             "marvel_timepoint",
-            "patient_id",
+            "study_id",
             "sample_type",
             "qubit_cfdna_ng_ul",
             "haemolysis_reference",
@@ -67,7 +67,7 @@ class SampleForm(ModelForm):
             "music_timepoint": "Music Timepoint",
             "marvel_timepoint": "Marvel Timepoint",
             "sample_id": "Sample ID*",
-            "patient_id": "Patient ID*",
+            "study_id": "Study ID*",
             "sample_datetime": "Sampling Datetime*",
             "sample_location": "Sample Location*",
             "sample_sublocation": "Sample Sublocation",
@@ -83,6 +83,15 @@ class SampleForm(ModelForm):
             "paraffin_block_key": "Paraffin Block Key",
             "frozen_datetime": "Frozen Datetime (If Applicable)",
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        study_id_text = cleaned_data.get("study_id")
+        if study_id_text:
+            study_id_text = study_id_text.upper()
+            study_identifier, created = StudyIdentifier.objects.get_or_create(name=study_id_text)
+            cleaned_data["study_id"] = study_identifier
+        return cleaned_data
 
 
 class CheckoutForm(ModelForm):

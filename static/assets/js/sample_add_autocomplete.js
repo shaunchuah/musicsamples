@@ -12,7 +12,7 @@ $(document).ready(function () {
   $("input#id_sample_sublocation").autocomplete({
     source: autocomplete_sublocations,
   });
-  $("input#id_patient_id").autocomplete({
+  $("input#id_study_id").autocomplete({
     source: autocomplete_patients,
   });
 });

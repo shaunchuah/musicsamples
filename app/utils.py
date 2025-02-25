@@ -46,13 +46,13 @@ def queryset_by_study_name(model, study_name):
     return a filtered queryset
     """
     if study_name == "music":
-        queryset = model.objects.filter(patient_id__startswith="MID-")
+        queryset = model.objects.filter(study_id__name__startswith="MID-")
     elif study_name == "gidamps":
-        queryset = model.objects.filter(patient_id__startswith="GID-")
+        queryset = model.objects.filter(study_id__name__startswith="GID-")
     elif study_name == "mini_music":
-        queryset = model.objects.filter(patient_id__startswith="MINI-")
+        queryset = model.objects.filter(study_id__name__startswith="MINI-")
     elif study_name == "marvel":
-        queryset = model.objects.filter(Q(patient_id__regex=r"^[0-9]{6}$"))
+        queryset = model.objects.filter(Q(study_id__name__regex=r"^[0-9]{6}$"))
     else:
         queryset = model.objects.all()
     return queryset
@@ -74,21 +74,21 @@ def render_dataframe_to_csv_response(df: pd.DataFrame, study_name: str):
 
 
 def retrieve_center_number(row):
-    patient_id = row.name[0]
-    patient_id = str(patient_id)
-    return str.split(patient_id, "-")[1]
+    study_id = row.name[0]
+    study_id = str(study_id)
+    return str.split(study_id, "-")[1]
 
 
 def retrieve_patient_number(row):
-    patient_id = row.name[0]
-    patient_id = str(patient_id)
-    return str.split(patient_id, "-")[2]
+    study_id = row.name[0]
+    study_id = str(study_id)
+    return str.split(study_id, "-")[2]
 
 
 def sort_music_dataframe(df: pd.DataFrame):
     """
     Takes in music or mini_music dataframes and
-    sorts by center and patient_id
+    sorts by center and study_id
     """
     df["center_number"] = df.apply(retrieve_center_number, axis=1)
     df["patient_number"] = df.apply(retrieve_patient_number, axis=1)
@@ -134,7 +134,7 @@ def create_sample_type_pivot(qs: QuerySet, study_name: str):
 
     df = df.drop_duplicates()
 
-    # Remove all rows where the patient_id is not consistent with the studies format
+    # Remove all rows where the study_id is not consistent with the studies format
     # Eg negative controls
     match study_name:
         case "mini_music":
@@ -146,12 +146,12 @@ def create_sample_type_pivot(qs: QuerySet, study_name: str):
         case "marvel":
             pattern_to_match = "^\d{6}$"
 
-    filter = df["patient_id"].str.contains(pattern_to_match, regex=True)
+    filter = df["study_id"].str.contains(pattern_to_match, regex=True)
     df = df[filter]
 
     # Create the pivot table of interest
     output_df = df.pivot_table(
-        index=["patient_id", "sample_date"],
+        index=["study_id", "sample_date"],
         columns="sample_type",
         values="sample_id",
         aggfunc=pd.unique,
