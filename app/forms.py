@@ -125,6 +125,8 @@ class SampleSelectionWidget(s2forms.ModelSelect2MultipleWidget):
 
 
 class DataStoreForm(ModelForm):
+    study_id = forms.CharField(label="Associated Study ID (optional)", required=False)
+
     class Meta:
         model = DataStore
         fields = [
@@ -133,7 +135,7 @@ class DataStoreForm(ModelForm):
             "study_name",
             "music_timepoint",
             "marvel_timepoint",
-            "patient_id",
+            "study_id",
             "comments",
         ]
         labels = {
@@ -142,12 +144,20 @@ class DataStoreForm(ModelForm):
             "music_timepoint": "Music Timepoint",
             "marvel_timepoint": "Marvel Timepoint",
             "comments": "Comments",
-            "patient_id": "Associated Patient ID (optional)",
         }
 
     def __init__(self, *args, **kwargs):
         super(DataStoreForm, self).__init__(*args, **kwargs)
         self.fields["file"].widget.attrs = {"class": "form-control-file custom-file-input"}
+
+    def clean(self):
+        cleaned_data = super().clean()
+        study_id_text = cleaned_data.get("study_id")
+        if study_id_text:
+            study_id_text = study_id_text.upper()
+            study_identifier, created = StudyIdentifier.objects.get_or_create(name=study_id_text)
+            cleaned_data["study_id"] = study_identifier
+        return cleaned_data
 
 
 class DataStoreUpdateForm(ModelForm):

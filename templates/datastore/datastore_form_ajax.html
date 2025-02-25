@@ -111,15 +111,16 @@
                   <option value="24_weeks">24 weeks</option>
                 </select>
               </div>
-              <!-- Patient ID -->
+              <!-- Study ID -->
               <div class="form-group col-md-4">
-                <label for="id_patient_id">Associated Patient ID (optional):</label>
+                <label for="id_study_id">Associated Study ID (optional):</label>
                 <input type="text"
-                       name="patient_id"
+                       name="study_id"
                        maxlength="200"
                        class="form-control"
-                       id="id_patient_id"
-                       x-model="data.patient_id"
+                       id="id_study_id"
+                       @autocomplete.camel="data.study_id = $event.detail.value"
+                       x-model="data.study_id"
                        autocomplete="off" />
               </div>
               <!-- Comments -->
@@ -167,7 +168,7 @@
 {% endblock content %}
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-  <script src="{% static 'assets/js/sample_add_autocomplete.js' %}"></script>
+  <script src="{% static 'assets/js/datastore_autocomplete.js' %}"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script>
     document.addEventListener('alpine:init', () => {
@@ -186,7 +187,7 @@
           study_name: '',
           music_timepoint: '',
           marvel_timepoint: '',
-          patient_id: "",
+          study_id: "",
           comments: "",
           file_name: "",
         },
@@ -265,7 +266,7 @@
                 Alpine.store('upload').loading = false;
                 Alpine.store('upload').completed = true;
                 Alpine.store('upload').initial = false;
-                window.location.href = "/datastore/dashboard/";
+                // window.location.href = "/datastore/dashboard/";
               })
             });
           }).catch(function(error) {

@@ -7,7 +7,7 @@
           <th>Status</th>
           <th>Category</th>
           <th>Study Name</th>
-          <th>Patient ID</th>
+          <th>Study ID</th>
           <th>File Name</th>
           <th>Comments</th>
           <th>Size</th>
@@ -52,7 +52,7 @@
                 <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.get_study_name_display }}</span>
               </td>
               <td>
-                <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.patient_id }}</span>
+                <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.study_id }}</span>
               </td>
               <td>
                 <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.formatted_file_name }}</span>

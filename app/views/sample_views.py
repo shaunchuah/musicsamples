@@ -243,7 +243,7 @@ def sample_types_pivot(request, study_name):
     """
     Takes in a url with study_name being one of the five studies
     and returns a pivot table with sample types as columns,
-    patient ID and sample date as rows.
+    study ID and sample date as rows.
     """
     qs = Sample.objects.filter(study_name=study_name)
     output_df = create_sample_type_pivot(qs, study_name=study_name)

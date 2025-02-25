@@ -118,7 +118,9 @@ class DataStore(models.Model):
     # Metadata Fields
     category = models.CharField(max_length=200, choices=FileCategoryChoices.choices)
     study_name = models.CharField(max_length=200, choices=StudyNameChoices.choices)
-    patient_id = models.CharField(max_length=200, blank=True, null=True)
+    study_id = models.ForeignKey(
+        StudyIdentifier, on_delete=models.PROTECT, related_name="files", null=True, blank=True
+    )
     music_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MusicTimepointChoices.choices)
     marvel_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MarvelTimepointChoices.choices)
     comments = models.TextField(blank=True, null=True)

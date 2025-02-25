@@ -53,7 +53,7 @@ def autocomplete_sublocations(request):
 
 @login_required(login_url="/login/")
 def autocomplete_study_id(request):
-    # Helps speed up sample adding by locating existing patient IDs
+    # Helps speed up sample adding by locating existing study IDs
     if "term" in request.GET:
         qs = StudyIdentifier.objects.filter(name__icontains=request.GET.get("term")).values("name")
     else:

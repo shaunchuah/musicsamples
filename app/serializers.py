@@ -115,7 +115,7 @@ class SampleExportSerializer(serializers.ModelSerializer):
         fields = [
             "study_name",
             "sample_id",
-            "patient_id",
+            "study_id",
             "sample_type",
             "sample_location",
             "sample_sublocation",

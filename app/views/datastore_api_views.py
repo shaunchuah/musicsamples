@@ -13,12 +13,12 @@ class FileDirectUploadStartApi(APIView):
         study_name = serializers.CharField()
         music_timepoint = serializers.CharField(required=False, allow_blank=True)
         marvel_timepoint = serializers.CharField(required=False, allow_blank=True)
-        patient_id = serializers.CharField(required=False, allow_blank=True)
+        study_id = serializers.CharField(required=False, allow_blank=True)
         comments = serializers.CharField(required=False, allow_blank=True)
 
         file_name = serializers.CharField()
 
-        def validate_patient_id(self, value):
+        def validate_study_id(self, value):
             if value == "":
                 return None
             return value

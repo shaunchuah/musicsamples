@@ -159,7 +159,7 @@ def create_sample_type_pivot(qs: QuerySet, study_name: str):
     )
 
     # Sort the output dataframe for mini music and music
-    # by center and patient id
+    # by center and study id
     match study_name:
         case "gidamps" | "marvel":
             pass

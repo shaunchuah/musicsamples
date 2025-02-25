@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
-from app.models import DataStore, file_generate_name, file_upload_path
+from app.models import DataStore, StudyIdentifier, file_generate_name, file_upload_path
 
 
 def azure_get_blob_service_client():
@@ -78,11 +78,12 @@ class FileDirectUploadService:
         music_timepoint: str,
         marvel_timepoint: str,
         comments: str,
-        patient_id: str = None,
+        study_id: str = None,
     ) -> dict:
-        if patient_id:
-            patient_id = patient_id.upper()
-            formatted_file_name = file_generate_name(file_name, study_name, patient_id)
+        if study_id:
+            study_id = study_id.upper()
+            study_identifier, _ = StudyIdentifier.objects.get_or_create(name=study_id)
+            formatted_file_name = file_generate_name(file_name, study_name, study_id)
         else:
             formatted_file_name = file_generate_name(file_name, study_name)
 
@@ -92,7 +93,7 @@ class FileDirectUploadService:
             music_timepoint=music_timepoint,
             marvel_timepoint=marvel_timepoint,
             comments=comments,
-            patient_id=patient_id,
+            study_id=study_identifier if study_id else None,
             file_type=file_name.split(".")[-1],
             original_file_name=file_name,
             formatted_file_name=formatted_file_name,

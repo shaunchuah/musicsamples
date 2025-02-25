@@ -55,25 +55,7 @@
           <h2 class="card-title">API Endpoints</h2>
         </div>
         <div class="card-body">
-          <p>These endpoints allow for programmatic access to the data held on G-Trac.</p>
-          <h3>All Samples</h3>
-          <p>
-            <a href="{% url 'all-list' %}" target="_blank">
-              <pre>https://samples.musicstudy.uk/api/all/</pre></a>
-            <strong>Warning: This API will be slow as it exports every single sample in G-Trac.</strong>
-            Suggest download the data once to a json file rather than accessing the API repeatedly.
-          </p>
-          <h3>Single Sample Lookup</h3>
-          <p>
-            You can query particular samples by their sample ID using the following format:
-            <pre>https://samples.musicstudy.uk/api/all/{sample_id}/</pre>
-          </p>
-          <p>
-            For example (click to try):
-            <a href="{% url 'all-list' %}MUS10083/" target="_blank">
-              <pre>https://samples.musicstudy.uk/api/all/MUS10083/</pre>
-            </a>
-          </p>
+          <p>Sample API endpoints are undergoing upgrades. If you need access to them speak to Shaun.</p>
           <h3>API Security and Authentication</h3>
           <p>
             Authorization is by token authentication.

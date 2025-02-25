@@ -37,10 +37,9 @@ def datastore_create_view(request):
             form.save(commit=False)
             form.instance.file_type = form.cleaned_data["file"].name.split(".")[-1]
             form.instance.original_file_name = form.cleaned_data["file"].name
-            if form.cleaned_data["patient_id"]:
-                form.instance.patient_id = form.cleaned_data["patient_id"].upper()
+            if form.cleaned_data["study_id"]:
                 form.instance.formatted_file_name = file_generate_name(
-                    form.cleaned_data["file"].name, form.cleaned_data["study_name"], form.cleaned_data["patient_id"]
+                    form.cleaned_data["file"].name, form.cleaned_data["study_name"], form.cleaned_data["study_id"].name
                 )
             else:
                 form.instance.formatted_file_name = file_generate_name(
@@ -130,7 +129,7 @@ def datastore_search_view(request):
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
         data_store_list = DataStore.objects.filter(
-            Q(patient_id__icontains=query_string)
+            Q(study_id__name__icontains=query_string)
             | Q(study_name__icontains=query_string)
             | Q(comments__icontains=query_string)
             | Q(category__icontains=query_string)
@@ -184,7 +183,7 @@ def datastore_search_export_csv(request):
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
         queryset = DataStore.objects.filter(
-            Q(patient_id__icontains=query_string)
+            Q(study_id__name__icontains=query_string)
             | Q(study_name__icontains=query_string)
             | Q(comments__icontains=query_string)
             | Q(category__icontains=query_string)
