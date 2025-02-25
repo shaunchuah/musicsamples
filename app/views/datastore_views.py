@@ -21,7 +21,7 @@ User = get_user_model()
 @login_required()
 @permission_required("app.view_datastore", raise_exception=True)
 def datastore_list_view(request):
-    datastores = DataStore.objects.all()
+    datastores = DataStore.objects.select_related("study_id").all()
     user_access_list = User.objects.filter(groups__name="datastores").order_by("first_name")
     return render(
         request, "datastore/datastore_list.html", {"datastores": datastores, "user_access_list": user_access_list}

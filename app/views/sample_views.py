@@ -32,7 +32,7 @@ SAMPLE_PAGINATION_SIZE = settings.SAMPLE_PAGINATION_SIZE
 @login_required(login_url="/login/")
 def index(request):
     # Home Page
-    sample_list = Sample.objects.filter(is_used=False).order_by("-sample_datetime")
+    sample_list = Sample.objects.filter(is_used=False).select_related("study_id").order_by("-sample_datetime")
     sample_count = sample_list.count()
     page = request.GET.get("page", 1)
     paginator = Paginator(sample_list, SAMPLE_PAGINATION_SIZE)
@@ -52,7 +52,7 @@ def index(request):
 
 @login_required(login_url="/login/")
 def filter(request):
-    queryset = Sample.objects.all()
+    queryset = Sample.objects.select_related("study_id").all()
     sample_filter = SampleFilter(request.GET, queryset=queryset)
     sample_list = sample_filter.qs
     sample_count = sample_list.count()
@@ -85,7 +85,7 @@ def filter(request):
 
 @login_required(login_url="/login/")
 def filter_export_csv(request):
-    queryset = Sample.objects.all()
+    queryset = Sample.objects.select_related("study_id").all()
     sample_filter = SampleFilter(request.GET, queryset=queryset)
     sample_list = sample_filter.qs
     return export_csv(sample_list)
@@ -93,7 +93,7 @@ def filter_export_csv(request):
 
 @login_required(login_url="/login/")
 def used_samples(request):
-    sample_list = Sample.objects.filter(is_used=True).order_by("-last_modified")
+    sample_list = Sample.objects.filter(is_used=True).select_related("study_id").order_by("-last_modified")
     sample_count = sample_list.count()
     page = request.GET.get("page", 1)
     paginator = Paginator(sample_list, SAMPLE_PAGINATION_SIZE)
@@ -116,13 +116,17 @@ def used_samples_search(request):
     query_string = ""
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
-        sample_list = Sample.objects.filter(is_used=True).filter(
-            Q(sample_id__icontains=query_string)
-            | Q(study_id__name__icontains=query_string)
-            | Q(sample_location__icontains=query_string)
-            | Q(sample_sublocation__icontains=query_string)
-            | Q(sample_type__icontains=query_string)
-            | Q(sample_comments__icontains=query_string)
+        sample_list = (
+            Sample.objects.filter(is_used=True)
+            .filter(
+                Q(sample_id__icontains=query_string)
+                | Q(study_id__name__icontains=query_string)
+                | Q(sample_location__icontains=query_string)
+                | Q(sample_sublocation__icontains=query_string)
+                | Q(sample_type__icontains=query_string)
+                | Q(sample_comments__icontains=query_string)
+            )
+            .select_related("study_id")
         )
         sample_count = sample_list.count()
         return render(
@@ -148,7 +152,7 @@ def used_samples_archive_all(request):
     This function will retrieve all used samples and remove their last location.
     This helps to keep the database clean.
     """
-    sample_list = Sample.objects.filter(is_used=True).exclude(sample_location="used")
+    sample_list = Sample.objects.filter(is_used=True).exclude(sample_location="used").select_related("study_id")
 
     number_of_samples = sample_list.count()
     if number_of_samples == 0:  # if no samples need updating; skip the database update step
@@ -245,7 +249,7 @@ def sample_types_pivot(request, study_name):
     and returns a pivot table with sample types as columns,
     study ID and sample date as rows.
     """
-    qs = Sample.objects.filter(study_name=study_name)
+    qs = Sample.objects.filter(study_name=study_name).select_related("study_id")
     output_df = create_sample_type_pivot(qs, study_name=study_name)
     response = render_dataframe_to_csv_response(output_df, study_name=study_name)
     return response
@@ -260,7 +264,11 @@ def reference(request):
 @login_required(login_url="/login/")
 def account(request):
     # User account page showing last 20 recently accessed samples
-    sample_list = Sample.objects.filter(last_modified_by=request.user.email).order_by("-last_modified")[:20]
+    sample_list = (
+        Sample.objects.filter(last_modified_by=request.user.email)
+        .select_related("study_id")
+        .order_by("-last_modified")[:20]
+    )
     context = {"sample_list": sample_list}
     return render(request, "account.html", context)
 
@@ -373,14 +381,18 @@ def sample_search(request):
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
 
-        sample_list = Sample.objects.filter(
-            Q(sample_id__icontains=query_string)
-            | Q(study_id__name__icontains=query_string)
-            | Q(sample_location__icontains=query_string)
-            | Q(sample_sublocation__icontains=query_string)
-            | Q(sample_type__icontains=query_string)
-            | Q(sample_comments__icontains=query_string)
-        ).filter(is_used=False)
+        sample_list = (
+            Sample.objects.filter(
+                Q(sample_id__icontains=query_string)
+                | Q(study_id__name__icontains=query_string)
+                | Q(sample_location__icontains=query_string)
+                | Q(sample_sublocation__icontains=query_string)
+                | Q(sample_type__icontains=query_string)
+                | Q(sample_comments__icontains=query_string)
+            )
+            .filter(is_used=False)
+            .select_related("study_id")
+        )
 
         if ("include_used_samples" in request.GET) and request.GET["include_used_samples"].strip():
             sample_list = Sample.objects.filter(
@@ -488,7 +500,7 @@ def export_csv_view(request, study_name):
             | Q(sample_location__icontains=query_string)
             | Q(sample_type__icontains=query_string)
             | Q(sample_comments__icontains=query_string)
-        )
+        ).select_related("study_id")
     else:
         samples_queryset = queryset
     response = export_csv(samples_queryset)
