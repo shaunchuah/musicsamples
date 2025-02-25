@@ -124,7 +124,6 @@ class DataStoreForm(ModelForm):
             "study_name",
             "music_timepoint",
             "marvel_timepoint",
-            "sample_id",
             "patient_id",
             "comments",
         ]
@@ -134,7 +133,6 @@ class DataStoreForm(ModelForm):
             "music_timepoint": "Music Timepoint",
             "marvel_timepoint": "Marvel Timepoint",
             "comments": "Comments",
-            "sample_id": "Associated Sample IDs (optional)",
             "patient_id": "Associated Patient ID (optional)",
         }
 
@@ -147,20 +145,12 @@ class DataStoreUpdateForm(ModelForm):
     class Meta:
         model = DataStore
         fields = [
-            "category",
-            "study_name",
             "music_timepoint",
             "marvel_timepoint",
-            "sample_id",
-            "patient_id",
             "comments",
         ]
         labels = {
-            "category": "Category*",
-            "study_name": "Study Name*",
             "music_timepoint": "Music Timepoint",
             "marvel_timepoint": "Marvel Timepoint",
             "comments": "Comments",
-            "sample_id": "Associated Sample IDs (optional)",
-            "patient_id": "Associated Patient ID (optional)",
         }

@@ -1,33 +1,53 @@
+import datetime
+
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import ListView
 
 from app.filters import DataStoreFilter
-from app.forms import DataStoreForm
-from app.models import DataStore
+from app.forms import DataStoreForm, DataStoreUpdateForm
+from app.models import DataStore, file_generate_name
 from app.services import azure_delete_file, azure_generate_download_link
 from app.utils import export_csv
 
 DATASTORE_PAGINATION_SIZE = settings.DATASTORE_PAGINATION_SIZE
-
-
-class DataStoreListView(LoginRequiredMixin, ListView):
-    model = DataStore
-    template_name = "datastore/datastore_list.html"
-    context_object_name = "datastores"
+User = get_user_model()
 
 
 @login_required()
+@permission_required("app.view_datastore", raise_exception=True)
+def datastore_list_view(request):
+    datastores = DataStore.objects.all()
+    user_access_list = User.objects.filter(groups__name="datastores").order_by("first_name")
+    return render(
+        request, "datastore/datastore_list.html", {"datastores": datastores, "user_access_list": user_access_list}
+    )
+
+
+@login_required()
+@permission_required("app.view_datastore", raise_exception=True)
 def datastore_create_view(request):
     if request.method == "POST":
         form = DataStoreForm(request.POST, request.FILES)
         if form.is_valid():
             form.save(commit=False)
+            form.instance.file_type = form.cleaned_data["file"].name.split(".")[-1]
+            form.instance.original_file_name = form.cleaned_data["file"].name
+            if form.cleaned_data["patient_id"]:
+                form.instance.patient_id = form.cleaned_data["patient_id"].upper()
+                form.instance.formatted_file_name = file_generate_name(
+                    form.cleaned_data["file"].name, form.cleaned_data["study_name"], form.cleaned_data["patient_id"]
+                )
+            else:
+                form.instance.formatted_file_name = file_generate_name(
+                    form.cleaned_data["file"].name, form.cleaned_data["study_name"]
+                )
+
+            form.instance.upload_finished_at = datetime.datetime.now()
             form.instance.uploaded_by = request.user
             form.save()
             return redirect("datastore_list")
@@ -38,12 +58,38 @@ def datastore_create_view(request):
     return render(request, "datastore/datastore_form.html", {"form": form})
 
 
+@login_required()
+@permission_required("app.view_datastore", raise_exception=True)
+def datastore_edit_metadata_view(request, id):
+    file = get_object_or_404(DataStore, id=id)
+    if request.method == "POST":
+        form = DataStoreUpdateForm(request.POST, instance=file)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"File {file.formatted_file_name} metadata has been updated.")
+            return redirect("datastore_list")
+        else:
+            messages.error(request, "Form is invalid.")
+    else:
+        form = DataStoreUpdateForm(instance=file)
+    return render(request, "datastore/datastore_form_edit.html", {"form": form, "file": file})
+
+
+@login_required()
+@permission_required("app.view_datastore", raise_exception=True)
+def datastore_create_view_ajax(request):
+    return render(request, "datastore/datastore_form_ajax.html")
+
+
+@login_required()
+@permission_required("app.view_datastore", raise_exception=True)
 def datastore_read_view(request, id):
     file = get_object_or_404(DataStore, id=id)
     return render(request, "datastore/datastore_detail.html", {"file": file})
 
 
 @login_required()
+@permission_required("app.view_datastore", raise_exception=True)
 def datastore_download_view(request, id):
     file = get_object_or_404(DataStore, id=id)
     download_url = azure_generate_download_link(file, download=True)
@@ -55,6 +101,7 @@ def datastore_download_view(request, id):
 
 
 @login_required()
+@permission_required("app.view_datastore", raise_exception=True)
 def datastore_azure_view(request, id):
     file = get_object_or_404(DataStore, id=id)
     download_url = azure_generate_download_link(file)
@@ -66,6 +113,7 @@ def datastore_azure_view(request, id):
 
 
 @login_required()
+@permission_required("app.view_datastore", raise_exception=True)
 def datastore_delete_view(request, id):
     file = get_object_or_404(DataStore, id=id)
     azure_delete_file(file)
@@ -76,6 +124,7 @@ def datastore_delete_view(request, id):
 
 
 @login_required()
+@permission_required("app.view_datastore", raise_exception=True)
 def datastore_search_view(request):
     query_string = ""
     if ("q" in request.GET) and request.GET["q"].strip():
@@ -97,6 +146,7 @@ def datastore_search_view(request):
 
 
 @login_required()
+@permission_required("app.view_datastore", raise_exception=True)
 def datastore_filter_view(request):
     queryset = DataStore.objects.all()
     datastore_filter = DataStoreFilter(request.GET, queryset=queryset)
@@ -128,6 +178,7 @@ def datastore_filter_view(request):
 
 
 @login_required()
+@permission_required("app.view_datastore", raise_exception=True)
 def datastore_search_export_csv(request):
     query_string = ""
     if ("q" in request.GET) and request.GET["q"].strip():
@@ -146,6 +197,7 @@ def datastore_search_export_csv(request):
 
 
 @login_required()
+@permission_required("app.view_datastore", raise_exception=True)
 def datastore_filter_export_csv(request):
     queryset = DataStore.objects.all()
     datastore_filter = DataStoreFilter(request.GET, queryset=queryset)

@@ -60,7 +60,11 @@
           <h3 class="card-title">Files</h3>
         </div>
         <div class="card-footer">
+          <!--Legacy upload
           <a href="{% url 'datastore_create' %}" class="btn btn-fill btn-success">Upload New File</a>
+          -->
+          <a href="{% url 'datastore_create_ajax' %}"
+             class="btn btn-fill btn-success">Upload File</a>
           <a href="{% url 'datastore_search_export_csv' %}?q={{ query_string }}"
              class="btn btn-success float-lg-right"
              data-toggle="tooltip"
@@ -75,6 +79,7 @@
             <table class="table tablesorter" id="mainTable">
               <thead class="text-primary">
                 <tr>
+                  <th>Status</th>
                   <th>Category</th>
                   <th>Study Name</th>
                   <th>Patient ID</th>
@@ -84,7 +89,6 @@
                   <th>Type</th>
                   <th>Upload Date</th>
                   <th>Timepoint</th>
-                  <th>Sample ID</th>
                   <th>Download</th>
                   <th>View Metadata</th>
                   <th>Delete</th>
@@ -94,30 +98,81 @@
                 {% if datastores %}
                   {% for file in datastores %}
                     <tr>
-                      <td>{{ file.get_category_display }}</td>
-                      <td>{{ file.get_study_name_display }}</td>
-                      <td>{{ file.patient_id }}</td>
-                      <td>{{ file.formatted_file_name }}</td>
-                      <td>{{ file.comments }}</td>
-                      <td>{{ file.size|filesizeformat }}</td>
-                      <td>{{ file.file_type }}</td>
-                      <td>{{ file.upload_finished_at|date:'d M Y H:i' }}</td>
                       <td>
-                        {% if file.music_timepoint %}
-                          {{ file.get_music_timepoint_display }}
-                        {% elif file.marvel_timepoint %}
-                          {{ file.get_marvel_timepoint_display }}
+                        {% if file.is_valid %}
+                          <svg width="24"
+                               height="24"
+                               viewBox="0 0 24 24"
+                               fill="none"
+                               stroke="currentColor"
+                               stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
                         {% else %}
-                          None
+                          <svg width="24"
+                               height="24"
+                               viewBox="0 0 24 24"
+                               fill="none"
+                               stroke="currentColor"
+                               stroke-width="2"
+                               class="text-danger">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
                         {% endif %}
                       </td>
-                      <td>{{ file.sample_id }}</td>
                       <td>
-                        <a href="{% url 'datastore_download' id=file.id %}"><i class="tim-icons icon-cloud-download-93"></i> Download</a>
-                        <a href="{% url 'datastore_azure_view' id=file.id %}" target="_blank"><i class="tim-icons icon-zoom-split"></i> View on Azure</a>
+                        <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.get_category_display }}</span>
                       </td>
                       <td>
-                        <a href="{% url 'datastore_read' id=file.id %}"><i class="tim-icons icon-zoom-split"></i> View</a>
+                        <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.get_study_name_display }}</span>
+                      </td>
+                      <td>
+                        <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.patient_id }}</span>
+                      </td>
+                      <td>
+                        <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.formatted_file_name }}</span>
+                      </td>
+                      <td>
+                        <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.comments }}</span>
+                      </td>
+                      <td>
+                        <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">
+                          {% if file.is_valid %}
+                            {{ file.size|filesizeformat }}
+                          {% else %}
+                            -
+                          {% endif %}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.file_type }}</span>
+                      </td>
+                      <td>
+                        <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">
+                          {% if file.upload_finished_at %}
+                            {{ file.upload_finished_at|date:'d M Y H:i' }}
+                          {% else %}
+                            Did not complete
+                          {% endif %}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">
+                          {% if file.music_timepoint %}
+                            {{ file.get_music_timepoint_display }}
+                          {% elif file.marvel_timepoint %}
+                            {{ file.get_marvel_timepoint_display }}
+                          {% else %}
+                            -
+                          {% endif %}
+                        </span>
+                      </td>
+                      <td>
+                        <a href="{% url 'datastore_download' id=file.id %}"><i class="tim-icons icon-cloud-download-93"></i> Download</a>
+                        <a href="{% url 'datastore_azure_view' id=file.id %}" target="_blank"><i class="tim-icons icon-zoom-split"></i> View</a>
+                      </td>
+                      <td>
+                        <a href="{% url 'datastore_read' id=file.id %}"><i class="tim-icons icon-zoom-split"></i> Metadata</a>
                       </td>
                       <td class="text-center">
                         <a href="#"
@@ -135,6 +190,33 @@
               </tbody>
             </table>
             {% include "layouts/pagination.html" %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">DataStore Access List</h3>
+        </div>
+        <div class="card-body">
+          <div class="mb-4">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                </tr>
+              </thead>
+              {% for user in user_access_list %}
+                <tr>
+                  <td>{{ user.first_name }} {{ user.last_name }}</td>
+                  <td>
+                    <a href="mailto:{{ user.email }}" target="_blank">{{ user.email }}</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </table>
           </div>
         </div>
       </div>

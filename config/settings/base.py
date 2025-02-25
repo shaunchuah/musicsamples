@@ -197,6 +197,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://app.musicstudy.uk",
     "https://musicstudy.uk",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
 ]
 CORS_ALLOW_CREDENTIALS = True
 

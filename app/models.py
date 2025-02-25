@@ -1,6 +1,6 @@
-import datetime
 import pathlib
 
+from azure.core.exceptions import ResourceNotFoundError
 from django.conf import settings
 from django.db import models
 from simple_history.models import HistoricalRecords
@@ -106,7 +106,6 @@ class DataStore(models.Model):
     music_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MusicTimepointChoices.choices)
     marvel_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MarvelTimepointChoices.choices)
     comments = models.TextField(blank=True, null=True)
-    sample_id = models.ForeignKey(Sample, null=True, blank=True, on_delete=models.SET_NULL, related_name="files")
 
     file = models.FileField(upload_to=file_upload_path, blank=True, null=True)
 
@@ -133,8 +132,10 @@ class DataStore(models.Model):
 
     @property
     def size(self):
-        if self.file:
+        try:
             return self.file.size
+        except ResourceNotFoundError:
+            return None
 
     def __str__(self):
         return self.formatted_file_name
@@ -143,19 +144,6 @@ class DataStore(models.Model):
         if self.patient_id:
             self.patient_id = self.patient_id.upper()
         super().clean()
-
-    def save(self, *args, **kwargs):
-        if self.file:
-            # This is the default django method
-            # Takes the original file, saves the original file name,
-            # generates a new file name and saves the file with the new name
-            self.file_type = self.file.name.split(".")[-1]
-            self.original_file_name = self.file.name
-            self.formatted_file_name = file_generate_name(self.original_file_name, self.study_name, self.patient_id)
-            self.file.name = self.formatted_file_name
-            self.upload_finished_at = datetime.datetime.now()
-        super().save(*args, **kwargs)
-        # TODO: when doing asynchronous upload, we might need to generate the formatted url and file name
 
     class Meta:
         ordering = ["-upload_finished_at"]

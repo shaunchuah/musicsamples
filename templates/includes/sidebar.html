@@ -1,93 +1,95 @@
 {% load static %}
 
 <div class="sidebar" data="blue">
-    <div class="sidebar-wrapper">
-        <div class="glogo">
-            <img src="{% static 'assets/img/gtreklogo.jpg' %}"
-                 class="glogo-image"
-                 alt="gtrac logo"
-                 width="378"
-                 height="113" />
-        </div>
-        {% if user.is_authenticated %}
-            <ul class="nav">
-                <li class="{% if request.path == '/' %}active{% endif %}">
-                    <a href="{% url 'home' %}">
-                        <i class="tim-icons icon-molecule-40"></i>
-                        <p>Dashboard</p>
-                    </a>
-                </li>
-                <li class="{% if 'add_multiple' in request.path %}active{% endif %}">
-                    <a href="{% url 'barcode_add_multiple' %}">
-                        <i class="tim-icons icon-bullet-list-67"></i>
-                        <p>Add Multiple</p>
-                    </a>
-                </li>
-                <li class="{% if 'barcode' in request.path and 'add_multiple' not in request.path %}active{% endif %}">
-                    <a href="{% url 'barcode' %}">
-                        <i class="tim-icons icon-tag"></i>
-                        <p>QR Scan</p>
-                    </a>
-                </li>
-                <li class="{% if 'analytics' in request.path %}active{% endif %}">
-                    <a href="{% url 'analytics' %}">
-                        <i class="tim-icons icon-chart-bar-32"></i>
-                        <p>Analytics</p>
-                    </a>
-                </li>
-                <li class="{% if request.path == '/reference/' %}active{% endif %}">
-                    <a href="{% url 'reference' %}">
-                        <i class="tim-icons icon-single-copy-04"></i>
-                        <p>Reference</p>
-                    </a>
-                </li>
-                <li class="{% if request.path == '/data_export/' %}active{% endif %}">
-                    <a href="{% url 'data_export' %}">
-                        <i class="tim-icons icon-upload"></i>
-                        <p>Data Export</p>
-                    </a>
-                </li>
-                <li class="{% if 'datastore' in request.path %}active{% endif %}">
-                    <a href="{% url 'datastore_list' %}">
-                        <i class="tim-icons icon-app"></i>
-                        <p>DataStore</p>
-                    </a>
-                </li>
-                {% if perms.datasets.view_dataset %}
-                    <li class="{% if 'datasets' in request.path %}active{% endif %}">
-                        <a href="{% url 'datasets:list' %}">
-                            <i class="tim-icons icon-paper"></i>
-                            <p>Datasets</p>
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-            <div class="mt-5">
-                <ul class="nav">
-                    <li class="{% if request.path == '/used_samples/' %}active{% endif %}">
-                        <a href="{% url 'used_samples' %}">
-                            <i class="tim-icons icon-send"></i>
-                            <p>Used Samples</p>
-                        </a>
-                    </li>
-                    {% if request.user.is_staff %}
-                        <li class="{% if request.path == '/users/' %}active{% endif %}">
-                            <a href="{% url 'user_list' %}">
-                                <i class="tim-icons icon-single-02"></i>
-                                <p>Users</p>
-                            </a>
-                        </li>
-                    {% endif %}
-                    {% if request.user.is_superuser %}
-                        <li>
-                            <a href="{% url 'management' %}">
-                                <i class="tim-icons icon-settings-gear-63"></i>
-                                <p>Admin</p>
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-        {% endif %}
+  <div class="sidebar-wrapper">
+    <div class="glogo">
+      <img src="{% static 'assets/img/gtreklogo.jpg' %}"
+           class="glogo-image"
+           alt="gtrac logo"
+           width="378"
+           height="113" />
     </div>
+    {% if user.is_authenticated %}
+      <ul class="nav">
+        <li class="{% if request.path == '/' %}active{% endif %}">
+          <a href="{% url 'home' %}">
+            <i class="tim-icons icon-molecule-40"></i>
+            <p>Dashboard</p>
+          </a>
+        </li>
+        <li class="{% if 'add_multiple' in request.path %}active{% endif %}">
+          <a href="{% url 'barcode_add_multiple' %}">
+            <i class="tim-icons icon-bullet-list-67"></i>
+            <p>Add Multiple</p>
+          </a>
+        </li>
+        <li class="{% if 'barcode' in request.path and 'add_multiple' not in request.path %}active{% endif %}">
+          <a href="{% url 'barcode' %}">
+            <i class="tim-icons icon-tag"></i>
+            <p>QR Scan</p>
+          </a>
+        </li>
+        <li class="{% if 'analytics' in request.path %}active{% endif %}">
+          <a href="{% url 'analytics' %}">
+            <i class="tim-icons icon-chart-bar-32"></i>
+            <p>Analytics</p>
+          </a>
+        </li>
+        <li class="{% if request.path == '/reference/' %}active{% endif %}">
+          <a href="{% url 'reference' %}">
+            <i class="tim-icons icon-single-copy-04"></i>
+            <p>Reference</p>
+          </a>
+        </li>
+        <li class="{% if request.path == '/data_export/' %}active{% endif %}">
+          <a href="{% url 'data_export' %}">
+            <i class="tim-icons icon-upload"></i>
+            <p>Data Export</p>
+          </a>
+        </li>
+        {% if perms.app.view_datastore %}
+          <li class="{% if 'datastore' in request.path %}active{% endif %}">
+            <a href="{% url 'datastore_list' %}">
+              <i class="tim-icons icon-app"></i>
+              <p>DataStore</p>
+            </a>
+          </li>
+        {% endif %}
+        {% if perms.datasets.view_dataset %}
+          <li class="{% if 'datasets' in request.path %}active{% endif %}">
+            <a href="{% url 'datasets:list' %}">
+              <i class="tim-icons icon-paper"></i>
+              <p>Datasets</p>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+      <div class="mt-5">
+        <ul class="nav">
+          <li class="{% if request.path == '/used_samples/' %}active{% endif %}">
+            <a href="{% url 'used_samples' %}">
+              <i class="tim-icons icon-send"></i>
+              <p>Used Samples</p>
+            </a>
+          </li>
+          {% if request.user.is_staff %}
+            <li class="{% if request.path == '/users/' %}active{% endif %}">
+              <a href="{% url 'user_list' %}">
+                <i class="tim-icons icon-single-02"></i>
+                <p>Users</p>
+              </a>
+            </li>
+          {% endif %}
+          {% if request.user.is_superuser %}
+            <li>
+              <a href="{% url 'management' %}">
+                <i class="tim-icons icon-settings-gear-63"></i>
+                <p>Admin</p>
+              </a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
 </div>

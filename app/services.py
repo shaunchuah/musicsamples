@@ -3,6 +3,10 @@ from datetime import datetime, timedelta
 
 from azure.storage.blob import BlobSasPermissions, BlobServiceClient, generate_blob_sas
 from django.conf import settings
+from django.db import transaction
+from django.utils import timezone
+
+from app.models import DataStore, file_generate_name, file_upload_path
 
 
 def azure_get_blob_service_client():
@@ -62,3 +66,68 @@ def azure_delete_file(file):
         logging.error(e)
         return None
     return True
+
+
+class FileDirectUploadService:
+    @transaction.atomic
+    def start(
+        self,
+        category: str,
+        study_name: str,
+        file_name: str,
+        music_timepoint: str,
+        marvel_timepoint: str,
+        comments: str,
+        patient_id: str = None,
+    ) -> dict:
+        if patient_id:
+            patient_id = patient_id.upper()
+            formatted_file_name = file_generate_name(file_name, study_name, patient_id)
+        else:
+            formatted_file_name = file_generate_name(file_name, study_name)
+
+        file = DataStore(
+            category=category,
+            study_name=study_name,
+            music_timepoint=music_timepoint,
+            marvel_timepoint=marvel_timepoint,
+            comments=comments,
+            patient_id=patient_id,
+            file_type=file_name.split(".")[-1],
+            original_file_name=file_name,
+            formatted_file_name=formatted_file_name,
+            file=None,
+        )
+        file.full_clean()
+        file.save()
+
+        upload_path = file_upload_path(file, formatted_file_name)
+
+        file.file = file.file.field.attr_class(file, file.file.field, upload_path)
+        file.save()
+
+        try:
+            sas_kwargs = {
+                "account_name": settings.AZURE_ACCOUNT_NAME,
+                "container_name": settings.AZURE_CONTAINER_NAME,
+                "blob_name": upload_path,
+                "account_key": settings.AZURE_ACCOUNT_KEY,
+                "permission": BlobSasPermissions(write=True),
+                "expiry": timezone.now() + timedelta(hours=1),
+            }
+
+            sas_token = generate_blob_sas(**sas_kwargs)
+            upload_url = f"https://{settings.AZURE_ACCOUNT_NAME}.blob.core.windows.net/{settings.AZURE_CONTAINER_NAME}/{upload_path}?{sas_token}"
+
+        except Exception as e:
+            logging.error(e)
+            return {"error": "Failed to generate upload URL"}
+        return {"id": file.id, "upload_url": upload_url}
+
+    @transaction.atomic
+    def finish(self, *, file: DataStore) -> DataStore:
+        file.upload_finished_at = timezone.now()
+        file.full_clean()
+        file.save()
+
+        return file
