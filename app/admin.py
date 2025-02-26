@@ -9,7 +9,8 @@ class StudyIdentifierAdmin(admin.ModelAdmin):
     list_display = [
         "name",
         "study_name",
-        "group",
+        "study_group",
+        "study_center",
         "sex",
         "age",
     ]

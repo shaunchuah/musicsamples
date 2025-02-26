@@ -36,11 +36,14 @@ class SampleFilter(django_filters.FilterSet):
 
 
 class DataStoreFilter(django_filters.FilterSet):
+    study_id__name = django_filters.AllValuesFilter(label="Study ID")
+
     class Meta:
         model = DataStore
         fields = [
             "category",
             "study_name",
+            "study_id__name",
             "music_timepoint",
             "marvel_timepoint",
         ]

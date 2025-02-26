@@ -41,7 +41,7 @@ git clone https://github.com/shaunchuah/musicsamples.git
 cd musicsamples
 
 # Create a virtual environment
-python -m venv venv 
+python -m venv venv
 
 source venv/bin/activate # for mac/linux
 ./venv/Scripts/activate # for windows
@@ -147,7 +147,7 @@ crontab -e
 Add the following line to the crontab file:
 
 ```sh
-0 0 * * * /path/to/your/script/db_backup_example.sh 
+0 0 * * * /path/to/your/script/db_backup_example.sh
 ```
 
 This copies production database to S3 at midnight every day
@@ -159,6 +159,10 @@ Use Django's dumpdata and loaddata as follows:
 `python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.Permission > dump.json`
 
 You will need to exclude contenttypes and auth.permission to switch between databases.
+
+## Specific Permission Settings
+
+Once the app is deployed, make 3 groups - default, datasets and datastores. For datasets, assign the view_dataset permission. For datastores, assign the view_datastore permission. You can switch people back to the default group to remove access to datasets and datastores.
 
 ## Project Architecture
 

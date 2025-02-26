@@ -87,3 +87,9 @@ class FileCategoryChoices(models.TextChoices):
     UNCATEGORISED = "uncategorised", "Uncategorised"
     ENDOSCOPY_VIDEOS = "endoscopy_videos", "Endoscopy Videos"
     HISTOLOGY_SLIDES = "histology_slides", "Histology Slides"
+
+
+class StudyCenterChoices(models.TextChoices):
+    EDINBURGH = "edinburgh", "Edinburgh"
+    GLASGOW = "glasgow", "Glasgow"
+    DUNDEE = "dundee", "Dundee"

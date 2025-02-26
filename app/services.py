@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, timedelta
 
+import pandas as pd
 from azure.storage.blob import BlobSasPermissions, BlobServiceClient, generate_blob_sas
 from django.conf import settings
 from django.db import transaction
@@ -132,3 +133,78 @@ class FileDirectUploadService:
         file.save()
 
         return file
+
+
+class StudyIdentifierImportService:
+    @staticmethod
+    @transaction.atomic
+    def import_from_dataframe(df):
+        """
+        Import study identifiers from a DataFrame
+        Returns a dictionary with counts of processed records
+        """
+        # Initialize counters and collections
+        updated = 0
+        skipped = 0
+        new_identifiers = []
+
+        # Get existing identifiers to avoid duplicates
+        existing_identifiers = {}
+
+        # Build mapping of existing identifiers - both regular and suffixed
+        for si in StudyIdentifier.objects.all():
+            existing_identifiers[si.name] = si
+
+            # For suffixed IDs, store the base name too for easy lookup
+            if si.name.endswith("-P"):
+                base_name = si.name[:-2]
+                if base_name not in existing_identifiers:
+                    existing_identifiers[base_name] = si
+            elif si.name.endswith("-HC"):
+                base_name = si.name[:-3]
+                if base_name not in existing_identifiers:
+                    existing_identifiers[base_name] = si
+
+        # Process each row in the dataframe
+        for _, row in df.iterrows():
+            name = row.get("study_id", "").strip().upper()
+            if not name:  # Skip empty identifiers
+                continue
+
+            # Check if this ID already exists (either direct match or as a suffixed version)
+            if name in existing_identifiers:
+                study_identifier = existing_identifiers[name]
+                needs_update = False
+
+                # Check if updates are needed and fields are present
+                fields_to_check = ["study_name", "study_center", "study_group", "sex", "age"]
+                for field in fields_to_check:
+                    if field in row and row[field] is not None and getattr(study_identifier, field) != row[field]:
+                        setattr(study_identifier, field, row[field])
+                        needs_update = True
+
+                if needs_update:
+                    study_identifier.save()
+                    updated += 1
+                else:
+                    skipped += 1
+                continue
+
+            # If we reach here, this is a completely new identifier
+            study_identifier = StudyIdentifier(
+                name=name,
+                study_name=row.get("study_name"),
+                study_center=row.get("study_center"),
+                study_group=row.get("study_group"),
+                sex=row.get("sex"),
+                age=row.get("age") if "age" in row and pd.notna(row["age"]) else None,
+            )
+            new_identifiers.append(study_identifier)
+
+        # Bulk create new objects
+        created = 0
+        if new_identifiers:
+            StudyIdentifier.objects.bulk_create(new_identifiers)
+            created = len(new_identifiers)
+
+        return {"total": len(df), "created": created, "updated": updated, "skipped": skipped}

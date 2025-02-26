@@ -111,6 +111,7 @@ urlpatterns = [
     path("datastore/filter/export_csv/", views.datastore_filter_export_csv, name="datastore_filter_export_csv"),
     path("datastore/api/upload/start/", views.FileDirectUploadStartApi.as_view(), name="file_direct_upload_start"),
     path("datastore/api/upload/finish/", views.FileDirectUploadFinishApi.as_view(), name="file_direct_upload_finish"),
+    path("datastore/api/import_study_id/", views.import_study_identifiers, name="import_study_identifiers"),
     path("api/v2/auth/login/", views.login_view, name="login"),
     path("api/v2/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/v2/token/verify/", TokenVerifyView.as_view(), name="token_verify"),

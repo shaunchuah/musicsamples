@@ -14,6 +14,7 @@ from app.choices import (
     MusicTimepointChoices,
     SampleTypeChoices,
     SampleVolumeUnitChoices,
+    StudyCenterChoices,
     StudyNameChoices,
 )
 
@@ -21,7 +22,13 @@ from app.choices import (
 class StudyIdentifier(models.Model):
     name = models.CharField(max_length=200, unique=True)
     study_name = models.CharField(max_length=200, choices=StudyNameChoices.choices, blank=True, null=True)
-    group = models.CharField(max_length=200, blank=True, null=True)
+    study_center = models.CharField(
+        max_length=200,
+        choices=StudyCenterChoices.choices,
+        blank=True,
+        null=True,
+    )
+    study_group = models.CharField(max_length=200, blank=True, null=True)
     sex = models.CharField(max_length=10, blank=True, null=True)
     age = models.IntegerField(blank=True, null=True)
 
