@@ -4,24 +4,18 @@ $(document).ready(function () {
     sortReset: true,
     dateFormat: "ddmmyyyy",
     headers: {
-      6: {
+      8: {
         sorter: "shortDate",
       },
-      13: {
+      14: {
         sorter: false,
       },
-      9: {
+      15: {
         sorter: false,
       },
-      10: {
+      16: {
         sorter: false,
-      },
-      11: {
-        sorter: false,
-      },
-      12: {
-        sorter: false,
-      },
+      }
     },
   });
 

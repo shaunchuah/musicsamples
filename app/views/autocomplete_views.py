@@ -129,18 +129,18 @@ class MultipleSampleViewSet(viewsets.ModelViewSet):
 
 @login_required(login_url="/login/")
 def barcode(request):
-    # Returns the page - frontend logic is in the barcode.html template file
-    return render(request, "barcode.html")
+    # Returns the page - frontend logic is in the barcode/update_location.html template file
+    return render(request, "barcode/update_location.html")
 
 
 @login_required(login_url="/login/")
 def barcode_samples_used(request):
-    return render(request, "barcode-markused.html")
+    return render(request, "barcode/mark_used.html")
 
 
 @login_required(login_url="/login/")
 def barcode_add_multiple(request):
-    return render(request, "barcode-addmultiple.html")
+    return render(request, "barcode/add_multiple.html")
 
 
 @login_required(login_url="/login/")
@@ -166,4 +166,4 @@ def no_timepoint_view(request, study_name):
         "page_obj": samples,
         "sample_count": sample_count,
     }
-    return render(request, "dashboard.html", context)
+    return render(request, "samples/sample_list.html", context)

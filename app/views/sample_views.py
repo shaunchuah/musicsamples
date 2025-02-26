@@ -47,7 +47,7 @@ def index(request):
         "page_obj": samples,
         "sample_count": sample_count,
     }
-    return render(request, "dashboard.html", context)
+    return render(request, "samples/sample_list.html", context)
 
 
 @login_required(login_url="/login/")
@@ -76,11 +76,12 @@ def filter(request):
 
     context = {
         "sample_list": samples,
+        "page_obj": samples,
         "sample_count": sample_count,
         "sample_filter": sample_filter,
         "parameter_string": parameter_string,
     }
-    return render(request, "filter.html", context)
+    return render(request, "samples/sample_filter.html", context)
 
 
 @login_required(login_url="/login/")
@@ -407,7 +408,7 @@ def sample_search(request):
         sample_count = sample_list.count()
         return render(
             request,
-            "dashboard.html",
+            "samples/sample_list.html",
             {
                 "query_string": query_string,
                 "sample_list": sample_list,
@@ -415,7 +416,7 @@ def sample_search(request):
             },
         )
     else:
-        return render(request, "dashboard.html", {"query_string": "Null", "sample_count": 0})
+        return render(request, "samples/sample_list.html", {"query_string": "Null", "sample_count": 0})
 
 
 @login_required(login_url="/login/")

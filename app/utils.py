@@ -7,14 +7,17 @@ from django.http import HttpResponse
 from django_pandas.io import read_frame
 
 
-def export_csv(queryset, file_prefix="gtrac", file_name="samples"):
+def export_csv(queryset, file_prefix="gtrac", file_name="samples", include_related=True):
     """
     Takes in queryset, returns csv download response
     file_prefix: optional, default is gtrac to control the name of the csv file.
     file_name: optional, default is samples
+    include_related: optional, default True. If True, includes foreign key fields
 
     By default takes in a queryset and returns gtrac_samples_<current_date>.csv
     """
+    from django.db.models.fields.related import ForeignKey, OneToOneField
+
     current_date = datetime.datetime.now().strftime("%d-%b-%Y")
 
     response = HttpResponse(content_type="text/csv")
@@ -24,19 +27,71 @@ def export_csv(queryset, file_prefix="gtrac", file_name="samples"):
         current_date,
     )
     writer = csv.writer(response)
-    field_names = [field.name for field in queryset.model._meta.get_fields()]
-    writer.writerow(field_names)
-    for row in queryset:
-        values = []
-        for field in field_names:
-            try:
-                value = getattr(row, field)
-            except AttributeError:
-                value = ""
+
+    # Get all field names including related fields
+    fields = []
+
+    # First add the direct fields
+    for field in queryset.model._meta.fields:
+        fields.append(field.name)
+
+    # Then add the related fields
+    if include_related:
+        # List of related fields to exclude
+        excluded_related_fields = ["study_id__study_name", "study_id__name"]
+
+        for field in queryset.model._meta.fields:
+            if isinstance(field, (ForeignKey, OneToOneField)):
+                related_model = field.related_model
+                if related_model and not related_model.__name__ == "User":
+                    for related_field in related_model._meta.fields:
+                        # Skip primary keys of related models
+                        if not related_field.primary_key:
+                            related_name = f"{field.name}__{related_field.name}"
+                            # Skip excluded related fields
+                            if related_name not in excluded_related_fields:
+                                fields.append(related_name)
+
+    # Write header row
+    writer.writerow(fields)
+
+    # Write data rows
+    for obj in queryset:
+        row_data = []
+        for field_name in fields:
+            if "__" in field_name:
+                # This is a related field
+                parts = field_name.split("__")
+                value = obj
+                for part in parts:
+                    if value is None:
+                        break
+                    try:
+                        value = getattr(value, part)
+                        # Handle callable attributes (like methods)
+                        if callable(value):
+                            value = value()
+                    except (AttributeError, TypeError):
+                        value = None
+                        break
+            else:
+                # This is a direct field
+                try:
+                    value = getattr(obj, field_name)
+                    # Handle callable attributes
+                    if callable(value):
+                        value = value()
+                except (AttributeError, TypeError):
+                    value = None
+
+            # Convert None to empty string for CSV
             if value is None:
                 value = ""
-            values.append(value)
-        writer.writerow(values)
+
+            row_data.append(value)
+
+        writer.writerow(row_data)
+
     return response
 
 

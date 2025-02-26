@@ -93,3 +93,19 @@ class StudyCenterChoices(models.TextChoices):
     EDINBURGH = "edinburgh", "Edinburgh"
     GLASGOW = "glasgow", "Glasgow"
     DUNDEE = "dundee", "Dundee"
+    ABERDEEN = "aberdeen", "Aberdeen"
+
+
+class StudyGroupChoices(models.TextChoices):
+    UC = "uc", "UC"
+    CD = "cd", "CD"
+    HC = "hc", "HC"
+    IBDU = "ibdu", "IBDU"
+    NON_IBD = "non_ibd", "Non-IBD"
+    AWAIT_DX = "await_dx", "Awaiting Diagnosis"
+    OTHER = "other", "Other"
+
+
+class SexChoices(models.TextChoices):
+    MALE = "male", "Male"
+    FEMALE = "female", "Female"

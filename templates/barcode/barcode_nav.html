@@ -1,0 +1,8 @@
+<nav class="nav nav-pills nav-fill">
+  <a class="nav-item nav-link {% if request.path == '/barcode/' %}active{% endif %}"
+     href="/barcode/">Update locations</a>
+  <a class="nav-item nav-link {% if request.path == '/barcode/samples_used/' %}active{% endif %}"
+     href="/barcode/samples_used/">Mark as used</a>
+  <a class="nav-item nav-link {% if request.path == '/barcode/add_multiple/' %}active{% endif %}"
+     href="/barcode/add_multiple/">Add multiple samples</a>
+</nav>
