@@ -79,7 +79,7 @@ def import_study_identifiers(request):
         return Response({"error": f"Error processing data: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@staff_member_required
+@login_required
 def study_id_list_view(request):
     # Get all StudyIdentifiers with related samples and files in a single query
     study_id_list = StudyIdentifier.objects.all().prefetch_related("samples", "files")
@@ -101,7 +101,7 @@ def study_id_list_view(request):
     )
 
 
-@staff_member_required
+@login_required
 def study_id_edit_view(request, name: str):
     study_id = StudyIdentifier.objects.get(name=name)
 
@@ -116,7 +116,7 @@ def study_id_edit_view(request, name: str):
     return render(request, "study_id/study_id_form.html", {"form": form, "study_id": study_id})
 
 
-@staff_member_required
+@login_required
 def study_id_search_view(request):
     # Sample search in home page
     query_string = ""

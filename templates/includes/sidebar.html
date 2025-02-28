@@ -47,6 +47,12 @@
             <p>Data Export</p>
           </a>
         </li>
+        <li class="{% if request.path == '/study_id/' %}active{% endif %}">
+          <a href="{% url 'study_id_list' %}">
+            <i class="tim-icons icon-badge"></i>
+            <p>Study ID</p>
+          </a>
+        </li>
         {% if perms.app.view_datastore %}
           <li class="{% if 'datastore' in request.path %}active{% endif %}">
             <a href="{% url 'datastore_list' %}">
@@ -77,12 +83,6 @@
               <a href="{% url 'user_list' %}">
                 <i class="tim-icons icon-single-02"></i>
                 <p>Users</p>
-              </a>
-            </li>
-            <li class="{% if request.path == '/study_id/' %}active{% endif %}">
-              <a href="{% url 'study_id_list' %}">
-                <i class="tim-icons icon-badge"></i>
-                <p>Study ID</p>
               </a>
             </li>
           {% endif %}
