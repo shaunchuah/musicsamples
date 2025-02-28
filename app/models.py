@@ -34,6 +34,8 @@ class StudyIdentifier(models.Model):
     sex = models.CharField(max_length=10, choices=SexChoices.choices, blank=True, null=True)
     age = models.IntegerField(blank=True, null=True)
 
+    history = HistoricalRecords()
+
     def __str__(self):
         return self.name
 
@@ -145,6 +147,8 @@ class DataStore(models.Model):
     uploaded_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True, related_name="uploaded_files"
     )
+
+    history = HistoricalRecords()
 
     @property
     def is_valid(self):

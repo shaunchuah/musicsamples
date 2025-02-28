@@ -1,0 +1,165 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+  {% if form.errors %}
+    {% for field in form %}
+      {% for error in field.errors %}
+        <div class="row">
+          <div class="col-md-6">
+            <div class="alert alert-danger">
+              <button type="button"
+                      aria-hidden="true"
+                      class="close"
+                      data-dismiss="alert"
+                      aria-label="Close">
+                <i class="tim-icons icon-simple-remove"></i>
+              </button>
+              <span>{{ field.label }}: {{ error|escape }}</span>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
+  <div class="row">
+    <div class="col-md-7">
+      <div class="card">
+        <h3 class="card-header card-title">Study ID Details</h3>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <th>Editable Fields</th>
+                  <th></th>
+                </tr>
+                <tr>
+                  <td>Study ID</td>
+                  <td>{{ study_id.name }}</td>
+                </tr>
+                <tr>
+                  <td>Study Name</td>
+                  <td>{{ study_id.get_study_name_display }}</td>
+                </tr>
+                {% if study_id.study_name == "mini_music" or study_id.study_name == "music" or study_id.study_name == "marvel" %}
+                  <tr>
+                    <td>Timepoint</td>
+                    <td>
+                      {% if study_id.music_timepoint %}
+                        {{ study_id.get_music_timepoint_display }}
+                      {% elif study_id.marvel_timepoint %}
+                        {{ study_id.get_marvel_timepoint_display }}
+                      {% else %}
+                        None
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endif %}
+                <tr>
+                  <th>Data via Orca</th>
+                  <th></th>
+                </tr>
+                <tr>
+                  <td>Group</td>
+                  <td>{{ study_id.get_study_group_display }}</td>
+                </tr>
+                <tr>
+                  <td>Age</td>
+                  <td>{{ study_id.age }}</td>
+                </tr>
+                <tr>
+                  <td>Sex</td>
+                  <td>{{ study_id.get_sex_display }}</td>
+                </tr>
+                <tr>
+                  <td>Center</td>
+                  <td>{{ study_id.get_study_center_display }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="{% url 'study_id_edit' name=study_id.name %}"
+             class="btn btn-fill btn-success">Edit</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card">
+        <h3 class="card-title card-header">History</h3>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table" id="history_table">
+              <thead>
+                <tr>
+                  <th>date/time</th>
+                  <th>change made</th>
+                  <th>responsible</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for change in changes %}
+                  <tr>
+                    <td>{{ change.new_record.history_date|date:"D j M Y, H:i" }}</td>
+                    <td>
+                      {% if change.changed_fields|length > 0 %}
+                        {% for change_by_id in change.changes %}
+                          <b>{{ change_by_id.field|title }}</b>
+                          from
+                          {% if change_by_id.old %}
+                            <b>{{ change_by_id.old }}</b>
+                          {% else %}
+                            <b>blank field</b>
+                          {% endif %}
+                          to
+                          <b>{{ change_by_id.new }}</b>
+                          <br />
+                        {% endfor %}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
+                    <td>{{ change.new_record.history_user }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="3" class="text-center">No history so far.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-7">
+      <div class="card">
+        <h3 class="card-header card-title">Associated Samples</h3>
+        {% with sample_list=study_id.samples.all sample_count=study_id.samples.count %}
+          {% include 'samples/includes/sample_table.html' %}
+        {% endwith %}
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card">
+        <h3 class="card-header card-title">Associated Files</h3>
+        {% with datastores=study_id.files.all %}
+          {% include 'datastore/includes/datastore_file_table.html' %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+  <script>
+    $(document).ready(function() {
+      // Javascript method's body can be found in assets/js/demos.js
+      demo.initDashboardPageCharts();
+
+    });
+  </script>
+{% endblock javascripts %}

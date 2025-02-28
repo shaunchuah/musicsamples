@@ -130,9 +130,9 @@ class TestUrls(SimpleTestCase):
         url = reverse("datastore_azure_view", kwargs={"id": 1})
         self.assertEqual(resolve(url).func, views.datastore_azure_view)
 
-    def test_datastore_read_url_resolves(self):
-        url = reverse("datastore_read", kwargs={"id": 1})
-        self.assertEqual(resolve(url).func, views.datastore_read_view)
+    def test_datastore_detail_url_resolves(self):
+        url = reverse("datastore_detail", kwargs={"id": 1})
+        self.assertEqual(resolve(url).func, views.datastore_detail_view)
 
     def test_datastore_edit_url_resolves(self):
         url = reverse("datastore_edit", kwargs={"id": 1})

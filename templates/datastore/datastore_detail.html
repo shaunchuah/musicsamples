@@ -62,27 +62,25 @@
                   <th>Editable Fields</th>
                   <th></th>
                 </tr>
-                {% if file.study_name == "mini_music" or file.study_name == "music" %}
-                  <tr>
-                    <td>Timepoint</td>
-                    <td>
-                      {% if file.music_timepoint %}
-                        {{ file.get_music_timepoint_display }}
-                      {% elif file.marvel_timepoint %}
-                        {{ file.get_marvel_timepoint_display }}
-                      {% else %}
-                        None
-                      {% endif %}
-                    </td>
-                  </tr>
-                {% endif %}
+                <tr>
+                  <td>Timepoint</td>
+                  <td>
+                    {% if file.music_timepoint %}
+                      {{ file.get_music_timepoint_display }}
+                    {% elif file.marvel_timepoint %}
+                      {{ file.get_marvel_timepoint_display }}
+                    {% else %}
+                      None
+                    {% endif %}
+                  </td>
+                </tr>
                 <tr>
                   <td>Sampling Date</td>
                   <td>{{ file.sampling_date|date:"j M Y" }}</td>
                 </tr>
                 <tr>
                   <td>Comments</td>
-                  <td>{{ file.sample_comments }}</td>
+                  <td>{{ file.comments }}</td>
                 </tr>
               </tbody>
             </table>

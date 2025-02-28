@@ -2,9 +2,11 @@ import pandas as pd
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
@@ -13,6 +15,7 @@ from rest_framework.response import Response
 from app.forms import StudyIdUpdateForm
 from app.models import StudyIdentifier
 from app.services import StudyIdentifierImportService
+from app.utils import historical_changes
 
 STUDY_ID_PAGINATION_SIZE = settings.STUDY_ID_PAGINATION_SIZE
 
@@ -99,14 +102,14 @@ def study_id_list_view(request):
 
 
 @staff_member_required
-def study_id_edit_view(request, id):
-    study_id = StudyIdentifier.objects.get(id=id)
+def study_id_edit_view(request, name: str):
+    study_id = StudyIdentifier.objects.get(name=name)
 
     if request.method == "POST":
         form = StudyIdUpdateForm(request.POST, instance=study_id)
         if form.is_valid():
             form.save()
-            return redirect("study_id_list")
+            return redirect(reverse("study_id_detail", args=[name]))
     else:
         form = StudyIdUpdateForm(instance=study_id)
 
@@ -158,3 +161,21 @@ def study_id_delete_view(request, id):
     except Exception as e:
         messages.error(request, f"Failed to delete study ID. {e}")
         return redirect("study_id_list")
+
+
+@login_required
+def study_id_detail_view(request, name):
+    # retrieves sample history and also linked notes both public and private
+    study_id = get_object_or_404(StudyIdentifier, name=name)
+    study_id_history = study_id.history.filter(name=name)
+    changes = historical_changes(study_id_history)
+    first_change = study_id_history.first()
+    return render(
+        request,
+        "study_id/study_id_detail.html",
+        {
+            "study_id": study_id,
+            "changes": changes,
+            "first": first_change,
+        },
+    )

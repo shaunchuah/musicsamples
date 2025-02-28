@@ -49,6 +49,7 @@
                   <th>Center</th>
                   <th>Samples</th>
                   <th>Files</th>
+                  <th>View</th>
                   <th>Edit</th>
                   <th>Delete</th>
                 </tr>
@@ -95,7 +96,7 @@
                             <div class="dropdown-menu"
                                  aria-labelledby="filesDropdown{{ study_id.id }}">
                               {% for file in study_id.files.all %}
-                                <a class="dropdown-item" href="{% url 'datastore_read' id=file.id %}">{{ file }}</a>
+                                <a class="dropdown-item" href="{% url 'datastore_detail' id=file.id %}">{{ file }}</a>
                               {% endfor %}
                             </div>
                           </div>
@@ -104,7 +105,10 @@
                         {% endif %}
                       </td>
                       <td>
-                        <a href="{% url 'study_id_edit' id=study_id.id %}"><i class="tim-icons icon-cloud-download-93"></i> Edit</a>
+                        <a href="{% url 'study_id_detail' name=study_id.name %}"><i class="tim-icons icon-zoom-split"></i> View</a>
+                      </td>
+                      <td>
+                        <a href="{% url 'study_id_edit' name=study_id.name %}"><i class="tim-icons icon-cloud-download-93"></i> Edit</a>
                       </td>
                       <td>
                         <a href="#"
@@ -139,7 +143,19 @@
         dateFormat: "ddmmyyyy",
         headers: {
 
+          6: {
+            sorter: false
+          },
+          7: {
+            sorter: false
+          },
           8: {
+            sorter: false
+          },
+          9: {
+            sorter: false
+          },
+          10: {
             sorter: false
           },
 

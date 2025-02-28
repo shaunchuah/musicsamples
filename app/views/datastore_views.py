@@ -7,12 +7,13 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from app.filters import DataStoreFilter
 from app.forms import DataStoreForm, DataStoreUpdateForm
 from app.models import DataStore, file_generate_name
 from app.services import azure_delete_file, azure_generate_download_link
-from app.utils import export_csv
+from app.utils import export_csv, historical_changes
 
 DATASTORE_PAGINATION_SIZE = settings.DATASTORE_PAGINATION_SIZE
 User = get_user_model()
@@ -66,7 +67,7 @@ def datastore_edit_metadata_view(request, id):
         if form.is_valid():
             form.save()
             messages.success(request, f"File {file.formatted_file_name} metadata has been updated.")
-            return redirect("datastore_list")
+            return redirect(reverse("datastore_detail", args=[file.id]))
         else:
             messages.error(request, "Form is invalid.")
     else:
@@ -82,9 +83,14 @@ def datastore_create_view_ajax(request):
 
 @login_required()
 @permission_required("app.view_datastore", raise_exception=True)
-def datastore_read_view(request, id):
+def datastore_detail_view(request, id):
     file = get_object_or_404(DataStore, id=id)
-    return render(request, "datastore/datastore_detail.html", {"file": file})
+    file_history = file.history.filter(id=id)
+    changes = historical_changes(file_history)
+    first_change = file_history.first()
+    return render(
+        request, "datastore/datastore_detail.html", {"file": file, "changes": changes, "first": first_change}
+    )
 
 
 @login_required()

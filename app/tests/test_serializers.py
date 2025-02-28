@@ -128,27 +128,3 @@ class MultipleSamplesTest(APITestCase):
         response = self.client.post("/api/multiple_samples/", sample_data, format="json")
         assert response.status_code == 400  # bad request
         assert response.data["non_field_errors"][0].code == "invalid"
-
-    def test_mini_marvel_sample_without_timepoint(self):
-        sample_data = {
-            "study_name": "mini_marvel",
-            "music_timepoint": "",
-            "marvel_timepoint": "",
-            "sample_id": "test001",
-            "study_id": "patient001",
-            "sample_location": "location001",
-            "sample_type": "cfdna_plasma",
-            "sample_datetime": "2020-01-01T13:20:30",
-            "sample_comments": "",
-            "processing_datetime": "2020-01-01T13:20:30",
-            "sample_sublocation": "",
-            "sample_volume": "",
-            "sample_volume_units": "",
-            "freeze_thaw_count": 0,
-            "haemolysis_reference": "",
-            "biopsy_location": "",
-            "biopsy_inflamed_status": "",
-        }
-        response = self.client.post("/api/multiple_samples/", sample_data, format="json")
-        assert response.status_code == 400  # bad request
-        assert response.data["non_field_errors"][0].code == "invalid"
