@@ -14,7 +14,7 @@ class FileDirectUploadStartApi(APIView):
         study_id = serializers.CharField(required=False, allow_blank=True)
         music_timepoint = serializers.CharField(required=False, allow_blank=True)
         marvel_timepoint = serializers.CharField(required=False, allow_blank=True)
-        sampling_date = serializers.DateField(required=False, allow_null=True)
+        sampling_date = serializers.DateField(required=False, allow_null=True, input_formats=["%Y-%m-%d", "iso-8601"])
         comments = serializers.CharField(required=False, allow_blank=True)
 
         file_name = serializers.CharField()
@@ -27,7 +27,7 @@ class FileDirectUploadStartApi(APIView):
     def post(self, request, *args, **kwargs):
         serializer = self.InputSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        presigned_data = FileDirectUploadService.start(self, **serializer.validated_data)
+        presigned_data = FileDirectUploadService.start(self, uploaded_by=request.user, **serializer.validated_data)
 
         return Response(data=presigned_data)
 

@@ -81,6 +81,7 @@ class FileDirectUploadService:
         comments: str,
         sampling_date: datetime = None,
         study_id: str = None,
+        uploaded_by=None,
     ) -> dict:
         if study_id:
             study_id = study_id.upper()
@@ -100,6 +101,7 @@ class FileDirectUploadService:
             file_type=file_name.split(".")[-1],
             original_file_name=file_name,
             formatted_file_name=formatted_file_name,
+            uploaded_by=uploaded_by,
             file=None,
         )
         file.full_clean()
