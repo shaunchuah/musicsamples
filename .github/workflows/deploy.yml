@@ -60,7 +60,7 @@ jobs:
           SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
 
       - name: Pull latest version from GitHub
-        run: ssh deploy 'cd ${{ secrets.INSTALLATION_DIRECTORY }} && git pull'
+        run: ssh deploy 'cd ${{ secrets.INSTALLATION_DIRECTORY }} && git pull git@github.com:shaunchuah/musicsamples.git'
 
       - name: Make deployment script executable
         run: ssh deploy 'chmod +x ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
