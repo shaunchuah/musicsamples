@@ -1,9 +1,10 @@
 import pandas as pd
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
@@ -145,3 +146,15 @@ def study_id_search_view(request):
             "study_id/study_id_list.html",
             {"query_string": "Null", "study_id_list_count": study_id_list_count},
         )
+
+
+@staff_member_required
+def study_id_delete_view(request, id):
+    study_id = get_object_or_404(StudyIdentifier, id=id)
+    try:
+        study_id.delete()
+        messages.success(request, "Study ID has been deleted.")
+        return redirect("study_id_list")
+    except Exception as e:
+        messages.error(request, f"Failed to delete study ID. {e}")
+        return redirect("study_id_list")

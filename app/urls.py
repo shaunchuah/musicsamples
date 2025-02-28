@@ -115,6 +115,7 @@ urlpatterns = [
     path("study_id/", views.study_id_list_view, name="study_id_list"),
     path("study_id/edit/<int:id>/", views.study_id_edit_view, name="study_id_edit"),
     path("study_id/search/", views.study_id_search_view, name="study_id_search"),
+    path("study_id/delete/<int:id>/", views.study_id_delete_view, name="study_id_delete"),
     # Prototype API
     path("api/v2/auth/login/", views.login_view, name="login"),
     path("api/v2/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),

@@ -50,6 +50,7 @@
                   <th>Samples</th>
                   <th>Files</th>
                   <th>Edit</th>
+                  <th>Delete</th>
                 </tr>
               </thead>
               <tbody>
@@ -105,11 +106,17 @@
                       <td>
                         <a href="{% url 'study_id_edit' id=study_id.id %}"><i class="tim-icons icon-cloud-download-93"></i> Edit</a>
                       </td>
+                      <td>
+                        <a href="#"
+                           data-toggle="modal"
+                           data-target="#deleteConfirmModal"
+                           data-href="{% url 'study_id_delete' id=study_id.id %}"><i class="tim-icons icon-simple-remove"></i> Delete</a>
+                      </td>
                     </tr>
                   {% endfor %}
                 {% else %}
                   <tr>
-                    <td colspan="17" align="center">No active files found.</td>
+                    <td colspan="10" align="center">No active files found.</td>
                   </tr>
                 {% endif %}
               </tbody>
@@ -120,6 +127,7 @@
       </div>
     </div>
   </div>
+  {% include 'study_id/includes/study_id_delete_modal.html' %}
 {% endblock content %}
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
@@ -137,6 +145,10 @@
 
         },
       });
+    });
+    $("#deleteConfirmModal").on("show.bs.modal", function(e) {
+      var url = $(e.relatedTarget).data("href");
+      $("#confirmDeleteBtn").attr("href", url);
     });
   </script>
 {% endblock javascripts %}

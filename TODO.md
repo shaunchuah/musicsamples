@@ -1,7 +1,4 @@
 # To-Do List
-
-1. Create a overview display for study_id, showing all available sample types and file categories.
-
 After reviewing your repository, I can see that you're working with a Django-based sample tracking system called G-Trac that appears to be used for tracking research samples across multiple sites. The repository has both a traditional Django backend and a Next.js frontend.
 
 ## Current Structure Overview
