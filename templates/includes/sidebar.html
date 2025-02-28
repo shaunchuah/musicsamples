@@ -87,7 +87,7 @@
             </li>
           {% endif %}
           {% if request.user.is_superuser %}
-            <li>
+            <li class="{% if request.path == '/management/' %}active{% endif %}">
               <a href="{% url 'management' %}">
                 <i class="tim-icons icon-settings-gear-63"></i>
                 <p>Admin</p>
