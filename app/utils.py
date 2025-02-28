@@ -223,3 +223,42 @@ def create_sample_type_pivot(qs: QuerySet, study_name: str):
             sort_music_dataframe(output_df)
 
     return output_df
+
+
+def historical_changes(query):
+    # Historical changes integrates simple history into the sample detail page
+    changes = []
+    if query is not None:
+        last = query.first()
+        for all_changes in range(query.count()):
+            new_record, old_record = last, last.prev_record
+            if old_record is not None:
+                delta = new_record.diff_against(old_record)
+
+                # Process each change to use string representation for foreign keys
+                for change in delta.changes:
+                    # Check if the field is 'study_id' (or any other FK field you want to handle)
+                    if change.field == "study_id":
+                        # If values aren't None, replace with string representation
+                        if change.old is not None:
+                            # Get the related model instance from historical record
+                            try:
+                                from app.models import StudyIdentifier
+
+                                old_instance = StudyIdentifier.objects.get(pk=change.old)
+                                change.old = str(old_instance)
+                            except (StudyIdentifier.DoesNotExist, ValueError):
+                                pass  # Keep as is if we can't find the object
+
+                        if change.new is not None:
+                            try:
+                                from app.models import StudyIdentifier
+
+                                new_instance = StudyIdentifier.objects.get(pk=change.new)
+                                change.new = str(new_instance)
+                            except (StudyIdentifier.DoesNotExist, ValueError):
+                                pass  # Keep as is if we can't find the object
+
+                changes.append(delta)
+                last = old_record
+        return changes
