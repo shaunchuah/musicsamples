@@ -5,7 +5,7 @@ set -e
 cd ~/musicsamples/
 echo "Begin app update..."
 echo "Pulling from github..."
-git pull || exit 1
+git stash && git pull || exit 1
 echo "Activating python virtual environment..."
 source ~/musicsamples/venv/bin/activate
 echo "Installing requirements.txt..."
