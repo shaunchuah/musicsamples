@@ -29,18 +29,18 @@ class TestAutocomplete(TestCase):
         assert "location1" in json.loads(response_3.content)
         assert "test2" in json.loads(response_3.content)
 
-    def test_autocomplete_patient_id(self):
-        SampleFactory(patient_id="GID-123-P")
-        SampleFactory(patient_id="GID-003-P")
+    def test_autocomplete_study_id(self):
+        SampleFactory(study_id__name="GID-123-P")
+        SampleFactory(study_id__name="MID-3-P")
         path = reverse("autocomplete_patients")
         response = self.client.get(path + "?term=GID-123")
         assert "GID-123-P" in json.loads(response.content)
-        assert "GID-003-P" not in json.loads(response.content)
+        assert "MID-3-P" not in json.loads(response.content)
 
-        response_2 = self.client.get(path + "?term=003")
+        response_2 = self.client.get(path + "?term=MID")
         assert "GID-123-P" not in json.loads(response_2.content)
-        assert "GID-003-P" in json.loads(response_2.content)
+        assert "MID-3-P" in json.loads(response_2.content)
 
         response_3 = self.client.get(path)
         assert "GID-123-P" in json.loads(response_3.content)
-        assert "GID-003-P" in json.loads(response_3.content)
+        assert "MID-3-P" in json.loads(response_3.content)

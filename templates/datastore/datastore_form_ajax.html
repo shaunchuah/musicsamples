@@ -1,0 +1,291 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+
+{% block title %}
+  Upload File
+{% endblock title %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+  {% if form.errors %}
+    {% for field in form %}
+      {% for error in field.errors %}
+        <div class="row">
+          <div class="col-xl-9">
+            <div class="alert alert-danger">
+              <button type="button"
+                      aria-hidden="true"
+                      class="close"
+                      data-dismiss="alert"
+                      aria-label="Close">
+                <i class="tim-icons icon-simple-remove"></i>
+              </button>
+              <span>{{ field.label }}: {{ error|escape }}</span>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
+  <div class="row" x-data="upload()">
+    <div class="col-xl-9">
+      <h2>
+        <i class="tim-icons icon-pencil"></i> Upload New File
+      </h2>
+      <div class="card">
+        <div class="card-body">
+          <form method="post"
+                enctype="multipart/form-data"
+                @submit.prevent="uploadFile()">
+            {% csrf_token %}
+            <div class="row">
+              <!-- File Upload -->
+              <div class="form-group col-md-12">
+                <label for="id_file">File*:</label>
+                <input type="file"
+                       name="file"
+                       class="form-control"
+                       required
+                       id="id_file"
+                       x-on:change="selectFile($event)" />
+              </div>
+              <!-- Category -->
+              <div class="form-group col-md-12">
+                <label for="id_category">Category*:</label>
+                <select name="category"
+                        class="form-control"
+                        required
+                        id="id_category"
+                        x-model="data.category">
+                  <option value="">---------</option>
+                  <option value="uncategorised">Uncategorised</option>
+                  <option value="endoscopy_videos">Endoscopy Videos</option>
+                  <option value="histology_slides">Histology Slides</option>
+                </select>
+              </div>
+              <!-- Study Name -->
+              <div class="form-group col-md-12">
+                <label for="id_study_name">Study Name*:</label>
+                <select name="study_name"
+                        class="form-control"
+                        required
+                        id="id_study_name"
+                        x-model="data.study_name">
+                  <option value="">---------</option>
+                  <option value="gidamps">GI-DAMPs</option>
+                  <option value="music">MUSIC</option>
+                  <option value="mini_music">Mini-MUSIC</option>
+                  <option value="marvel">MARVEL</option>
+                  <option value="mini_marvel">Mini-MARVEL</option>
+                  <option value="fate_cd">FATE-CD</option>
+                  <option value="none">None</option>
+                </select>
+              </div>
+              <!-- Study ID -->
+              <div class="form-group col-md-12">
+                <label for="id_study_id">Study ID (optional):</label>
+                <input type="text"
+                       name="study_id"
+                       maxlength="200"
+                       class="form-control"
+                       id="id_study_id"
+                       @autocomplete.camel="data.study_id = $event.detail.value"
+                       x-model="data.study_id"
+                       autocomplete="off" />
+              </div>
+              <!-- Music Timepoint -->
+              <div class="form-group col-md-12">
+                <label for="id_music_timepoint">Music Timepoint:</label>
+                <select name="music_timepoint"
+                        class="form-control"
+                        id="id_music_timepoint"
+                        x-model="data.music_timepoint">
+                  <option value="">---------</option>
+                  <option value="baseline">Baseline</option>
+                  <option value="3_months">3 Months</option>
+                  <option value="6_months">6 Months</option>
+                  <option value="9_months">9 Months</option>
+                  <option value="12_months">12 Months</option>
+                </select>
+              </div>
+              <!-- Marvel Timepoint -->
+              <div class="form-group col-md-12">
+                <label for="id_marvel_timepoint">Marvel Timepoint:</label>
+                <select name="marvel_timepoint"
+                        class="form-control"
+                        id="id_marvel_timepoint"
+                        x-model="data.marvel_timepoint">
+                  <option value="">---------</option>
+                  <option value="baseline">Baseline</option>
+                  <option value="12_weeks">12 weeks</option>
+                  <option value="24_weeks">24 weeks</option>
+                </select>
+              </div>
+              <!-- Sampling Date -->
+              <div class="form-group col-md-12 mb-4">
+                <label for="id_sampling_date">Sampling Date:</label>
+                <input type="date"
+                       name="sampling_date"
+                       class="form-control mb-0"
+                       aria-describedby="id_sampling_date_helptext"
+                       id="id_sampling_date"
+                       x-model="data.sampling_date" />
+                <small class="form-text text-muted mt-0">Sampling date to allow for merging (GI-DAMPs)</small>
+              </div>
+              <!-- Comments -->
+              <div class="form-group col-md-12">
+                <label for="id_comments">Comments:</label>
+                <textarea name="comments"
+                          cols="40"
+                          rows="10"
+                          class="form-control"
+                          id="id_comments"
+                          x-model="data.comments"></textarea>
+              </div>
+            </div>
+            <!-- Upload Status -->
+            <div class="mt-4">
+              <button x-show="$store.upload.initial"
+                      type="submit"
+                      class="btn btn-fill btn-success">Upload File</button>
+              <button x-show="$store.upload.loading"
+                      class="btn btn-fill btn-warning"
+                      disabled>
+                <span class="spinner-border spinner-border-sm mr-2"></span>
+                Uploading...
+              </button>
+              <button x-show="$store.upload.completed"
+                      class="btn btn-fill btn-info"
+                      disabled>Upload Complete</button>
+            </div>
+            <!-- Progress Bar -->
+            <div class="progress mt-3" x-show="$store.upload.showProgressBar">
+              <div class="progress-bar progress-bar-animated"
+                   role="progressbar"
+                   :style="`width: ${$store.upload.progress}%`"
+                   :aria-valuenow="$store.upload.progress"
+                   aria-valuemin="0"
+                   aria-valuemax="100">
+                <span x-text="`${$store.upload.progress}%`"></span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+  <script src="{% static 'assets/js/datastore_autocomplete.js' %}"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.store('upload', {
+        initial: true,
+        loading: false,
+        completed: false,
+        progress: 0,
+        showProgressBar: false,
+      })
+    })
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('upload', () => ({
+        data: {
+          category: '',
+          study_name: '',
+          study_id: "",
+          music_timepoint: '',
+          marvel_timepoint: '',
+          sampling_date: "",
+          comments: "",
+          file_name: "",
+        },
+        selectFile(event) {
+          const file = event.target.files[0];
+          this.data.file_name = file.name;
+        },
+        uploadFile() {
+          const start_url = '/datastore/api/upload/start/';
+          const finish_url = '/datastore/api/upload/finish/';
+
+          // Set ui states
+          Alpine.store('upload').loading = true;
+          Alpine.store('upload').initial = false;
+          Alpine.store('upload').showProgressBar = true;
+
+          console.log("Input Data:");
+          console.log(this.data);
+
+          // First step is to register the upload with Django
+          // This retrieves a pre-signed URL for direct to S3 upload
+          axios.post(start_url, this.data, {
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+            }
+          }).then(function(response) {
+            console.log("Call to Django Start Upload API to Generate SAS URL")
+            console.log(response);
+            // Once we get the presigned URL back it's time to construct the data for S3.
+            const postData = new FormData();
+            const file_id = response.data.id;
+            for (const key in response.data.fields) {
+              postData.append(key, response.data.fields[key]);
+            }
+
+            // Attach the file in preparation for S3 upload
+            const fileInput = document.getElementById('id_file');
+            const file = fileInput.files[0];
+            postData.append('file', file);
+
+            // Progress bar monitoring
+            const config = {
+              onUploadProgress: function(progressEvent) {
+                const percentCompleted = Math.round(
+                  (progressEvent.loaded * 100) / progressEvent.total
+                );
+                Alpine.store('upload').progress = percentCompleted;
+              },
+              headers: {
+                'x-ms-blob-type': 'BlockBlob',
+                'Content-Type': file.type || 'application/octet-stream'
+              }
+            };
+
+            // Perform the upload to S3 here
+            axios.put(response.data.upload_url, file, config).then(function(response) {
+              Promise.resolve({
+                fileId: file_id
+              })
+            }).then(function(response) {
+              // Once the S3 upload succeeds, register success with Django
+              console.log("Response from Azure Blob Storage");
+              console.log(response);
+              axios.post(finish_url, {
+                file_id: file_id
+              }, {
+                headers: {
+                  'X-CSRFToken': '{{ csrf_token }}',
+                }
+              }).then(function(response) {
+                console.log("Successfully registered file upload finish with Django");
+                console.log(response);
+
+                // Entire process successfully completed here
+                // Set UI states and redirect to dashboard.
+                Alpine.store('upload').loading = false;
+                Alpine.store('upload').completed = true;
+                Alpine.store('upload').initial = false;
+                window.location.href = "/datastore/dashboard/";
+              })
+            });
+          }).catch(function(error) {
+            console.log(error);
+          });
+        }
+      }))
+    })
+  </script>
+{% endblock javascripts %}

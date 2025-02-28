@@ -1,23 +1,56 @@
+import pathlib
+
+from azure.core.exceptions import ResourceNotFoundError
+from django.conf import settings
 from django.db import models
 from simple_history.models import HistoricalRecords
 
 from app.choices import (
     BiopsyInflamedStatusChoices,
     BiopsyLocationChoices,
+    FileCategoryChoices,
     HaemolysisReferenceChoices,
     MarvelTimepointChoices,
     MusicTimepointChoices,
     SampleTypeChoices,
     SampleVolumeUnitChoices,
+    SexChoices,
+    StudyCenterChoices,
+    StudyGroupChoices,
     StudyNameChoices,
 )
 
 
+class StudyIdentifier(models.Model):
+    name = models.CharField(max_length=200, unique=True)
+    study_name = models.CharField(max_length=200, choices=StudyNameChoices.choices, blank=True, null=True)
+    study_center = models.CharField(
+        max_length=200,
+        choices=StudyCenterChoices.choices,
+        blank=True,
+        null=True,
+    )
+    study_group = models.CharField(max_length=200, choices=StudyGroupChoices.choices, blank=True, null=True)
+    sex = models.CharField(max_length=10, choices=SexChoices.choices, blank=True, null=True)
+    age = models.IntegerField(blank=True, null=True)
+
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Study Identifier"
+        verbose_name_plural = "Study Identifiers"
+        ordering = ["name"]
+
+
 class Sample(models.Model):
     study_name = models.CharField(max_length=200, choices=StudyNameChoices.choices)
-
+    study_id = models.ForeignKey(
+        StudyIdentifier, on_delete=models.PROTECT, related_name="samples", null=True, blank=True
+    )
     sample_id = models.CharField(max_length=200, unique=True)
-    patient_id = models.CharField(max_length=200)
     sample_location = models.CharField(max_length=200)
     sample_sublocation = models.CharField(max_length=200, blank=True, null=True)
     sample_type = models.CharField(max_length=200, choices=SampleTypeChoices.choices)
@@ -61,19 +94,6 @@ class Sample(models.Model):
 
     def clean(self):
         self.sample_id = self.sample_id.upper()
-        self.patient_id = self.patient_id.upper()
-
-        # Suspend form validation until all samples have been allocated timepoints
-        # if (
-        #     self.study_name == StudyNameChoices.MUSIC
-        #     or self.study_name == StudyNameChoices.MINI_MUSIC
-        # ):
-        #     if self.music_timepoint is None or self.music_timepoint == "":
-        #         raise ValidationError(
-        #             {
-        #                 "music_timepoint": "Music Timepoint must be filled for MUSIC and Mini-MUSIC studies."
-        #             }
-        #         )
 
     def __str__(self):
         return self.sample_id
@@ -83,3 +103,74 @@ class Sample(models.Model):
 
     class Meta:
         ordering = ["-created"]
+
+
+def file_upload_path(instance, filename):
+    """
+    Returns the path for Azure uploads
+    In this case "category/<file>"
+    """
+    # Both filename and instance.file_name should have the same values
+    return f"{instance.category}/{instance.formatted_file_name}"
+
+
+def file_generate_name(original_file_name: str, study_name: str, study_id: str = None) -> str:
+    """
+    Takes filename, study_name and returns a formatted filename with unique hash
+    """
+    extension = pathlib.Path(original_file_name).suffix
+    file_name = pathlib.Path(original_file_name).stem
+    if not study_id:
+        return f"{study_name}_{file_name}{extension}"
+    return f"{study_name}_{study_id}_{file_name}{extension}"
+
+
+class DataStore(models.Model):
+    # Metadata Fields
+    category = models.CharField(max_length=200, choices=FileCategoryChoices.choices)
+    study_name = models.CharField(max_length=200, choices=StudyNameChoices.choices)
+    study_id = models.ForeignKey(
+        StudyIdentifier, on_delete=models.PROTECT, related_name="files", null=True, blank=True
+    )
+    music_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MusicTimepointChoices.choices)
+    marvel_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MarvelTimepointChoices.choices)
+    sampling_date = models.DateField(blank=True, null=True)  # for merging GI-DAMPs
+    comments = models.TextField(blank=True, null=True)
+
+    file = models.FileField(upload_to=file_upload_path, blank=True, null=True)
+
+    file_type = models.CharField(max_length=255, blank=True)  # File Extension
+    original_file_name = models.TextField(blank=True)
+    formatted_file_name = models.TextField(blank=True)
+
+    upload_finished_at = models.DateTimeField(blank=True, null=True)
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True, related_name="uploaded_files"
+    )
+
+    history = HistoricalRecords()
+
+    @property
+    def is_valid(self):
+        """
+        We consider a file "valid" if the the datetime flag has value.
+        """
+        return bool(self.upload_finished_at)
+
+    @property
+    def url(self):
+        if self.file:
+            return self.file.url
+
+    @property
+    def size(self):
+        try:
+            return self.file.size
+        except ResourceNotFoundError:
+            return None
+
+    def __str__(self):
+        return self.formatted_file_name
+
+    class Meta:
+        ordering = ["-upload_finished_at"]

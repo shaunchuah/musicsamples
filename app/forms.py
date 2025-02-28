@@ -1,8 +1,13 @@
 from django import forms
 from django.forms import ModelForm
 from django.utils import timezone
+from django_select2 import forms as s2forms
 
-from app.models import Sample
+from app.models import DataStore, Sample, StudyIdentifier
+
+
+class DateInput(forms.DateInput):
+    input_type = "date"
 
 
 class DateTimeInput(forms.DateTimeInput):
@@ -22,10 +27,10 @@ def currentTime():
 
 class SampleForm(ModelForm):
     # Main sample registration form
+    study_id = forms.CharField(label="Study ID*", required=True)
     processing_datetime = forms.DateTimeField(
         label="Processing Datetime",
         widget=DateTimeInput(),
-        initial=currentTime,
         required=False,
     )
 
@@ -38,7 +43,7 @@ class SampleForm(ModelForm):
             "study_name",
             "music_timepoint",
             "marvel_timepoint",
-            "patient_id",
+            "study_id",
             "sample_type",
             "qubit_cfdna_ng_ul",
             "haemolysis_reference",
@@ -62,7 +67,7 @@ class SampleForm(ModelForm):
             "music_timepoint": "Music Timepoint",
             "marvel_timepoint": "Marvel Timepoint",
             "sample_id": "Sample ID*",
-            "patient_id": "Patient ID*",
+            "study_id": "Study ID*",
             "sample_datetime": "Sampling Datetime*",
             "sample_location": "Sample Location*",
             "sample_sublocation": "Sample Sublocation",
@@ -78,6 +83,22 @@ class SampleForm(ModelForm):
             "paraffin_block_key": "Paraffin Block Key",
             "frozen_datetime": "Frozen Datetime (If Applicable)",
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        study_id_text = cleaned_data.get("study_id")
+        if study_id_text:
+            study_id_text = study_id_text.upper()
+            study_identifier, created = StudyIdentifier.objects.get_or_create(name=study_id_text)
+            cleaned_data["study_id"] = study_identifier
+        return cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # If the form has an instance, update the display text for study_id
+        if self.instance and self.instance.pk and self.instance.study_id:
+            # Use the string representation instead of ID
+            self.initial["study_id"] = str(self.instance.study_id)
 
 
 class CheckoutForm(ModelForm):
@@ -102,3 +123,81 @@ class ReactivateForm(ModelForm):
         model = Sample
         fields = ["is_used"]
         labels = {"is_used": "Uncheck to reactivate"}
+
+
+class SampleSelectionWidget(s2forms.ModelSelect2MultipleWidget):
+    search_fields = [
+        "sample_id__icontains",
+    ]
+
+
+class DataStoreForm(ModelForm):
+    study_id = forms.CharField(label="Study ID (optional)", required=False)
+    sampling_date = forms.DateField(
+        label="Sampling Date",
+        widget=DateInput(),
+        required=False,
+        help_text="Sampling date to allow for merging (GI-DAMPs)",
+    )
+
+    class Meta:
+        model = DataStore
+        fields = [
+            "file",
+            "category",
+            "study_name",
+            "study_id",
+            "music_timepoint",
+            "marvel_timepoint",
+            "sampling_date",
+            "comments",
+        ]
+        labels = {
+            "category": "Category*",
+            "study_name": "Study Name*",
+            "music_timepoint": "Music Timepoint",
+            "marvel_timepoint": "Marvel Timepoint",
+            "comments": "Comments",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(DataStoreForm, self).__init__(*args, **kwargs)
+        self.fields["file"].widget.attrs = {"class": "form-control-file custom-file-input"}
+
+    def clean(self):
+        cleaned_data = super().clean()
+        study_id_text = cleaned_data.get("study_id")
+        if study_id_text:
+            study_id_text = study_id_text.upper()
+            study_identifier, created = StudyIdentifier.objects.get_or_create(name=study_id_text)
+            cleaned_data["study_id"] = study_identifier
+        return cleaned_data
+
+
+class DataStoreUpdateForm(ModelForm):
+    sampling_date = forms.DateField(
+        label="Sampling Date",
+        widget=DateInput(),
+        required=False,
+        help_text="Sampling date to allow for merging (GI-DAMPs)",
+    )
+
+    class Meta:
+        model = DataStore
+        fields = [
+            "sampling_date",
+            "music_timepoint",
+            "marvel_timepoint",
+            "comments",
+        ]
+        labels = {
+            "music_timepoint": "Music Timepoint",
+            "marvel_timepoint": "Marvel Timepoint",
+            "comments": "Comments",
+        }
+
+
+class StudyIdUpdateForm(ModelForm):
+    class Meta:
+        model = StudyIdentifier
+        fields = ["name", "study_name"]

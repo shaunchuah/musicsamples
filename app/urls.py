@@ -1,23 +1,21 @@
 from django.urls import include, path
 from django.views.generic.base import TemplateView
 from rest_framework import routers
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 from app import views
 
-from .views import (
-    AllSampleExportViewset,
-    MultipleSampleViewSet,
-    SampleIsUsedViewSet,
-    SampleViewSet,
-)
+from .views import MultipleSampleViewSet, SampleIsUsedViewSet, SampleLocationViewSet, SampleV2ViewSet
 
 router = routers.DefaultRouter()
 
 # Django Rest Framework API endpoints
-router.register(r"samples", SampleViewSet, "samples")
+router.register(r"sample_location", SampleLocationViewSet, "sample_location")
 router.register(r"samples_used", SampleIsUsedViewSet, "samples_used")
 router.register(r"multiple_samples", MultipleSampleViewSet, "multiple_samples")
-router.register(r"all", AllSampleExportViewset, "all")
+
+router_v2 = routers.DefaultRouter()
+router_v2.register(r"samples", SampleV2ViewSet, "samples")
 
 urlpatterns = [
     path("", views.index, name="home"),
@@ -78,7 +76,7 @@ urlpatterns = [
     ),
     path(
         "autocomplete/patients/",
-        views.autocomplete_patient_id,
+        views.autocomplete_study_id,
         name="autocomplete_patients",
     ),
     # Django Rest Framework URLs
@@ -99,4 +97,29 @@ urlpatterns = [
         views.export_historical_samples,
         name="export_historical_samples",
     ),
+    path("datastore/dashboard/", views.datastore_list_view, name="datastore_list"),
+    path("datastore/upload/", views.datastore_create_view, name="datastore_create"),
+    path("datastore/upload/ajax/", views.datastore_create_view_ajax, name="datastore_create_ajax"),
+    path("datastore/download/<int:id>/", views.datastore_download_view, name="datastore_download"),
+    path("datastore/azure_view/<int:id>/", views.datastore_azure_view, name="datastore_azure_view"),
+    path("datastore/read/<int:id>/", views.datastore_detail_view, name="datastore_detail"),
+    path("datastore/edit/<int:id>/", views.datastore_edit_metadata_view, name="datastore_edit"),
+    path("datastore/delete/<int:id>/", views.datastore_delete_view, name="datastore_delete"),
+    path("datastore/search/", views.datastore_search_view, name="datastore_search"),
+    path("datastore/search/export_csv/", views.datastore_search_export_csv, name="datastore_search_export_csv"),
+    path("datastore/filter/", views.datastore_filter_view, name="datastore_filter"),
+    path("datastore/filter/export_csv/", views.datastore_filter_export_csv, name="datastore_filter_export_csv"),
+    path("datastore/api/upload/start/", views.FileDirectUploadStartApi.as_view(), name="file_direct_upload_start"),
+    path("datastore/api/upload/finish/", views.FileDirectUploadFinishApi.as_view(), name="file_direct_upload_finish"),
+    path("datastore/api/import_study_id/", views.import_study_identifiers, name="import_study_identifiers"),
+    path("study_id/", views.study_id_list_view, name="study_id_list"),
+    path("study_id/edit/<str:name>/", views.study_id_edit_view, name="study_id_edit"),
+    path("study_id/search/", views.study_id_search_view, name="study_id_search"),
+    path("study_id/delete/<int:id>/", views.study_id_delete_view, name="study_id_delete"),
+    path("study_id/detail/<str:name>/", views.study_id_detail_view, name="study_id_detail"),
+    # Prototype API
+    path("api/v2/auth/login/", views.login_view, name="login"),
+    path("api/v2/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/v2/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
+    path("api/v2/", include(router_v2.urls)),
 ]

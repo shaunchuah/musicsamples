@@ -7,32 +7,91 @@ from django.http import HttpResponse
 from django_pandas.io import read_frame
 
 
-def export_csv(queryset, study_name="gtrac"):
+def export_csv(queryset, file_prefix="gtrac", file_name="samples", include_related=True):
     """
     Takes in queryset, returns csv download response
-    study_name parameter is optional to control the name of the csv file.
+    file_prefix: optional, default is gtrac to control the name of the csv file.
+    file_name: optional, default is samples
+    include_related: optional, default True. If True, includes foreign key fields
+
+    By default takes in a queryset and returns gtrac_samples_<current_date>.csv
     """
+    from django.db.models.fields.related import ForeignKey, OneToOneField
+
     current_date = datetime.datetime.now().strftime("%d-%b-%Y")
 
     response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = 'attachment; filename="%s_samples_%s.csv"' % (
-        study_name,
+    response["Content-Disposition"] = 'attachment; filename="%s_%s_%s.csv"' % (
+        file_prefix,
+        file_name,
         current_date,
     )
     writer = csv.writer(response)
-    field_names = [field.name for field in queryset.model._meta.get_fields()]
-    writer.writerow(field_names)
-    for row in queryset:
-        values = []
-        for field in field_names:
-            try:
-                value = getattr(row, field)
-            except AttributeError:
-                value = ""
+
+    # Get all field names including related fields
+    fields = []
+
+    # First add the direct fields
+    for field in queryset.model._meta.fields:
+        fields.append(field.name)
+
+    # Then add the related fields
+    if include_related:
+        # List of related fields to exclude
+        excluded_related_fields = ["study_id__study_name", "study_id__name"]
+
+        for field in queryset.model._meta.fields:
+            if isinstance(field, (ForeignKey, OneToOneField)):
+                related_model = field.related_model
+                if related_model and not related_model.__name__ == "User":
+                    for related_field in related_model._meta.fields:
+                        # Skip primary keys of related models
+                        if not related_field.primary_key:
+                            related_name = f"{field.name}__{related_field.name}"
+                            # Skip excluded related fields
+                            if related_name not in excluded_related_fields:
+                                fields.append(related_name)
+
+    # Write header row
+    writer.writerow(fields)
+
+    # Write data rows
+    for obj in queryset:
+        row_data = []
+        for field_name in fields:
+            if "__" in field_name:
+                # This is a related field
+                parts = field_name.split("__")
+                value = obj
+                for part in parts:
+                    if value is None:
+                        break
+                    try:
+                        value = getattr(value, part)
+                        # Handle callable attributes (like methods)
+                        if callable(value):
+                            value = value()
+                    except (AttributeError, TypeError):
+                        value = None
+                        break
+            else:
+                # This is a direct field
+                try:
+                    value = getattr(obj, field_name)
+                    # Handle callable attributes
+                    if callable(value):
+                        value = value()
+                except (AttributeError, TypeError):
+                    value = None
+
+            # Convert None to empty string for CSV
             if value is None:
                 value = ""
-            values.append(value)
-        writer.writerow(values)
+
+            row_data.append(value)
+
+        writer.writerow(row_data)
+
     return response
 
 
@@ -42,13 +101,13 @@ def queryset_by_study_name(model, study_name):
     return a filtered queryset
     """
     if study_name == "music":
-        queryset = model.objects.filter(patient_id__startswith="MID-")
+        queryset = model.objects.filter(study_id__name__startswith="MID-")
     elif study_name == "gidamps":
-        queryset = model.objects.filter(patient_id__startswith="GID-")
+        queryset = model.objects.filter(study_id__name__startswith="GID-")
     elif study_name == "mini_music":
-        queryset = model.objects.filter(patient_id__startswith="MINI-")
+        queryset = model.objects.filter(study_id__name__startswith="MINI-")
     elif study_name == "marvel":
-        queryset = model.objects.filter(Q(patient_id__regex=r"^[0-9]{6}$"))
+        queryset = model.objects.filter(Q(study_id__name__regex=r"^[0-9]{6}$"))
     else:
         queryset = model.objects.all()
     return queryset
@@ -70,21 +129,21 @@ def render_dataframe_to_csv_response(df: pd.DataFrame, study_name: str):
 
 
 def retrieve_center_number(row):
-    patient_id = row.name[0]
-    patient_id = str(patient_id)
-    return str.split(patient_id, "-")[1]
+    study_id = row.name[0]
+    study_id = str(study_id)
+    return str.split(study_id, "-")[1]
 
 
 def retrieve_patient_number(row):
-    patient_id = row.name[0]
-    patient_id = str(patient_id)
-    return str.split(patient_id, "-")[2]
+    study_id = row.name[0]
+    study_id = str(study_id)
+    return str.split(study_id, "-")[2]
 
 
 def sort_music_dataframe(df: pd.DataFrame):
     """
     Takes in music or mini_music dataframes and
-    sorts by center and patient_id
+    sorts by center and study_id
     """
     df["center_number"] = df.apply(retrieve_center_number, axis=1)
     df["patient_number"] = df.apply(retrieve_patient_number, axis=1)
@@ -130,7 +189,7 @@ def create_sample_type_pivot(qs: QuerySet, study_name: str):
 
     df = df.drop_duplicates()
 
-    # Remove all rows where the patient_id is not consistent with the studies format
+    # Remove all rows where the study_id is not consistent with the studies format
     # Eg negative controls
     match study_name:
         case "mini_music":
@@ -142,12 +201,12 @@ def create_sample_type_pivot(qs: QuerySet, study_name: str):
         case "marvel":
             pattern_to_match = "^\d{6}$"
 
-    filter = df["patient_id"].str.contains(pattern_to_match, regex=True)
+    filter = df["study_id"].str.contains(pattern_to_match, regex=True)
     df = df[filter]
 
     # Create the pivot table of interest
     output_df = df.pivot_table(
-        index=["patient_id", "sample_date"],
+        index=["study_id", "sample_date"],
         columns="sample_type",
         values="sample_id",
         aggfunc=pd.unique,
@@ -155,7 +214,7 @@ def create_sample_type_pivot(qs: QuerySet, study_name: str):
     )
 
     # Sort the output dataframe for mini music and music
-    # by center and patient id
+    # by center and study id
     match study_name:
         case "gidamps" | "marvel":
             pass
@@ -164,3 +223,42 @@ def create_sample_type_pivot(qs: QuerySet, study_name: str):
             sort_music_dataframe(output_df)
 
     return output_df
+
+
+def historical_changes(query):
+    # Historical changes integrates simple history into the sample detail page
+    changes = []
+    if query is not None:
+        last = query.first()
+        for all_changes in range(query.count()):
+            new_record, old_record = last, last.prev_record
+            if old_record is not None:
+                delta = new_record.diff_against(old_record)
+
+                # Process each change to use string representation for foreign keys
+                for change in delta.changes:
+                    # Check if the field is 'study_id' (or any other FK field you want to handle)
+                    if change.field == "study_id":
+                        # If values aren't None, replace with string representation
+                        if change.old is not None:
+                            # Get the related model instance from historical record
+                            try:
+                                from app.models import StudyIdentifier
+
+                                old_instance = StudyIdentifier.objects.get(pk=change.old)
+                                change.old = str(old_instance)
+                            except (StudyIdentifier.DoesNotExist, ValueError):
+                                pass  # Keep as is if we can't find the object
+
+                        if change.new is not None:
+                            try:
+                                from app.models import StudyIdentifier
+
+                                new_instance = StudyIdentifier.objects.get(pk=change.new)
+                                change.new = str(new_instance)
+                            except (StudyIdentifier.DoesNotExist, ValueError):
+                                pass  # Keep as is if we can't find the object
+
+                changes.append(delta)
+                last = old_record
+        return changes

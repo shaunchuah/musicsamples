@@ -1,9 +1,9 @@
 from rest_framework import serializers
 
-from app.models import Sample
+from app.models import Sample, StudyIdentifier
 
 
-class SampleSerializer(serializers.ModelSerializer):
+class SampleLocationSerializer(serializers.ModelSerializer):
     """
     Serializer for updating sample locations
     """
@@ -15,6 +15,17 @@ class SampleSerializer(serializers.ModelSerializer):
             "sample_location",
             "sample_sublocation",
         ]
+        lookup_field = "sample_id"
+
+
+class SampleV2Serializer(serializers.ModelSerializer):
+    """
+    Serializer for NextJS Fronend
+    """
+
+    class Meta:
+        model = Sample
+        fields = "__all__"
         lookup_field = "sample_id"
 
 
@@ -37,6 +48,8 @@ class MultipleSampleSerializer(serializers.ModelSerializer):
     Serializer for adding multiple samples
     """
 
+    study_id = serializers.CharField()
+
     class Meta:
         model = Sample
         fields = [
@@ -46,7 +59,7 @@ class MultipleSampleSerializer(serializers.ModelSerializer):
             "sample_id",
             "sample_location",
             "sample_sublocation",
-            "patient_id",
+            "study_id",
             "sample_type",
             "qubit_cfdna_ng_ul",
             "haemolysis_reference",
@@ -63,10 +76,6 @@ class MultipleSampleSerializer(serializers.ModelSerializer):
             "frozen_datetime",
         ]
         lookup_field = "sample_id"
-
-    def create(self, validated_data):
-        validated_data["patient_id"] = validated_data["patient_id"].upper()
-        return super(MultipleSampleSerializer, self).create(validated_data)
 
     def validate(self, data):
         """
@@ -85,6 +94,16 @@ class MultipleSampleSerializer(serializers.ModelSerializer):
 
         return data
 
+    def create(self, validated_data):
+        study_id = validated_data.pop("study_id", None)
+
+        if study_id:
+            study_id = study_id.upper()
+            study_identifier, _ = StudyIdentifier.objects.get_or_create(name=study_id)
+            validated_data["study_id"] = study_identifier
+
+        return super().create(validated_data)
+
 
 class SampleExportSerializer(serializers.ModelSerializer):
     """
@@ -96,7 +115,7 @@ class SampleExportSerializer(serializers.ModelSerializer):
         fields = [
             "study_name",
             "sample_id",
-            "patient_id",
+            "study_id",
             "sample_type",
             "sample_location",
             "sample_sublocation",

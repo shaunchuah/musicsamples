@@ -1,182 +1,182 @@
 {% extends "layouts/base.html" %}
 
 {% block title %}
-    Datasets
+  Datasets
 {% endblock title %}
 {% block stylesheets %}
 {% endblock stylesheets %}
 {% block content %}
-    <h2>
-        <i class="tim-icons icon-paper"></i> Datasets
-    </h2>
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="row">
-                {% for dataset in datasets %}
-                    <div class="col-xl-6 d-flex align-items-stretch">
-                        <div class="card">
-                            <div class="card-header">
-                                {{ dataset.get_study_name_display }}
-                                <h3 class="card-title">{{ dataset.name }}</h3>
-                            </div>
-                            <div class="card-body">
-                                Description:
-                                <p>{{ dataset.description }}</p>
-                            </div>
-                            <div class="card-footer">
-                                API URL (JSON):
-                                <p>
-                                    <a href="{% url 'datasets:retrieve' dataset.name %}" target="_blank">{{ site_url }}{% url 'datasets:retrieve' dataset.name %}</a>
-                                </p>
-                                CSV File:
-                                <p>
-                                    <a href="{% url 'datasets:export_csv' dataset.name %}" target="_blank">Download CSV</a>
-                                </p>
-                                <p>
-                                    Last updated: {{ dataset.last_modified|date:'d M Y H:i' }} |
-                                    Access count: {{ dataset.datasetaccesshistory_set.all|length }} |
-                                    <a class="btn-dataset d-inline"
-                                       href="{% url 'datasets:access_history' dataset.name %}"
-                                       target="_blank">
-                                        <span>Access history</span>
-                                        <svg width="14"
-                                             height="14"
-                                             data-slot="icon"
-                                             fill="none"
-                                             stroke-width="1.5"
-                                             stroke="currentColor"
-                                             viewBox="0 0 24 24"
-                                             xmlns="http://www.w3.org/2000/svg"
-                                             aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                        </svg>
-                                    </a>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                {% empty %}
-                    No datasets yet.
-                {% endfor %}
+  <h2>
+    <i class="tim-icons icon-paper"></i> Datasets
+  </h2>
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="row">
+        {% for dataset in datasets %}
+          <div class="col-xl-6 d-flex align-items-stretch">
+            <div class="card">
+              <div class="card-header">
+                {{ dataset.get_study_name_display }}
+                <h3 class="card-title">{{ dataset.name }}</h3>
+              </div>
+              <div class="card-body">
+                Description:
+                <p>{{ dataset.description }}</p>
+              </div>
+              <div class="card-footer">
+                API URL (JSON):
+                <p>
+                  <a href="{% url 'datasets:retrieve' dataset.name %}" target="_blank">{{ site_url }}{% url 'datasets:retrieve' dataset.name %}</a>
+                </p>
+                CSV File:
+                <p>
+                  <a href="{% url 'datasets:export_csv' dataset.name %}" target="_blank">Download CSV</a>
+                </p>
+                <p>
+                  Last updated: {{ dataset.last_modified|date:'d M Y H:i' }} |
+                  Access count: {{ dataset.datasetaccesshistory_set.all|length }} |
+                  <a class="btn-dataset d-inline"
+                     href="{% url 'datasets:access_history' dataset.name %}"
+                     target="_blank">
+                    <span>Access history</span>
+                    <svg width="14"
+                         height="14"
+                         data-slot="icon"
+                         fill="none"
+                         stroke-width="1.5"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24"
+                         xmlns="http://www.w3.org/2000/svg"
+                         aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
+                  </a>
+                </p>
+              </div>
             </div>
-            <!-- Connection Status -->
-            {% if data_source_status_checks %}
-                <div class="row">
-                    <div class="col">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Data Source Connection Status</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="row px-3">
-                                    {% for check in data_source_status_checks %}
-                                        {% if check.response_status == 200 %}
-                                            <div class="status_card mb-2 mr-2">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="status_dot mr-2"></div>
-                                                    <div class="status_title">{{ check.data_source }}</div>
-                                                </div>
-                                                <div class="status_subtitle">Last checked: {{ check.checked_at|date:'d M Y H:i' }}</div>
-                                                <div class="status_text">200 OK.</div>
-                                                <!--Monitoring Graph-->
-                                                <div class="d-flex pt-1">
-                                                    {% for data_point in graph_data %}
-                                                        {% if data_point.data_source == check.data_source %}
-                                                            {% if data_point.response_status == 200 %}
-                                                                <div class="monitor_dot"></div>
-                                                            {% else %}
-                                                                <div class="monitor_dot_error"></div>
-                                                            {% endif %}
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </div>
-                                                <div class="status_subtitle mt-1 d-flex flex-row-reverse">Last 30 days</div>
-                                                <!--End Monitoring Graph-->
-                                            </div>
-                                        {% else %}
-                                            <div class="status_card mb-2 mr-2">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="status_dot_error mr-2"></div>
-                                                    <div class="status_title">{{ check.data_source }}</div>
-                                                </div>
-                                                <div class="status_subtitle">Last checked: {{ check.checked_at|date:'d M Y H:i' }}</div>
-                                                <div class="status_text_error">{{ check.error_message }}</div>
-                                                <!--Monitoring Graph-->
-                                                <div class="d-flex pt-1">
-                                                    {% for data_point in graph_data %}
-                                                        {% if data_point.data_source == check.data_source %}
-                                                            {% if data_point.response_status == 200 %}
-                                                                <div class="monitor_dot"></div>
-                                                            {% else %}
-                                                                <div class="monitor_dot_error"></div>
-                                                            {% endif %}
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </div>
-                                                <!--End Monitoring Graph-->
-                                            </div>
-                                        {% endif %}
-                                    {% endfor %}
-                                </div>
-                            </div>
+          </div>
+        {% empty %}
+          No datasets yet.
+        {% endfor %}
+      </div>
+      <!-- Connection Status -->
+      {% if data_source_status_checks %}
+        <div class="row">
+          <div class="col">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Data Source Connection Status</h3>
+              </div>
+              <div class="card-body">
+                <div class="row px-3">
+                  {% for check in data_source_status_checks %}
+                    {% if check.response_status == 200 %}
+                      <div class="status_card mb-2 mr-2">
+                        <div class="d-flex align-items-center">
+                          <div class="status_dot mr-2"></div>
+                          <div class="status_title">{{ check.data_source }}</div>
                         </div>
-                    </div>
+                        <div class="status_subtitle">Last checked: {{ check.checked_at|date:'d M Y H:i' }}</div>
+                        <div class="status_text">200 OK.</div>
+                        <!--Monitoring Graph-->
+                        <div class="d-flex pt-1">
+                          {% for data_point in graph_data %}
+                            {% if data_point.data_source == check.data_source %}
+                              {% if data_point.response_status == 200 %}
+                                <div class="monitor_dot"></div>
+                              {% else %}
+                                <div class="monitor_dot_error"></div>
+                              {% endif %}
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+                        <div class="status_subtitle mt-1 d-flex flex-row-reverse">Last 30 days</div>
+                        <!--End Monitoring Graph-->
+                      </div>
+                    {% else %}
+                      <div class="status_card mb-2 mr-2">
+                        <div class="d-flex align-items-center">
+                          <div class="status_dot_error mr-2"></div>
+                          <div class="status_title">{{ check.data_source }}</div>
+                        </div>
+                        <div class="status_subtitle">Last checked: {{ check.checked_at|date:'d M Y H:i' }}</div>
+                        <div class="status_text_error">{{ check.error_message }}</div>
+                        <!--Monitoring Graph-->
+                        <div class="d-flex pt-1">
+                          {% for data_point in graph_data %}
+                            {% if data_point.data_source == check.data_source %}
+                              {% if data_point.response_status == 200 %}
+                                <div class="monitor_dot"></div>
+                              {% else %}
+                                <div class="monitor_dot_error"></div>
+                              {% endif %}
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+                        <!--End Monitoring Graph-->
+                      </div>
+                    {% endif %}
+                  {% endfor %}
                 </div>
-            {% endif %}
-            <!-- End Connection Status-->
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="col-lg-4">
-            <div class="notes card">
-                <div class="card-header">
-                    <h2 class="card-title">Datasets User Guide</h2>
-                </div>
-                <div class="card-body" x-data="{ 'api_url': '' }">
-                    <p>
-                        <span class="d-block">Full dataset documentation is available here:</span>
-                        <a href="https://shaunchuah.github.io/musicsamples/"
-                           target="_blank"
-                           class="d-inline-block btn btn-secondary">Documentation (opens in new window)</a>
-                    </p>
-                    <h3>Beginners Tutorial</h3>
-                    <p>
-                        If all this is new to you, try the
-                        <a href="https://shaunchuah.github.io/software_engineering_for_science/"
-                           target="_blank"
-                           class="d-inline-block">full beginner's tutorial</a>
-                    </p>
-                    <h3>API User Guide</h3>
-                    <p>These endpoints allow for programmatic access to the datasets held on G-Trac.</p>
-                    <h3>Authentication</h3>
-                    <p>
-                        API authentication is performed using token authentication.
-                        <pre>Your API token is: {% if request.user.auth_token %}{{ request.user.auth_token }}{% else %}No token yet. Create one using the button below.{% endif %}</pre>
-                        {% if request.user.auth_token %}
-                            <a href="{% url 'refresh_token' %}?next={{ request.path }}"
-                               class="btn btn-sm">Renew Token</a>
-                            <a href="{% url 'delete_token' %}?next={{ request.path }}"
-                               class="btn btn-sm btn-danger">Delete Token</a>
-                        {% else %}
-                            <a href="{% url 'generate_token' %}?next={{ request.path }}"
-                               class="btn btn-sm btn-success">Generate Token</a>
-                        {% endif %}
-                    </p>
-                    <p>
-                        To authenticate with the endpoint, include the following http header with your request:
-                        <pre>Authorization: Token {{ request.user.auth_token }}</pre>
-                    </p>
-                    <h3>Code Examples</h3>
-                    <p>Select your dataset to update the code example below:</p>
-                    <div class="form-group mb-4">
-                        <select name="api_url" class="form-control" id="id_api_url" x-model="api_url">
-                            <option value="" selected="">---------</option>
-                            {% for dataset in datasets %}
-                                <option value="{{ site_url }}{% url 'datasets:retrieve' dataset.name %}">{{ dataset.name }}</option>
-                            {% endfor %}
-                        </select>
-                        <div id="id_study_name_error" class="text-danger text-lg"></div>
-                    </div>
-                    <h3>Python</h3>
-                    <pre>
+      {% endif %}
+      <!-- End Connection Status-->
+    </div>
+    <div class="col-lg-4">
+      <div class="notes card">
+        <div class="card-header">
+          <h2 class="card-title">Datasets User Guide</h2>
+        </div>
+        <div class="card-body" x-data="{ 'api_url': '' }">
+          <p>
+            <span class="d-block">Full dataset documentation is available here:</span>
+            <a href="https://shaunchuah.github.io/musicsamples/"
+               target="_blank"
+               class="d-inline-block btn btn-secondary">Documentation (opens in new window)</a>
+          </p>
+          <h3>Beginners Tutorial</h3>
+          <p>
+            If all this is new to you, try the
+            <a href="https://shaunchuah.github.io/software_engineering_for_science/"
+               target="_blank"
+               class="d-inline-block">full beginner's tutorial</a>
+          </p>
+          <h3>API User Guide</h3>
+          <p>These endpoints allow for programmatic access to the datasets held on G-Trac.</p>
+          <h3>Authentication</h3>
+          <p>
+            API authentication is performed using token authentication.
+            <pre>Your API token is: {% if request.user.auth_token %}{{ request.user.auth_token }}{% else %}No token yet. Create one using the button below.{% endif %}</pre>
+            {% if request.user.auth_token %}
+              <a href="{% url 'refresh_token' %}?next={{ request.path }}"
+                 class="btn btn-sm">Renew Token</a>
+              <a href="{% url 'delete_token' %}?next={{ request.path }}"
+                 class="btn btn-sm btn-danger">Delete Token</a>
+            {% else %}
+              <a href="{% url 'generate_token' %}?next={{ request.path }}"
+                 class="btn btn-sm btn-success">Generate Token</a>
+            {% endif %}
+          </p>
+          <p>
+            To authenticate with the endpoint, include the following http header with your request:
+            <pre>Authorization: Token {{ request.user.auth_token }}</pre>
+          </p>
+          <h3>Code Examples</h3>
+          <p>Select your dataset to update the code example below:</p>
+          <div class="form-group mb-4">
+            <select name="api_url" class="form-control" id="id_api_url" x-model="api_url">
+              <option value="" selected="">---------</option>
+              {% for dataset in datasets %}
+                <option value="{{ site_url }}{% url 'datasets:retrieve' dataset.name %}">{{ dataset.name }}</option>
+              {% endfor %}
+            </select>
+            <div id="id_study_name_error" class="text-danger text-lg"></div>
+          </div>
+          <h3>Python</h3>
+          <pre>
 # This is a basic example - do not commit this code to git.
 
 import requests
@@ -201,8 +201,8 @@ response = requests.get(API_URL, headers = authorization_header, timeout=30)
 data = response.json()
 df = pd.DataFrame(data)
       </pre>
-                    <h3>R</h3>
-                    <pre>
+          <h3>R</h3>
+          <pre>
 library(httr)
 library(jsonlite)
 
@@ -216,46 +216,46 @@ response &lt;- httr::GET(API_URL, add_headers(Authorization = GTRAC_API_TOKEN))
 json_result &lt;- httr::content(response, as="text", encoding="utf-8")
 df &lt;- jsonlite::fromJSON(json_result)
 </pre>
-                </div>
-            </div>
-            <!-- User Access List -->
-            <div class="row">
-                <div class="col">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Datasets Access List</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-4">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                        </tr>
-                                    </thead>
-                                    {% for user in user_access_list %}
-                                        <tr>
-                                            <td>{{ user.first_name }} {{ user.last_name }}</td>
-                                            <td>
-                                                <a href="mailto:{{ user.email }}" target="_blank">{{ user.email }}</a>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </table>
-                            </div>
-                            <h3 class="card-title">Dagster</h3>
-                            <p>
-                                Dagster is the data orchestrator which pulls data from the various databases, cleans it and stores it in G-Trac.
-                                <a href="https://dagster.musicstudy.uk/" target="_blank">https://dagster.musicstudy.uk/</a>. If you wish to troubleshoot a pipeline, please contact Shaun for the username and password. Data is refreshed every Monday to Friday night.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- End User Access List-->
         </div>
+      </div>
+      <!-- User Access List -->
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Datasets Access List</h3>
+            </div>
+            <div class="card-body">
+              <div class="mb-4">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                    </tr>
+                  </thead>
+                  {% for user in user_access_list %}
+                    <tr>
+                      <td>{{ user.first_name }} {{ user.last_name }}</td>
+                      <td>
+                        <a href="mailto:{{ user.email }}" target="_blank">{{ user.email }}</a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </table>
+              </div>
+              <h3 class="card-title">Orca</h3>
+              <p>
+                Orca is our data orchestration platform using dagster.
+                <a href="https://orca.musicstudy.uk/" target="_blank">https://orca.musicstudy.uk/</a>. If you wish to troubleshoot a pipeline, please contact Shaun for the username and password. Data is refreshed every Monday to Friday night.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End User Access List-->
     </div>
+  </div>
 {% endblock content %}
 {% block javascripts %}
 {% endblock javascripts %}

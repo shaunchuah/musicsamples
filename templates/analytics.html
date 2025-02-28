@@ -1,270 +1,270 @@
 {% extends "layouts/base.html" %}
 
 {% block title %}
-    Dashboard
+  Dashboard
 {% endblock title %}
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}
 {% endblock stylesheets %}
 {% block content %}
-    <h2>
-        <i class="tim-icons icon-chart-bar-32"></i> Analytics
-    </h2>
-    <h3>Samples</h3>
-    <div class="row">
-        <div class="col-xl-4">
-            <div class="row">
-                <div class="col">
-                    <div class="card card-chart">
-                        <div class="card-header p-4">
-                            <h5 class="card-category">Total Active Samples</h5>
-                            <h3 class="card-title">
-                                <i class="tim-icons icon-atom"></i> {{ total_active_samples }}
-                            </h3>
-                            <p>out of {{ total_samples }} total lifetime samples</p>
-                        </div>
-                    </div>
-                </div>
+  <h2>
+    <i class="tim-icons icon-chart-bar-32"></i> Analytics
+  </h2>
+  <h3>Samples</h3>
+  <div class="row">
+    <div class="col-xl-4">
+      <div class="row">
+        <div class="col">
+          <div class="card card-chart">
+            <div class="card-header p-4">
+              <h5 class="card-category">Total Active Samples</h5>
+              <h3 class="card-title">
+                <i class="tim-icons icon-atom"></i> {{ total_active_samples }}
+              </h3>
+              <p>out of {{ total_samples }} total lifetime samples</p>
             </div>
+          </div>
         </div>
-        <div class="col-xl-8">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Samples Overview</h3>
-                </div>
-                <div class="card-body">
-                    <p>CSV file containing sample types by patient ID and sampling date</p>
-                    <a href="{% url 'sample_types_pivot' study_name='mini_music' %}"
-                       class="btn btn-fill btn-success">Mini-MUSIC</a>
-                    <a href="{% url 'sample_types_pivot' study_name='music' %}"
-                       class="btn btn-fill btn-success">MUSIC</a>
-                    <a href="{% url 'sample_types_pivot' study_name='gidamps' %}"
-                       class="btn btn-fill btn-success">GI-DAMPs</a>
-                    <a href="{% url 'sample_types_pivot' study_name='marvel' %}"
-                       class="btn btn-fill btn-success">Marvel</a>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
-    <div class="row">
-        <div class="col-xl-4">
-            <div class="card card-chart">
-                <div class="card-header">
-                    <h5 class="card-category">Total Samples by Study</h5>
-                </div>
-                <div class="chart-area p-4">
-                    <canvas id="samples_by_study_chart_area"></canvas>
-                </div>
-            </div>
+    <div class="col-xl-8">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Samples Overview</h3>
         </div>
-        <div class="col-xl-8">
-            <div class="card card-chart">
-                <div class="card-header">
-                    <h5 class="card-category">Active Samples by Type</h5>
-                </div>
-                <div class="chart-area p-2">
-                    <canvas id="samplestype"></canvas>
-                </div>
-            </div>
+        <div class="card-body">
+          <p>CSV file containing sample types by study ID and sampling date</p>
+          <a href="{% url 'sample_types_pivot' study_name='mini_music' %}"
+             class="btn btn-fill btn-success">Mini-MUSIC</a>
+          <a href="{% url 'sample_types_pivot' study_name='music' %}"
+             class="btn btn-fill btn-success">MUSIC</a>
+          <a href="{% url 'sample_types_pivot' study_name='gidamps' %}"
+             class="btn btn-fill btn-success">GI-DAMPs</a>
+          <a href="{% url 'sample_types_pivot' study_name='marvel' %}"
+             class="btn btn-fill btn-success">Marvel</a>
         </div>
+      </div>
     </div>
-    <div class="row">
-        <div class="col-xl-8">
-            <div class="card card-chart">
-                <div class="card-header">
-                    <h5 class="card-category">Monthly Created Samples (Last 12 Months)</h5>
-                </div>
-                <div class="chart-area">
-                    <canvas id="monthlysamples"></canvas>
-                </div>
-            </div>
+  </div>
+  <div class="row">
+    <div class="col-xl-4">
+      <div class="card card-chart">
+        <div class="card-header">
+          <h5 class="card-category">Total Samples by Study</h5>
         </div>
-        <div class="col-xl-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-category">Active Samples by Location</h5>
-                </div>
-                <div class="card-body sample-location">
-                    <div class="table-responsive">
-                        <table class="table tablesorter">
-                            <thead>
-                                <th>Sample Location</th>
-                                <th>Number of Samples</th>
-                            </thead>
-                            <tbody>
-                                {% for s in samples_by_location %}
-                                    <tr>
-                                        <td>
-                                            <a href="{% url 'sample_search' %}?q={{ s.sample_location }}">{{ s.sample_location }}</a>
-                                        </td>
-                                        <td>{{ s.sample_location_count }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+        <div class="chart-area p-4">
+          <canvas id="samples_by_study_chart_area"></canvas>
         </div>
+      </div>
     </div>
-    <h3>GI-DAMPs</h3>
-    <div class="row">
-        <div class="col-xl-4">
-            <div class="card card-chart">
-                <div class="card-header">
-                    <h5 class="card-category">Participants by Center</h5>
-                </div>
-                <div class="chart-area p-4">
-                    <canvas id="gidamps_participants_by_center_chart_area"></canvas>
-                </div>
-            </div>
+    <div class="col-xl-8">
+      <div class="card card-chart">
+        <div class="card-header">
+          <h5 class="card-category">Active Samples by Type</h5>
         </div>
-        <div class="col-xl-4">
-            <div class="card card-chart">
-                <div class="card-header">
-                    <h5 class="card-category">Participants by Study Group</h5>
-                </div>
-                <div class="chart-area p-4">
-                    <canvas id="gidamps_participants_by_study_group_chart_area"></canvas>
-                </div>
-            </div>
+        <div class="chart-area p-2">
+          <canvas id="samplestype"></canvas>
         </div>
-        <div class="col-xl-4">
-            <div class="card card-chart">
-                <div class="card-header">
-                    <h5 class="card-category">Participants by Recruitment Setting</h5>
-                </div>
-                <div class="chart-area p-4">
-                    <canvas id="gidamps_participants_by_recruitment_setting_chart_area"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-4">
-            <div class="card card-chart">
-                <div class="card-header">
-                    <h5 class="card-category">Participants by New Diagnosis of IBD</h5>
-                </div>
-                <div class="chart-area p-4">
-                    <canvas id="gidamps_participants_by_new_diagnosis_of_ibd_chart_area"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-category">Montreal Classification for IBD Participants</h5>
-                </div>
-                <div class="card-body sample-location">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <th></th>
-                                <th colspan="2">Crohn's disease</th>
-                                <th></th>
-                                <th colspan="2">Ulcerative colitis</th>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Total CD</td>
-                                    <td colspan="2">{{ gidamps_montreal_classification.total_cd }}</td>
-                                    <td>Total UC</td>
-                                    <td colspan="2">{{ gidamps_montreal_classification.total_uc }}</td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td>n</td>
-                                    <td>Percentage</td>
-                                    <td></td>
-                                    <td>n</td>
-                                    <td>Percentage</td>
-                                </tr>
-                                <tr>
-                                    <td>L1</td>
-                                    <td>{{ gidamps_montreal_classification.location.L1 }}</td>
-                                    <td>{{ gidamps_montreal_classification.location_percentages.L1 }}%</td>
-                                    <td>E1</td>
-                                    <td>{{ gidamps_montreal_classification.extent.E1 }}</td>
-                                    <td>{{ gidamps_montreal_classification.extent_percentages.E1 }}%</td>
-                                </tr>
-                                <tr>
-                                    <td>L2</td>
-                                    <td>{{ gidamps_montreal_classification.location.L2 }}</td>
-                                    <td>{{ gidamps_montreal_classification.location_percentages.L2 }}%</td>
-                                    <td>E2</td>
-                                    <td>{{ gidamps_montreal_classification.extent.E2 }}</td>
-                                    <td>{{ gidamps_montreal_classification.extent_percentages.E2 }}%</td>
-                                </tr>
-                                <tr>
-                                    <td>L3</td>
-                                    <td>{{ gidamps_montreal_classification.location.L3 }}</td>
-                                    <td>{{ gidamps_montreal_classification.location_percentages.L3 }}%</td>
-                                    <td>E3</td>
-                                    <td>{{ gidamps_montreal_classification.extent.E3 }}</td>
-                                    <td>{{ gidamps_montreal_classification.extent_percentages.E3 }}%</td>
-                                </tr>
-                                <tr>
-                                    <td>+/- L4</td>
-                                    <td>{{ gidamps_montreal_classification.upper_gi.yes }}</td>
-                                    <td>{{ gidamps_montreal_classification.upper_gi_percentages.yes }}%</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>B1</td>
-                                    <td>{{ gidamps_montreal_classification.behaviour.B1 }}</td>
-                                    <td>{{ gidamps_montreal_classification.behaviour_percentages.B1 }}%</td>
-                                    <td>S0</td>
-                                    <td>{{ gidamps_montreal_classification.severity.S0 }}</td>
-                                    <td>{{ gidamps_montreal_classification.severity_percentages.S0 }}%</td>
-                                </tr>
-                                <tr>
-                                    <td>B2</td>
-                                    <td>{{ gidamps_montreal_classification.behaviour.B2 }}</td>
-                                    <td>{{ gidamps_montreal_classification.behaviour_percentages.B2 }}%</td>
-                                    <td>S1</td>
-                                    <td>{{ gidamps_montreal_classification.severity.S1 }}</td>
-                                    <td>{{ gidamps_montreal_classification.severity_percentages.S1 }}%</td>
-                                </tr>
-                                <tr>
-                                    <td>B3</td>
-                                    <td>{{ gidamps_montreal_classification.behaviour.B3 }}</td>
-                                    <td>{{ gidamps_montreal_classification.behaviour_percentages.B3 }}%</td>
-                                    <td>S2</td>
-                                    <td>{{ gidamps_montreal_classification.severity.S2 }}</td>
-                                    <td>{{ gidamps_montreal_classification.severity_percentages.S2 }}%</td>
-                                </tr>
-                                <tr>
-                                    <td>+p</td>
-                                    <td>{{ gidamps_montreal_classification.perianal.yes }}</td>
-                                    <td>{{ gidamps_montreal_classification.perianal_percentages.yes }}%</td>
-                                    <td>S3</td>
-                                    <td>{{ gidamps_montreal_classification.severity.S3 }}</td>
-                                    <td>{{ gidamps_montreal_classification.severity_percentages.S3 }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
+  <div class="row">
+    <div class="col-xl-8">
+      <div class="card card-chart">
+        <div class="card-header">
+          <h5 class="card-category">Monthly Created Samples (Last 12 Months)</h5>
+        </div>
+        <div class="chart-area">
+          <canvas id="monthlysamples"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-category">Active Samples by Location</h5>
+        </div>
+        <div class="card-body sample-location">
+          <div class="table-responsive">
+            <table class="table tablesorter">
+              <thead>
+                <th>Sample Location</th>
+                <th>Number of Samples</th>
+              </thead>
+              <tbody>
+                {% for s in samples_by_location %}
+                  <tr>
+                    <td>
+                      <a href="{% url 'sample_search' %}?q={{ s.sample_location }}">{{ s.sample_location }}</a>
+                    </td>
+                    <td>{{ s.sample_location_count }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <h3>GI-DAMPs</h3>
+  <div class="row">
+    <div class="col-xl-4">
+      <div class="card card-chart">
+        <div class="card-header">
+          <h5 class="card-category">Participants by Center</h5>
+        </div>
+        <div class="chart-area p-4">
+          <canvas id="gidamps_participants_by_center_chart_area"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4">
+      <div class="card card-chart">
+        <div class="card-header">
+          <h5 class="card-category">Participants by Study Group</h5>
+        </div>
+        <div class="chart-area p-4">
+          <canvas id="gidamps_participants_by_study_group_chart_area"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4">
+      <div class="card card-chart">
+        <div class="card-header">
+          <h5 class="card-category">Participants by Recruitment Setting</h5>
+        </div>
+        <div class="chart-area p-4">
+          <canvas id="gidamps_participants_by_recruitment_setting_chart_area"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4">
+      <div class="card card-chart">
+        <div class="card-header">
+          <h5 class="card-category">Participants by New Diagnosis of IBD</h5>
+        </div>
+        <div class="chart-area p-4">
+          <canvas id="gidamps_participants_by_new_diagnosis_of_ibd_chart_area"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-category">Montreal Classification for IBD Participants</h5>
+        </div>
+        <div class="card-body sample-location">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <th></th>
+                <th colspan="2">Crohn's disease</th>
+                <th></th>
+                <th colspan="2">Ulcerative colitis</th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Total CD</td>
+                  <td colspan="2">{{ gidamps_montreal_classification.total_cd }}</td>
+                  <td>Total UC</td>
+                  <td colspan="2">{{ gidamps_montreal_classification.total_uc }}</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>n</td>
+                  <td>Percentage</td>
+                  <td></td>
+                  <td>n</td>
+                  <td>Percentage</td>
+                </tr>
+                <tr>
+                  <td>L1</td>
+                  <td>{{ gidamps_montreal_classification.location.L1 }}</td>
+                  <td>{{ gidamps_montreal_classification.location_percentages.L1 }}%</td>
+                  <td>E1</td>
+                  <td>{{ gidamps_montreal_classification.extent.E1 }}</td>
+                  <td>{{ gidamps_montreal_classification.extent_percentages.E1 }}%</td>
+                </tr>
+                <tr>
+                  <td>L2</td>
+                  <td>{{ gidamps_montreal_classification.location.L2 }}</td>
+                  <td>{{ gidamps_montreal_classification.location_percentages.L2 }}%</td>
+                  <td>E2</td>
+                  <td>{{ gidamps_montreal_classification.extent.E2 }}</td>
+                  <td>{{ gidamps_montreal_classification.extent_percentages.E2 }}%</td>
+                </tr>
+                <tr>
+                  <td>L3</td>
+                  <td>{{ gidamps_montreal_classification.location.L3 }}</td>
+                  <td>{{ gidamps_montreal_classification.location_percentages.L3 }}%</td>
+                  <td>E3</td>
+                  <td>{{ gidamps_montreal_classification.extent.E3 }}</td>
+                  <td>{{ gidamps_montreal_classification.extent_percentages.E3 }}%</td>
+                </tr>
+                <tr>
+                  <td>+/- L4</td>
+                  <td>{{ gidamps_montreal_classification.upper_gi.yes }}</td>
+                  <td>{{ gidamps_montreal_classification.upper_gi_percentages.yes }}%</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>B1</td>
+                  <td>{{ gidamps_montreal_classification.behaviour.B1 }}</td>
+                  <td>{{ gidamps_montreal_classification.behaviour_percentages.B1 }}%</td>
+                  <td>S0</td>
+                  <td>{{ gidamps_montreal_classification.severity.S0 }}</td>
+                  <td>{{ gidamps_montreal_classification.severity_percentages.S0 }}%</td>
+                </tr>
+                <tr>
+                  <td>B2</td>
+                  <td>{{ gidamps_montreal_classification.behaviour.B2 }}</td>
+                  <td>{{ gidamps_montreal_classification.behaviour_percentages.B2 }}%</td>
+                  <td>S1</td>
+                  <td>{{ gidamps_montreal_classification.severity.S1 }}</td>
+                  <td>{{ gidamps_montreal_classification.severity_percentages.S1 }}%</td>
+                </tr>
+                <tr>
+                  <td>B3</td>
+                  <td>{{ gidamps_montreal_classification.behaviour.B3 }}</td>
+                  <td>{{ gidamps_montreal_classification.behaviour_percentages.B3 }}%</td>
+                  <td>S2</td>
+                  <td>{{ gidamps_montreal_classification.severity.S2 }}</td>
+                  <td>{{ gidamps_montreal_classification.severity_percentages.S2 }}%</td>
+                </tr>
+                <tr>
+                  <td>+p</td>
+                  <td>{{ gidamps_montreal_classification.perianal.yes }}</td>
+                  <td>{{ gidamps_montreal_classification.perianal_percentages.yes }}%</td>
+                  <td>S3</td>
+                  <td>{{ gidamps_montreal_classification.severity.S3 }}</td>
+                  <td>{{ gidamps_montreal_classification.severity_percentages.S3 }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock content %}
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-    {% load static %}
+  {% load static %}
 
-    <script src="{% static 'assets/js/plugins/chartjs.min.js' %}"></script>
-    <script src="https://d3js.org/d3-color.v1.min.js"></script>
-    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-    {{ samples_by_type|json_script:"samples_by_type" }}
-    {{ samples_by_month|json_script:"samples_by_month" }}
-    {{ samples_by_study|json_script:"samples_by_study" }}
-    <script src="{% static 'assets/js/analytics.js' %}"></script>
-    {{ gidamps_participants_by_center|json_script:"gidamps_participants_by_center" }}
-    {{ gidamps_participants_by_study_group|json_script:"gidamps_participants_by_study_group" }}
-    {{ gidamps_participants_by_recruitment_setting|json_script:"gidamps_participants_by_recruitment_setting" }}
-    {{ gidamps_participants_by_new_diagnosis_of_ibd|json_script:"gidamps_participants_by_new_diagnosis_of_ibd" }}
-    <script src="{% static 'assets/js/gidamps_analytics.js' %}"></script>
+  <script src="{% static 'assets/js/plugins/chartjs.min.js' %}"></script>
+  <script src="https://d3js.org/d3-color.v1.min.js"></script>
+  <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  {{ samples_by_type|json_script:"samples_by_type" }}
+  {{ samples_by_month|json_script:"samples_by_month" }}
+  {{ samples_by_study|json_script:"samples_by_study" }}
+  <script src="{% static 'assets/js/analytics.js' %}"></script>
+  {{ gidamps_participants_by_center|json_script:"gidamps_participants_by_center" }}
+  {{ gidamps_participants_by_study_group|json_script:"gidamps_participants_by_study_group" }}
+  {{ gidamps_participants_by_recruitment_setting|json_script:"gidamps_participants_by_recruitment_setting" }}
+  {{ gidamps_participants_by_new_diagnosis_of_ibd|json_script:"gidamps_participants_by_new_diagnosis_of_ibd" }}
+  <script src="{% static 'assets/js/gidamps_analytics.js' %}"></script>
 {% endblock javascripts %}

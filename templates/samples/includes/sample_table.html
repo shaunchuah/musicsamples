@@ -1,0 +1,88 @@
+<div class="card-body">
+  <div class="d-flex flex-row-reverse pb-3">Total Count: {{ sample_count }}</div>
+  <div class="table-responsive">
+    <table class="table tablesorter" id="mainTable">
+      <thead class="text-primary">
+        <tr>
+          <th>Study Name</th>
+          <th>Sample ID</th>
+          <th>Study ID</th>
+          <th>Sample Location</th>
+          <th>Sample Sublocation</th>
+          <th>Sample Type</th>
+          <th>Sample Datetime</th>
+          <th>Timepoint</th>
+          <th>Group</th>
+          <th>Age</th>
+          <th>Sex</th>
+          <th>Center</th>
+          <th>Comments</th>
+          <th>View</th>
+          <th>Checkout</th>
+          <th>Edit</th>
+          <th class="text-center">Used</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if sample_list %}
+          {% for sample in sample_list %}
+            <tr>
+              <td>{{ sample.get_study_name_display }}</td>
+              <td>{{ sample.sample_id }}</td>
+              <td>{{ sample.study_id }}</td>
+              <td>{{ sample.sample_location }}</td>
+              <td>
+                {% if sample.sample_sublocation is None %}
+                {% else %}
+                  {{ sample.sample_sublocation }}
+                {% endif %}
+              </td>
+              <td>{{ sample.get_sample_type_display }}</td>
+              <td>{{ sample.sample_datetime|date:'d M Y H:i' }}</td>
+              <td>
+                {% if sample.music_timepoint %}
+                  {{ sample.get_music_timepoint_display }}
+                {% elif sample.marvel_timepoint %}
+                  {{ sample.get_marvel_timepoint_display }}
+                {% else %}
+                {% endif %}
+              </td>
+              <td>
+                {% if sample.study_id.study_group %}{{ sample.study_id.get_study_group_display }}{% endif %}
+              </td>
+              <td>
+                {% if sample.study_id.age %}{{ sample.study_id.age }}{% endif %}
+              </td>
+              <td>
+                {% if sample.study_id.sex %}{{ sample.study_id.get_sex_display }}{% endif %}
+              </td>
+              <td>
+                {% if sample.study_id.study_center %}{{ sample.study_id.get_study_center_display }}{% endif %}
+              </td>
+              <td>{{ sample.sample_comments }}</td>
+              <td>
+                <a href="{% url 'sample_detail' pk=sample.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
+              </td>
+              <td>
+                <a href="{% url 'sample_checkout' pk=sample.pk %}?next={{ request.get_full_path }}">
+                  <i class="tim-icons icon-cloud-upload-94"></i> Checkout
+                </a>
+              </td>
+              <td>
+                <a href="{% url 'sample_edit' pk=sample.pk %}?next={{ request.get_full_path }}"><i class="tim-icons icon-pencil"></i> Edit</a>
+              </td>
+              <td class="text-center">
+                <a href="{% url 'sample_used' pk=sample.pk %}"><i class="tim-icons icon-send align-center"></i> Used</a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="15" align="center">No active samples found.</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+    {% include "layouts/pagination.html" %}
+  </div>
+</div>

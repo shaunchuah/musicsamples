@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -57,11 +58,13 @@ THIRD_PARTY_APPS = [
     "django_pandas",
     "rest_framework",
     "rest_framework.authtoken",
+    "rest_framework_simplejwt",
     "storages",
     "django_filters",
     "oauth2_provider",
     "corsheaders",
     "guardian",
+    "django_extensions",
 ]
 
 LOCAL_APPS = [
@@ -164,11 +167,14 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
-    "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    "DEFAULT_RENDERER_CLASSES": [
+        # "rest_framework.renderers.BrowsableAPIRenderer",
+        "rest_framework.renderers.JSONRenderer",
+    ],
 }
 
 
@@ -188,10 +194,27 @@ OAUTH2_PROVIDER = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://0.0.0.0:4180",
-    "http://localhost:4180",
-    "http://127.0.0.1:4180",
+    "http://localhost:3000",
+    "https://app.musicstudy.uk",
+    "https://musicstudy.uk",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
 ]
+CORS_ALLOW_CREDENTIALS = True
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100MB
+
+# App Configuration
+SAMPLE_PAGINATION_SIZE = 100
+DATASTORE_PAGINATION_SIZE = 100
+STUDY_ID_PAGINATION_SIZE = 100
+
+# JWT settings
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "SIGNING_KEY": SECRET_KEY,
+    "ALGORITHM": "HS512",
+}

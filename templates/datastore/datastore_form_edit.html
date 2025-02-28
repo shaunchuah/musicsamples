@@ -1,0 +1,170 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+
+{% block title %}
+  Upload File
+{% endblock title %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+  {% if form.errors %}
+    {% for field in form %}
+      {% for error in field.errors %}
+        <div class="row">
+          <div class="col-xl-9">
+            <div class="alert alert-danger">
+              <button type="button"
+                      aria-hidden="true"
+                      class="close"
+                      data-dismiss="alert"
+                      aria-label="Close">
+                <i class="tim-icons icon-simple-remove"></i>
+              </button>
+              <span>{{ field.label }}: {{ error|escape }}</span>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
+  <div class="row">
+    <div class="col-md-7">
+      <h2>
+        <i class="tim-icons icon-pencil"></i> Edit File
+      </h2>
+      <div class="card">
+        <div class="card-body">
+          <form autocomplete="off" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% load widget_tweaks %}
+
+            {% for hidden_field in form.hidden_fields %}{{ hidden_field }}{% endfor %}
+            <div class="row">
+              {% for field in form.visible_fields %}
+                <div class="form-group col-md-12">
+                  {{ field.label_tag }}
+                  {% render_field field class="form-control" %}
+                  {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
+                </div>
+              {% endfor %}
+            </div>
+            {{ form.media.js }}
+            <div class="card-footer">
+              <button type="submit" value="submit" class="btn btn-fill btn-success">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="card-header card-title">File Details</h3>
+        <div class="card-body">
+          <p>
+            Some of these details cannot be changed once a file is uploaded to maintain data integrity. If you wish to change the details you will need to delete and reupload the file.
+          </p>
+          <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <th>Fixed Fields</th>
+                  <th></th>
+                </tr>
+                <tr>
+                  <td>File Name</td>
+                  <td>{{ file.formatted_file_name }}</td>
+                </tr>
+                <tr>
+                  <td>Category</td>
+                  <td>{{ file.category }}</td>
+                </tr>
+                <tr>
+                  <td>Study Name</td>
+                  <td>{{ file.get_study_name_display }}</td>
+                </tr>
+                <tr>
+                  <td>Study ID</td>
+                  <td>{{ file.study_id }}</td>
+                </tr>
+                <tr>
+                  <th>Editable Fields</th>
+                  <th></th>
+                </tr>
+                {% if file.study_name == "mini_music" or file.study_name == "music" %}
+                  <tr>
+                    <td>Timepoint</td>
+                    <td>
+                      {% if file.music_timepoint %}
+                        {{ file.get_music_timepoint_display }}
+                      {% elif file.marvel_timepoint %}
+                        {{ file.get_marvel_timepoint_display }}
+                      {% else %}
+                        None
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endif %}
+                <tr>
+                  <td>Sampling Date</td>
+                  <td>{{ file.sampling_date|date:"j M Y" }}</td>
+                </tr>
+                <tr>
+                  <td>Comments</td>
+                  <td>{{ file.sample_comments }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="card-title card-header">Metadata</h3>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td>File Size</td>
+                  <td>{{ file.size|filesizeformat }}</td>
+                </tr>
+                <tr>
+                  <td>File Type</td>
+                  <td>{{ file.file_type }}</td>
+                </tr>
+                <tr>
+                  <td>File URL</td>
+                  <td>{{ file.url }}</td>
+                </tr>
+                <tr>
+                  <td>Blob Name</td>
+                  <td>{{ file.file.name }}</td>
+                </tr>
+                <tr>
+                  <td>Original File Name</td>
+                  <td>{{ file.original_file_name }}</td>
+                </tr>
+                <tr>
+                  <td>Formatted File Name</td>
+                  <td>{{ file.formatted_file_name }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3"></div>
+  </div>
+{% endblock content %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+  <script>
+    $('#id_file').on('change', function() {
+      //get the file name
+      var fileName = $(this).val();
+      //replace the "Choose a file" label
+      $(this).next('.custom-file-label').html(fileName);
+    })
+  </script>
+  <script src="{% static 'assets/js/sample_add_autocomplete.js' %}"></script>
+{% endblock javascripts %}

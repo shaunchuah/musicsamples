@@ -1,0 +1,170 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+
+{% block title %}
+  Dashboard
+{% endblock title %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Search Study ID</h3>
+        </div>
+        <div class="card-body">
+          <form id="searchform" action="{% url 'study_id_search' %}" method="get">
+            <div class="form-group">
+              <input type="text" autofocus name="q" class="form-control" />
+            </div>
+            <div>
+              <button type="submit" class="btn btn-fill btn-success">Search</button>
+              <a href="{% url 'study_id_list' %}" class="btn btn-fill btn-secondary">Clear</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Study ID</h3>
+        </div>
+        <div class="card-body">
+          <div class="d-flex flex-row-reverse pb-3">Total Count: {{ study_id_list_count }}</div>
+          <div class="table-responsive">
+            <table class="table tablesorter" id="mainTable">
+              <thead class="text-primary">
+                <tr>
+                  <th>Study ID</th>
+                  <th>Study Name</th>
+                  <th>Group</th>
+                  <th>Age</th>
+                  <th>Sex</th>
+                  <th>Center</th>
+                  <th>Samples</th>
+                  <th>Files</th>
+                  <th>View</th>
+                  <th>Edit</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if study_id_list %}
+                  {% for study_id in study_id_list %}
+                    <tr>
+                      <td>{{ study_id.name }}</td>
+                      <td>{{ study_id.get_study_name_display }}</td>
+                      <td>{{ study_id.get_study_group_display }}</td>
+                      <td>{{ study_id.age }}</td>
+                      <td>{{ study_id.get_sex_display }}</td>
+                      <td>{{ study_id.get_study_center_display }}</td>
+                      <td>
+                        {% if study_id.samples.all %}
+                          <div class="dropdown">
+                            <button class="btn btn-xs btn-secondary dropdown-toggle"
+                                    type="button"
+                                    id="samplesDropdown{{ study_id.id }}"
+                                    data-toggle="dropdown"
+                                    aria-haspopup="true"
+                                    aria-expanded="false">{{ study_id.samples.all|length }} Sample(s)</button>
+                            <div class="dropdown-menu"
+                                 aria-labelledby="samplesDropdown{{ study_id.id }}">
+                              {% for sample in study_id.samples.all %}
+                                <a class="dropdown-item" href="{% url 'sample_detail' pk=sample.id %}">{{ sample.sample_id }}</a>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        {% else %}
+                          <span>No samples</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if study_id.files.all %}
+                          <div class="dropdown">
+                            <button class="btn btn-xs btn-secondary dropdown-toggle"
+                                    type="button"
+                                    id="filesDropdown{{ study_id.id }}"
+                                    data-toggle="dropdown"
+                                    aria-haspopup="true"
+                                    aria-expanded="false">{{ study_id.files.all|length }} File(s)</button>
+                            <div class="dropdown-menu"
+                                 aria-labelledby="filesDropdown{{ study_id.id }}">
+                              {% for file in study_id.files.all %}
+                                <a class="dropdown-item" href="{% url 'datastore_detail' id=file.id %}">{{ file }}</a>
+                              {% endfor %}
+                            </div>
+                          </div>
+                        {% else %}
+                          <span>No files</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        <a href="{% url 'study_id_detail' name=study_id.name %}"><i class="tim-icons icon-zoom-split"></i> View</a>
+                      </td>
+                      <td>
+                        <a href="{% url 'study_id_edit' name=study_id.name %}"><i class="tim-icons icon-cloud-download-93"></i> Edit</a>
+                      </td>
+                      <td>
+                        <a href="#"
+                           data-toggle="modal"
+                           data-target="#deleteConfirmModal"
+                           data-href="{% url 'study_id_delete' id=study_id.id %}"><i class="tim-icons icon-simple-remove"></i> Delete</a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="10" align="center">No active files found.</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+            {% include "layouts/pagination.html" %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% include 'study_id/includes/study_id_delete_modal.html' %}
+{% endblock content %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+  <script>
+    $(document).ready(function() {
+
+      $("#mainTable").tablesorter({
+        sortReset: true,
+        dateFormat: "ddmmyyyy",
+        headers: {
+
+          6: {
+            sorter: false
+          },
+          7: {
+            sorter: false
+          },
+          8: {
+            sorter: false
+          },
+          9: {
+            sorter: false
+          },
+          10: {
+            sorter: false
+          },
+
+        },
+      });
+    });
+    $("#deleteConfirmModal").on("show.bs.modal", function(e) {
+      var url = $(e.relatedTarget).data("href");
+      $("#confirmDeleteBtn").attr("href", url);
+    });
+  </script>
+{% endblock javascripts %}

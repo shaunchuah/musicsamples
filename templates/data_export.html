@@ -1,101 +1,74 @@
 {% extends "layouts/base.html" %}
+
 {% block title %}
-    Page User
+  Page User
 {% endblock title %}
 {% block stylesheets %}
 {% endblock stylesheets %}
 {% block content %}
-    <div class="row">
-        <div class="col-lg-8">
-            <h2>
-                <i class="tim-icons icon-upload"></i> Data Export
-            </h2>
-            <div class="notes card">
-                <div class="card-header">
-                    <h2 class="card-title">API Token</h2>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col">
-                            <p>
-                                This will allow you to programmatically access G-trac data from the api endpoints listed here. This API
-                                token does not expire so please delete it if you no longer require access.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-4">API Token:</div>
-                        {% if request.user.auth_token %}
-                            <div class="col-8">{{ request.user.auth_token }}</div>
-                        {% else %}
-                            <div class="col-8">No token. Create one using the button below.</div>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <!--<button type="submit" class="btn btn-fill btn-primary">Save</button>-->
-                    {% if request.user.auth_token %}
-                        <a href="{% url 'refresh_token' %}?next={{ request.path }}" class="btn btn-fill">Renew Token</a>
-                        <a href="{% url 'delete_token' %}?next={{ request.path }}" class="btn btn-fill btn-danger">Delete Token</a>
-                    {% else %}
-                        <a href="{% url 'generate_token' %}?next={{ request.path }}" class="btn btn-fill">Generate Token</a>
-                    {% endif %}
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-lg-8">
+      <h2>
+        <i class="tim-icons icon-upload"></i> Data Export
+      </h2>
+      <div class="notes card">
+        <div class="card-header">
+          <h2 class="card-title">API Token</h2>
         </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col">
+              <p>
+                This will allow you to programmatically access G-trac data from the api endpoints listed here. This API
+                token does not expire so please delete it if you no longer require access.
+              </p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-4">API Token:</div>
+            {% if request.user.auth_token %}
+              <div class="col-8">{{ request.user.auth_token }}</div>
+            {% else %}
+              <div class="col-8">No token. Create one using the button below.</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="card-footer">
+          <!--<button type="submit" class="btn btn-fill btn-primary">Save</button>-->
+          {% if request.user.auth_token %}
+            <a href="{% url 'refresh_token' %}?next={{ request.path }}"
+               class="btn btn-fill">Renew Token</a>
+            <a href="{% url 'delete_token' %}?next={{ request.path }}"
+               class="btn btn-fill btn-danger">Delete Token</a>
+          {% else %}
+            <a href="{% url 'generate_token' %}?next={{ request.path }}"
+               class="btn btn-fill">Generate Token</a>
+          {% endif %}
+        </div>
+      </div>
     </div>
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="notes card">
-                <div class="card-header">
-                    <h2 class="card-title">API Endpoints</h2>
-                </div>
-                <div class="card-body">
-                    <p>These endpoints allow for programmatic access to the data held on G-Trac.</p>
-                    <h3>All Samples</h3>
-                    <p>
-                        <a href="{% url 'all-list' %}" target="_blank">
-                            <pre>https://samples.musicstudy.uk/api/all/</pre></a>
-                        <strong>Warning: This API will be slow as it exports every single sample in G-Trac.</strong>
-                        Suggest download the data once to a json file rather than accessing the API repeatedly.
-                    </p>
-                    <h3>Single Sample Lookup</h3>
-                    <p>
-                        You can query particular samples by their sample ID using the following format:
-                        <pre>https://samples.musicstudy.uk/api/all/{sample_id}/</pre>
-                    </p>
-                    <p>
-                        For example (click to try):
-                        <a href="{% url 'all-list' %}MUS10083/" target="_blank">
-                            <pre>https://samples.musicstudy.uk/api/all/MUS10083/</pre>
-                        </a>
-                    </p>
-                    <h3>Filtering Samples by Starting Characters of Patient ID</h3>
-                    <p>
-                        You can query for particular samples by what their patient ID starts with (this is case insensitive) using the
-                        following format:
-                        <pre>https://samples.musicstudy.uk/api/all/?patient_id_starts_with={query}</pre>
-                    </p>
-                    <p>
-                        For example (click to try):
-                        <a href="{% url 'all-list' %}?patient_id_starts_with=MID-90"
-                           target="_blank">
-                            <pre>https://samples.musicstudy.uk/api/all/?patient_id_starts_with=MID-90</pre>
-                        </a>
-                    </p>
-                    <h3>API Security and Authentication</h3>
-                    <p>
-                        Authorization is by token authentication.
-                        To authenticate with the endpoint, include the http header:
-                        <pre>Authorization: Token {{ request.user.auth_token }}</pre>
-                    </p>
-                    <p>
-                        Full guide to API authorization <a href="https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication"
+  </div>
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="notes card">
+        <div class="card-header">
+          <h2 class="card-title">API Endpoints</h2>
+        </div>
+        <div class="card-body">
+          <p>Sample API endpoints are undergoing upgrades. If you need access to them speak to Shaun.</p>
+          <h3>API Security and Authentication</h3>
+          <p>
+            Authorization is by token authentication.
+            To authenticate with the endpoint, include the http header:
+            <pre>Authorization: Token {{ request.user.auth_token }}</pre>
+          </p>
+          <p>
+            Full guide to API authorization <a href="https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication"
     target="_blank"
     rel="noopener">here</a>.
-                    </p>
-                    <h3>Python Example</h3>
-                    <pre>
+          </p>
+          <h3>Python Example</h3>
+          <pre>
 import requests
 
 GTRAC_API_TOKEN = {{ request.user.auth_token }}
@@ -106,8 +79,8 @@ authorization_header = {'Authorization': f'Token {GTRAC_API_TOKEN}'}
 response = requests.get(https://samples.musicstudy.uk/api/gidamps/, headers = authorization_header, timeout=20)
 data = response.json()
       </pre>
-                    <h3>R Example</h3>
-                    <pre>
+          <h3>R Example</h3>
+          <pre>
 library(httr)
 library(jsonlite)
 
@@ -116,10 +89,10 @@ response &lt;- GET("https://samples.musicstudy.uk/api/gidamps/", add_headers(Aut
 json_result &lt;- httr::content(response, as="text")
 result &lt;- jsonlite::fromJSON(json_result)
     </pre>
-                </div>
-            </div>
         </div>
+      </div>
     </div>
+  </div>
 {% endblock content %}
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}

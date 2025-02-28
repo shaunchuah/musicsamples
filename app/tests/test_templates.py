@@ -20,12 +20,12 @@ class TestTemplates(TestCase):
     def test_index_page(self):
         url = reverse("home")
         response = self.client.get(url)
-        assertTemplateUsed(response, "dashboard.html")
+        assertTemplateUsed(response, "samples/sample_list.html")
 
     def test_sample_search(self):
         path = reverse("sample_search")
         response = self.client.get(path)
-        assertTemplateUsed(response, "dashboard.html")
+        assertTemplateUsed(response, "samples/sample_list.html")
 
     def test_account_page(self):
         path = reverse("account")
@@ -40,17 +40,17 @@ class TestTemplates(TestCase):
     def test_barcode_main(self):
         path = reverse("barcode")
         response = self.client.get(path)
-        assertTemplateUsed(response, "barcode.html")
+        assertTemplateUsed(response, "barcode/update_location.html")
 
     def test_barcode_samples_used(self):
         path = reverse("barcode_samples_used")
         response = self.client.get(path)
-        assertTemplateUsed(response, "barcode-markused.html")
+        assertTemplateUsed(response, "barcode/mark_used.html")
 
     def test_barcode_add_multiple(self):
         path = reverse("barcode_add_multiple")
         response = self.client.get(path)
-        assertTemplateUsed(response, "barcode-addmultiple.html")
+        assertTemplateUsed(response, "barcode/add_multiple.html")
 
     def test_reference(self):
         path = reverse("reference")

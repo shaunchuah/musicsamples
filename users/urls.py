@@ -4,6 +4,7 @@ from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 
 from users.views import (
+    PasswordChangeView,
     activate_account_view,
     deactivate_account_view,
     delete_token,
@@ -48,7 +49,7 @@ urlpatterns = [
     ),
     path(
         "password_change/",
-        auth_views.PasswordChangeView.as_view(template_name="accounts/password_change.html"),
+        PasswordChangeView.as_view(template_name="accounts/password_change.html"),
         name="password_change",
     ),
     path(

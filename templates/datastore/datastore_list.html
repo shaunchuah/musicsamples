@@ -1,0 +1,114 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+
+{% block title %}
+  Dashboard
+{% endblock title %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Search DataStore</h3>
+        </div>
+        <div class="card-body">
+          <form id="searchform" action="{% url 'datastore_search' %}" method="get">
+            <div class="form-group">
+              <input type="text" autofocus name="q" class="form-control" />
+            </div>
+            <div>
+              <button type="submit" class="btn btn-fill btn-success">Search</button>
+              <a href="{% url 'datastore_list' %}" class="btn btn-fill btn-secondary">Clear</a>
+              <a href="{% url 'datastore_filter' %}"
+                 class="btn btn-fill btn-success float-lg-right">Advanced
+              Filtering</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">DataStore by Study</h3>
+        </div>
+        <div class="card-footer">
+          <div>
+            <a href="{% url 'datastore_filter' %}?study_name=music"
+               class="btn btn-fill btn-success">MUSIC</a>
+            <a href="{% url 'datastore_filter' %}?study_name=gidamps"
+               class="btn btn-fill btn-success">GI-DAMPs</a>
+            <a href="{% url 'datastore_filter' %}?study_name=mini_music"
+               class="btn btn-fill btn-success">Mini-Music</a>
+            <a href="{% url 'datastore_filter' %}?study_name=marvel"
+               class="btn btn-fill btn-success">MARVEL</a>
+            <a href="{% url 'datastore_filter' %}?study_name=fate_cd"
+               class="btn btn-fill btn-success">FATE-CD</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Files</h3>
+        </div>
+        <div class="card-footer">
+          <!--Legacy upload
+          <a href="{% url 'datastore_create' %}" class="btn btn-fill btn-success">Upload New File</a>
+          -->
+          <a href="{% url 'datastore_create_ajax' %}"
+             class="btn btn-fill btn-success">Upload File</a>
+          <a href="{% url 'datastore_search_export_csv' %}?q={{ query_string }}"
+             class="btn btn-success float-lg-right"
+             data-toggle="tooltip"
+             data-placement="bottom"
+             data-html="true"
+             title="Tip: Customise the export by searching for the set of file metadata you wish to download."><i class="tim-icons icon-cloud-download-93"></i> Export Current View
+          to CSV</a>
+        </div>
+        {% include 'datastore/includes/datastore_file_table.html' %}
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">DataStore Access List</h3>
+        </div>
+        <div class="card-body">
+          <div class="mb-4">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                </tr>
+              </thead>
+              {% for user in user_access_list %}
+                <tr>
+                  <td>{{ user.first_name }} {{ user.last_name }}</td>
+                  <td>
+                    <a href="mailto:{{ user.email }}" target="_blank">{{ user.email }}</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% include 'datastore/includes/datastore_delete_modal.html' %}
+{% endblock content %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+  <script src="{% static 'assets/js/datastore_list.js' %}"></script>
+{% endblock javascripts %}

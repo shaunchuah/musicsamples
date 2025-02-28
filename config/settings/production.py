@@ -18,6 +18,20 @@ sentry_sdk.init(
     send_default_pii=True,
 )
 
+# STORAGES
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.azure_storage.AzureStorage",
+        "OPTIONS": {
+            "azure_container": "gtrac-store",
+            "connection_string": env("AZURE_STORAGE_CONNECTION_STRING"),
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
+
 
 # CACHES
 # ------------------------------------------------------------------------------

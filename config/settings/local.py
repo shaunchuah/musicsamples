@@ -1,6 +1,6 @@
 # ruff: noqa: E501
 from .base import *  # noqa: F403
-from .base import INSTALLED_APPS, MIDDLEWARE
+from .base import INSTALLED_APPS, MIDDLEWARE, env
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -8,6 +8,29 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "testserver", "host.docker.internal"]
 
+# AZURE STORAGE CONFIGURATION
+# ------------------------------------------------------------------------------
+AZURE_ACCOUNT_KEY = env("AZURE_ACCOUNT_KEY")
+AZURE_STORAGE_CONNECTION_STRING = env("AZURE_STORAGE_CONNECTION_STRING")
+AZURE_ACCOUNT_NAME = "gutresearch"
+AZURE_CONTAINER_NAME = "gtrac-store-dev"
+
+
+# STORAGES
+# ------------------------------------------------------------------------------
+# https://django-storages.readthedocs.io/en/latest/#installation
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.azure_storage.AzureStorage",
+        "OPTIONS": {
+            "azure_container": AZURE_CONTAINER_NAME,
+            "connection_string": AZURE_STORAGE_CONNECTION_STRING,
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
 
 # CACHES
 # ------------------------------------------------------------------------------

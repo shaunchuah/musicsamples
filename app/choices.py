@@ -64,7 +64,6 @@ class StudyNameChoices(models.TextChoices):
     MUSIC = "music", "MUSIC"
     MINI_MUSIC = "mini_music", "Mini-MUSIC"
     MARVEL = "marvel", "MARVEL"
-    MINI_MARVEL = "mini_marvel", "Mini-MARVEL"
     FATE_CD = "fate_cd", "FATE-CD"
     NONE = "none", "None"
 
@@ -81,3 +80,31 @@ class MarvelTimepointChoices(models.TextChoices):
     BASELINE = "baseline", "Baseline"
     TWELVE_WEEKS = "12_weeks", "12 weeks"
     TWENTY_FOUR_WEEKS = "24_weeks", "24 weeks"
+
+
+class FileCategoryChoices(models.TextChoices):
+    UNCATEGORISED = "uncategorised", "Uncategorised"
+    ENDOSCOPY_VIDEOS = "endoscopy_videos", "Endoscopy Videos"
+    HISTOLOGY_SLIDES = "histology_slides", "Histology Slides"
+
+
+class StudyCenterChoices(models.TextChoices):
+    EDINBURGH = "edinburgh", "Edinburgh"
+    GLASGOW = "glasgow", "Glasgow"
+    DUNDEE = "dundee", "Dundee"
+    ABERDEEN = "aberdeen", "Aberdeen"
+
+
+class StudyGroupChoices(models.TextChoices):
+    UC = "uc", "UC"
+    CD = "cd", "CD"
+    HC = "hc", "HC"
+    IBDU = "ibdu", "IBDU"
+    NON_IBD = "non_ibd", "Non-IBD"
+    AWAIT_DX = "await_dx", "Awaiting Diagnosis"
+    OTHER = "other", "Other"
+
+
+class SexChoices(models.TextChoices):
+    MALE = "male", "Male"
+    FEMALE = "female", "Female"

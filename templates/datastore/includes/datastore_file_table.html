@@ -1,0 +1,143 @@
+<div class="card-body">
+  <div class="d-flex flex-row-reverse pb-3">Total Count: {{ datastores|length }}</div>
+  <div class="table-responsive">
+    <table class="table tablesorter" id="mainTable">
+      <thead class="text-primary">
+        <tr>
+          <th>Status</th>
+          <th>Category</th>
+          <th>Study Name</th>
+          <th>Study ID</th>
+          <th>File Name</th>
+          <th>Comments</th>
+          <th>Size</th>
+          <th>Type</th>
+          <th>Upload Date</th>
+          <th>Group</th>
+          <th>Age</th>
+          <th>Sex</th>
+          <th>Center</th>
+          <th>Timepoint</th>
+          <th>Sampling Date</th>
+          <th>Download</th>
+          <th>View Metadata</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if datastores %}
+          {% for file in datastores %}
+            <tr>
+              <td>
+                {% if file.is_valid %}
+                  <svg width="24"
+                       height="24"
+                       viewBox="0 0 24 24"
+                       fill="none"
+                       stroke="currentColor"
+                       stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                {% else %}
+                  <svg width="24"
+                       height="24"
+                       viewBox="0 0 24 24"
+                       fill="none"
+                       stroke="currentColor"
+                       stroke-width="2"
+                       class="text-danger">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                {% endif %}
+              </td>
+              <td>
+                <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.get_category_display }}</span>
+              </td>
+              <td>
+                <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.get_study_name_display }}</span>
+              </td>
+              <td>
+                <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.study_id }}</span>
+              </td>
+              <td>
+                <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.formatted_file_name }}</span>
+              </td>
+              <td>
+                <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.comments }}</span>
+              </td>
+              <td>
+                <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">
+                  {% if file.is_valid %}
+                    {{ file.size|filesizeformat }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </span>
+              </td>
+              <td>
+                <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">{{ file.file_type }}</span>
+              </td>
+              <td>
+                <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">
+                  {% if file.upload_finished_at %}
+                    {{ file.upload_finished_at|date:'d M Y H:i' }}
+                  {% else %}
+                    Did not complete
+                  {% endif %}
+                </span>
+              </td>
+              <td>
+                {% if file.study_id.study_group %}{{ file.study_id.get_study_group_display }}{% endif %}
+              </td>
+              <td>
+                {% if file.study_id.age %}{{ file.study_id.age }}{% endif %}
+              </td>
+              <td>
+                {% if file.study_id.sex %}{{ file.study_id.get_sex_display }}{% endif %}
+              </td>
+              <td>
+                {% if file.study_id.study_center %}{{ file.study_id.get_study_center_display }}{% endif %}
+              </td>
+              <td>
+                <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">
+                  {% if file.music_timepoint %}
+                    {{ file.get_music_timepoint_display }}
+                  {% elif file.marvel_timepoint %}
+                    {{ file.get_marvel_timepoint_display }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </span>
+              </td>
+              <td>
+                {% if file.sampling_date %}
+                  {{ file.sampling_date|date:"j M Y" }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'datastore_download' id=file.id %}"><i class="tim-icons icon-cloud-download-93"></i> Download</a>
+                <a href="{% url 'datastore_azure_view' id=file.id %}" target="_blank"><i class="tim-icons icon-zoom-split"></i> View</a>
+              </td>
+              <td>
+                <a href="{% url 'datastore_detail' id=file.id %}"><i class="tim-icons icon-zoom-split"></i> Metadata</a>
+              </td>
+              <td class="text-center">
+                <a href="#"
+                   data-toggle="modal"
+                   data-target="#deleteConfirmModal"
+                   data-href="{% url 'datastore_delete' id=file.id %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="17" align="center">No active files found.</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+    {% include "layouts/pagination.html" %}
+  </div>
+</div>
