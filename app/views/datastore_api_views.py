@@ -11,9 +11,10 @@ class FileDirectUploadStartApi(APIView):
     class InputSerializer(serializers.Serializer):
         category = serializers.CharField()
         study_name = serializers.CharField()
+        study_id = serializers.CharField(required=False, allow_blank=True)
         music_timepoint = serializers.CharField(required=False, allow_blank=True)
         marvel_timepoint = serializers.CharField(required=False, allow_blank=True)
-        study_id = serializers.CharField(required=False, allow_blank=True)
+        sampling_date = serializers.DateField(required=False, allow_null=True)
         comments = serializers.CharField(required=False, allow_blank=True)
 
         file_name = serializers.CharField()

@@ -7,13 +7,13 @@ $(document).ready(function () {
       8: {
         sorter: "shortDate",
       },
-      14: {
-        sorter: false,
-      },
       15: {
         sorter: false,
       },
       16: {
+        sorter: false,
+      },
+      17: {
         sorter: false,
       }
     },

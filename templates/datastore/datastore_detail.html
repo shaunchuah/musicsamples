@@ -33,11 +33,15 @@
         <h3 class="card-header card-title">File Details</h3>
         <div class="card-body">
           <p>
-            Some of these details cannot be changed once a file is uploaded. If you wish to change the details you will need to delete and reupload the file.
+            Some of these details cannot be changed once a file is uploaded to maintain data integrity. If you wish to change the details you will need to delete and reupload the file.
           </p>
           <div class="table-responsive">
             <table class="table">
               <tbody>
+                <tr>
+                  <th>Fixed Fields</th>
+                  <th></th>
+                </tr>
                 <tr>
                   <td>File Name</td>
                   <td>{{ file.formatted_file_name }}</td>
@@ -49,6 +53,14 @@
                 <tr>
                   <td>Study Name</td>
                   <td>{{ file.get_study_name_display }}</td>
+                </tr>
+                <tr>
+                  <td>Study ID</td>
+                  <td>{{ file.study_id }}</td>
+                </tr>
+                <tr>
+                  <th>Editable Fields</th>
+                  <th></th>
                 </tr>
                 {% if file.study_name == "mini_music" or file.study_name == "music" %}
                   <tr>
@@ -65,12 +77,8 @@
                   </tr>
                 {% endif %}
                 <tr>
-                  <td>Sample ID</td>
-                  <td>{{ file.sample_id }}</td>
-                </tr>
-                <tr>
-                  <td>Study ID</td>
-                  <td>{{ file.study_id }}</td>
+                  <td>Sampling Date</td>
+                  <td>{{ file.sampling_date|date:"j M Y" }}</td>
                 </tr>
                 <tr>
                   <td>Comments</td>
@@ -119,6 +127,13 @@
             </table>
           </div>
         </div>
+        <div class="card-footer">
+          <a href="#"
+             data-toggle="modal"
+             data-target="#deleteConfirmModal"
+             data-href="{% url 'datastore_delete' id=file.id %}"
+             class="btn btn-fill btn-danger">Delete</a>
+        </div>
       </div>
     </div>
     <div class="col-md-5">
@@ -130,7 +145,7 @@
               <tbody>
                 <tr>
                   <td>Uploaded At</td>
-                  <td>{{ file.upload_finished_at }}</td>
+                  <td>{{ file.upload_finished_at|date:"D j M Y, H:i" }}</td>
                 </tr>
                 <tr>
                   <td>Uploaded By</td>
@@ -172,7 +187,7 @@
                   </tr>
                 {% endfor %}
                 <tr>
-                  <td>{{ file.upload_finished_at }}</td>
+                  <td>{{ file.upload_finished_at|date:"D j M Y, H:i" }}</td>
                   <td>First Created</td>
                   <td>{{ file.uploaded_by }}</td>
                 </tr>
@@ -183,7 +198,14 @@
       </div>
     </div>
   </div>
+  {% include 'datastore/includes/datastore_delete_modal.html' %}
 {% endblock content %}
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
+  <script>
+    $("#deleteConfirmModal").on("show.bs.modal", function(e) {
+      var url = $(e.relatedTarget).data("href");
+      $("#confirmDeleteBtn").attr("href", url);
+    });
+  </script>
 {% endblock javascripts %}

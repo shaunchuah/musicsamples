@@ -125,7 +125,13 @@ class SampleSelectionWidget(s2forms.ModelSelect2MultipleWidget):
 
 
 class DataStoreForm(ModelForm):
-    study_id = forms.CharField(label="Associated Study ID (optional)", required=False)
+    study_id = forms.CharField(label="Study ID (optional)", required=False)
+    sampling_date = forms.DateField(
+        label="Sampling Date",
+        widget=DateInput(),
+        required=False,
+        help_text="Sampling date to allow for merging (GI-DAMPs)",
+    )
 
     class Meta:
         model = DataStore
@@ -133,9 +139,10 @@ class DataStoreForm(ModelForm):
             "file",
             "category",
             "study_name",
+            "study_id",
             "music_timepoint",
             "marvel_timepoint",
-            "study_id",
+            "sampling_date",
             "comments",
         ]
         labels = {
@@ -161,9 +168,17 @@ class DataStoreForm(ModelForm):
 
 
 class DataStoreUpdateForm(ModelForm):
+    sampling_date = forms.DateField(
+        label="Sampling Date",
+        widget=DateInput(),
+        required=False,
+        help_text="Sampling date to allow for merging (GI-DAMPs)",
+    )
+
     class Meta:
         model = DataStore
         fields = [
+            "sampling_date",
             "music_timepoint",
             "marvel_timepoint",
             "comments",

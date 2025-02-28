@@ -13,7 +13,7 @@ This document outlines the data structure for a File object that facilitates sys
 Files must be named using the following format:
 
 ```sh
-StudyName_StudyID_Timepoint_OriginalFileName_UUIDhex.ext
+StudyName_StudyID_OriginalFileName.ext
 ```
 
 ## Container Organization

@@ -79,6 +79,7 @@ class FileDirectUploadService:
         music_timepoint: str,
         marvel_timepoint: str,
         comments: str,
+        sampling_date: datetime = None,
         study_id: str = None,
     ) -> dict:
         if study_id:
@@ -93,6 +94,7 @@ class FileDirectUploadService:
             study_name=study_name,
             music_timepoint=music_timepoint,
             marvel_timepoint=marvel_timepoint,
+            sampling_date=sampling_date,
             comments=comments,
             study_id=study_identifier if study_id else None,
             file_type=file_name.split(".")[-1],

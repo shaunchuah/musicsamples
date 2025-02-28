@@ -18,6 +18,7 @@
           <th>Sex</th>
           <th>Center</th>
           <th>Timepoint</th>
+          <th>Sampling Date</th>
           <th>Download</th>
           <th>View Metadata</th>
           <th>Delete</th>
@@ -107,6 +108,13 @@
                     -
                   {% endif %}
                 </span>
+              </td>
+              <td>
+                {% if file.sampling_date %}
+                  {{ file.sampling_date|date:"j M Y" }}
+                {% else %}
+                  -
+                {% endif %}
               </td>
               <td>
                 <a href="{% url 'datastore_download' id=file.id %}"><i class="tim-icons icon-cloud-download-93"></i> Download</a>

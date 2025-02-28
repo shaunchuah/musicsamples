@@ -43,19 +43,11 @@
             {% for hidden_field in form.hidden_fields %}{{ hidden_field }}{% endfor %}
             <div class="row">
               {% for field in form.visible_fields %}
-                {% if field.name == 'file' or field.name == 'comments' %}
-                  <div class="form-group col-md-12">
-                    {{ field.label_tag }}
-                    {% render_field field class="form-control" %}
-                    {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
-                  </div>
-                {% else %}
-                  <div class="form-group col-md-4">
-                    {{ field.label_tag }}
-                    {% render_field field class="form-control" %}
-                    {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
-                  </div>
-                {% endif %}
+                <div class="form-group col-md-12 mb-4">
+                  {{ field.label_tag }}
+                  {% render_field field class="form-control mb-0" %}
+                  {% if field.help_text %}<small class="form-text text-muted mt-0">{{ field.help_text }}</small>{% endif %}
+                </div>
               {% endfor %}
             </div>
             {{ form.media.js }}

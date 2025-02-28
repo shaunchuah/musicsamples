@@ -132,6 +132,7 @@ class DataStore(models.Model):
     )
     music_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MusicTimepointChoices.choices)
     marvel_timepoint = models.CharField(max_length=50, blank=True, null=True, choices=MarvelTimepointChoices.choices)
+    sampling_date = models.DateField(blank=True, null=True)  # for merging GI-DAMPs
     comments = models.TextField(blank=True, null=True)
 
     file = models.FileField(upload_to=file_upload_path, blank=True, null=True)

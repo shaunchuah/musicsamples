@@ -52,7 +52,7 @@
                        x-on:change="selectFile($event)" />
               </div>
               <!-- Category -->
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-12">
                 <label for="id_category">Category*:</label>
                 <select name="category"
                         class="form-control"
@@ -66,7 +66,7 @@
                 </select>
               </div>
               <!-- Study Name -->
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-12">
                 <label for="id_study_name">Study Name*:</label>
                 <select name="study_name"
                         class="form-control"
@@ -83,8 +83,20 @@
                   <option value="none">None</option>
                 </select>
               </div>
+              <!-- Study ID -->
+              <div class="form-group col-md-12">
+                <label for="id_study_id">Study ID (optional):</label>
+                <input type="text"
+                       name="study_id"
+                       maxlength="200"
+                       class="form-control"
+                       id="id_study_id"
+                       @autocomplete.camel="data.study_id = $event.detail.value"
+                       x-model="data.study_id"
+                       autocomplete="off" />
+              </div>
               <!-- Music Timepoint -->
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-12">
                 <label for="id_music_timepoint">Music Timepoint:</label>
                 <select name="music_timepoint"
                         class="form-control"
@@ -99,7 +111,7 @@
                 </select>
               </div>
               <!-- Marvel Timepoint -->
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-12">
                 <label for="id_marvel_timepoint">Marvel Timepoint:</label>
                 <select name="marvel_timepoint"
                         class="form-control"
@@ -111,17 +123,16 @@
                   <option value="24_weeks">24 weeks</option>
                 </select>
               </div>
-              <!-- Study ID -->
-              <div class="form-group col-md-4">
-                <label for="id_study_id">Associated Study ID (optional):</label>
-                <input type="text"
-                       name="study_id"
-                       maxlength="200"
-                       class="form-control"
-                       id="id_study_id"
-                       @autocomplete.camel="data.study_id = $event.detail.value"
-                       x-model="data.study_id"
-                       autocomplete="off" />
+              <!-- Sampling Date -->
+              <div class="form-group col-md-12 mb-4">
+                <label for="id_sampling_date">Sampling Date:</label>
+                <input type="date"
+                       name="sampling_date"
+                       class="form-control mb-0"
+                       aria-describedby="id_sampling_date_helptext"
+                       id="id_sampling_date"
+                       x-model="data.sampling_date" />
+                <small class="form-text text-muted mt-0">Sampling date to allow for merging (GI-DAMPs)</small>
               </div>
               <!-- Comments -->
               <div class="form-group col-md-12">
@@ -185,9 +196,10 @@
         data: {
           category: '',
           study_name: '',
+          study_id: "",
           music_timepoint: '',
           marvel_timepoint: '',
-          study_id: "",
+          sampling_date: "",
           comments: "",
           file_name: "",
         },
@@ -266,7 +278,7 @@
                 Alpine.store('upload').loading = false;
                 Alpine.store('upload').completed = true;
                 Alpine.store('upload').initial = false;
-                // window.location.href = "/datastore/dashboard/";
+                window.location.href = "/datastore/dashboard/";
               })
             });
           }).catch(function(error) {
