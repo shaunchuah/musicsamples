@@ -81,9 +81,9 @@ def test_sample_detail_page(auto_login_user):
     SampleFactory(sample_id="TEST001")
     path = reverse("sample_detail", kwargs={"pk": 1})
     response = client.get(path)
-    assert (
-        response.context["sample"].sample_id == "TEST001"
-    ), "Should create sample with ID TEST001 and retrieve sample detail view."
+    assert response.context["sample"].sample_id == "TEST001", (
+        "Should create sample with ID TEST001 and retrieve sample detail view."
+    )
 
 
 def test_sample_detail_processing_datetime_logic(auto_login_user):
@@ -94,9 +94,9 @@ def test_sample_detail_processing_datetime_logic(auto_login_user):
     )
     path = reverse("sample_detail", kwargs={"pk": 1})
     response = client.get(path)
-    assert (
-        response.context["processing_time"] == 5
-    ), "Should test processing_time calculation given sampling and processing datetime."
+    assert response.context["processing_time"] == 5, (
+        "Should test processing_time calculation given sampling and processing datetime."
+    )
 
 
 def test_sample_edit_page(auto_login_user):
@@ -106,9 +106,9 @@ def test_sample_edit_page(auto_login_user):
     path = reverse("sample_edit", kwargs={"pk": 2})
     response = client.get(path)
     assertTemplateUsed(response, "samples/sample-add.html")
-    assert (
-        response.context["form"].initial["sample_id"] == "TEST003"
-    ), "Should create two separate sample instances and return the second one."
+    assert response.context["form"].initial["sample_id"] == "TEST003", (
+        "Should create two separate sample instances and return the second one."
+    )
 
 
 def test_sample_search_page(auto_login_user):
@@ -120,9 +120,9 @@ def test_sample_search_page(auto_login_user):
     path = reverse("sample_search")
     response = client.get(path + "?q=TEST")
 
-    assert (
-        response.context["sample_list"].count() == 2
-    ), "Should create a few objects, run a search and return 2 objects."
+    assert response.context["sample_list"].count() == 2, (
+        "Should create a few objects, run a search and return 2 objects."
+    )
 
     response = client.get(path)
     assert response.context["query_string"] == "Null", "Should return no objects with empty query string."
@@ -135,15 +135,15 @@ def test_sample_checkout_page(auto_login_user):
 
     # Get the sample checkout page and check template is correct
     response = client.get(path)
-    assert (
-        response.context["form"].initial["sample_location"] == "location1"
-    ), "Should retrieve an instance to checkout."
+    assert response.context["form"].initial["sample_location"] == "location1", (
+        "Should retrieve an instance to checkout."
+    )
 
     # Checkout the sample from location1 to location2
     response = client.post(path, data={"sample_location": "location2"})
-    assert (
-        Sample.objects.get(pk=1).sample_location == "location2"
-    ), "Should checkout the sample location from location1 to location2."
+    assert Sample.objects.get(pk=1).sample_location == "location2", (
+        "Should checkout the sample location from location1 to location2."
+    )
     assert Sample.objects.get(pk=1).last_modified_by == "testuser1@test.com"
     assert response.status_code == 302
 
