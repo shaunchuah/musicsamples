@@ -64,7 +64,6 @@ class StudyNameChoices(models.TextChoices):
     MUSIC = "music", "MUSIC"
     MINI_MUSIC = "mini_music", "Mini-MUSIC"
     MARVEL = "marvel", "MARVEL"
-    MINI_MARVEL = "mini_marvel", "Mini-MARVEL"
     FATE_CD = "fate_cd", "FATE-CD"
     NONE = "none", "None"
 
