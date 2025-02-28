@@ -112,6 +112,10 @@ urlpatterns = [
     path("datastore/api/upload/start/", views.FileDirectUploadStartApi.as_view(), name="file_direct_upload_start"),
     path("datastore/api/upload/finish/", views.FileDirectUploadFinishApi.as_view(), name="file_direct_upload_finish"),
     path("datastore/api/import_study_id/", views.import_study_identifiers, name="import_study_identifiers"),
+    path("study_id/", views.study_id_list_view, name="study_id_list"),
+    path("study_id/edit/<int:id>/", views.study_id_edit_view, name="study_id_edit"),
+    path("study_id/search/", views.study_id_search_view, name="study_id_search"),
+    # Prototype API
     path("api/v2/auth/login/", views.login_view, name="login"),
     path("api/v2/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/v2/token/verify/", TokenVerifyView.as_view(), name="token_verify"),

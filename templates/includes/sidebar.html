@@ -79,6 +79,12 @@
                 <p>Users</p>
               </a>
             </li>
+            <li class="{% if request.path == '/study_id/' %}active{% endif %}">
+              <a href="{% url 'study_id_list' %}">
+                <i class="tim-icons icon-badge"></i>
+                <p>Study ID</p>
+              </a>
+            </li>
           {% endif %}
           {% if request.user.is_superuser %}
             <li>

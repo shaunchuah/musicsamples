@@ -93,6 +93,13 @@ class SampleForm(ModelForm):
             cleaned_data["study_id"] = study_identifier
         return cleaned_data
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # If the form has an instance, update the display text for study_id
+        if self.instance and self.instance.pk and self.instance.study_id:
+            # Use the string representation instead of ID
+            self.initial["study_id"] = str(self.instance.study_id)
+
 
 class CheckoutForm(ModelForm):
     class Meta:
@@ -188,3 +195,9 @@ class DataStoreUpdateForm(ModelForm):
             "marvel_timepoint": "Marvel Timepoint",
             "comments": "Comments",
         }
+
+
+class StudyIdUpdateForm(ModelForm):
+    class Meta:
+        model = StudyIdentifier
+        fields = ["name", "study_name"]

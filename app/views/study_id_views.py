@@ -1,10 +1,19 @@
 import pandas as pd
+from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Q
+from django.shortcuts import redirect, render
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
+from app.forms import StudyIdUpdateForm
+from app.models import StudyIdentifier
 from app.services import StudyIdentifierImportService
+
+STUDY_ID_PAGINATION_SIZE = settings.STUDY_ID_PAGINATION_SIZE
 
 
 @api_view(["POST"])
@@ -64,3 +73,75 @@ def import_study_identifiers(request):
 
     except Exception as e:
         return Response({"error": f"Error processing data: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@staff_member_required
+def study_id_list_view(request):
+    # Get all StudyIdentifiers with related samples and files in a single query
+    study_id_list = StudyIdentifier.objects.all().prefetch_related("samples", "files")
+    study_id_list_count = study_id_list.count()
+
+    page = request.GET.get("page", 1)
+    paginator = Paginator(study_id_list, STUDY_ID_PAGINATION_SIZE)
+    try:
+        study_id_list = paginator.page(page)
+    except PageNotAnInteger:
+        study_id_list = paginator.page(1)
+    except EmptyPage:
+        study_id_list = paginator.page(paginator.num_pages)
+
+    return render(
+        request,
+        "study_id/study_id_list.html",
+        {"study_id_list": study_id_list, "page_obj": study_id_list, "study_id_list_count": study_id_list_count},
+    )
+
+
+@staff_member_required
+def study_id_edit_view(request, id):
+    study_id = StudyIdentifier.objects.get(id=id)
+
+    if request.method == "POST":
+        form = StudyIdUpdateForm(request.POST, instance=study_id)
+        if form.is_valid():
+            form.save()
+            return redirect("study_id_list")
+    else:
+        form = StudyIdUpdateForm(instance=study_id)
+
+    return render(request, "study_id/study_id_form.html", {"form": form, "study_id": study_id})
+
+
+@staff_member_required
+def study_id_search_view(request):
+    # Sample search in home page
+    query_string = ""
+    if ("q" in request.GET) and request.GET["q"].strip():
+        query_string = request.GET.get("q")
+
+        study_id_list = StudyIdentifier.objects.filter(Q(name__icontains=query_string)).prefetch_related(
+            "samples", "files"
+        )
+
+        study_id_list_count = study_id_list.count()
+
+        page = request.GET.get("page", 1)
+        paginator = Paginator(study_id_list, STUDY_ID_PAGINATION_SIZE)
+        try:
+            study_id_list = paginator.page(page)
+        except PageNotAnInteger:
+            study_id_list = paginator.page(1)
+        except EmptyPage:
+            study_id_list = paginator.page(paginator.num_pages)
+
+        return render(
+            request,
+            "study_id/study_id_list.html",
+            {"study_id_list": study_id_list, "page_obj": study_id_list, "study_id_list_count": study_id_list_count},
+        )
+    else:
+        return render(
+            request,
+            "study_id/study_id_list.html",
+            {"query_string": "Null", "study_id_list_count": study_id_list_count},
+        )

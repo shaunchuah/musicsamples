@@ -88,9 +88,22 @@
             </table>
           </div>
         </div>
-        <div class="card-footer">
+        <div class="card-footer d-flex justify-content-between">
           <a href="{% url 'datastore_edit' id=file.id %}"
-             class="btn btn-fill btn-success">Edit</a>
+             class="btn btn-fill btn-success">
+            <i class="tim-icons icon-pencil"></i> Edit
+          </a>
+          <div>
+            <a href="{% url 'datastore_azure_view' id=file.id %}"
+               target="_blank"
+               class="btn btn-fill btn-success">
+              <i class="tim-icons icon-zoom-split"></i> View
+            </a>
+            <a href="{% url 'datastore_download' id=file.id %}"
+               class="btn btn-fill btn-success">
+              <i class="tim-icons icon-cloud-download-93"></i> Download
+            </a>
+          </div>
         </div>
       </div>
       <div class="card">

@@ -181,9 +181,23 @@ class StudyIdentifierImportService:
                 # Check if updates are needed and fields are present
                 fields_to_check = ["study_name", "study_center", "study_group", "sex", "age"]
                 for field in fields_to_check:
-                    if field in row and row[field] is not None and getattr(study_identifier, field) != row[field]:
-                        setattr(study_identifier, field, row[field])
-                        needs_update = True
+                    # Only consider fields that are present in the row
+                    if field in row and pd.notna(row[field]):
+                        # Convert types for proper comparison
+                        current_value = getattr(study_identifier, field)
+                        new_value = row[field]
+
+                        # Handle age specifically since it's an integer field
+                        if field == "age":
+                            if pd.isna(new_value):
+                                new_value = None
+                            elif new_value is not None:
+                                new_value = int(new_value)
+
+                        # Compare and update if different
+                        if current_value != new_value:
+                            setattr(study_identifier, field, new_value)
+                            needs_update = True
 
                 if needs_update:
                     study_identifier.save()
