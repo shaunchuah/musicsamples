@@ -18,6 +18,13 @@ sentry_sdk.init(
     send_default_pii=True,
 )
 
+# AZURE STORAGE CONFIGURATION
+# ------------------------------------------------------------------------------
+AZURE_ACCOUNT_KEY = env("AZURE_ACCOUNT_KEY")
+AZURE_STORAGE_CONNECTION_STRING = env("AZURE_STORAGE_CONNECTION_STRING")
+AZURE_ACCOUNT_NAME = "gutresearch"
+AZURE_CONTAINER_NAME = "gtrac-store"
+
 # STORAGES
 STORAGES = {
     "default": {
