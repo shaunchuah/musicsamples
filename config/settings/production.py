@@ -108,9 +108,3 @@ ANYMAIL = {
 }
 
 SITE_URL = "https://samples.musicstudy.uk"
-
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-    }
-}
