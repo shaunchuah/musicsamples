@@ -109,6 +109,9 @@ def study_id_edit_view(request, name: str):
         form = StudyIdUpdateForm(request.POST, instance=study_id)
         if form.is_valid():
             form.save()
+            messages.success(request, "Study ID has been updated.")
+            # re-retrieve the study_id name as it might have changed
+            name = form.cleaned_data["name"]
             return redirect(reverse("study_id_detail", args=[name]))
     else:
         form = StudyIdUpdateForm(instance=study_id)
