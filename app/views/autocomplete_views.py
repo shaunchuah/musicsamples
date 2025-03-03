@@ -121,6 +121,11 @@ class MultipleSampleViewSet(viewsets.ModelViewSet):
     lookup_field = "sample_id"
 
     def perform_create(self, serializer):
+        # Get the sample_id from validated_data and convert to uppercase
+        sample_id = serializer.validated_data.get("sample_id")
+        if sample_id:
+            serializer.validated_data["sample_id"] = sample_id.upper()
+
         serializer.save(
             created_by=self.request.user.email,
             last_modified_by=self.request.user.email,
