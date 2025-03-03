@@ -216,12 +216,22 @@
           Alpine.store('upload').initial = false;
           Alpine.store('upload').showProgressBar = true;
 
+          // Process the data before sending to API
+          const dataToSend = {
+            ...this.data
+          };
+
+          // Convert empty date string to null
+          if (dataToSend.sampling_date === "") {
+            dataToSend.sampling_date = null;
+          }
+
           console.log("Input Data:");
-          console.log(this.data);
+          console.log(dataToSend);
 
           // First step is to register the upload with Django
           // This retrieves a pre-signed URL for direct to S3 upload
-          axios.post(start_url, this.data, {
+          axios.post(start_url, dataToSend, {
             headers: {
               'X-CSRFToken': '{{ csrf_token }}',
             }

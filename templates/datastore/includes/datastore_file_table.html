@@ -124,10 +124,12 @@
                 <a href="{% url 'datastore_detail' id=file.id %}"><i class="tim-icons icon-zoom-split"></i> Metadata</a>
               </td>
               <td class="text-center">
-                <a href="#"
-                   data-toggle="modal"
-                   data-target="#deleteConfirmModal"
-                   data-href="{% url 'datastore_delete' id=file.id %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
+                {% if request.user == file.uploaded_by or request.user.is_superuser %}
+                  <a href="#"
+                     data-toggle="modal"
+                     data-target="#deleteConfirmModal"
+                     data-href="{% url 'datastore_delete' id=file.id %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
+                {% endif %}
               </td>
             </tr>
           {% endfor %}

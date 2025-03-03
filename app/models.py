@@ -3,6 +3,9 @@ import pathlib
 from azure.core.exceptions import ResourceNotFoundError
 from django.conf import settings
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from guardian.shortcuts import assign_perm
 from simple_history.models import HistoricalRecords
 
 from app.choices import (
@@ -174,3 +177,11 @@ class DataStore(models.Model):
 
     class Meta:
         ordering = ["-upload_finished_at"]
+        permissions = (("delete_own_datastore", "Can delete own datastore"),)
+
+
+@receiver(post_save, sender=DataStore)
+def set_permission(sender, instance, created, **kwargs):
+    if created and instance.uploaded_by:
+        assign_perm("delete_own_datastore", instance.uploaded_by, instance)
+        assign_perm("app.view_datastore", instance.uploaded_by, instance)

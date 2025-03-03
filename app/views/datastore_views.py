@@ -121,10 +121,17 @@ def datastore_azure_view(request, id):
 @permission_required("app.view_datastore", raise_exception=True)
 def datastore_delete_view(request, id):
     file = get_object_or_404(DataStore, id=id)
-    azure_delete_file(file)
+    if (
+        request.user.is_superuser
+        or request.user == file.uploaded_by
+        or request.user.has_perm("delete_own_datastore", file)
+    ):
+        azure_delete_file(file)
+        file.delete()
+        messages.success(request, "File has been deleted.")
+    else:
+        messages.error(request, "You don't have permission to delete this file.")
 
-    file.delete()
-    messages.success(request, "File has been deleted.")
     return redirect("datastore_list")
 
 

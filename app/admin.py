@@ -1,4 +1,5 @@
 from django.contrib import admin
+from guardian.admin import GuardedModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
 from app.models import DataStore, Sample, StudyIdentifier
@@ -29,7 +30,7 @@ class SampleAdmin(SimpleHistoryAdmin):
 
 
 @admin.register(DataStore)
-class DataStoreAdmin(admin.ModelAdmin):
+class DataStoreAdmin(GuardedModelAdmin):
     list_display = [
         "study_name",
         "category",

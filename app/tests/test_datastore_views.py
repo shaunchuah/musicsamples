@@ -16,6 +16,12 @@ class TestDataStoreViews:
     @pytest.fixture(autouse=True)
     def setup_class(self):
         """Setup test data and permissions that will be used by all tests."""
+        # Create a test user with basic permissions
+        self.user = User.objects.create_user(email="testuser@test.com", password="testpass")
+        content_type = ContentType.objects.get_for_model(DataStore)
+        view_permission = Permission.objects.get(content_type=content_type, codename="view_datastore")
+        self.user.user_permissions.add(view_permission)
+
         # Create test data for DataStore
         self.ds1 = DataStore.objects.create(
             study_name=StudyNameChoices.GIDAMPS.value,
@@ -23,6 +29,7 @@ class TestDataStoreViews:
             file_type="mov",
             original_file_name="testfile1.mov",
             formatted_file_name="Study1_testfile1_abcd123.mov",
+            uploaded_by=self.user,
         )
 
         self.ds2 = DataStore.objects.create(
@@ -31,13 +38,8 @@ class TestDataStoreViews:
             file_type="txt",
             original_file_name="unique_filename.txt",
             formatted_file_name="Study2_unique_filename_efgh456.txt",
+            uploaded_by=self.user,
         )
-
-        # Create a test user with basic permissions
-        self.user = User.objects.create_user(email="testuser@test.com", password="testpass")
-        content_type = ContentType.objects.get_for_model(DataStore)
-        view_permission = Permission.objects.get(content_type=content_type, codename="view_datastore")
-        self.user.user_permissions.add(view_permission)
 
         # Create client and log in
         self.client = Client()
