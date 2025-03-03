@@ -30,8 +30,8 @@ STORAGES = {
     "default": {
         "BACKEND": "storages.backends.azure_storage.AzureStorage",
         "OPTIONS": {
-            "azure_container": "gtrac-store",
-            "connection_string": env("AZURE_STORAGE_CONNECTION_STRING"),
+            "azure_container": AZURE_CONTAINER_NAME,
+            "connection_string": AZURE_STORAGE_CONNECTION_STRING,
         },
     },
     "staticfiles": {
