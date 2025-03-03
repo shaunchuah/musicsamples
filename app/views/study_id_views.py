@@ -123,9 +123,9 @@ def study_id_search_view(request):
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
 
-        study_id_list = StudyIdentifier.objects.filter(Q(name__icontains=query_string)).prefetch_related(
-            "samples", "files"
-        )
+        study_id_list = StudyIdentifier.objects.filter(
+            Q(name__icontains=query_string) | Q(study_name__icontains=query_string)
+        ).prefetch_related("samples", "files")
 
         study_id_list_count = study_id_list.count()
 
@@ -141,7 +141,12 @@ def study_id_search_view(request):
         return render(
             request,
             "study_id/study_id_list.html",
-            {"study_id_list": study_id_list, "page_obj": study_id_list, "study_id_list_count": study_id_list_count},
+            {
+                "study_id_list": study_id_list,
+                "page_obj": study_id_list,
+                "study_id_list_count": study_id_list_count,
+                "query_string": query_string,
+            },
         )
     else:
         return render(
