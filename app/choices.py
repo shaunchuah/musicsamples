@@ -86,6 +86,7 @@ class FileCategoryChoices(models.TextChoices):
     UNCATEGORISED = "uncategorised", "Uncategorised"
     ENDOSCOPY_VIDEOS = "endoscopy_videos", "Endoscopy Videos"
     HISTOLOGY_SLIDES = "histology_slides", "Histology Slides"
+    FAPI_PET_MRI = "fapi_pet_mri", "FAPI PET MRI"
 
 
 class StudyCenterChoices(models.TextChoices):

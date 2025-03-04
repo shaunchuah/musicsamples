@@ -19,8 +19,7 @@ $(document).ready(function () {
   }
 
   if (
-    $("#id_study_name").val() == "marvel" ||
-    $("#id_study_name").val() == "mini_marvel"
+    $("#id_study_name").val() == "marvel"
   ) {
     $("label[for=id_music_timepoint], #id_marvel_timepoint").show();
   }
@@ -115,8 +114,7 @@ $(document).ready(function () {
     }
 
     if (
-      $("#id_study_name").val() == "marvel" ||
-      $("#id_study_name").val() == "mini_marvel"
+      $("#id_study_name").val() == "marvel"
     ) {
       $("label[for=id_marvel_timepoint], #id_marvel_timepoint").show("slow");
     } else {
