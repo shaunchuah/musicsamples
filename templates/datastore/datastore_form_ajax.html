@@ -171,6 +171,16 @@
                 <span x-text="`${$store.upload.progress}%`"></span>
               </div>
             </div>
+            <!--Help Text-->
+            <div class="mt-3">
+              <p>
+                <strong>Max file size: 5GB. Max upload time: 1 hour.</strong>
+                <br />
+                For files greater than 5GB, uploading has to be done through Azure Storage Explorer and post-uploading registration done in the Django backend.
+                <br />
+                If the upload fails/does not complete, please delete the incomplete entry in datastore and re-upload.
+              </p>
+            </div>
           </form>
         </div>
       </div>
