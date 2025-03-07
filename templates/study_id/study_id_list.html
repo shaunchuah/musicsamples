@@ -76,7 +76,7 @@
                             <div class="dropdown-menu"
                                  aria-labelledby="samplesDropdown{{ study_id.id }}">
                               {% for sample in study_id.samples.all %}
-                                <a class="dropdown-item" href="{% url 'sample_detail' pk=sample.id %}">{{ sample.sample_id }}</a>
+                                <a class="dropdown-item" href="{% url 'sample_detail' pk=sample.id %}">{{ sample.sample_id }} {{ sample.get_sample_type_display }}</a>
                               {% endfor %}
                             </div>
                           </div>
