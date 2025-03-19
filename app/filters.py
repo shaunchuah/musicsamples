@@ -20,6 +20,9 @@ class SampleFilter(django_filters.FilterSet):
     study_id__study_group = django_filters.ChoiceFilter(label="Study Group", choices=StudyGroupChoices.choices)
     study_id__study_center = django_filters.ChoiceFilter(label="Study Center", choices=StudyCenterChoices.choices)
     study_id__sex = django_filters.ChoiceFilter(label="Biological Sex", choices=SexChoices.choices)
+    study_id__genotype_data_available = django_filters.BooleanFilter(label="Genotype Data Available")
+    study_id__nod2_mutation_present = django_filters.BooleanFilter(label="NOD2 Mutation Present")
+    study_id__il23r_mutation_present = django_filters.BooleanFilter(label="IL23R Mutation Present")
 
     class Meta:
         model = Sample
@@ -49,6 +52,9 @@ class DataStoreFilter(django_filters.FilterSet):
     study_id__study_group = django_filters.ChoiceFilter(label="Study Group", choices=StudyGroupChoices.choices)
     study_id__study_center = django_filters.ChoiceFilter(label="Study Center", choices=StudyCenterChoices.choices)
     study_id__sex = django_filters.ChoiceFilter(label="Biological Sex", choices=SexChoices.choices)
+    study_id__genotype_data_available = django_filters.BooleanFilter(label="Genotype Data Available")
+    study_id__nod2_mutation_present = django_filters.BooleanFilter(label="NOD2 Mutation Present")
+    study_id__il23r_mutation_present = django_filters.BooleanFilter(label="IL23R Mutation Present")
 
     class Meta:
         model = DataStore
