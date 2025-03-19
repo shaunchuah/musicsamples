@@ -16,6 +16,7 @@
           <th>Age</th>
           <th>Sex</th>
           <th>Center</th>
+          <th>Genotyping</th>
           <th>Comments</th>
           <th>View</th>
           <th>Checkout</th>
@@ -58,6 +59,9 @@
               </td>
               <td>
                 {% if sample.study_id.study_center %}{{ sample.study_id.get_study_center_display }}{% endif %}
+              </td>
+              <td>
+                {% if sample.study_id.genotype_data_available %}{{ sample.study_id.genotype_data_available }}{% endif %}
               </td>
               <td>{{ sample.sample_comments }}</td>
               <td>

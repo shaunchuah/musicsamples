@@ -181,7 +181,16 @@ class StudyIdentifierImportService:
                 needs_update = False
 
                 # Check if updates are needed and fields are present
-                fields_to_check = ["study_name", "study_center", "study_group", "sex", "age"]
+                fields_to_check = [
+                    "study_name",
+                    "study_center",
+                    "study_group",
+                    "sex",
+                    "age",
+                    "genotype_data_available",
+                    "nod2_mutation_present",
+                    "il23r_mutation_present",
+                ]
                 for field in fields_to_check:
                     # Only consider fields that are present in the row
                     if field in row and pd.notna(row[field]):
@@ -195,6 +204,13 @@ class StudyIdentifierImportService:
                                 new_value = None
                             elif new_value is not None:
                                 new_value = int(new_value)
+
+                        # For boolean fields like genotype_data_available
+                        if field in ["genotype_data_available", "nod2_mutation_present", "il23r_mutation_present"]:
+                            if pd.isna(new_value):
+                                new_value = False
+                            else:
+                                new_value = bool(new_value)
 
                         # Compare and update if different
                         if current_value != new_value:
@@ -216,6 +232,9 @@ class StudyIdentifierImportService:
                 study_group=row.get("study_group"),
                 sex=row.get("sex"),
                 age=row.get("age") if "age" in row and pd.notna(row["age"]) else None,
+                genotype_data_available=row.get("genotype_data_available", False),
+                nod2_mutation_present=row.get("nod2_mutation_present", False),
+                il23r_mutation_present=row.get("il23r_mutation_present", False),
             )
             new_identifiers.append(study_identifier)
 

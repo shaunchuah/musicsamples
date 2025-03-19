@@ -14,6 +14,9 @@ class StudyIdentifierAdmin(admin.ModelAdmin):
         "study_center",
         "sex",
         "age",
+        "genotype_data_available",
+        "nod2_mutation_present",
+        "il23r_mutation_present",
     ]
 
 

@@ -38,6 +38,9 @@ class SampleFilter(django_filters.FilterSet):
             "study_id__study_group",
             "study_id__study_center",
             "study_id__sex",
+            "study_id__genotype_data_available",
+            "study_id__nod2_mutation_present",
+            "study_id__il23r_mutation_present",
         ]
 
 
@@ -58,4 +61,7 @@ class DataStoreFilter(django_filters.FilterSet):
             "study_id__study_group",
             "study_id__study_center",
             "study_id__sex",
+            "study_id__genotype_data_available",
+            "study_id__nod2_mutation_present",
+            "study_id__il23r_mutation_present",
         ]

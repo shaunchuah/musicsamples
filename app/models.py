@@ -36,6 +36,9 @@ class StudyIdentifier(models.Model):
     study_group = models.CharField(max_length=200, choices=StudyGroupChoices.choices, blank=True, null=True)
     sex = models.CharField(max_length=10, choices=SexChoices.choices, blank=True, null=True)
     age = models.IntegerField(blank=True, null=True)
+    genotype_data_available = models.BooleanField(default=False)
+    nod2_mutation_present = models.BooleanField(default=False)
+    il23r_mutation_present = models.BooleanField(default=False)
 
     history = HistoricalRecords()
 

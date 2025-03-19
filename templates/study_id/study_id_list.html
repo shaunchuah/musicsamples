@@ -47,6 +47,9 @@
                   <th>Age</th>
                   <th>Sex</th>
                   <th>Center</th>
+                  <th>Genotyping</th>
+                  <th>NOD2 Mutation</th>
+                  <th>IL23R Mutation</th>
                   <th>Samples</th>
                   <th>Files</th>
                   <th>View</th>
@@ -64,6 +67,9 @@
                       <td>{{ study_id.age }}</td>
                       <td>{{ study_id.get_sex_display }}</td>
                       <td>{{ study_id.get_study_center_display }}</td>
+                      <td>{{ study_id.genotype_data_available }}</td>
+                      <td>{{ study_id.nod2_mutation_present }}</td>
+                      <td>{{ study_id.il23r_mutation_present }}</td>
                       <td>
                         {% if study_id.samples.all %}
                           <div class="dropdown">
@@ -143,13 +149,13 @@
         dateFormat: "ddmmyyyy",
         headers: {
 
-          6: {
+          11: {
             sorter: false
           },
-          7: {
+          12: {
             sorter: false
           },
-          8: {
+          13: {
             sorter: false
           },
           9: {

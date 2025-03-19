@@ -34,6 +34,11 @@ def import_study_identifiers(request):
     - study_group
     - age
     - sex
+
+    Optional columns:
+    - genotype_data_available
+    - nod2_mutation_present
+    - il23r_mutation_present
     """
     try:
         # If sending JSON data
@@ -62,7 +67,14 @@ def import_study_identifiers(request):
             )
 
         # Validate the data has required columns
-        required_columns = ["study_id", "study_name", "study_center", "study_group", "age", "sex"]
+        required_columns = [
+            "study_id",
+            "study_name",
+            "study_center",
+            "study_group",
+            "age",
+            "sex",
+        ]
         missing_columns = [col for col in required_columns if col not in df.columns]
         if missing_columns:
             return Response(

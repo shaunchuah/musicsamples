@@ -17,6 +17,7 @@
           <th>Age</th>
           <th>Sex</th>
           <th>Center</th>
+          <th>Genotype</th>
           <th>Timepoint</th>
           <th>Sampling Date</th>
           <th>Download</th>
@@ -97,6 +98,9 @@
               </td>
               <td>
                 {% if file.study_id.study_center %}{{ file.study_id.get_study_center_display }}{% endif %}
+              </td>
+              <td>
+                {% if file.study_id.genotype_data_available %}{{ file.study_id.genotype_data_available }}{% endif %}
               </td>
               <td>
                 <span class="{% if not file.is_valid %}text-danger font-weight-bold{% endif %}">
