@@ -2,7 +2,7 @@ from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
-from app.models import DataStore, Sample, StudyIdentifier
+from app.models import ClinicalData, DataStore, Sample, StudyIdentifier
 
 
 @admin.register(StudyIdentifier)
@@ -17,6 +17,16 @@ class StudyIdentifierAdmin(admin.ModelAdmin):
         "genotype_data_available",
         "nod2_mutation_present",
         "il23r_mutation_present",
+    ]
+
+
+@admin.register(ClinicalData)
+class ClinicalDataAdmin(admin.ModelAdmin):
+    list_display = [
+        "study_id",
+        "sample_date",
+        "crp",
+        "calprotectin",
     ]
 
 

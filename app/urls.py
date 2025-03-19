@@ -112,6 +112,7 @@ urlpatterns = [
     path("datastore/api/upload/start/", views.FileDirectUploadStartApi.as_view(), name="file_direct_upload_start"),
     path("datastore/api/upload/finish/", views.FileDirectUploadFinishApi.as_view(), name="file_direct_upload_finish"),
     path("datastore/api/import_study_id/", views.import_study_identifiers, name="import_study_identifiers"),
+    path("datastore/api/import_clinical_data/", views.import_clinical_data, name="import_clinical_data"),
     path("study_id/", views.study_id_list_view, name="study_id_list"),
     path("study_id/edit/<str:name>/", views.study_id_edit_view, name="study_id_edit"),
     path("study_id/search/", views.study_id_search_view, name="study_id_search"),

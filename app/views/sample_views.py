@@ -10,6 +10,7 @@ from django.urls import reverse
 from app.filters import SampleFilter
 from app.forms import CheckoutForm, ReactivateForm, SampleForm, UsedForm
 from app.models import Sample
+from app.services import get_samples_with_clinical_data
 from app.utils import (
     export_csv,
     historical_changes,
@@ -26,7 +27,9 @@ SAMPLE_PAGINATION_SIZE = settings.SAMPLE_PAGINATION_SIZE
 @login_required(login_url="/login/")
 def index(request):
     # Home Page
-    sample_list = Sample.objects.filter(is_used=False).select_related("study_id").order_by("-sample_datetime")
+    sample_list = get_samples_with_clinical_data(
+        Sample.objects.filter(is_used=False).select_related("study_id").order_by("-sample_datetime")
+    )
     sample_count = sample_list.count()
     page = request.GET.get("page", 1)
     paginator = Paginator(sample_list, SAMPLE_PAGINATION_SIZE)
@@ -48,7 +51,7 @@ def index(request):
 def filter(request):
     queryset = Sample.objects.select_related("study_id").all()
     sample_filter = SampleFilter(request.GET, queryset=queryset)
-    sample_list = sample_filter.qs
+    sample_list = get_samples_with_clinical_data(sample_filter.qs)
     sample_count = sample_list.count()
 
     # Pagination
@@ -88,7 +91,8 @@ def filter_export_csv(request):
 
 @login_required(login_url="/login/")
 def used_samples(request):
-    sample_list = Sample.objects.filter(is_used=True).select_related("study_id").order_by("-last_modified")
+    queryset = Sample.objects.filter(is_used=True).select_related("study_id").order_by("-last_modified")
+    sample_list = get_samples_with_clinical_data(queryset)
     sample_count = sample_list.count()
     page = request.GET.get("page", 1)
     paginator = Paginator(sample_list, SAMPLE_PAGINATION_SIZE)
@@ -271,7 +275,7 @@ def sample_search(request):
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
 
-        sample_list = (
+        queryset = (
             Sample.objects.filter(
                 Q(sample_id__icontains=query_string)
                 | Q(study_id__name__icontains=query_string)
@@ -285,7 +289,7 @@ def sample_search(request):
         )
 
         if ("include_used_samples" in request.GET) and request.GET["include_used_samples"].strip():
-            sample_list = Sample.objects.filter(
+            queryset = Sample.objects.filter(
                 Q(sample_id__icontains=query_string)
                 | Q(study_id__name__icontains=query_string)
                 | Q(sample_location__icontains=query_string)
@@ -293,6 +297,8 @@ def sample_search(request):
                 | Q(sample_type__icontains=query_string)
                 | Q(sample_comments__icontains=query_string)
             )
+
+        sample_list = get_samples_with_clinical_data(queryset)
 
         sample_count = sample_list.count()
         return render(

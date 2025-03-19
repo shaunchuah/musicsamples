@@ -16,6 +16,8 @@
           <th>Age</th>
           <th>Sex</th>
           <th>Center</th>
+          <th>CRP</th>
+          <th>Calprotectin</th>
           <th>Genotyping</th>
           <th>Comments</th>
           <th>View</th>
@@ -59,6 +61,12 @@
               </td>
               <td>
                 {% if sample.study_id.study_center %}{{ sample.study_id.get_study_center_display }}{% endif %}
+              </td>
+              <td>
+                {% if sample.crp %}{{ sample.crp }}{% endif %}
+              </td>
+              <td>
+                {% if sample.calprotectin %}{{ sample.calprotectin }}{% endif %}
               </td>
               <td>
                 {% if sample.study_id.genotype_data_available %}{{ sample.study_id.genotype_data_available }}{% endif %}

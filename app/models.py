@@ -188,3 +188,37 @@ def set_permission(sender, instance, created, **kwargs):
     if created and instance.uploaded_by:
         assign_perm("delete_own_datastore", instance.uploaded_by, instance)
         assign_perm("app.view_datastore", instance.uploaded_by, instance)
+
+
+class ClinicalData(models.Model):
+    study_id = models.ForeignKey(StudyIdentifier, null=True, on_delete=models.PROTECT, related_name="clinical_data")
+    sample_date = models.DateField(null=True)
+    music_timepoint = models.CharField(max_length=50, null=True, blank=True, choices=MusicTimepointChoices.choices)
+
+    # Clinical markers
+    crp = models.FloatField(null=True, blank=True)
+    calprotectin = models.FloatField(null=True, blank=True)
+
+    # Additional fields...
+    created = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        # Add a constraint to ensure we have either sample_date or music_timepoint
+        constraints = [
+            models.CheckConstraint(
+                check=(models.Q(sample_date__isnull=False) | models.Q(music_timepoint__isnull=False)),
+                name="clinical_data_has_date_or_timepoint",
+            ),
+            # Unique constraints for different study types
+            models.UniqueConstraint(
+                fields=["study_id", "sample_date"],
+                condition=models.Q(music_timepoint__isnull=True),
+                name="unique_study_id_sample_date",
+            ),
+            models.UniqueConstraint(
+                fields=["study_id", "music_timepoint"],
+                condition=models.Q(sample_date__isnull=True),
+                name="unique_study_id_music_timepoint",
+            ),
+        ]
