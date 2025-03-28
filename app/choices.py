@@ -87,6 +87,7 @@ class FileCategoryChoices(models.TextChoices):
     ENDOSCOPY_VIDEOS = "endoscopy_videos", "Endoscopy Videos"
     HISTOLOGY_SLIDES = "histology_slides", "Histology Slides"
     FAPI_PET_MRI = "fapi_pet_mri", "FAPI PET MRI"
+    SPATIAL_TRANSCRIPTOMICS = "spatial_transcriptomics", "Spatial Transcriptomics"
 
 
 class StudyCenterChoices(models.TextChoices):
