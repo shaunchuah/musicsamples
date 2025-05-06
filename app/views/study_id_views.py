@@ -1,3 +1,5 @@
+import logging
+
 import pandas as pd
 from django.conf import settings
 from django.contrib import messages
@@ -18,6 +20,9 @@ from app.services import StudyIdentifierImportService
 from app.utils import historical_changes
 
 STUDY_ID_PAGINATION_SIZE = settings.STUDY_ID_PAGINATION_SIZE
+
+# Get a logger instance
+logger = logging.getLogger(__name__)
 
 
 @api_view(["POST"])
@@ -88,6 +93,7 @@ def import_study_identifiers(request):
         return Response(result, status=status.HTTP_200_OK)
 
     except Exception as e:
+        logger.error(f"Error in import_study_identifiers: {str(e)}", exc_info=True)
         return Response({"error": f"Error processing data: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
