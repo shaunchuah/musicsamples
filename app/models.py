@@ -207,7 +207,7 @@ class ClinicalData(models.Model):
         # Add a constraint to ensure we have either sample_date or music_timepoint
         constraints = [
             models.CheckConstraint(
-                check=(models.Q(sample_date__isnull=False) | models.Q(music_timepoint__isnull=False)),
+                condition=(models.Q(sample_date__isnull=False) | models.Q(music_timepoint__isnull=False)),
                 name="clinical_data_has_date_or_timepoint",
             ),
             # Unique constraints for different study types
