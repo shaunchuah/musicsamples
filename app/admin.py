@@ -25,8 +25,11 @@ class ClinicalDataAdmin(admin.ModelAdmin):
     list_display = [
         "study_id",
         "sample_date",
+        "music_timepoint",
         "crp",
         "calprotectin",
+        "endoscopic_mucosal_healing_at_3_6_months",
+        "endoscopic_mucosal_healing_at_12_months",
     ]
 
 

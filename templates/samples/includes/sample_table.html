@@ -18,6 +18,8 @@
           <th>Center</th>
           <th>CRP</th>
           <th>Calprotectin</th>
+          <th>Mucosal Healing (3-6m)</th>
+          <th>Mucosal Healing (12m)</th>
           <th>Genotyping</th>
           <th>Comments</th>
           <th>View</th>
@@ -67,6 +69,16 @@
               </td>
               <td>
                 {% if sample.calprotectin %}{{ sample.calprotectin }}{% endif %}
+              </td>
+              <td>
+                {% if sample.endoscopic_mucosal_healing_at_3_6_months %}
+                  {{ sample.endoscopic_mucosal_healing_at_3_6_months }}
+                {% endif %}
+              </td>
+              <td>
+                {% if sample.endoscopic_mucosal_healing_at_12_months %}
+                  {{ sample.endoscopic_mucosal_healing_at_12_months }}
+                {% endif %}
               </td>
               <td>
                 {% if sample.study_id.genotype_data_available %}{{ sample.study_id.genotype_data_available }}{% endif %}

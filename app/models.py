@@ -1,4 +1,5 @@
 import pathlib
+from typing import Optional
 
 from azure.core.exceptions import ResourceNotFoundError
 from django.conf import settings
@@ -120,7 +121,7 @@ def file_upload_path(instance, filename):
     return f"{instance.category}/{instance.formatted_file_name}"
 
 
-def file_generate_name(original_file_name: str, study_name: str, study_id: str = None) -> str:
+def file_generate_name(original_file_name: str, study_name: str, study_id: Optional[str] = None) -> str:
     """
     Takes filename, study_name and returns a formatted filename with unique hash
     """
@@ -198,6 +199,12 @@ class ClinicalData(models.Model):
     # Clinical markers
     crp = models.FloatField(null=True, blank=True)
     calprotectin = models.FloatField(null=True, blank=True)
+    endoscopic_mucosal_healing_at_3_6_months = models.BooleanField(
+        null=True, blank=True, verbose_name="Endoscopic mucosal healing at 3-6 months"
+    )
+    endoscopic_mucosal_healing_at_12_months = models.BooleanField(
+        null=True, blank=True, verbose_name="Endoscopic mucosal healing at 12 months"
+    )
 
     # Additional fields...
     created = models.DateTimeField(auto_now_add=True)
@@ -207,7 +214,7 @@ class ClinicalData(models.Model):
         # Add a constraint to ensure we have either sample_date or music_timepoint
         constraints = [
             models.CheckConstraint(
-                condition=(models.Q(sample_date__isnull=False) | models.Q(music_timepoint__isnull=False)),
+                check=(models.Q(sample_date__isnull=False) | models.Q(music_timepoint__isnull=False)),
                 name="clinical_data_has_date_or_timepoint",
             ),
             # Unique constraints for different study types

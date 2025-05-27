@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta
+from typing import Optional
 
 import pandas as pd
 from azure.storage.blob import BlobSasPermissions, BlobServiceClient, generate_blob_sas
@@ -79,8 +80,8 @@ class FileDirectUploadService:
         music_timepoint: str,
         marvel_timepoint: str,
         comments: str,
-        sampling_date: datetime = None,
-        study_id: str = None,
+        sampling_date: Optional[datetime] = None,
+        study_id: Optional[str] = None,
         uploaded_by=None,
     ) -> dict:
         if study_id:
@@ -89,6 +90,7 @@ class FileDirectUploadService:
             formatted_file_name = file_generate_name(file_name, study_name, study_id)
         else:
             formatted_file_name = file_generate_name(file_name, study_name)
+            study_identifier = None
 
         file = DataStore(
             category=category,
@@ -97,7 +99,7 @@ class FileDirectUploadService:
             marvel_timepoint=marvel_timepoint,
             sampling_date=sampling_date,
             comments=comments,
-            study_id=study_identifier if study_id else None,
+            study_id=study_identifier,
             file_type=file_name.split(".")[-1],
             original_file_name=file_name,
             formatted_file_name=formatted_file_name,
@@ -128,7 +130,7 @@ class FileDirectUploadService:
         except Exception as e:
             logging.error(e)
             return {"error": "Failed to generate upload URL"}
-        return {"id": file.id, "upload_url": upload_url}
+        return {"id": file.pk, "upload_url": upload_url}
 
     @transaction.atomic
     def finish(self, *, file: DataStore) -> DataStore:
@@ -332,15 +334,22 @@ class ClinicalDataImportService:
                 # Use a list to track which fields were updated
                 updated_fields = []
 
-                if "crp" in row and pd.notna(row["crp"]):
-                    clinical_data.crp = row["crp"]
-                    updated_fields.append("crp")
-
-                if "calprotectin" in row and pd.notna(row["calprotectin"]):
-                    clinical_data.calprotectin = row["calprotectin"]
-                    updated_fields.append("calprotectin")
-
-                # Add more clinical fields as needed
+                # For each field, set to value or None if NA, and always update if different
+                clinical_fields = [
+                    "crp",
+                    "calprotectin",
+                    "endoscopic_mucosal_healing_at_3_6_months",
+                    "endoscopic_mucosal_healing_at_12_months",
+                    # Add more clinical fields as needed
+                ]
+                for field in clinical_fields:
+                    if field in row:
+                        value = row[field]
+                        if pd.isna(value):
+                            value = None
+                        if getattr(clinical_data, field) != value:
+                            setattr(clinical_data, field, value)
+                            updated_fields.append(field)
 
                 # Only save if there are actual updates or it's a new record
                 if updated_fields or created_new:
@@ -457,6 +466,18 @@ def get_samples_with_clinical_data(queryset):
             default=Subquery(default_clinical_data.values("calprotectin")[:1]),
         ),
         # Add more fields as needed using the same pattern
+        endoscopic_mucosal_healing_at_3_6_months=Case(
+            When(
+                study_name_lower__contains="music",
+                then=Subquery(music_clinical_data.values("endoscopic_mucosal_healing_at_3_6_months")[:1]),
+            )
+        ),
+        endoscopic_mucosal_healing_at_12_months=Case(
+            When(
+                study_name_lower__contains="music",
+                then=Subquery(music_clinical_data.values("endoscopic_mucosal_healing_at_12_months")[:1]),
+            )
+        ),
     )
 
     return samples_with_clinical
