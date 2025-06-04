@@ -1,4 +1,5 @@
 import csv
+import dataclasses
 import datetime
 
 import pandas as pd
@@ -235,30 +236,35 @@ def historical_changes(query):
             if old_record is not None:
                 delta = new_record.diff_against(old_record)
 
-                # Process each change to use string representation for foreign keys
+                # Prepare a new list for processed changes
+                processed_changes = []
                 for change in delta.changes:
+                    # Copy the change to avoid mutating a frozen instance
+                    change_dict = change.__dict__.copy()
                     # Check if the field is 'study_id' (or any other FK field you want to handle)
                     if change.field == "study_id":
-                        # If values aren't None, replace with string representation
                         if change.old is not None:
-                            # Get the related model instance from historical record
                             try:
                                 from app.models import StudyIdentifier
 
                                 old_instance = StudyIdentifier.objects.get(pk=change.old)
-                                change.old = str(old_instance)
+                                change_dict["old"] = str(old_instance)
                             except (StudyIdentifier.DoesNotExist, ValueError):
-                                pass  # Keep as is if we can't find the object
-
+                                pass
                         if change.new is not None:
                             try:
                                 from app.models import StudyIdentifier
 
                                 new_instance = StudyIdentifier.objects.get(pk=change.new)
-                                change.new = str(new_instance)
+                                change_dict["new"] = str(new_instance)
                             except (StudyIdentifier.DoesNotExist, ValueError):
-                                pass  # Keep as is if we can't find the object
+                                pass
+                    # Recreate the change object (assumes it's a dataclass)
+                    processed_change = dataclasses.replace(change, **change_dict)
+                    processed_changes.append(processed_change)
 
-                changes.append(delta)
+                # Replace delta.changes with processed_changes
+                new_delta = dataclasses.replace(delta, changes=processed_changes)
+                changes.append(new_delta)
                 last = old_record
         return changes
