@@ -10,6 +10,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.production")
 django.setup()
 
 # Import your models after Django setup
+from app.choices import MusicTimepointChoices  # noqa: E402
 from app.models import Sample  # noqa: E402
 
 
@@ -21,6 +22,14 @@ def update_timepoints_from_csv(csv_filepath):
     updated_count = 0
     errors = []
 
+    timepoint_mapping = {
+        "timepoint_1": MusicTimepointChoices.BASELINE,
+        "timepoint_2": MusicTimepointChoices.THREE_MONTHS,
+        "timepoint_3": MusicTimepointChoices.SIX_MONTHS,
+        "timepoint_4": MusicTimepointChoices.NINE_MONTHS,
+        "timepoint_5": MusicTimepointChoices.TWELVE_MONTHS,
+    }
+
     # Read all data from CSV first to validate before starting transaction
     updates = []
     with open(csv_filepath, "r", encoding="utf-8-sig") as csvfile:
@@ -28,11 +37,20 @@ def update_timepoints_from_csv(csv_filepath):
 
         for row in reader:
             sample_id = row.get("sample_id")
-            music_timepoint = row.get("likely_timepoint")
+            csv_timepoint = row.get("likely_timepoint")
 
             # Skip rows with missing data
-            if not sample_id or not music_timepoint:
+            if not sample_id or not csv_timepoint:
                 errors.append(f"Missing data in row: {row}")
+                continue
+
+            if csv_timepoint in timepoint_mapping:
+                music_timepoint = timepoint_mapping[csv_timepoint]
+            else:
+                errors.append(
+                    f"Invalid timepoint '{csv_timepoint}' for sample {sample_id}. "
+                    f"Must be one of: {', '.join(timepoint_mapping.keys())}"
+                )
                 continue
 
             updates.append((sample_id, music_timepoint))
