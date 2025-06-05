@@ -512,6 +512,11 @@ This is a subset of the main music dataframe, keeping only `timepoint_1` and red
   "complete_mucosal_healing_at_3_6_months",
   "endoscopic_mucosal_healing_at_12_months",
   "complete_mucosal_healing_at_12_months"
+  "cd_pro2_raw",
+  "cd_pro2_weighted",
+  "uc_pro2",
+  "ibdresponse_criteria_cd_met",
+  "ibdresponse_criteria_uc_met",
 ]
 ```
 
@@ -532,3 +537,11 @@ This is a subset of the main music dataframe, keeping only `timepoint_1` and red
 - `complete_mucosal_healing_at_3_6_months` was created by taking the `complete_mucosal_healing` value at `timepoint_2` and populating it to `timepoint_1` to `timepoint_5`.
 - `endoscopic_mucosal_healing_at_12_months` was created by taking the `endoscopic_mucosal_healing` value at `timepoint_5` and populating it to `timepoint_1` to `timepoint_5`.
 - `complete_mucosal_healing_at_12_months` was created by taking the `complete_mucosal_healing` value at `timepoint_5` and populating it to `timepoint_1` to `timepoint_5`.
+
+### PRO2 Columns
+
+- `cd_pro2_raw` is the raw PRO2 score for Crohn's disease calculated by hbi_liquid_stools + hbi_abdominal_pain where pain is scored 0-3 corresponding to none, mild, moderate, severe.
+- `cd_pro2_weighted` is the weighted PRO2 score for Crohn's disease calculated by hbi_liquid_stools + (hbi_abdominal_pain * 2) where pain is scored 0-3 corresponding to none, mild, moderate, severe and multiplied by 5.
+- `uc_pro2` is the PRO2 score for Ulcerative Colitis calculated by scoring mayo_stool_frequency 0-3 based on the categories + mayo_rectal_bleeding 0-3.
+- `ibdresponse_criteria_cd_met` is a boolean indicating if the PRO2 score meets the IBD Response Study Criteria, where hbi_liquid_stools >= 4 and hbi_abdominal_pain >= 2.
+- `ibdresponse_criteria_uc_met` is a boolean indicating if the PRO2 score meets the IBD Response Study Criteria, where mayo_stool_frequency = 3 and mayo_rectal_bleeding > 0.

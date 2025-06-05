@@ -1475,6 +1475,60 @@ def music_cleaned_dataframe(
         timepoint_5_mapping_df.set_index("study_id")["complete_mucosal_healing"]
     )
 
+
+    # Ensure df['hbi_liquid_stools'] is numeric
+    df["hbi_liquid_stools"] = pd.to_numeric(df["hbi_liquid_stools"], errors="coerce")
+
+    # Add 3 columns: cd_pro2_raw, cd_pro2_weighted and uc_pro2
+
+    df["cd_pro2_raw"] = df["hbi_liquid_stools"] + df["hbi_abdominal_pain"].map(
+        {
+            "none": 0,
+            "mild": 1,
+            "moderate": 2,
+            "severe": 3,
+        }
+    )
+    df["cd_pro2_weighted"] = (
+        df["hbi_liquid_stools"] * 2
+        + df["hbi_abdominal_pain"].map(
+            {
+                "none": 0,
+                "mild": 1,
+                "moderate": 2,
+                "severe": 3,
+            }
+        )
+        * 5
+    )
+    df["uc_pro2"] = df["mayo_stool_frequency"].map(
+        {
+            "normal": 0,
+            "1-2_above_normal": 1,
+            "3-4_above_normal": 2,
+            ">5_above_normal": 3,
+        }
+    ) + df["mayo_rectal_bleeding"].map(
+        {
+            "none": 0,
+            "less_than_half": 1,
+            "more_than_half": 2,
+            "blood_alone": 3,
+        }
+    )
+
+    # For CD criteria - liquid stools ≥ 4 AND abdominal pain is moderate or severe
+    df["ibdresponse_criteria_cd_met"] = (df["hbi_liquid_stools"] >= 4) & (
+        (df["hbi_abdominal_pain"] == "moderate")
+        | (df["hbi_abdominal_pain"] == "severe")
+    )
+
+    # For UC criteria - stool frequency is ">5_above_normal" OR rectal bleeding is not "none"
+    df["ibdresponse_criteria_uc_met"] = (
+        df["mayo_stool_frequency"] == ">5_above_normal"
+    ) | (df["mayo_rectal_bleeding"] != "none")
+
+
     rows, columns = df.shape
     context.add_output_metadata(
         {
