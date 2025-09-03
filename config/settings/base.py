@@ -160,7 +160,7 @@ MEDIA_URL = "/files/"
 
 # EMAIL
 # ------------------------------------------------------------------------------
-DEFAULT_FROM_EMAIL = "G-Trac <noreply@musicstudy.uk>"
+DEFAULT_FROM_EMAIL = "G-Trac Support <support@musicstudy.uk>"
 
 
 REST_FRAMEWORK = {
