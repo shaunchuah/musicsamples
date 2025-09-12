@@ -261,3 +261,19 @@ class BasicScienceBoxForm(ModelForm):
         if not (self.instance and self.instance.pk):
             if "is_used" in self.fields:
                 del self.fields["is_used"]
+
+
+class ExperimentalIDForm(ModelForm):
+    class Meta:
+        model = ExperimentalID
+        fields = ["name", "description", "date"]
+        widgets = {
+            "date": DateInput(),
+            "description": forms.Textarea(attrs={"rows": 3}),
+            "name": forms.TextInput(attrs={"placeholder": "e.g., EXP-001"}),
+        }
+        labels = {
+            "name": "Experiment Name",
+            "description": "Description",
+            "date": "Experiment Date",
+        }

@@ -2,7 +2,7 @@ from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
-from app.models import ClinicalData, DataStore, Sample, StudyIdentifier
+from app.models import BasicScienceBox, ClinicalData, DataStore, Sample, StudyIdentifier
 
 
 @admin.register(StudyIdentifier)
@@ -59,4 +59,18 @@ class DataStoreAdmin(GuardedModelAdmin):
         "comments",
         "music_timepoint",
         "marvel_timepoint",
+    ]
+
+
+@admin.register(BasicScienceBox)
+class BasicScienceBoxAdmin(admin.ModelAdmin):
+    list_display = [
+        "box_id",
+        "box_type",
+        "basic_science_group",
+        "location",
+        "species",
+        "is_used",
+        "created_by",
+        "last_modified_by",
     ]

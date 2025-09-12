@@ -1,14 +1,38 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from django.views.decorators.http import require_http_methods
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from app.filters import BasicScienceBoxFilter
-from app.forms import BasicScienceBoxForm
+from app.forms import BasicScienceBoxForm, ExperimentalIDForm
 from app.models import BasicScienceBox
+from app.utils import historical_changes
+
+
+class BasicScienceBoxDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    model = BasicScienceBox
+    template_name = "boxes/box_detail.html"
+    context_object_name = "box"
+    permission_required = "app.view_basicsciencebox"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        box = self.get_object()
+        box_history = box.history.filter(id=box.pk)
+        changes = historical_changes(box_history)
+        first_change = box_history.first()
+        context.update(
+            {
+                "changes": changes,
+                "first": first_change,
+            }
+        )
+        return context
 
 
 class BasicScienceBoxListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -39,6 +63,7 @@ class BasicScienceBoxCreateView(LoginRequiredMixin, PermissionRequiredMixin, Cre
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         form.instance.last_modified_by = self.request.user
+        messages.success(self.request, "Box registered successfully.")
         return super().form_valid(form)
 
 
@@ -51,6 +76,7 @@ class BasicScienceBoxUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Upd
 
     def form_valid(self, form):
         form.instance.last_modified_by = self.request.user
+        messages.success(self.request, "Box updated successfully.")
         return super().form_valid(form)
 
 
@@ -60,12 +86,13 @@ class BasicScienceBoxDeleteView(LoginRequiredMixin, PermissionRequiredMixin, Del
     success_url = reverse_lazy("boxes:list")
     permission_required = "app.delete_basicsciencebox"
 
-    def delete(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         success_url = self.get_success_url()
         self.object.is_used = True  # type: ignore
         self.object.last_modified_by = self.request.user  # type: ignore
         self.object.save()
+        messages.success(self.request, "Box deleted successfully.")
         return HttpResponseRedirect(success_url)
 
 
@@ -105,3 +132,25 @@ def box_search(request):
         )
     else:
         return render(request, "boxes/box_list.html", {"query_string": "Null", "box_count": 0})
+
+
+@login_required
+@require_http_methods(["POST"])
+def create_experimental_id(request):
+    """AJAX view to create a new ExperimentalID."""
+    form = ExperimentalIDForm(request.POST)
+
+    if form.is_valid():
+        experimental_id = form.save()
+        return JsonResponse(
+            {
+                "success": True,
+                "experimental_id": {
+                    "id": experimental_id.id,
+                    "name": experimental_id.name,
+                    "description": experimental_id.description,
+                },
+            }
+        )
+    else:
+        return JsonResponse({"success": False, "errors": form.errors})

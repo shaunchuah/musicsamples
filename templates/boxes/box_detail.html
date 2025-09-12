@@ -1,0 +1,194 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+  Dashboard
+{% endblock title %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+  <div class="row mb-2">
+    <div class="col">
+      <a href="{% url 'boxes:list' %}">&larr; Back to Boxes List</a>
+    </div>
+  </div>
+  {% if form.errors %}
+    {% for field in form %}
+      {% for error in field.errors %}
+        <div class="row">
+          <div class="col-md-5">
+            <div class="alert alert-danger">
+              <button type="button"
+                      aria-hidden="true"
+                      class="close"
+                      data-dismiss="alert"
+                      aria-label="Close">
+                <i class="tim-icons icon-simple-remove"></i>
+              </button>
+              <span>{{ field.label }}: {{ error|escape }}</span>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
+  <div class="row">
+    <div class="col-md-7">
+      <div class="card">
+        <h3 class="card-header card-title">Box Details</h3>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td>Box ID</td>
+                  <td>{{ box.box_id }}</td>
+                </tr>
+                <tr>
+                  <td>Group</td>
+                  <td>{{ box.get_basic_science_group_display }}</td>
+                </tr>
+                <tr>
+                  <td>Experimental IDs</td>
+                  <td>
+                    {% for exp_id in box.experimental_ids.all %}
+                      {{ exp_id.name }}
+                      {% if not forloop.last %},{% endif %}
+                    {% empty %}
+                      N/A
+                    {% endfor %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Box Location</td>
+                  <td>{{ box.get_location_display }}</td>
+                </tr>
+                <tr>
+                  <td>Box Sublocation</td>
+                  <td>{{ box.row }}{{ box.column }}{{ box.depth }}</td>
+                </tr>
+                <tr>
+                  <td>Box Type</td>
+                  <td>{{ box.get_box_type_display }}</td>
+                </tr>
+                <tr>
+                  <td>Species</td>
+                  <td>{{ box.get_species_display }}</td>
+                </tr>
+                <tr>
+                  <td>Sample Types</td>
+                  <td>
+                    {% for sample_type in box.sample_types.all %}
+                      {{ sample_type.label }}
+                      {% if not forloop.last %},{% endif %}
+                    {% empty %}
+                      N/A
+                    {% endfor %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Tissue Types</td>
+                  <td>
+                    {% for tissue_type in box.tissue_types.all %}
+                      {{ tissue_type.label }}
+                      {% if not forloop.last %},{% endif %}
+                    {% empty %}
+                      N/A
+                    {% endfor %}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Comments</td>
+                  <td>{{ box.comments }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="{% url 'boxes:edit' pk=box.pk %}"
+             class="btn btn-fill btn-success">Edit</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card">
+        <h3 class="card-title card-header">History</h3>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td>First Registered</td>
+                  <td>{{ box.created }}</td>
+                </tr>
+                <tr>
+                  <td>Created By</td>
+                  <td>{{ box.created_by }}</td>
+                </tr>
+                <tr>
+                  <td>Last Modified</td>
+                  <td>{{ box.last_modified }}</td>
+                </tr>
+                <tr>
+                  <td>Modified By</td>
+                  <td>{{ box.last_modified_by }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <table class="table" id="history_table">
+              <thead>
+                <tr>
+                  <th>date/time</th>
+                  <th>change made</th>
+                  <th>responsible</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for change in changes %}
+                  <tr>
+                    <td>{{ change.new_record.history_date|date:"D j M Y, H:i" }}</td>
+                    <td>
+                      {% if change.changed_fields|length > 0 %}
+                        {% for change_by_id in change.changes %}
+                          <b>{{ change_by_id.field|title }}</b>
+                          from
+                          {% if change_by_id.old %}
+                            <b>{{ change_by_id.old }}</b>
+                          {% else %}
+                            <b>blank field</b>
+                          {% endif %}
+                          to
+                          <b>{{ change_by_id.new }}</b>
+                          <br />
+                        {% endfor %}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
+                    <td>{{ change.new_record.history_user }}</td>
+                  </tr>
+                {% endfor %}
+                <tr>
+                  <td>{{ box.created }}</td>
+                  <td>First Created</td>
+                  <td>{{ box.created_by }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+  <script>
+    $(document).ready(function() {
+      // Javascript method's body can be found in assets/js/demos.js
+      demo.initDashboardPageCharts();
+
+    });
+  </script>
+{% endblock javascripts %}

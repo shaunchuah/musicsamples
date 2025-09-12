@@ -119,8 +119,8 @@ class BasicScienceGroupChoices(models.TextChoices):
 
 
 class BasicScienceBoxTypeChoices(models.TextChoices):
-    BASIC_SCIENCE_SAMPLES = "basic_science_samples", "Basic Science Samples"
-    BASIC_SCIENCE_REAGENTS = "basic_science_reagents", "Basic Science Reagents"
+    BASIC_SCIENCE_SAMPLES = "basic_science_samples", "Samples"
+    BASIC_SCIENCE_REAGENTS = "basic_science_reagents", "Reagents"
 
 
 class BasicScienceSampleTypeChoices(models.TextChoices):

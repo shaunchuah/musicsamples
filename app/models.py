@@ -191,6 +191,7 @@ class DataStore(models.Model):
     class Meta:
         ordering = ["-upload_finished_at"]
         permissions = (("delete_own_datastore", "Can delete own datastore"),)
+        verbose_name_plural = "Data Stores"
 
 
 @receiver(post_save, sender=DataStore)
@@ -238,6 +239,7 @@ class ClinicalData(models.Model):
                 name="unique_study_id_music_timepoint",
             ),
         ]
+        verbose_name_plural = "Clinical Data"
 
 
 class ExperimentalID(models.Model):
@@ -303,3 +305,4 @@ class BasicScienceBox(models.Model):
 
     class Meta:
         ordering = ["-created"]
+        verbose_name_plural = "Basic Science Boxes"

@@ -55,13 +55,17 @@
               <thead class="text-primary">
                 <tr>
                   <th>Box ID</th>
-                  <th>Box Type</th>
-                  <th>Basic Science Group</th>
+                  <th>Group</th>
+                  <th>Experimental IDs</th>
                   <th>Location</th>
+                  <th>Sublocation</th>
+                  <th>Box Type</th>
                   <th>Species</th>
-                  <th>Created By</th>
+                  <th>Sample Types</th>
+                  <th>Tissue Types</th>
+                  <th>Comments</th>
                   <th>Created</th>
-                  <th>Used</th>
+                  <th>Created By</th>
                   <th>View</th>
                   <th>Edit</th>
                   <th>Delete</th>
@@ -71,27 +75,40 @@
                 {% for box in boxes %}
                   <tr>
                     <td>{{ box.box_id }}</td>
-                    <td>{{ box.get_box_type_display }}</td>
                     <td>{{ box.get_basic_science_group_display }}</td>
+                    <td>
+                      {% for exp_id in box.experimental_ids.all %}
+                        {{ exp_id.name }}
+                        {% if not forloop.last %},{% endif %}
+                      {% endfor %}
+                    </td>
                     <td>{{ box.get_location_display }}</td>
+                    <td>{{ box.row }}{{ box.column }}{{ box.depth }}</td>
+                    <td>{{ box.get_box_type_display }}</td>
                     <td>{{ box.get_species_display }}</td>
-                    <td>{{ box.created_by.get_full_name|default:box.created_by.username }}</td>
+                    <td>
+                      {% for sample_type in box.sample_types.all %}
+                        {{ sample_type.label }}
+                        {% if not forloop.last %},{% endif %}
+                      {% endfor %}
+                    </td>
+                    <td>
+                      {% for tissue_type in box.tissue_types.all %}
+                        {{ tissue_type.label }}
+                        {% if not forloop.last %},{% endif %}
+                      {% endfor %}
+                    </td>
+                    <td>{{ box.comments }}</td>
+                    <td>{{ box.created_by.email }}</td>
                     <td>{{ box.created|date:'d M Y' }}</td>
                     <td>
-                      {% if box.is_used %}
-                        <span class="badge badge-danger">Used</span>
-                      {% else %}
-                        <span class="badge badge-success">Active</span>
-                      {% endif %}
+                      <a href="{% url 'boxes:detail' box.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
                     </td>
                     <td>
-                      <a href="#" class="btn btn-sm btn-info">View</a>
+                      <a href="{% url 'boxes:edit' box.pk %}"><i class="tim-icons icon-pencil"></i> Edit</a>
                     </td>
                     <td>
-                      <a href="{% url 'boxes:edit' box.pk %}" class="btn btn-sm btn-warning">Edit</a>
-                    </td>
-                    <td>
-                      <a href="{% url 'boxes:delete' box.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                      <a href="{% url 'boxes:delete' box.pk %}"><i class="tim-icons icon-send align-center"></i> Used</a>
                     </td>
                   </tr>
                 {% empty %}

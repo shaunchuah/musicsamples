@@ -3,9 +3,11 @@ from django.urls import path
 from .views.box_views import (
     BasicScienceBoxCreateView,
     BasicScienceBoxDeleteView,
+    BasicScienceBoxDetailView,
     BasicScienceBoxListView,
     BasicScienceBoxUpdateView,
     box_search,
+    create_experimental_id,
 )
 
 app_name = "boxes"
@@ -13,7 +15,9 @@ app_name = "boxes"
 urlpatterns = [
     path("", BasicScienceBoxListView.as_view(), name="list"),
     path("create/", BasicScienceBoxCreateView.as_view(), name="create"),
-    path("<int:pk>/edit/", BasicScienceBoxUpdateView.as_view(), name="edit"),
-    path("<int:pk>/delete/", BasicScienceBoxDeleteView.as_view(), name="delete"),
+    path("view/<int:pk>/", BasicScienceBoxDetailView.as_view(), name="detail"),
+    path("edit/<int:pk>/", BasicScienceBoxUpdateView.as_view(), name="edit"),
+    path("delete/<int:pk>/", BasicScienceBoxDeleteView.as_view(), name="delete"),
     path("search/", box_search, name="search"),
+    path("create-experimental-id/", create_experimental_id, name="create_experimental_id"),
 ]

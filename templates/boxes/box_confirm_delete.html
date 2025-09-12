@@ -7,14 +7,14 @@
   <div class="row">
     <div class="col-xl-9">
       <h2>
-        <i class="tim-icons icon-trash-simple"></i> Delete Basic Science Box
+        <i class="tim-icons icon-trash-simple"></i> Mark as Used - Basic Science Box
       </h2>
       <div class="card">
         <div class="card-body">
           <p>Are you sure you want to delete the box "{{ object }}"?</p>
           <form method="post">
             {% csrf_token %}
-            <button type="submit" class="btn btn-fill btn-danger">Yes, Delete</button>
+            <button type="submit" class="btn btn-fill btn-danger">Yes, mark as used</button>
             <a href="{% url 'boxes:list' %}" class="btn btn-fill btn-secondary">Cancel</a>
           </form>
         </div>
