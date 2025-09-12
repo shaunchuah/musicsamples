@@ -1,12 +1,11 @@
-# Import all models from the new modular structure
-# This file is kept for backward compatibility
-from .models.basic_science import (
+# Import all models to maintain backward compatibility
+from .basic_science import (
     BasicScienceBox,
     BasicScienceSampleType,
     ExperimentalID,
     TissueType,
 )
-from .models.clinical import (
+from .clinical import (
     ClinicalData,
     DataStore,
     Sample,
