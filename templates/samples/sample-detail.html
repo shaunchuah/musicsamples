@@ -7,6 +7,11 @@
 {% block stylesheets %}
 {% endblock stylesheets %}
 {% block content %}
+  <div class="row mb-2">
+    <div class="col">
+      <a href="{% url 'home' %}">&larr; Back to Samples Dashboard</a>
+    </div>
+  </div>
   {% if form.errors %}
     {% for field in form %}
       {% for error in field.errors %}

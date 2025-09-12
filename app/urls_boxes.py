@@ -8,6 +8,7 @@ from .views.box_views import (
     BasicScienceBoxUpdateView,
     box_search,
     create_experimental_id,
+    export_boxes_csv,
 )
 
 app_name = "boxes"
@@ -20,4 +21,5 @@ urlpatterns = [
     path("delete/<int:pk>/", BasicScienceBoxDeleteView.as_view(), name="delete"),
     path("search/", box_search, name="search"),
     path("create-experimental-id/", create_experimental_id, name="create_experimental_id"),
+    path("export_csv/", export_boxes_csv, name="export_csv"),
 ]

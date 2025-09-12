@@ -47,6 +47,13 @@
         </div>
         <div class="card-footer">
           <a href="{% url 'boxes:create' %}" class="btn btn-fill btn-success">Add New Box</a>
+          <a href="{% url 'boxes:export_csv' %}?q={{ query_string }}"
+             class="btn btn-success float-lg-right"
+             data-toggle="tooltip"
+             data-placement="bottom"
+             data-html="true"
+             title="Tip: Customise the export by searching for the set of samples you wish to download."><i class="tim-icons icon-cloud-download-93"></i> Export Current View
+          to CSV</a>
         </div>
         <div class="card-body">
           <div class="d-flex flex-row-reverse pb-3">Total Count: {{ boxes|length }}</div>
@@ -78,8 +85,8 @@
                     <td>{{ box.get_basic_science_group_display }}</td>
                     <td>
                       {% for exp_id in box.experimental_ids.all %}
-                        {{ exp_id.name }}
-                        {% if not forloop.last %},{% endif %}
+                        {{ exp_id.name }} {{ exp_id.date|date:'d M Y' }}
+                        {% if not forloop.last %}<br />{% endif %}
                       {% endfor %}
                     </td>
                     <td>{{ box.get_location_display }}</td>
@@ -89,18 +96,18 @@
                     <td>
                       {% for sample_type in box.sample_types.all %}
                         {{ sample_type.label }}
-                        {% if not forloop.last %},{% endif %}
+                        {% if not forloop.last %}<br />{% endif %}
                       {% endfor %}
                     </td>
                     <td>
                       {% for tissue_type in box.tissue_types.all %}
                         {{ tissue_type.label }}
-                        {% if not forloop.last %},{% endif %}
+                        {% if not forloop.last %}<br />{% endif %}
                       {% endfor %}
                     </td>
                     <td>{{ box.comments }}</td>
-                    <td>{{ box.created_by.email }}</td>
                     <td>{{ box.created|date:'d M Y' }}</td>
+                    <td>{{ box.created_by.email }}</td>
                     <td>
                       <a href="{% url 'boxes:detail' box.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
                     </td>
@@ -143,6 +150,7 @@
 {% block javascripts %}
   <script>
     $(document).ready(function() {
+      $('[data-toggle="tooltip"]').tooltip();
       $("#mainTable").tablesorter({
         sortReset: true,
         headers: {

@@ -36,6 +36,10 @@ def export_csv(queryset, file_prefix="gtrac", file_name="samples", include_relat
     for field in queryset.model._meta.fields:
         fields.append(field.name)
 
+    # Then add the many-to-many fields
+    for field in queryset.model._meta.many_to_many:
+        fields.append(field.name)
+
     # Then add the related fields
     if include_related:
         # List of related fields to exclude
@@ -79,8 +83,17 @@ def export_csv(queryset, file_prefix="gtrac", file_name="samples", include_relat
                 # This is a direct field
                 try:
                     value = getattr(obj, field_name)
+                    # Handle many-to-many fields first (before callable check)
+                    if hasattr(value, "all"):
+                        # This is a many-to-many manager
+                        related_objects = list(value.all())
+                        if related_objects:
+                            # Join the string representations
+                            value = ", ".join(str(obj) for obj in related_objects)
+                        else:
+                            value = ""
                     # Handle callable attributes
-                    if callable(value):
+                    elif callable(value):
                         value = value()
                 except (AttributeError, TypeError):
                     value = None
@@ -125,7 +138,7 @@ def render_dataframe_to_csv_response(df: pd.DataFrame, study_name: str):
         study_name,
         current_date,
     )
-    df.to_csv(response)
+    df.to_csv(response)  # type:ignore
     return response
 
 
@@ -194,15 +207,15 @@ def create_sample_type_pivot(qs: QuerySet, study_name: str):
     # Eg negative controls
     match study_name:
         case "mini_music":
-            pattern_to_match = "MINI-\d{3}-\d+"
+            pattern_to_match = r"MINI-\d{3}-\d+"
         case "music":
-            pattern_to_match = "MID-\d{2}-\d+"
+            pattern_to_match = r"MID-\d{2}-\d+"
         case "gidamps":
-            pattern_to_match = "GID-\d+-."
+            pattern_to_match = r"GID-\d+-."
         case "marvel":
-            pattern_to_match = "^\d{6}$"
+            pattern_to_match = r"^\d{6}$"
 
-    filter = df["study_id"].str.contains(pattern_to_match, regex=True)
+    filter = df["study_id"].str.contains(pattern_to_match, regex=True)  # type: ignore
     df = df[filter]
 
     # Create the pivot table of interest
@@ -249,7 +262,7 @@ def historical_changes(query):
 
                                 old_instance = StudyIdentifier.objects.get(pk=change.old)
                                 change_dict["old"] = str(old_instance)
-                            except (StudyIdentifier.DoesNotExist, ValueError):
+                            except (StudyIdentifier.DoesNotExist, ValueError):  # type: ignore
                                 pass
                         if change.new is not None:
                             try:
@@ -257,7 +270,7 @@ def historical_changes(query):
 
                                 new_instance = StudyIdentifier.objects.get(pk=change.new)
                                 change_dict["new"] = str(new_instance)
-                            except (StudyIdentifier.DoesNotExist, ValueError):
+                            except (StudyIdentifier.DoesNotExist, ValueError):  # type: ignore
                                 pass
                     # Recreate the change object (assumes it's a dataclass)
                     processed_change = dataclasses.replace(change, **change_dict)

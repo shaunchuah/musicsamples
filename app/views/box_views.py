@@ -11,7 +11,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 from app.filters import BasicScienceBoxFilter
 from app.forms import BasicScienceBoxForm, ExperimentalIDForm
 from app.models import BasicScienceBox
-from app.utils import historical_changes
+from app.utils import export_csv, historical_changes
 
 
 class BasicScienceBoxDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
@@ -50,6 +50,7 @@ class BasicScienceBoxListView(LoginRequiredMixin, PermissionRequiredMixin, ListV
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["filter"] = self.filterset
+        context["query_string"] = self.request.GET.get("q", "")
         return context
 
 
@@ -154,3 +155,33 @@ def create_experimental_id(request):
         )
     else:
         return JsonResponse({"success": False, "errors": form.errors})
+
+
+@login_required(login_url="/login/")
+def export_boxes_csv(request):
+    """
+    Exports boxes to CSV based on search query or all boxes if no query.
+    """
+    query_string = ""
+    if ("q" in request.GET) and request.GET["q"].strip():
+        query_string = request.GET.get("q")
+        queryset = BasicScienceBox.objects.filter(
+            Q(box_id__icontains=query_string)
+            | Q(box_type__icontains=query_string)
+            | Q(basic_science_group__icontains=query_string)
+            | Q(location__icontains=query_string)
+            | Q(species__icontains=query_string)
+        ).exclude(is_used=True)
+
+        if ("include_used_boxes" in request.GET) and request.GET["include_used_boxes"].strip():
+            queryset = BasicScienceBox.objects.filter(
+                Q(box_id__icontains=query_string)
+                | Q(box_type__icontains=query_string)
+                | Q(basic_science_group__icontains=query_string)
+                | Q(location__icontains=query_string)
+                | Q(species__icontains=query_string)
+            )
+    else:
+        queryset = BasicScienceBox.objects.exclude(is_used=True)
+
+    return export_csv(queryset, file_prefix="gtrac", file_name="basic_science_boxes")
