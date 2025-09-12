@@ -1,17 +1,21 @@
 import django_filters
 from django.db import models
+from django_filters.widgets import RangeWidget
 
 from app.choices import (
+    BasicScienceBoxTypeChoices,
+    BasicScienceGroupChoices,
+    ColumnChoices,
+    DepthChoices,
+    FreezerLocationChoices,
+    RowChoices,
     SampleTypeChoices,
     SexChoices,
     StudyCenterChoices,
     StudyGroupChoices,
     StudyNameChoices,
-    BasicScienceGroupChoices,
-    BasicScienceBoxTypeChoices,
-    FreezerLocationChoices,
 )
-from app.models import DataStore, Sample, BasicScienceBox
+from app.models import BasicScienceBox, BasicScienceSampleType, DataStore, ExperimentalID, Sample, TissueType
 
 
 class SampleFilter(django_filters.FilterSet):
@@ -22,7 +26,7 @@ class SampleFilter(django_filters.FilterSet):
     sample_type = django_filters.ChoiceFilter(label="Sample Type", choices=SampleTypeChoices.choices)
     is_used = django_filters.BooleanFilter(label="Used Samples?")
     sample_datetime = django_filters.DateFromToRangeFilter(
-        widget=django_filters.widgets.RangeWidget(attrs={"type": "date"}),
+        widget=RangeWidget(attrs={"type": "date"}),
         label="Sample Date Range",
     )
     sample_comments = django_filters.CharFilter(lookup_expr="icontains", label="Sample Comments")
@@ -136,7 +140,47 @@ class BasicScienceBoxFilter(django_filters.FilterSet):
     )
     box_type = django_filters.ChoiceFilter(label="Box Type", choices=BasicScienceBoxTypeChoices.choices)
     location = django_filters.ChoiceFilter(label="Location", choices=FreezerLocationChoices.choices)
+    row = django_filters.ChoiceFilter(label="Row", choices=RowChoices.choices)
+    column = django_filters.ChoiceFilter(label="Column", choices=ColumnChoices.choices)
+    depth = django_filters.ChoiceFilter(label="Depth", choices=DepthChoices.choices)
+    experimental_ids = django_filters.ModelMultipleChoiceFilter(
+        label="Experimental IDs", queryset=ExperimentalID.objects.all(), method="filter_experimental_ids"
+    )
+    experimental_ids_date = django_filters.DateFromToRangeFilter(
+        label="Experimental IDs Date Range",
+        widget=RangeWidget(attrs={"type": "date"}),
+        method="filter_experimental_ids_date",
+    )
+    sample_types = django_filters.ModelMultipleChoiceFilter(
+        label="Sample Types", queryset=BasicScienceSampleType.objects.all(), method="filter_sample_types"
+    )
+    tissue_types = django_filters.ModelMultipleChoiceFilter(
+        label="Tissue Types", queryset=TissueType.objects.all(), method="filter_tissue_types"
+    )
     is_used = django_filters.BooleanFilter(label="Used?")
+
+    def filter_experimental_ids(self, queryset, name, value):
+        if value:
+            return queryset.filter(experimental_ids__in=value)
+        return queryset
+
+    def filter_experimental_ids_date(self, queryset, name, value):
+        if value:
+            if value.start:
+                queryset = queryset.filter(experimental_ids__date__gte=value.start)
+            if value.stop:
+                queryset = queryset.filter(experimental_ids__date__lte=value.stop)
+        return queryset
+
+    def filter_sample_types(self, queryset, name, value):
+        if value:
+            return queryset.filter(sample_types__in=value)
+        return queryset
+
+    def filter_tissue_types(self, queryset, name, value):
+        if value:
+            return queryset.filter(tissue_types__in=value)
+        return queryset
 
     class Meta:
         model = BasicScienceBox
@@ -144,5 +188,8 @@ class BasicScienceBoxFilter(django_filters.FilterSet):
             "basic_science_group",
             "box_type",
             "location",
+            "row",
+            "column",
+            "depth",
             "is_used",
         ]

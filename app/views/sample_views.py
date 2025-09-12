@@ -224,7 +224,7 @@ def sample_add(request):
 def sample_detail(request, pk):
     # retrieves sample history and also linked notes both public and private
     sample = get_object_or_404(Sample, pk=pk)
-    sample_history = sample.history.filter(id=pk)
+    sample_history = sample.history.filter(id=pk)  # type:ignore
     changes = historical_changes(sample_history)
     first_change = sample_history.first()
     processing_time = None

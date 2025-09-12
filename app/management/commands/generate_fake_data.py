@@ -2,10 +2,11 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from app.factories import SampleFactory
-from app.models import Sample
+from app.factories import BasicScienceBoxFactory, SampleFactory
+from app.models import BasicScienceBox, Sample
 
 NUM_SAMPLES = 358
+NUM_BOXES = 100
 
 
 class Command(BaseCommand):
@@ -16,7 +17,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         if settings.DEBUG:
             self.stdout.write("Deleting old data...")
-            models = [Sample]
+            models = [BasicScienceBox, Sample]
             for m in models:
                 m.objects.all().delete()
 
@@ -26,7 +27,10 @@ class Command(BaseCommand):
             for _ in range(NUM_SAMPLES):
                 SampleFactory()
 
-            self.stdout.write(f"Successfully added {NUM_SAMPLES} samples.")
+            for _ in range(NUM_BOXES):
+                BasicScienceBoxFactory()
+
+            self.stdout.write(f"Successfully added {NUM_SAMPLES} samples and {NUM_BOXES} boxes.")
         else:
             self.stderr.write(
                 "WARNING: You are not allowed to run this command in production. "

@@ -1,0 +1,136 @@
+{% extends "layouts/base.html" %}
+
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Filter Boxes</h3>
+        </div>
+        <div class="card-body">
+          <form id="searchform" method="get">
+            {% load widget_tweaks %}
+
+            <div class="row">
+              {% for field in box_filter.form %}
+                {% if field.name == 'basic_science_group' %}
+                  <div class="col-md-4">
+                    <div class="form-group">{{ field.label_tag }} {% render_field field class="form-control" %}</div>
+                  </div>
+                {% elif field.name == 'box_type' %}
+                  <div class="col-md-4">
+                    <div class="form-group">{{ field.label_tag }} {% render_field field class="form-control" %}</div>
+                  </div>
+                {% elif field.name == 'is_used' %}
+                  <div class="col-md-4">
+                    <div class="form-group">{{ field.label_tag }} {% render_field field class="form-control" %}</div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+            <div class="row">
+              {% for field in box_filter.form %}
+                {% if field.name == 'location' %}
+                  <div class="col-md-6">
+                    <div class="form-group">{{ field.label_tag }} {% render_field field class="form-control" %}</div>
+                  </div>
+                {% elif field.name == 'row' %}
+                  <div class="col-md-2">
+                    <div class="form-group">{{ field.label_tag }} {% render_field field class="form-control" %}</div>
+                  </div>
+                {% elif field.name == 'column' %}
+                  <div class="col-md-2">
+                    <div class="form-group">{{ field.label_tag }} {% render_field field class="form-control" %}</div>
+                  </div>
+                {% elif field.name == 'depth' %}
+                  <div class="col-md-2">
+                    <div class="form-group">{{ field.label_tag }} {% render_field field class="form-control" %}</div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+            <div class="row">
+              {% for field in box_filter.form %}
+                {% if field.name == 'experimental_ids' %}
+                  <div class="col-md-4">
+                    <div class="form-group">{{ field.label_tag }} {% render_field field class="form-control" %}</div>
+                  </div>
+                {% elif field.name == 'sample_types' %}
+                  <div class="col-md-4">
+                    <div class="form-group">{{ field.label_tag }} {% render_field field class="form-control" %}</div>
+                  </div>
+                {% elif field.name == 'tissue_types' %}
+                  <div class="col-md-4">
+                    <div class="form-group">{{ field.label_tag }} {% render_field field class="form-control" %}</div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+            <div class="row mb-4">
+              {% for field in box_filter.form %}
+                {% if field.name == 'experimental_ids_date' %}
+                  <div class="col-md-6">
+                    {{ field.label_tag }}
+                    <div class="d-flex flex-row align-items-center">{% render_field field class="form-control" %}</div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+            <div>
+              <button type="submit" class="btn btn-fill btn-success">Filter</button>
+              <a href="{% url 'boxes:filter' %}" class="btn btn-fill btn-secondary">Clear</a>
+            <a href="{% url 'boxes:filter_export_csv' %}?{{ parameter_string }}"
+               class="btn btn-success float-lg-right"><i class="tim-icons icon-cloud-download-93"></i>
+          Export CSV</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Boxes</h3>
+      </div>
+      {% include 'boxes/includes/box_table.html' %}
+    </div>
+  </div>
+</div>
+{% endblock content %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+  <script>
+    $(document).ready(function() {
+      $('[data-toggle="tooltip"]').tooltip();
+      $("#mainTable").tablesorter({
+        sortReset: true,
+        dateFormat: "ddmmyyyy",
+        headers: {
+          6: {
+            sorter: 'shortDate'
+          },
+          17: {
+            sorter: false
+          },
+          18: {
+            sorter: false
+          },
+          19: {
+            sorter: false
+          },
+          20: {
+            sorter: false
+          },
+          21: {
+            sorter: false
+          },
+
+        },
+      });
+    });
+  </script>
+{% endblock javascripts %}
