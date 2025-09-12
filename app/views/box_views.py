@@ -23,7 +23,7 @@ class BasicScienceBoxDetailView(LoginRequiredMixin, PermissionRequiredMixin, Det
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         box = self.get_object()
-        box_history = box.history.filter(id=box.pk)
+        box_history = box.history.filter(id=box.pk)  # type: ignore
         changes = historical_changes(box_history)
         first_change = box_history.first()
         context.update(
