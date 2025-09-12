@@ -1,0 +1,148 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+  Basic Science Boxes
+{% endblock title %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Search Boxes</h3>
+        </div>
+        <div class="card-body">
+          <form id="searchform" action="{% url 'boxes:search' %}" method="get">
+            <div class="form-group">
+              <input type="text" autofocus name="q" class="form-control" />
+            </div>
+            <div class="form-check">
+              <input type="checkbox"
+                     class="form-check-input mr-2"
+                     id="id_include_used_boxes"
+                     name="include_used_boxes"
+                     value="True"
+                     class="form-control" />
+              <label for="id_include_used_boxes" class="form-check-label">Include used boxes?</label>
+            </div>
+            <div>
+              <button type="submit" class="btn btn-fill btn-success">Search</button>
+              <a href="{% url 'boxes:list' %}" class="btn btn-fill btn-secondary">Clear</a>
+              <a href="{% url 'filter' %}"
+                 class="btn btn-fill btn-success float-lg-right">Advanced
+              Filtering</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Basic Science Boxes</h3>
+        </div>
+        <div class="card-footer">
+          <a href="{% url 'boxes:create' %}" class="btn btn-fill btn-success">Add New Box</a>
+        </div>
+        <div class="card-body">
+          <div class="d-flex flex-row-reverse pb-3">Total Count: {{ boxes|length }}</div>
+          <div class="table-responsive">
+            <table class="table tablesorter" id="mainTable">
+              <thead class="text-primary">
+                <tr>
+                  <th>Box ID</th>
+                  <th>Box Type</th>
+                  <th>Basic Science Group</th>
+                  <th>Location</th>
+                  <th>Species</th>
+                  <th>Created By</th>
+                  <th>Created</th>
+                  <th>Used</th>
+                  <th>View</th>
+                  <th>Edit</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for box in boxes %}
+                  <tr>
+                    <td>{{ box.box_id }}</td>
+                    <td>{{ box.get_box_type_display }}</td>
+                    <td>{{ box.get_basic_science_group_display }}</td>
+                    <td>{{ box.get_location_display }}</td>
+                    <td>{{ box.get_species_display }}</td>
+                    <td>{{ box.created_by.get_full_name|default:box.created_by.username }}</td>
+                    <td>{{ box.created|date:'d M Y' }}</td>
+                    <td>
+                      {% if box.is_used %}
+                        <span class="badge badge-danger">Used</span>
+                      {% else %}
+                        <span class="badge badge-success">Active</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <a href="#" class="btn btn-sm btn-info">View</a>
+                    </td>
+                    <td>
+                      <a href="{% url 'boxes:edit' box.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                    </td>
+                    <td>
+                      <a href="{% url 'boxes:delete' box.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="11" class="text-center">No boxes found.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if is_paginated %}
+            <div class="pagination">
+              <span class="step-links">
+                {% if page_obj.has_previous %}
+                  <a href="?page=1">&laquo; first</a>
+                  <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                {% endif %}
+                <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</span>
+                {% if page_obj.has_next %}
+                  <a href="?page={{ page_obj.next_page_number }}">next</a>
+                  <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+              </span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+  <script>
+    $(document).ready(function() {
+      $("#mainTable").tablesorter({
+        sortReset: true,
+        headers: {
+          7: {
+            sorter: false
+          },
+          8: {
+            sorter: false
+          },
+          9: {
+            sorter: false
+          },
+          10: {
+            sorter: false
+          },
+        },
+      });
+    });
+  </script>
+{% endblock javascripts %}

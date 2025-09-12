@@ -110,3 +110,89 @@ class StudyGroupChoices(models.TextChoices):
 class SexChoices(models.TextChoices):
     MALE = "male", "Male"
     FEMALE = "female", "Female"
+
+
+class BasicScienceGroupChoices(models.TextChoices):
+    BAIN = "bain", "BAIN"
+    JONES = "jones", "JONES"
+    OTHER = "other", "Other"
+
+
+class BasicScienceBoxTypeChoices(models.TextChoices):
+    BASIC_SCIENCE_SAMPLES = "basic_science_samples", "Basic Science Samples"
+    BASIC_SCIENCE_REAGENTS = "basic_science_reagents", "Basic Science Reagents"
+
+
+class BasicScienceSampleTypeChoices(models.TextChoices):
+    RNA = "rna", "RNA"
+    DNA = "dna", "DNA"
+    TISSUE = "tissue", "Tissue"
+    CELLS = "cells", "Cells"
+    SUPERNATANTS = "supernatants", "Supernatants"
+    OTHER = "other", "Other"
+
+
+class TissueTypeChoices(models.TextChoices):
+    BLOOD = "blood", "Blood"
+    GUT = "gut", "Gut"
+    STOOL = "stool", "Stool"
+    BONE_MARROW = "bone_marrow", "Bone Marrow"
+    LUNG = "lung", "Lung"
+    BRONCHOALVEOLAR_LAVAGE = "bronchoalveolar_lavage", "Bronchoalveolar Lavage"
+    OTHER = "other", "Other"
+
+
+class SpeciesChoices(models.TextChoices):
+    HUMAN = "human", "Human"
+    MOUSE = "mouse", "Mouse"
+
+
+class FreezerLocationChoices(models.TextChoices):
+    SII_FREEZER_1 = "sii_freezer_1", "SII Freezer 1"
+
+
+class RowChoices(models.TextChoices):
+    A = "A", "A"
+    B = "B", "B"
+    C = "C", "C"
+    D = "D", "D"
+    E = "E", "E"
+    F = "F", "F"
+    G = "G", "G"
+    H = "H", "H"
+    I = "I", "I"  # noqa: E741
+    J = "J", "J"
+    K = "K", "K"
+    L = "L", "L"
+    M = "M", "M"
+    N = "N", "N"
+    O = "O", "O"  # noqa: E741
+    P = "P", "P"
+    Q = "Q", "Q"
+    R = "R", "R"
+    S = "S", "S"
+    T = "T", "T"
+    U = "U", "U"
+    V = "V", "V"
+    W = "W", "W"
+    X = "X", "X"
+    Y = "Y", "Y"
+    Z = "Z", "Z"
+
+
+class ColumnChoices(models.TextChoices):
+    ONE = "1", "1"
+    TWO = "2", "2"
+    THREE = "3", "3"
+    FOUR = "4", "4"
+    FIVE = "5", "5"
+    SIX = "6", "6"
+    SEVEN = "7", "7"
+    EIGHT = "8", "8"
+
+
+class DepthChoices(models.TextChoices):
+    A = "A", "A"
+    B = "B", "B"
+    C = "C", "C"
+    D = "D", "D"

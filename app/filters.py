@@ -1,8 +1,17 @@
 import django_filters
 from django.db import models
 
-from app.choices import SampleTypeChoices, SexChoices, StudyCenterChoices, StudyGroupChoices, StudyNameChoices
-from app.models import DataStore, Sample
+from app.choices import (
+    SampleTypeChoices,
+    SexChoices,
+    StudyCenterChoices,
+    StudyGroupChoices,
+    StudyNameChoices,
+    BasicScienceGroupChoices,
+    BasicScienceBoxTypeChoices,
+    FreezerLocationChoices,
+)
+from app.models import DataStore, Sample, BasicScienceBox
 
 
 class SampleFilter(django_filters.FilterSet):
@@ -118,4 +127,22 @@ class DataStoreFilter(django_filters.FilterSet):
             "study_id__genotype_data_available",
             "study_id__nod2_mutation_present",
             "study_id__il23r_mutation_present",
+        ]
+
+
+class BasicScienceBoxFilter(django_filters.FilterSet):
+    basic_science_group = django_filters.ChoiceFilter(
+        label="Basic Science Group", choices=BasicScienceGroupChoices.choices
+    )
+    box_type = django_filters.ChoiceFilter(label="Box Type", choices=BasicScienceBoxTypeChoices.choices)
+    location = django_filters.ChoiceFilter(label="Location", choices=FreezerLocationChoices.choices)
+    is_used = django_filters.BooleanFilter(label="Used?")
+
+    class Meta:
+        model = BasicScienceBox
+        fields = [
+            "basic_science_group",
+            "box_type",
+            "location",
+            "is_used",
         ]

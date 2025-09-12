@@ -1,0 +1,130 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}
+  {% if object %}
+    Edit
+  {% else %}
+    Add
+  {% endif %}
+  Basic Science Box
+{% endblock title %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+  {% if form.errors %}
+    {% for field in form %}
+      {% for error in field.errors %}
+        <div class="row">
+          <div class="col-xl-9">
+            <div class="alert alert-danger">
+              <button type="button"
+                      aria-hidden="true"
+                      class="close"
+                      data-dismiss="alert"
+                      aria-label="Close">
+                <i class="tim-icons icon-simple-remove"></i>
+              </button>
+              <span>{{ field.label }}: {{ error|escape }}</span>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
+  <div class="row">
+    <div class="col-xl-9">
+      <h2>
+        <i class="tim-icons icon-pencil"></i>
+        {% if object %}
+          Edit
+        {% else %}
+          Add
+        {% endif %}
+        Basic Science Box
+      </h2>
+      <div class="card">
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  {{ form.basic_science_group.label_tag }}
+                  {{ form.basic_science_group|add_class:"form-control" }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  {{ form.box_type.label_tag }}
+                  {{ form.box_type|add_class:"form-control" }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  {{ form.species.label_tag }}
+                  {{ form.species|add_class:"form-control" }}
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  {{ form.location.label_tag }}
+                  {{ form.location|add_class:"form-control" }}
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  {{ form.row.label_tag }}
+                  {{ form.row|add_class:"form-control" }}
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  {{ form.column.label_tag }}
+                  {{ form.column|add_class:"form-control" }}
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  {{ form.depth.label_tag }}
+                  {{ form.depth|add_class:"form-control" }}
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              {{ form.experimental_ids.label_tag }}
+              {{ form.experimental_ids|add_class:"form-control" }}
+            </div>
+            <div class="form-group">
+              {{ form.sample_types.label_tag }}
+              {{ form.sample_types|add_class:"form-control" }}
+            </div>
+            <div class="form-group">
+              {{ form.tissue_types.label_tag }}
+              {{ form.tissue_types|add_class:"form-control" }}
+            </div>
+            <div class="form-check">
+              {{ form.is_used|add_class:"form-check-input" }}
+              {{ form.is_used.label_tag|add_class:"form-check-label" }}
+            </div>
+            <div class="form-group">
+              {{ form.comments.label_tag }}
+              {{ form.comments|add_class:"form-control" }}
+            </div>
+            <div class="form-group">
+              {{ form.box_id.label_tag }}
+              {{ form.box_id|add_class:"form-control" }}
+            </div>
+            <button type="submit" class="btn btn-fill btn-success">Save</button>
+            <a href="{% url 'boxes:list' %}" class="btn btn-fill btn-secondary">Cancel</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

@@ -3,7 +3,15 @@ from django.forms import ModelForm
 from django.utils import timezone
 from django_select2 import forms as s2forms
 
-from app.models import DataStore, Sample, StudyIdentifier
+from app.models import (
+    BasicScienceBox,
+    BasicScienceSampleType,
+    DataStore,
+    ExperimentalID,
+    Sample,
+    StudyIdentifier,
+    TissueType,
+)
 
 
 class DateInput(forms.DateInput):
@@ -201,3 +209,55 @@ class StudyIdUpdateForm(ModelForm):
     class Meta:
         model = StudyIdentifier
         fields = ["name", "study_name"]
+
+
+class BasicScienceBoxForm(ModelForm):
+    experimental_ids = forms.ModelMultipleChoiceField(
+        queryset=ExperimentalID.objects.all(),
+        widget=forms.SelectMultiple(attrs={"class": "form-control"}),
+        required=False,
+        label="Experimental IDs",
+    )
+    sample_types = forms.ModelMultipleChoiceField(
+        queryset=BasicScienceSampleType.objects.all(),
+        widget=forms.SelectMultiple(attrs={"class": "form-control"}),
+        required=False,
+        label="Sample Types",
+    )
+    tissue_types = forms.ModelMultipleChoiceField(
+        queryset=TissueType.objects.all(),
+        widget=forms.SelectMultiple(attrs={"class": "form-control"}),
+        required=False,
+        label="Tissue Types",
+    )
+
+    class Meta:
+        model = BasicScienceBox
+        fields = [
+            "basic_science_group",
+            "box_id",
+            "box_type",
+            "species",
+            "location",
+            "row",
+            "column",
+            "depth",
+            "comments",
+            "experimental_ids",
+            "sample_types",
+            "tissue_types",
+            "is_used",
+        ]
+        widgets = {
+            "comments": forms.Textarea(attrs={"rows": 3}),
+        }
+        labels = {
+            "is_used": "Is Used?",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Conditionally remove 'is_used' field for creation forms
+        if not (self.instance and self.instance.pk):
+            if "is_used" in self.fields:
+                del self.fields["is_used"]

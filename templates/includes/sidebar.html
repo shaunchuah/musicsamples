@@ -29,18 +29,26 @@
             <p>QR Scan</p>
           </a>
         </li>
+        {% if perms.app.view_basicsciencebox %}
+          <li class="{% if 'boxes' in request.path %}active{% endif %}">
+            <a href="{% url 'boxes:list' %}">
+              <i class="tim-icons icon-app"></i>
+              <p>Box Tracking</p>
+            </a>
+          </li>
+        {% endif %}
         <li class="{% if 'analytics' in request.path %}active{% endif %}">
           <a href="{% url 'analytics' %}">
             <i class="tim-icons icon-chart-bar-32"></i>
             <p>Analytics</p>
           </a>
         </li>
-        <li class="{% if request.path == '/reference/' %}active{% endif %}">
+        {% comment %} <li class="{% if request.path == '/reference/' %}active{% endif %}">
           <a href="{% url 'reference' %}">
             <i class="tim-icons icon-single-copy-04"></i>
             <p>Reference</p>
           </a>
-        </li>
+        </li> {% endcomment %}
         <li class="{% if request.path == '/data_export/' %}active{% endif %}">
           <a href="{% url 'data_export' %}">
             <i class="tim-icons icon-upload"></i>
@@ -56,7 +64,7 @@
         {% if perms.app.view_datastore %}
           <li class="{% if 'datastore' in request.path %}active{% endif %}">
             <a href="{% url 'datastore_list' %}">
-              <i class="tim-icons icon-app"></i>
+              <i class="tim-icons icon-cloud-upload-94"></i>
               <p>DataStore</p>
             </a>
           </li>
