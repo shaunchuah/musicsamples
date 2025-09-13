@@ -209,7 +209,7 @@ You will need to exclude contenttypes and auth.permission to switch between data
 
 ## 🔐 Specific Permission Settings
 
-Once the app is deployed, make 3 groups - default, datasets and datastores. For datasets, assign the view_dataset permission. For datastores, assign the view_datastore permission. You can switch people back to the default group to remove access to datasets and datastores.
+Once the app is deployed, make 4 groups - default, datasets, datastores, basic_science. For datasets, assign the view_dataset permission. For datastores, assign the view_datastore permission. For basic_science, assign the Add/change/delete/view basic science box permission. You can switch people back to the default group to remove access to datasets and datastores.
 
 ## 🏗️ Project Architecture
 
