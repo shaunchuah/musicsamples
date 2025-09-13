@@ -50,7 +50,7 @@ def datastore_create_view(request):
             form.instance.upload_finished_at = datetime.datetime.now()
             form.instance.uploaded_by = request.user
             form.save()
-            return redirect("datastore_list")
+            return redirect("datastore:list")
         else:
             messages.error(request, "Form is invalid.")
     else:
@@ -67,7 +67,7 @@ def datastore_edit_metadata_view(request, id):
         if form.is_valid():
             form.save()
             messages.success(request, f"File {file.formatted_file_name} metadata has been updated.")
-            return redirect(reverse("datastore_detail", args=[file.id]))  # type:ignore
+            return redirect(reverse("datastore:detail", args=[file.id]))  # type:ignore
         else:
             messages.error(request, "Form is invalid.")
     else:
@@ -102,7 +102,7 @@ def datastore_download_view(request, id):
         return redirect(download_url)
     else:
         messages.error(request, "Failed to generate download link.")
-        return redirect("datastore_list")
+        return redirect("datastore:list")
 
 
 @login_required()
@@ -132,7 +132,7 @@ def datastore_delete_view(request, id):
     else:
         messages.error(request, "You don't have permission to delete this file.")
 
-    return redirect("datastore_list")
+    return redirect("datastore:list")
 
 
 @login_required()
@@ -154,7 +154,7 @@ def datastore_search_view(request):
             request, "datastore/datastore_list.html", {"datastores": data_store_list, "query_string": query_string}
         )
     else:
-        return redirect("datastore_list")
+        return redirect("datastore:list")
 
 
 @login_required()

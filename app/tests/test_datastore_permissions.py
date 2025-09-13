@@ -15,9 +15,9 @@ User = get_user_model()
 class DataStorePermissionTests(TestCase):
     def setUp(self):
         # Create users
-        self.admin_user = User.objects.create_superuser(email="admin@example.com", password="adminpass")
-        self.regular_user1 = User.objects.create_user(email="user1@example.com", password="user1pass")
-        self.regular_user2 = User.objects.create_user(email="user2@example.com", password="user2pass")
+        self.admin_user = User.objects.create_superuser(email="admin@example.com", password="adminpass")  # type:ignore
+        self.regular_user1 = User.objects.create_user(email="user1@example.com", password="user1pass")  # type:ignore
+        self.regular_user2 = User.objects.create_user(email="user2@example.com", password="user2pass")  # type:ignore
 
         content_type = ContentType.objects.get_for_model(DataStore)
         view_permission = Permission.objects.get(
@@ -77,37 +77,37 @@ class DataStorePermissionTests(TestCase):
     def test_owner_can_delete_file(self, mock_azure_delete):
         """Test that file owner can delete their own file"""
         # User1 tries to delete their own file
-        response = self.user1_client.get(reverse("datastore_delete", args=[self.file1.id]))
+        response = self.user1_client.get(reverse("datastore:delete", args=[self.file1.id]))  # type:ignore
 
         # Verify azure_delete_file was called with the correct file
         mock_azure_delete.assert_called_once()
 
         # Check if file is deleted
         self.assertEqual(response.status_code, 302)  # Redirect after successful deletion
-        self.assertFalse(DataStore.objects.filter(id=self.file1.id).exists())
+        self.assertFalse(DataStore.objects.filter(id=self.file1.id).exists())  # type:ignore
 
     @patch("app.views.datastore_views.azure_delete_file")
     def test_non_owner_cannot_delete_file(self, mock_azure_delete):
         """Test that non-owner cannot delete someone else's file"""
         # User1 tries to delete user2's file
-        response = self.user1_client.get(reverse("datastore_delete", args=[self.file2.id]))
+        response = self.user1_client.get(reverse("datastore:delete", args=[self.file2.id]))  # type:ignore
 
         # Verify azure_delete_file was NOT called
         mock_azure_delete.assert_not_called()
 
         # Check if file still exists
         self.assertEqual(response.status_code, 302)  # Redirects with error message
-        self.assertTrue(DataStore.objects.filter(id=self.file2.id).exists())
+        self.assertTrue(DataStore.objects.filter(id=self.file2.id).exists())  # type:ignore
 
     @patch("app.views.datastore_views.azure_delete_file")
     def test_admin_can_delete_any_file(self, mock_azure_delete):
         """Test that admin can delete any file"""
         # Admin tries to delete user1's file
-        response = self.admin_client.get(reverse("datastore_delete", args=[self.file1.id]))
+        response = self.admin_client.get(reverse("datastore:delete", args=[self.file1.id]))  # type:ignore
 
         # Verify azure_delete_file was called with the correct file
         mock_azure_delete.assert_called_once()
 
         # Check if file is deleted
         self.assertEqual(response.status_code, 302)  # Redirect after successful deletion
-        self.assertFalse(DataStore.objects.filter(id=self.file1.id).exists())
+        self.assertFalse(DataStore.objects.filter(id=self.file1.id).exists())  # type:ignore

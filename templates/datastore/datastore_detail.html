@@ -87,17 +87,17 @@
           </div>
         </div>
         <div class="card-footer d-flex justify-content-between">
-          <a href="{% url 'datastore_edit' id=file.id %}"
+          <a href="{% url 'datastore:edit' id=file.id %}"
              class="btn btn-fill btn-success">
             <i class="tim-icons icon-pencil"></i> Edit
           </a>
           <div>
-            <a href="{% url 'datastore_azure_view' id=file.id %}"
+            <a href="{% url 'datastore:azure_view' id=file.id %}"
                target="_blank"
                class="btn btn-fill btn-success">
               <i class="tim-icons icon-zoom-split"></i> View
             </a>
-            <a href="{% url 'datastore_download' id=file.id %}"
+            <a href="{% url 'datastore:download' id=file.id %}"
                class="btn btn-fill btn-success">
               <i class="tim-icons icon-cloud-download-93"></i> Download
             </a>
@@ -143,7 +143,7 @@
             <a href="#"
                data-toggle="modal"
                data-target="#deleteConfirmModal"
-               data-href="{% url 'datastore_delete' id=file.id %}"
+               data-href="{% url 'datastore:delete' id=file.id %}"
                class="btn btn-fill btn-danger">Delete</a>
           {% endif %}
         </div>

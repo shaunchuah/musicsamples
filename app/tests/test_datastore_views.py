@@ -17,7 +17,7 @@ class TestDataStoreViews:
     def setup_class(self):
         """Setup test data and permissions that will be used by all tests."""
         # Create a test user with basic permissions
-        self.user = User.objects.create_user(email="testuser@test.com", password="testpass")
+        self.user = User.objects.create_user(email="testuser@test.com", password="testpass")  # type:ignore
         content_type = ContentType.objects.get_for_model(DataStore)
         view_permission = Permission.objects.get(content_type=content_type, codename="view_datastore")
         self.user.user_permissions.add(view_permission)
@@ -54,7 +54,7 @@ class TestDataStoreViews:
         return self.user
 
     def test_datastore_list_view_get_context_data(self):
-        response = self.client.get(reverse("datastore_list"))
+        response = self.client.get(reverse("datastore:list"))
 
         # Check that the response status is 200 OK.
         assert response.status_code == 200
@@ -70,7 +70,7 @@ class TestDataStoreViews:
 
     def test_datastore_search_view_with_query(self):
         # Test search with query that should match ds2
-        response = self.client.get(reverse("datastore_search") + "?q=unique")
+        response = self.client.get(reverse("datastore:search") + "?q=unique")
 
         assert response.status_code == 200
 
@@ -84,14 +84,14 @@ class TestDataStoreViews:
 
     def test_datastore_search_view_without_query(self):
         # Test search without query - should redirect to datastore_list
-        response = self.client.get(reverse("datastore_search"))
+        response = self.client.get(reverse("datastore:search"))
 
         assert response.status_code == 302
-        assert response.url == reverse("datastore_list")
+        assert response.url == reverse("datastore:list")  # type:ignore
 
     def test_datastore_filter_view(self):
         # Test filter by study name
-        response = self.client.get(reverse("datastore_filter") + f"?study_name={StudyNameChoices.MUSIC.value}")
+        response = self.client.get(reverse("datastore:filter") + f"?study_name={StudyNameChoices.MUSIC.value}")
 
         assert response.status_code == 200
 
@@ -106,7 +106,7 @@ class TestDataStoreViews:
 
     def test_datastore_search_export_csv(self):
         # Test export all
-        response = self.client.get(reverse("datastore_search_export_csv"))
+        response = self.client.get(reverse("datastore:search_export_csv"))
 
         # Check it returns CSV response
         assert response.status_code == 200
@@ -114,7 +114,7 @@ class TestDataStoreViews:
         assert 'attachment; filename="gtrac_files' in response["Content-Disposition"]
 
         # Test export with search query
-        response = self.client.get(reverse("datastore_search_export_csv") + "?q=testfile1")
+        response = self.client.get(reverse("datastore:search_export_csv") + "?q=testfile1")
 
         assert response.status_code == 200
         assert response["Content-Type"] == "text/csv"
@@ -122,7 +122,7 @@ class TestDataStoreViews:
     def test_datastore_filter_export_csv(self):
         # Test filtered export
         response = self.client.get(
-            reverse("datastore_filter_export_csv") + f"?study_name={StudyNameChoices.MUSIC.value}"
+            reverse("datastore:filter_export_csv") + f"?study_name={StudyNameChoices.MUSIC.value}"
         )
 
         assert response.status_code == 200
@@ -137,27 +137,27 @@ class TestDataStoreViews:
         monkeypatch.setattr("app.views.datastore_views.azure_delete_file", mock_azure_delete_file)
 
         # Test delete view
-        response = self.client.post(reverse("datastore_delete", kwargs={"id": self.ds1.id}))
+        response = self.client.post(reverse("datastore:delete", kwargs={"id": self.ds1.id}))  # type:ignore
 
         # Check redirect
         assert response.status_code == 302
-        assert response.url == reverse("datastore_list")
+        assert response.url == reverse("datastore:list")  # type:ignore
 
         # Check file was deleted
-        assert not DataStore.objects.filter(id=self.ds1.id).exists()
+        assert not DataStore.objects.filter(id=self.ds1.id).exists()  # type:ignore
 
     def test_permission_required_for_views(self):
         # Create user without permissions
-        User.objects.create_user(email="noperm@test.com", password="testpass")
+        User.objects.create_user(email="noperm@test.com", password="testpass")  # type:ignore
 
         # Create client and log in
         client = Client()
         client.login(username="noperm@test.com", password="testpass")
 
         # Try to access views that require permission
-        list_response = client.get(reverse("datastore_list"))
-        create_response = client.get(reverse("datastore_create"))
-        filter_response = client.get(reverse("datastore_filter"))
+        list_response = client.get(reverse("datastore:list"))
+        create_response = client.get(reverse("datastore:create"))
+        filter_response = client.get(reverse("datastore:filter"))
 
         # All should return 403 Forbidden
         assert list_response.status_code == 403

@@ -3,7 +3,7 @@ from django.urls import include, path
 urlpatterns = [
     path("", include("app.urls.web")),
     path("", include("app.urls.samples")),
-    path("", include("app.urls.datastore")),
+    path("datastore/", include("app.urls.datastore", namespace="datastore")),
     path("", include("app.urls.study_ids")),
     path("", include("app.urls.api")),
     path("", include("app.urls.api_v2")),

@@ -102,7 +102,7 @@
                             <div class="dropdown-menu"
                                  aria-labelledby="filesDropdown{{ study_id.id }}">
                               {% for file in study_id.files.all %}
-                                <a class="dropdown-item" href="{% url 'datastore_detail' id=file.id %}">{{ file }}</a>
+                                <a class="dropdown-item" href="{% url 'datastore:detail' id=file.id %}">{{ file }}</a>
                               {% endfor %}
                             </div>
                           </div>

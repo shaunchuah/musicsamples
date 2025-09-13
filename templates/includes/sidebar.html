@@ -63,7 +63,7 @@
         </li>
         {% if perms.app.view_datastore %}
           <li class="{% if 'datastore' in request.path %}active{% endif %}">
-            <a href="{% url 'datastore_list' %}">
+            <a href="{% url 'datastore:list' %}">
               <i class="tim-icons icon-cloud-upload-94"></i>
               <p>DataStore</p>
             </a>

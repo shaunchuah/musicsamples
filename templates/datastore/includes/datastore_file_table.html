@@ -121,18 +121,18 @@
                 {% endif %}
               </td>
               <td>
-                <a href="{% url 'datastore_download' id=file.id %}"><i class="tim-icons icon-cloud-download-93"></i> Download</a>
-                <a href="{% url 'datastore_azure_view' id=file.id %}" target="_blank"><i class="tim-icons icon-zoom-split"></i> View</a>
+                <a href="{% url 'datastore:download' id=file.id %}"><i class="tim-icons icon-cloud-download-93"></i> Download</a>
+                <a href="{% url 'datastore:azure_view' id=file.id %}" target="_blank"><i class="tim-icons icon-zoom-split"></i> View</a>
               </td>
               <td>
-                <a href="{% url 'datastore_detail' id=file.id %}"><i class="tim-icons icon-zoom-split"></i> Metadata</a>
+                <a href="{% url 'datastore:detail' id=file.id %}"><i class="tim-icons icon-zoom-split"></i> Metadata</a>
               </td>
               <td class="text-center">
                 {% if request.user == file.uploaded_by or request.user.is_superuser %}
                   <a href="#"
                      data-toggle="modal"
                      data-target="#deleteConfirmModal"
-                     data-href="{% url 'datastore_delete' id=file.id %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
+                     data-href="{% url 'datastore:delete' id=file.id %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
                 {% endif %}
               </td>
             </tr>

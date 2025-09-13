@@ -137,51 +137,51 @@ class TestUrls(SimpleTestCase):
 
     # DataStore URLs
     def test_datastore_list_url_resolves(self):
-        url = reverse("datastore_list")
+        url = reverse("datastore:list")
         self.assertEqual(resolve(url).func, views.datastore_list_view)
 
     def test_datastore_create_url_resolves(self):
-        url = reverse("datastore_create")
+        url = reverse("datastore:create")
         self.assertEqual(resolve(url).func, views.datastore_create_view)
 
     def test_datastore_create_ajax_url_resolves(self):
-        url = reverse("datastore_create_ajax")
+        url = reverse("datastore:create_ajax")
         self.assertEqual(resolve(url).func, views.datastore_create_view_ajax)
 
     def test_datastore_download_url_resolves(self):
-        url = reverse("datastore_download", kwargs={"id": 1})
+        url = reverse("datastore:download", kwargs={"id": 1})
         self.assertEqual(resolve(url).func, views.datastore_download_view)
 
     def test_datastore_azure_view_url_resolves(self):
-        url = reverse("datastore_azure_view", kwargs={"id": 1})
+        url = reverse("datastore:azure_view", kwargs={"id": 1})
         self.assertEqual(resolve(url).func, views.datastore_azure_view)
 
     def test_datastore_detail_url_resolves(self):
-        url = reverse("datastore_detail", kwargs={"id": 1})
+        url = reverse("datastore:detail", kwargs={"id": 1})
         self.assertEqual(resolve(url).func, views.datastore_detail_view)
 
     def test_datastore_edit_url_resolves(self):
-        url = reverse("datastore_edit", kwargs={"id": 1})
+        url = reverse("datastore:edit", kwargs={"id": 1})
         self.assertEqual(resolve(url).func, views.datastore_edit_metadata_view)
 
     def test_datastore_delete_url_resolves(self):
-        url = reverse("datastore_delete", kwargs={"id": 1})
+        url = reverse("datastore:delete", kwargs={"id": 1})
         self.assertEqual(resolve(url).func, views.datastore_delete_view)
 
     def test_datastore_search_url_resolves(self):
-        url = reverse("datastore_search")
+        url = reverse("datastore:search")
         self.assertEqual(resolve(url).func, views.datastore_search_view)
 
     def test_datastore_search_export_csv_url_resolves(self):
-        url = reverse("datastore_search_export_csv")
+        url = reverse("datastore:search_export_csv")
         self.assertEqual(resolve(url).func, views.datastore_search_export_csv)
 
     def test_datastore_filter_url_resolves(self):
-        url = reverse("datastore_filter")
+        url = reverse("datastore:filter")
         self.assertEqual(resolve(url).func, views.datastore_filter_view)
 
     def test_datastore_filter_export_csv_url_resolves(self):
-        url = reverse("datastore_filter_export_csv")
+        url = reverse("datastore:filter_export_csv")
         self.assertEqual(resolve(url).func, views.datastore_filter_export_csv)
 
     # Export related URLs
@@ -240,21 +240,21 @@ class TestUrls(SimpleTestCase):
 
     # Datastore API URLs
     def test_datastore_file_direct_upload_start_url_resolves(self):
-        url = reverse("file_direct_upload_start")
+        url = reverse("datastore:file_direct_upload_start")
         resolved = resolve(url)
         self.assertEqual(resolved.url_name, "file_direct_upload_start")
 
     def test_datastore_file_direct_upload_finish_url_resolves(self):
-        url = reverse("file_direct_upload_finish")
+        url = reverse("datastore:file_direct_upload_finish")
         resolved = resolve(url)
         self.assertEqual(resolved.url_name, "file_direct_upload_finish")
 
     def test_datastore_import_study_identifiers_url_resolves(self):
-        url = reverse("import_study_identifiers")
+        url = reverse("datastore:import_study_identifiers")
         self.assertEqual(resolve(url).func, views.import_study_identifiers)
 
     def test_datastore_import_clinical_data_url_resolves(self):
-        url = reverse("import_clinical_data")
+        url = reverse("datastore:import_clinical_data")
         self.assertEqual(resolve(url).func, views.import_clinical_data)
 
 

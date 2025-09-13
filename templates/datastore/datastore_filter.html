@@ -28,9 +28,9 @@
             </div>
             <div>
               <button type="submit" class="btn btn-fill btn-success">Filter</button>
-              <a href="{% url 'datastore_filter' %}"
+              <a href="{% url 'datastore:filter' %}"
                  class="btn btn-fill btn-secondary">Clear</a>
-            <a href="{% url 'datastore_filter_export_csv' %}?{{ parameter_string }}"
+            <a href="{% url 'datastore:filter_export_csv' %}?{{ parameter_string }}"
                class="btn btn-success float-lg-right"><i class="tim-icons icon-cloud-download-93"></i>
           Export CSV</a>
         </div>
@@ -46,7 +46,7 @@
         <h3 class="card-title">Files</h3>
       </div>
       <div class="card-footer">
-        <a href="{% url 'datastore_create_ajax' %}"
+        <a href="{% url 'datastore:create_ajax' %}"
            class="btn btn-fill btn-success">Upload File</a>
       </div>
       {% include 'datastore/includes/datastore_file_table.html' %}
