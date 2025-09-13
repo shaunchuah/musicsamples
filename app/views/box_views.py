@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
@@ -113,6 +113,7 @@ class BasicScienceBoxDeleteView(LoginRequiredMixin, PermissionRequiredMixin, Del
 
 
 @login_required(login_url="/login/")
+@permission_required("app.view_basicsciencebox", raise_exception=True)
 def box_search(request):
     query_string = ""
     if ("q" in request.GET) and request.GET["q"].strip():
@@ -164,6 +165,7 @@ def box_search(request):
 
 
 @login_required
+@permission_required("app.view_basicsciencebox", raise_exception=True)
 @require_http_methods(["POST"])
 def create_experimental_id(request):
     """AJAX view to create a new ExperimentalID."""
@@ -186,6 +188,7 @@ def create_experimental_id(request):
 
 
 @login_required(login_url="/login/")
+@permission_required("app.view_basicsciencebox", raise_exception=True)
 def export_boxes_csv(request):
     """
     Exports boxes to CSV based on search query or all boxes if no query.
@@ -196,12 +199,14 @@ def export_boxes_csv(request):
         queryset = (
             BasicScienceBox.objects.filter(
                 Q(box_id__icontains=query_string)
-                | Q(box_type__icontains=query_string)
                 | Q(basic_science_group__icontains=query_string)
                 | Q(location__icontains=query_string)
-                | Q(species__icontains=query_string)
+                | Q(comments__icontains=query_string)
+                | Q(experimental_ids__name__icontains=query_string)
+                | Q(sample_types__name__icontains=query_string)
+                | Q(tissue_types__name__icontains=query_string)
             )
-            .exclude(is_used=True)
+            .filter(is_used=False)
             .prefetch_related("experimental_ids", "sample_types", "tissue_types")
             .select_related("created_by", "last_modified_by")
         )
@@ -210,10 +215,12 @@ def export_boxes_csv(request):
             queryset = (
                 BasicScienceBox.objects.filter(
                     Q(box_id__icontains=query_string)
-                    | Q(box_type__icontains=query_string)
                     | Q(basic_science_group__icontains=query_string)
                     | Q(location__icontains=query_string)
-                    | Q(species__icontains=query_string)
+                    | Q(comments__icontains=query_string)
+                    | Q(experimental_ids__name__icontains=query_string)
+                    | Q(sample_types__name__icontains=query_string)
+                    | Q(tissue_types__name__icontains=query_string)
                 )
                 .prefetch_related("experimental_ids", "sample_types", "tissue_types")
                 .select_related("created_by", "last_modified_by")
@@ -229,6 +236,7 @@ def export_boxes_csv(request):
 
 
 @login_required(login_url="/login/")
+@permission_required("app.view_basicsciencebox", raise_exception=True)
 def box_filter(request):
     queryset = (
         BasicScienceBox.objects.all()
@@ -267,6 +275,7 @@ def box_filter(request):
 
 
 @login_required(login_url="/login/")
+@permission_required("app.view_basicsciencebox", raise_exception=True)
 def box_filter_export_csv(request):
     queryset = (
         BasicScienceBox.objects.all()

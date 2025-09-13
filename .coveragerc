@@ -1,8 +1,8 @@
 [run]
-omit = 
+omit =
     *apps.py,
-    *migrations/*,
-    *tests/*,
+    */migrations/*,
+    */tests/*,
     *wsgi.py,
     manage.py,
     *__init__.py,
@@ -12,6 +12,7 @@ omit =
     *storage_backends.py,
     *tests.py
     *venv/*
+    app/management/commands/generate_fake_data.py
 
 [report]
 exclude_lines =

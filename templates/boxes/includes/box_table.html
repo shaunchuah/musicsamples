@@ -1,5 +1,5 @@
 <div class="card-body">
-  <div class="d-flex flex-row-reverse pb-3">Total Count: {{ box_list|length }}</div>
+  <div class="d-flex flex-row-reverse pb-3">Total Count: {{ box_count }}</div>
   <div class="table-responsive">
     <table class="table tablesorter" id="mainTable">
       <thead class="text-primary">
@@ -69,19 +69,5 @@
       </tbody>
     </table>
   </div>
-  {% if is_paginated %}
-    <div class="pagination">
-      <span class="step-links">
-        {% if page_obj.has_previous %}
-          <a href="?page=1">&laquo; first</a>
-          <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-        {% endif %}
-        <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.</span>
-        {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}">next</a>
-          <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-        {% endif %}
-      </span>
-    </div>
-  {% endif %}
+  {% include "layouts/pagination.html" %}
 </div>

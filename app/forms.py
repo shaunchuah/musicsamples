@@ -253,6 +253,7 @@ class BasicScienceBoxForm(ModelForm):
         }
         labels = {
             "is_used": "Is Used?",
+            "box_id": "Box ID*",
         }
 
     def __init__(self, *args, **kwargs):

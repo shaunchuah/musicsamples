@@ -67,7 +67,7 @@ def datastore_edit_metadata_view(request, id):
         if form.is_valid():
             form.save()
             messages.success(request, f"File {file.formatted_file_name} metadata has been updated.")
-            return redirect(reverse("datastore_detail", args=[file.id]))
+            return redirect(reverse("datastore_detail", args=[file.id]))  # type:ignore
         else:
             messages.error(request, "Form is invalid.")
     else:
@@ -85,7 +85,7 @@ def datastore_create_view_ajax(request):
 @permission_required("app.view_datastore", raise_exception=True)
 def datastore_detail_view(request, id):
     file = get_object_or_404(DataStore, id=id)
-    file_history = file.history.filter(id=id)
+    file_history = file.history.filter(id=id)  # type:ignore
     changes = historical_changes(file_history)
     first_change = file_history.first()
     return render(

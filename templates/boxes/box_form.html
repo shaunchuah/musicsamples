@@ -101,7 +101,7 @@
               <div class="d-flex align-items-center">
                 {{ form.experimental_ids|add_class:"form-control" }}
                 <button type="button"
-                        class="btn btn-info btn-sm ml-2"
+                        class="btn btn-info btn-sm ml-2 flex-shrink-0"
                         data-toggle="modal"
                         data-target="#experimentModal">
                   <i class="tim-icons icon-simple-add"></i> Add New
@@ -117,7 +117,7 @@
               {{ form.tissue_types|add_class:"form-control" }}
             </div>
             <div class="form-check">
-              <label class="form-check-label">Is used?</label>
+              {% if form.is_used %}<label class="form-check-label">Is used?</label>{% endif %}
               {{ form.is_used|add_class:"form-check-input" }}
             </div>
             <div class="form-group">
