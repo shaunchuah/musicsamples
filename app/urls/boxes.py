@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views.box_views import (
+from ..views.box_views import (
     BasicScienceBoxCreateView,
     BasicScienceBoxDeleteView,
     BasicScienceBoxDetailView,
