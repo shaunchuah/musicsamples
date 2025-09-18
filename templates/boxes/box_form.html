@@ -107,14 +107,7 @@
                   <i class="tim-icons icon-simple-add"></i> Add New
                 </button>
               </div>
-            </div>
-            <div class="form-group">
-              {{ form.sample_types.label_tag }}
-              {{ form.sample_types|add_class:"form-control" }}
-            </div>
-            <div class="form-group">
-              {{ form.tissue_types.label_tag }}
-              {{ form.tissue_types|add_class:"form-control" }}
+              <small class="form-text text-muted">Sample and tissue tags are configured per experimental ID.</small>
             </div>
             <div class="form-check">
               {% if form.is_used %}<label class="form-check-label">Is used?</label>{% endif %}
@@ -155,21 +148,24 @@
             <div id="experimentFormErrors" class="alert alert-danger d-none"></div>
             {% csrf_token %}
             <div class="form-group">
-              <label for="id_name">Experiment Name</label>
-              <input type="text"
-                     class="form-control"
-                     id="id_name"
-                     name="name"
-                     placeholder="e.g., EXP-001"
-                     required />
+              {{ experimental_form.name.label_tag }}
+              {{ experimental_form.name|add_class:"form-control" }}
             </div>
             <div class="form-group">
-              <label for="id_description">Description</label>
-              <textarea class="form-control" id="id_description" name="description" rows="3"></textarea>
+              {{ experimental_form.description.label_tag }}
+              {{ experimental_form.description|add_class:"form-control" }}
             </div>
             <div class="form-group">
-              <label for="id_date">Experiment Date</label>
-              <input type="date" class="form-control" id="id_date" name="date" />
+              {{ experimental_form.date.label_tag }}
+              {{ experimental_form.date|add_class:"form-control" }}
+            </div>
+            <div class="form-group">
+              {{ experimental_form.sample_types.label_tag }}
+              {{ experimental_form.sample_types|add_class:"form-control" }}
+            </div>
+            <div class="form-group">
+              {{ experimental_form.tissue_types.label_tag }}
+              {{ experimental_form.tissue_types|add_class:"form-control" }}
             </div>
           </div>
           <div class="modal-footer">
@@ -192,12 +188,8 @@
         $('#experimentFormErrors').addClass('d-none').empty();
 
         // Get form data
-        var formData = {
-          'name': $('#id_name').val(),
-          'description': $('#id_description').val(),
-          'date': $('#id_date').val(),
-          'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
-        };
+        var $form = $(this);
+        var formData = $form.serialize();
 
         // Submit form via AJAX
         $.ajax({
@@ -214,6 +206,8 @@
               // Close modal and reset form
               $('#experimentModal').modal('hide');
               $('#experimentForm')[0].reset();
+              $('#id_sample_types').val([]);
+              $('#id_tissue_types').val([]);
 
               // Show success message (optional)
               var successMsg = '<div class="alert alert-success alert-dismissible fade show" role="alert">' +

@@ -161,7 +161,7 @@ class BasicScienceBoxFilter(django_filters.FilterSet):
 
     def filter_experimental_ids(self, queryset, name, value):
         if value:
-            return queryset.filter(experimental_ids__in=value)
+            return queryset.filter(experimental_ids__in=value).distinct()
         return queryset
 
     def filter_experimental_ids_date(self, queryset, name, value):
@@ -170,16 +170,17 @@ class BasicScienceBoxFilter(django_filters.FilterSet):
                 queryset = queryset.filter(experimental_ids__date__gte=value.start)
             if value.stop:
                 queryset = queryset.filter(experimental_ids__date__lte=value.stop)
+            queryset = queryset.distinct()
         return queryset
 
     def filter_sample_types(self, queryset, name, value):
         if value:
-            return queryset.filter(sample_types__in=value)
+            return queryset.filter(experimental_ids__sample_types__in=value).distinct()
         return queryset
 
     def filter_tissue_types(self, queryset, name, value):
         if value:
-            return queryset.filter(tissue_types__in=value)
+            return queryset.filter(experimental_ids__tissue_types__in=value).distinct()
         return queryset
 
     class Meta:

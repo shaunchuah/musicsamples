@@ -37,16 +37,28 @@
             <td>{{ box.get_box_type_display }}</td>
             <td>{{ box.get_species_display }}</td>
             <td>
-              {% for sample_type in box.sample_types.all %}
-                {{ sample_type.label }}
-                {% if not forloop.last %}<br />{% endif %}
-              {% endfor %}
+              {% with sample_labels=box.get_sample_type_labels %}
+                {% if sample_labels %}
+                  {% for label in sample_labels %}
+                    {{ label }}
+                    {% if not forloop.last %}<br />{% endif %}
+                  {% endfor %}
+                {% else %}
+                  N/A
+                {% endif %}
+              {% endwith %}
             </td>
             <td>
-              {% for tissue_type in box.tissue_types.all %}
-                {{ tissue_type.label }}
-                {% if not forloop.last %}<br />{% endif %}
-              {% endfor %}
+              {% with tissue_labels=box.get_tissue_type_labels %}
+                {% if tissue_labels %}
+                  {% for label in tissue_labels %}
+                    {{ label }}
+                    {% if not forloop.last %}<br />{% endif %}
+                  {% endfor %}
+                {% else %}
+                  N/A
+                {% endif %}
+              {% endwith %}
             </td>
             <td>{{ box.comments }}</td>
             <td>{{ box.created|date:'d M Y' }}</td>

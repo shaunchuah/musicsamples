@@ -31,7 +31,7 @@ LOCATION_CHOICES = ["CIR Freezer", "WGH Endoscopy Freezer", "GGH CRF", "Lab C2.2
 
 
 class StudyIdentifierFactory(DjangoModelFactory):
-    class Meta:
+    class Meta:  # type:ignore
         model = StudyIdentifier
 
     name = Sequence(lambda n: "DEMO-%d" % n)
@@ -39,7 +39,7 @@ class StudyIdentifierFactory(DjangoModelFactory):
 
 
 class SampleFactory(DjangoModelFactory):
-    class Meta:
+    class Meta:  # type:ignore
         model = Sample
 
     study_name = LazyAttribute(lambda x: choice(StudyNameChoices.values))
@@ -53,16 +53,48 @@ class SampleFactory(DjangoModelFactory):
 
 
 class ExperimentalIDFactory(DjangoModelFactory):
-    class Meta:
+    class Meta:  # type:ignore
         model = ExperimentalID
 
     name = Sequence(lambda n: "EXP-%03d" % n)
     description = Faker("sentence")
     date = Faker("date_this_year")
 
+    @PostGeneration
+    def sample_types(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for sample_type in extracted:
+                self.sample_types.add(sample_type)  # type:ignore
+        else:
+            for _ in range(choice([0, 1, 2])):
+                sample_type, _ = BasicScienceSampleType.objects.get_or_create(
+                    name=list(BasicScienceSampleTypeChoices.values)[
+                        choice(range(len(BasicScienceSampleTypeChoices.values)))
+                    ],
+                    defaults={"label": Faker("word")},
+                )
+                self.sample_types.add(sample_type)  # type:ignore
+
+    @PostGeneration
+    def tissue_types(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            for tissue_type in extracted:
+                self.tissue_types.add(tissue_type)  # type:ignore
+        else:
+            if choice([True, False]):
+                tissue_type, _ = TissueType.objects.get_or_create(
+                    name=list(TissueTypeChoices.values)[choice(range(len(TissueTypeChoices.values)))],
+                    defaults={"label": Faker("word")},
+                )
+                self.tissue_types.add(tissue_type)  # type:ignore
+
 
 class BasicScienceSampleTypeFactory(DjangoModelFactory):
-    class Meta:
+    class Meta:  # type:ignore
         model = BasicScienceSampleType
 
     name = Sequence(
@@ -72,12 +104,15 @@ class BasicScienceSampleTypeFactory(DjangoModelFactory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        """Override to use get_or_create instead of create"""
-        return model_class.objects.get_or_create(**kwargs)[0]
+        """Override to use get_or_create with defaults for non-unique fields"""
+        defaults = {}
+        if "label" in kwargs:
+            defaults["label"] = kwargs.pop("label")
+        return model_class.objects.get_or_create(defaults=defaults, **kwargs)[0]
 
 
 class TissueTypeFactory(DjangoModelFactory):
-    class Meta:
+    class Meta:  # type:ignore
         model = TissueType
 
     name = Sequence(lambda n: list(TissueTypeChoices.values)[n % len(TissueTypeChoices.values)])
@@ -85,12 +120,15 @@ class TissueTypeFactory(DjangoModelFactory):
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
-        """Override to use get_or_create instead of create"""
-        return model_class.objects.get_or_create(**kwargs)[0]
+        """Override to use get_or_create with defaults for non-unique fields"""
+        defaults = {}
+        if "label" in kwargs:
+            defaults["label"] = kwargs.pop("label")
+        return model_class.objects.get_or_create(defaults=defaults, **kwargs)[0]
 
 
 class BasicScienceBoxFactory(DjangoModelFactory):
-    class Meta:
+    class Meta:  # type:ignore
         model = BasicScienceBox
 
     basic_science_group = LazyAttribute(lambda x: choice(BasicScienceGroupChoices.values))
@@ -117,36 +155,3 @@ class BasicScienceBoxFactory(DjangoModelFactory):
             # Create 1-3 experimental IDs by default
             for _ in range(choice([1, 2, 3])):
                 self.experimental_ids.add(ExperimentalIDFactory())  # type:ignore
-
-    @PostGeneration
-    def sample_types(self, create, extracted, **kwargs):
-        if not create:
-            return
-        if extracted:
-            for sample_type in extracted:
-                self.sample_types.add(sample_type)  # type:ignore
-        else:
-            # Create 1-2 sample types by default
-            for _ in range(choice([1, 2])):
-                sample_type, _ = BasicScienceSampleType.objects.get_or_create(
-                    name=list(BasicScienceSampleTypeChoices.values)[
-                        choice(range(len(BasicScienceSampleTypeChoices.values)))
-                    ],
-                    defaults={"label": Faker("word")},
-                )
-                self.sample_types.add(sample_type)  # type:ignore
-
-    @PostGeneration
-    def tissue_types(self, create, extracted, **kwargs):
-        if not create:
-            return
-        if extracted:
-            for tissue_type in extracted:
-                self.tissue_types.add(tissue_type)  # type:ignore
-        else:
-            # Create 1 tissue type by default
-            tissue_type, _ = TissueType.objects.get_or_create(
-                name=list(TissueTypeChoices.values)[choice(range(len(TissueTypeChoices.values)))],
-                defaults={"label": Faker("word")},
-            )
-            self.tissue_types.add(tissue_type)  # type:ignore

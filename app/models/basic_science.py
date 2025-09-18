@@ -15,15 +15,6 @@ from app.choices import (
 )
 
 
-class ExperimentalID(models.Model):
-    name = models.CharField(max_length=200, unique=True)  # e.g., "EXP-001"
-    description = models.TextField(blank=True, null=True)
-    date = models.DateField(blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-
 class BasicScienceSampleType(models.Model):
     name = models.CharField(max_length=200, choices=BasicScienceSampleTypeChoices.choices, unique=True)
     label = models.CharField(max_length=200, blank=True, null=True)
@@ -38,6 +29,49 @@ class TissueType(models.Model):
 
     def __str__(self):
         return self.label if self.label else self.name
+
+
+class ExperimentalID(models.Model):
+    name = models.CharField(max_length=200, unique=True)  # e.g., "EXP-001"
+    description = models.TextField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+    sample_types = models.ManyToManyField(
+        BasicScienceSampleType,
+        related_name="experimental_ids",
+        blank=True,
+    )
+    tissue_types = models.ManyToManyField(
+        TissueType,
+        related_name="experimental_ids",
+        blank=True,
+    )
+
+    # Tracking
+    created = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="created_experimental_ids",
+    )
+    last_modified = models.DateTimeField(auto_now=True)
+    last_modified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="last_modified_experimental_ids",
+    )
+
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ["-created"]
+        verbose_name_plural = "Experimental IDs"
 
 
 class BasicScienceBox(models.Model):
@@ -56,8 +90,6 @@ class BasicScienceBox(models.Model):
 
     # Contents (many-to-many for flexibility)
     experimental_ids = models.ManyToManyField(ExperimentalID, related_name="boxes")
-    sample_types = models.ManyToManyField(BasicScienceSampleType, related_name="boxes")
-    tissue_types = models.ManyToManyField(TissueType, related_name="boxes")
 
     is_used = models.BooleanField(default=False)
 
@@ -75,6 +107,34 @@ class BasicScienceBox(models.Model):
 
     def __str__(self):
         return f"{self.box_id} ({self.box_type})"
+
+    def distinct_sample_types(self):
+        unique = {}
+        for experimental_id in self.experimental_ids.all():
+            for sample_type in experimental_id.sample_types.all():
+                unique[sample_type.pk] = sample_type
+        return list(unique.values())
+
+    def distinct_tissue_types(self):
+        unique = {}
+        for experimental_id in self.experimental_ids.all():
+            for tissue_type in experimental_id.tissue_types.all():
+                unique[tissue_type.pk] = tissue_type
+        return list(unique.values())
+
+    def get_sample_type_labels(self):
+        return [sample_type.label or sample_type.name for sample_type in self.distinct_sample_types()]
+
+    def get_tissue_type_labels(self):
+        return [tissue_type.label or tissue_type.name for tissue_type in self.distinct_tissue_types()]
+
+    @property
+    def sample_type_labels_display(self):
+        return ", ".join(self.get_sample_type_labels())
+
+    @property
+    def tissue_type_labels_display(self):
+        return ", ".join(self.get_tissue_type_labels())
 
     class Meta:
         ordering = ["-created"]

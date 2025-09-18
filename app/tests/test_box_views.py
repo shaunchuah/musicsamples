@@ -4,8 +4,13 @@ from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory, TestCase
 from django.urls import reverse, reverse_lazy
 
-from app.factories import BasicScienceBoxFactory
-from app.models import BasicScienceBox
+from app.factories import (
+    BasicScienceBoxFactory,
+    BasicScienceSampleTypeFactory,
+    ExperimentalIDFactory,
+    TissueTypeFactory,
+)
+from app.models import BasicScienceBox, ExperimentalID
 from app.views.box_views import (
     BasicScienceBoxCreateView,
     BasicScienceBoxDeleteView,
@@ -178,6 +183,18 @@ class BasicScienceBoxDetailViewTest(TestCase):
         self.assertIn("first", context)
         self.assertEqual(context["box"], self.box)
         self.assertIsInstance(context["changes"], list)
+
+    def test_distinct_sample_and_tissue_labels_helpers(self):
+        """Ensure helper methods aggregate experiment tags correctly"""
+        sample_type = BasicScienceSampleTypeFactory()
+        tissue_type = TissueTypeFactory()
+        experimental = ExperimentalIDFactory()
+        experimental.sample_types.add(sample_type)
+        experimental.tissue_types.add(tissue_type)
+        box = BasicScienceBoxFactory(experimental_ids=[experimental])
+
+        self.assertIn(sample_type.label or sample_type.name, box.get_sample_type_labels())
+        self.assertIn(tissue_type.label or tissue_type.name, box.get_tissue_type_labels())
 
 
 class BasicScienceBoxListViewTest(TestCase):
@@ -764,11 +781,21 @@ class FunctionBasedViewsTest(TestCase):
             )[0]
         )
         self.client.force_login(self.user)
-        data = {"name": "Test Exp", "description": "Test description"}
+        sample_type = BasicScienceSampleTypeFactory()
+        tissue_type = TissueTypeFactory()
+        data = {
+            "name": "Test Exp",
+            "description": "Test description",
+            "sample_types": [sample_type.pk],
+            "tissue_types": [tissue_type.pk],
+        }
         response = self.client.post(reverse("boxes:create_experimental_id"), data)
         self.assertEqual(response.status_code, 200)
         json_response = response.json()
         self.assertTrue(json_response["success"])
+        experimental = ExperimentalID.objects.get(name="Test Exp")
+        self.assertIn(sample_type, experimental.sample_types.all())
+        self.assertIn(tissue_type, experimental.tissue_types.all())
 
     def test_create_experimental_id_invalid(self):
         """Test create_experimental_id with invalid data"""

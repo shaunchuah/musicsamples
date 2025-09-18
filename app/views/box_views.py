@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -11,8 +11,14 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from app.filters import BasicScienceBoxFilter
 from app.forms import BasicScienceBoxForm, ExperimentalIDForm
-from app.models import BasicScienceBox
+from app.models import BasicScienceBox, ExperimentalID
 from app.utils import export_csv, historical_changes
+
+
+EXPERIMENT_PREFETCH = Prefetch(
+    "experimental_ids",
+    queryset=ExperimentalID.objects.prefetch_related("sample_types", "tissue_types"),
+)
 
 
 class BasicScienceBoxDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
@@ -26,7 +32,7 @@ class BasicScienceBoxDetailView(LoginRequiredMixin, PermissionRequiredMixin, Det
             super()
             .get_queryset()
             .select_related("created_by", "last_modified_by")
-            .prefetch_related("experimental_ids", "sample_types", "tissue_types")
+            .prefetch_related(EXPERIMENT_PREFETCH)
         )
 
     def get_context_data(self, **kwargs):
@@ -56,7 +62,7 @@ class BasicScienceBoxListView(LoginRequiredMixin, PermissionRequiredMixin, ListV
             super()
             .get_queryset()
             .exclude(is_used=True)
-            .prefetch_related("experimental_ids", "sample_types", "tissue_types")
+            .prefetch_related(EXPERIMENT_PREFETCH)
             .select_related("created_by", "last_modified_by")
         )
         self.filterset = BasicScienceBoxFilter(self.request.GET, queryset=queryset)
@@ -76,6 +82,11 @@ class BasicScienceBoxCreateView(LoginRequiredMixin, PermissionRequiredMixin, Cre
     success_url = reverse_lazy("boxes:list")
     permission_required = "app.add_basicsciencebox"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.setdefault("experimental_form", ExperimentalIDForm())
+        return context
+
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         form.instance.last_modified_by = self.request.user
@@ -89,6 +100,11 @@ class BasicScienceBoxUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Upd
     template_name = "boxes/box_form.html"
     success_url = reverse_lazy("boxes:list")
     permission_required = "app.change_basicsciencebox"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.setdefault("experimental_form", ExperimentalIDForm())
+        return context
 
     def form_valid(self, form):
         form.instance.last_modified_by = self.request.user
@@ -126,12 +142,13 @@ def box_search(request):
                 | Q(location__icontains=query_string)
                 | Q(comments__icontains=query_string)
                 | Q(experimental_ids__name__icontains=query_string)
-                | Q(sample_types__name__icontains=query_string)
-                | Q(tissue_types__name__icontains=query_string)
+                | Q(experimental_ids__sample_types__name__icontains=query_string)
+                | Q(experimental_ids__tissue_types__name__icontains=query_string)
             )
             .filter(is_used=False)
-            .prefetch_related("experimental_ids", "sample_types", "tissue_types")
+            .prefetch_related(EXPERIMENT_PREFETCH)
             .select_related("created_by", "last_modified_by")
+            .distinct()
         )
 
         if ("include_used_boxes" in request.GET) and request.GET["include_used_boxes"].strip():
@@ -142,11 +159,12 @@ def box_search(request):
                     | Q(location__icontains=query_string)
                     | Q(comments__icontains=query_string)
                     | Q(experimental_ids__name__icontains=query_string)
-                    | Q(sample_types__name__icontains=query_string)
-                    | Q(tissue_types__name__icontains=query_string)
+                    | Q(experimental_ids__sample_types__name__icontains=query_string)
+                    | Q(experimental_ids__tissue_types__name__icontains=query_string)
                 )
-                .prefetch_related("experimental_ids", "sample_types", "tissue_types")
+                .prefetch_related(EXPERIMENT_PREFETCH)
                 .select_related("created_by", "last_modified_by")
+                .distinct()
             )
 
         box_list = queryset
@@ -203,12 +221,13 @@ def export_boxes_csv(request):
                 | Q(location__icontains=query_string)
                 | Q(comments__icontains=query_string)
                 | Q(experimental_ids__name__icontains=query_string)
-                | Q(sample_types__name__icontains=query_string)
-                | Q(tissue_types__name__icontains=query_string)
+                | Q(experimental_ids__sample_types__name__icontains=query_string)
+                | Q(experimental_ids__tissue_types__name__icontains=query_string)
             )
             .filter(is_used=False)
-            .prefetch_related("experimental_ids", "sample_types", "tissue_types")
+            .prefetch_related(EXPERIMENT_PREFETCH)
             .select_related("created_by", "last_modified_by")
+            .distinct()
         )
 
         if ("include_used_boxes" in request.GET) and request.GET["include_used_boxes"].strip():
@@ -219,16 +238,17 @@ def export_boxes_csv(request):
                     | Q(location__icontains=query_string)
                     | Q(comments__icontains=query_string)
                     | Q(experimental_ids__name__icontains=query_string)
-                    | Q(sample_types__name__icontains=query_string)
-                    | Q(tissue_types__name__icontains=query_string)
+                    | Q(experimental_ids__sample_types__name__icontains=query_string)
+                    | Q(experimental_ids__tissue_types__name__icontains=query_string)
                 )
-                .prefetch_related("experimental_ids", "sample_types", "tissue_types")
+                .prefetch_related(EXPERIMENT_PREFETCH)
                 .select_related("created_by", "last_modified_by")
+                .distinct()
             )
     else:
         queryset = (
             BasicScienceBox.objects.exclude(is_used=True)
-            .prefetch_related("experimental_ids", "sample_types", "tissue_types")
+            .prefetch_related(EXPERIMENT_PREFETCH)
             .select_related("created_by", "last_modified_by")
         )
 
@@ -240,7 +260,7 @@ def export_boxes_csv(request):
 def box_filter(request):
     queryset = (
         BasicScienceBox.objects.all()
-        .prefetch_related("experimental_ids", "sample_types", "tissue_types")
+        .prefetch_related(EXPERIMENT_PREFETCH)
         .select_related("created_by", "last_modified_by")
     )
     box_filter = BasicScienceBoxFilter(request.GET, queryset=queryset)
@@ -279,7 +299,7 @@ def box_filter(request):
 def box_filter_export_csv(request):
     queryset = (
         BasicScienceBox.objects.all()
-        .prefetch_related("experimental_ids", "sample_types", "tissue_types")
+        .prefetch_related(EXPERIMENT_PREFETCH)
         .select_related("created_by", "last_modified_by")
     )
     box_filter = BasicScienceBoxFilter(request.GET, queryset=queryset)

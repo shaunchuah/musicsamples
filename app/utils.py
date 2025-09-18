@@ -40,6 +40,10 @@ def export_csv(queryset, file_prefix="gtrac", file_name="samples", include_relat
     for field in queryset.model._meta.many_to_many:
         fields.append(field.name)
 
+    # Custom derived fields for specific models
+    if queryset.model.__name__ == "BasicScienceBox":
+        fields.extend(["sample_type_labels_display", "tissue_type_labels_display"])
+
     # Then add the related fields
     if include_related:
         # List of related fields to exclude

@@ -218,18 +218,6 @@ class BasicScienceBoxForm(ModelForm):
         required=False,
         label="Experimental IDs",
     )
-    sample_types = forms.ModelMultipleChoiceField(
-        queryset=BasicScienceSampleType.objects.all(),
-        widget=forms.SelectMultiple(attrs={"class": "form-control"}),
-        required=False,
-        label="Sample Types",
-    )
-    tissue_types = forms.ModelMultipleChoiceField(
-        queryset=TissueType.objects.all(),
-        widget=forms.SelectMultiple(attrs={"class": "form-control"}),
-        required=False,
-        label="Tissue Types",
-    )
 
     class Meta:
         model = BasicScienceBox
@@ -244,8 +232,6 @@ class BasicScienceBoxForm(ModelForm):
             "depth",
             "comments",
             "experimental_ids",
-            "sample_types",
-            "tissue_types",
             "is_used",
         ]
         widgets = {
@@ -265,9 +251,22 @@ class BasicScienceBoxForm(ModelForm):
 
 
 class ExperimentalIDForm(ModelForm):
+    sample_types = forms.ModelMultipleChoiceField(
+        queryset=BasicScienceSampleType.objects.all(),
+        widget=forms.SelectMultiple(attrs={"class": "form-control"}),
+        required=False,
+        label="Sample Types",
+    )
+    tissue_types = forms.ModelMultipleChoiceField(
+        queryset=TissueType.objects.all(),
+        widget=forms.SelectMultiple(attrs={"class": "form-control"}),
+        required=False,
+        label="Tissue Types",
+    )
+
     class Meta:
         model = ExperimentalID
-        fields = ["name", "description", "date"]
+        fields = ["name", "description", "date", "sample_types", "tissue_types"]
         widgets = {
             "date": DateInput(),
             "description": forms.Textarea(attrs={"rows": 3}),

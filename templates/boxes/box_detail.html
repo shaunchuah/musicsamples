@@ -78,23 +78,31 @@
                 <tr>
                   <td>Sample Types</td>
                   <td>
-                    {% for sample_type in box.sample_types.all %}
-                      {{ sample_type.label }}
-                      {% if not forloop.last %},{% endif %}
-                    {% empty %}
-                      N/A
-                    {% endfor %}
+                    {% with sample_labels=box.get_sample_type_labels %}
+                      {% if sample_labels %}
+                        {% for label in sample_labels %}
+                          {{ label }}
+                          {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                      {% else %}
+                        N/A
+                      {% endif %}
+                    {% endwith %}
                   </td>
                 </tr>
                 <tr>
                   <td>Tissue Types</td>
                   <td>
-                    {% for tissue_type in box.tissue_types.all %}
-                      {{ tissue_type.label }}
-                      {% if not forloop.last %},{% endif %}
-                    {% empty %}
-                      N/A
-                    {% endfor %}
+                    {% with tissue_labels=box.get_tissue_type_labels %}
+                      {% if tissue_labels %}
+                        {% for label in tissue_labels %}
+                          {{ label }}
+                          {% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                      {% else %}
+                        N/A
+                      {% endif %}
+                    {% endwith %}
                   </td>
                 </tr>
                 <tr>

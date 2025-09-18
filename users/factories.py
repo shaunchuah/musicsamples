@@ -6,7 +6,7 @@ User = get_user_model()
 
 
 class UserFactory(DjangoModelFactory):
-    class Meta:
+    class Meta:  # type:ignore
         model = User
 
     email = Faker("email")

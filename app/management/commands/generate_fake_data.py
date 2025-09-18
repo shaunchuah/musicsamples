@@ -3,7 +3,8 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from app.factories import BasicScienceBoxFactory, SampleFactory
-from app.models import BasicScienceBox, Sample
+from app.models import BasicScienceBox, ExperimentalID, Sample, StudyIdentifier
+from users.models import User
 
 NUM_SAMPLES = 358
 NUM_BOXES = 100
@@ -17,9 +18,16 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         if settings.DEBUG:
             self.stdout.write("Deleting old data...")
-            models = [BasicScienceBox, Sample]
+
+            models = [BasicScienceBox, Sample, ExperimentalID]
             for m in models:
                 m.objects.all().delete()
+
+            self.stdout.write("Deleting demo study identifiers...")
+            StudyIdentifier.objects.filter(name__startswith="DEMO-").delete()
+
+            self.stdout.write("Deleting demo users...")
+            User.objects.filter(is_staff=False).delete()
 
             self.stdout.write("Creating new data...")
 
