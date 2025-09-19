@@ -1,5 +1,7 @@
 {% extends "layouts/base.html" %}
 
+{% load widget_tweaks %}
+
 {% block title %}
   Basic Science Boxes
 {% endblock title %}
@@ -31,15 +33,14 @@
               <button type="submit" class="btn btn-fill btn-success">Search</button>
               <a href="{% url 'boxes:list' %}" class="btn btn-fill btn-secondary">Clear</a>
               <a href="{% url 'boxes:filter' %}"
-                 class="btn btn-fill btn-success float-lg-right">Advanced
-              Filtering</a>
+                 class="btn btn-fill btn-success float-lg-right">Advanced Filtering</a>
             </div>
           </form>
         </div>
       </div>
     </div>
   </div>
-  <div class="row">
+  <div class="row mt-3">
     <div class="col">
       <div class="card">
         <div class="card-header">
@@ -52,10 +53,297 @@
              data-toggle="tooltip"
              data-placement="bottom"
              data-html="true"
-             title="Tip: Customise the export by searching for the set of samples you wish to download."><i class="tim-icons icon-cloud-download-93"></i> Export Current View
-          to CSV</a>
+             title="Tip: Customise the export by searching for the set of samples you wish to download."><i class="tim-icons icon-cloud-download-93"></i> Export Current View to CSV</a>
         </div>
         {% include 'boxes/includes/box_table.html' with box_list=boxes %}
+      </div>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="col">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3 class="card-title mb-0">Experimental IDs</h3>
+          <button type="button"
+                  class="btn btn-fill btn-success js-experimental-id-create"
+                  data-toggle="modal"
+                  data-target="#experimentalIdModal">
+            <i class="tim-icons icon-simple-add"></i> Add Experimental ID
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped" id="experimentalIdTable">
+              <thead class="text-primary">
+                <tr>
+                  <th>Name</th>
+                  <th>Date</th>
+                  <th>Sample Types</th>
+                  <th>Tissue Types</th>
+                  <th>Boxes</th>
+                  <th>Description</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for experimental in experimental_ids %}
+                  <tr>
+                    <td>{{ experimental.name }}</td>
+                    <td>
+                      {% if experimental.date %}
+                        {{ experimental.date|date:'d M Y' }}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% with samples=experimental.sample_types.all %}
+                        {% if samples %}
+                          {% for sample in samples %}
+                            {{ sample.label|default:sample.name }}
+                            {% if not forloop.last %}<br />{% endif %}
+                          {% endfor %}
+                        {% else %}
+                          N/A
+                        {% endif %}
+                      {% endwith %}
+                    </td>
+                    <td>
+                      {% with tissues=experimental.tissue_types.all %}
+                        {% if tissues %}
+                          {% for tissue in tissues %}
+                            {{ tissue.label|default:tissue.name }}
+                            {% if not forloop.last %}<br />{% endif %}
+                          {% endfor %}
+                        {% else %}
+                          N/A
+                        {% endif %}
+                      {% endwith %}
+                    </td>
+                    <td>
+                      {% with boxes=experimental.boxes.all %}
+                        {% if boxes %}
+                          {% for box in boxes %}
+                            {{ box.box_id }}
+                            {% if not forloop.last %}<br />{% endif %}
+                          {% endfor %}
+                        {% else %}
+                          None
+                        {% endif %}
+                      {% endwith %}
+                    </td>
+                    <td>{{ experimental.description|default:"-"|truncatechars:80 }}</td>
+                    <td class="text-right">
+                      <div class="btn-group btn-group-sm" role="group">
+                        <button type="button"
+                                class="btn btn-link js-experimental-id-view"
+                                data-toggle="modal"
+                                data-target="#experimentalIdDetailModal"
+                                data-detail-url="{% url 'boxes:experimental_id_detail' experimental.pk %}">
+                          View
+                        </button>
+                        <button type="button"
+                                class="btn btn-link js-experimental-id-edit"
+                                data-toggle="modal"
+                                data-target="#experimentalIdModal"
+                                data-detail-url="{% url 'boxes:experimental_id_detail' experimental.pk %}"
+                                data-update-url="{% url 'boxes:experimental_id_update' experimental.pk %}"
+                                data-name="{{ experimental.name }}">Edit</button>
+                        <button type="button"
+                                class="btn btn-link text-danger js-experimental-id-delete"
+                                data-toggle="modal"
+                                data-target="#experimentalIdDeleteModal"
+                                data-delete-url="{% url 'boxes:experimental_id_delete' experimental.pk %}"
+                                data-name="{{ experimental.name }}">Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="7" class="text-center">No experimental IDs found.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {% if experimental_ids_paginator.num_pages > 1 %}
+          <div class="card-footer d-flex justify-content-end">
+            <nav aria-label="Experimental IDs pagination">
+              <ul class="pagination mb-0">
+                <li class="page-item {% if not experimental_ids.has_previous %}disabled{% endif %}">
+                  {% if experimental_ids.has_previous %}
+                    <a class="page-link"
+                       href="?{% if experimental_ids_querystring %}{{ experimental_ids_querystring }}&{% endif %}exp_page={{ experimental_ids.previous_page_number }}"
+                       aria-label="Previous">&laquo;</a>
+                  {% else %}
+                    <span class="page-link" aria-hidden="true">&laquo;</span>
+                  {% endif %}
+                </li>
+                {% for num in experimental_ids_paginator.page_range %}
+                  {% if num == experimental_ids.number %}
+                    <li class="page-item active" aria-current="page">
+                      <span class="page-link">{{ num }}</span>
+                    </li>
+                  {% else %}
+                    <li class="page-item">
+                      <a class="page-link"
+                         href="?{% if experimental_ids_querystring %}{{ experimental_ids_querystring }}&{% endif %}exp_page={{ num }}">{{ num }}</a>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+                <li class="page-item {% if not experimental_ids.has_next %}disabled{% endif %}">
+                  {% if experimental_ids.has_next %}
+                    <a class="page-link"
+                       href="?{% if experimental_ids_querystring %}{{ experimental_ids_querystring }}&{% endif %}exp_page={{ experimental_ids.next_page_number }}"
+                       aria-label="Next">&raquo;</a>
+                  {% else %}
+                    <span class="page-link" aria-hidden="true">&raquo;</span>
+                  {% endif %}
+                </li>
+              </ul>
+            </nav>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <!-- Create / Edit Experimental ID Modal -->
+  <div class="modal fade"
+       id="experimentalIdModal"
+       tabindex="-1"
+       role="dialog"
+       aria-labelledby="experimentalIdModalTitle"
+       aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <form id="experimentalIdForm">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="experimentalIdModalTitle">Add Experimental ID</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div id="experimentalIdFormErrors" class="alert alert-danger d-none"></div>
+            <div class="form-group">
+              {{ experimental_form.name.label_tag }}
+              {{ experimental_form.name|add_class:"form-control" }}
+            </div>
+            <div class="form-group">
+              {{ experimental_form.description.label_tag }}
+              {{ experimental_form.description|add_class:"form-control" }}
+            </div>
+            <div class="form-group">
+              {{ experimental_form.date.label_tag }}
+              {{ experimental_form.date|add_class:"form-control" }}
+            </div>
+            <div class="form-group">
+              {{ experimental_form.sample_types.label_tag }}
+              {{ experimental_form.sample_types|add_class:"form-control" }}
+            </div>
+            <div class="form-group">
+              {{ experimental_form.tissue_types.label_tag }}
+              {{ experimental_form.tissue_types|add_class:"form-control" }}
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success" id="experimentalIdSubmit">Create</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- Experimental ID Detail Modal -->
+  <div class="modal fade"
+       id="experimentalIdDetailModal"
+       tabindex="-1"
+       role="dialog"
+       aria-labelledby="experimentalIdDetailTitle"
+       aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="experimentalIdDetailTitle">Experimental ID Details</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="experimentalIdDetailError" class="alert alert-danger d-none">
+            Unable to load experimental ID. Please try again.
+          </div>
+          <dl class="row mb-0">
+            <dt class="col-sm-4">Name</dt>
+            <dd class="col-sm-8" id="experimentalIdDetailName">
+            </dd>
+            <dt class="col-sm-4">Description</dt>
+            <dd class="col-sm-8" id="experimentalIdDetailDescription">
+            </dd>
+            <dt class="col-sm-4">Date</dt>
+            <dd class="col-sm-8" id="experimentalIdDetailDate">
+            </dd>
+          </dl>
+          <div class="row mt-3">
+            <div class="col-md-4">
+              <h6>Sample Types</h6>
+              <ul class="list-unstyled mb-0" id="experimentalIdDetailSampleTypes">
+              </ul>
+            </div>
+            <div class="col-md-4">
+              <h6>Tissue Types</h6>
+              <ul class="list-unstyled mb-0" id="experimentalIdDetailTissueTypes">
+              </ul>
+            </div>
+            <div class="col-md-4">
+              <h6>Boxes</h6>
+              <ul class="list-unstyled mb-0" id="experimentalIdDetailBoxes">
+              </ul>
+            </div>
+          </div>
+          <dl class="row mt-3 mb-0">
+            <dt class="col-sm-4">Created</dt>
+            <dd class="col-sm-8" id="experimentalIdDetailCreated">
+            </dd>
+            <dt class="col-sm-4">Last Modified</dt>
+            <dd class="col-sm-8" id="experimentalIdDetailLastModified">
+            </dd>
+          </dl>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Delete Experimental ID Modal -->
+  <div class="modal fade"
+       id="experimentalIdDeleteModal"
+       tabindex="-1"
+       role="dialog"
+       aria-labelledby="experimentalIdDeleteTitle"
+       aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="experimentalIdDeleteTitle">Delete Experimental ID</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="experimentalIdDeleteError" class="alert alert-danger d-none"></div>
+          <p>
+            Are you sure you want to delete <strong id="experimentalIdDeleteName"></strong>?
+            This action cannot be undone and will remove the ID from all associated boxes.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmExperimentalIdDelete">Delete</button>
+        </div>
       </div>
     </div>
   </div>
@@ -84,6 +372,198 @@
             sorter: false
           }
         },
+      });
+
+      const createExperimentalIdUrl = '{% url "boxes:create_experimental_id" %}';
+      const $experimentalIdModal = $('#experimentalIdModal');
+      const $experimentalIdForm = $('#experimentalIdForm');
+      const $formErrors = $('#experimentalIdFormErrors');
+      const $detailModal = $('#experimentalIdDetailModal');
+      const $detailError = $('#experimentalIdDetailError');
+      const $deleteModal = $('#experimentalIdDeleteModal');
+      const $deleteError = $('#experimentalIdDeleteError');
+      const $deleteConfirm = $('#confirmExperimentalIdDelete');
+
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+          return parts.pop().split(';').shift();
+        }
+        return null;
+      }
+
+      const csrfToken = getCookie('csrftoken');
+      if (csrfToken) {
+        $.ajaxSetup({
+          headers: {
+            'X-CSRFToken': csrfToken,
+          },
+        });
+      }
+
+      function resetExperimentalIdForm() {
+        $experimentalIdForm[0].reset();
+        $('#id_sample_types').val([]).trigger('change');
+        $('#id_tissue_types').val([]).trigger('change');
+        $formErrors.addClass('d-none').empty();
+        $('#experimentalIdModalTitle').text('Add Experimental ID');
+        $('#experimentalIdSubmit').text('Create');
+        $experimentalIdModal.data('mode', 'create').data('update-url', null);
+      }
+
+      function populateExperimentalIdForm(data) {
+        $('#id_name').val(data.name || '');
+        $('#id_description').val(data.description || '');
+        $('#id_date').val(data.date || '');
+        $('#id_sample_types').val(data.sample_type_ids || []).trigger('change');
+        $('#id_tissue_types').val(data.tissue_type_ids || []).trigger('change');
+      }
+
+      function renderList(items, $container) {
+        $container.empty();
+        if (!items || !items.length) {
+          $container.append('<li class="text-muted">None</li>');
+          return;
+        }
+        items.forEach(function(item) {
+          $container.append(`<li>${item.display}</li>`);
+        });
+      }
+
+      function clearDetailModal() {
+        $detailError.addClass('d-none');
+        $('#experimentalIdDetailName').empty();
+        $('#experimentalIdDetailDescription').empty();
+        $('#experimentalIdDetailDate').empty();
+        $('#experimentalIdDetailCreated').empty();
+        $('#experimentalIdDetailLastModified').empty();
+        $('#experimentalIdDetailSampleTypes').empty();
+        $('#experimentalIdDetailTissueTypes').empty();
+        $('#experimentalIdDetailBoxes').empty();
+      }
+
+      function handleFormErrors(xhr) {
+        if (xhr.responseJSON && xhr.responseJSON.errors) {
+          const errors = xhr.responseJSON.errors;
+          let html = '<strong>Please correct the following errors:</strong><ul class="mb-0">';
+          $.each(errors, function(field, fieldErrors) {
+            fieldErrors.forEach(function(error) {
+              html += `<li>${field}: ${error}</li>`;
+            });
+          });
+          html += '</ul>';
+          $formErrors.html(html).removeClass('d-none');
+        } else {
+          $formErrors.text('An unexpected error occurred. Please try again.').removeClass('d-none');
+        }
+      }
+
+      $('.js-experimental-id-create').on('click', function() {
+        resetExperimentalIdForm();
+      });
+
+      $('.js-experimental-id-edit').on('click', function() {
+        resetExperimentalIdForm();
+        const $button = $(this);
+        const detailUrl = $button.data('detail-url');
+        const updateUrl = $button.data('update-url');
+        $('#experimentalIdModalTitle').text('Edit Experimental ID');
+        $('#experimentalIdSubmit').text('Update');
+        $experimentalIdModal.data('mode', 'edit').data('update-url', updateUrl);
+
+        $.get(detailUrl)
+          .done(function(response) {
+            populateExperimentalIdForm(response.experimental_id);
+          })
+          .fail(function() {
+            $formErrors.text('Unable to load experimental ID details. Please try again.').removeClass('d-none');
+          });
+      });
+
+      $experimentalIdForm.on('submit', function(event) {
+        event.preventDefault();
+        $formErrors.addClass('d-none').empty();
+        const mode = $experimentalIdModal.data('mode');
+        let targetUrl = createExperimentalIdUrl;
+        if (mode === 'edit') {
+          targetUrl = $experimentalIdModal.data('update-url');
+        }
+
+        $.ajax({
+            url: targetUrl,
+            method: 'POST',
+            data: $experimentalIdForm.serialize(),
+          })
+          .done(function() {
+            window.location.reload();
+          })
+          .fail(function(xhr) {
+            handleFormErrors(xhr);
+          });
+      });
+
+      $('.js-experimental-id-view').on('click', function() {
+        clearDetailModal();
+        const detailUrl = $(this).data('detail-url');
+
+        $.get(detailUrl)
+          .done(function(response) {
+            const data = response.experimental_id;
+            $('#experimentalIdDetailName').text(data.name || '-');
+            $('#experimentalIdDetailDescription').text(data.description || '-');
+            $('#experimentalIdDetailDate').text(data.date_display || data.date || '-');
+            $('#experimentalIdDetailCreated').text(data.created_display || '-');
+            $('#experimentalIdDetailLastModified').text(data.last_modified_display || '-');
+            renderList(data.sample_types, $('#experimentalIdDetailSampleTypes'));
+            renderList(data.tissue_types, $('#experimentalIdDetailTissueTypes'));
+            renderList(data.boxes, $('#experimentalIdDetailBoxes'));
+          })
+          .fail(function() {
+            $detailError.removeClass('d-none');
+          });
+      });
+
+      $('.js-experimental-id-delete').on('click', function() {
+        const $button = $(this);
+        $('#experimentalIdDeleteName').text($button.data('name'));
+        $deleteModal.data('delete-url', $button.data('delete-url'));
+        $deleteError.addClass('d-none').empty();
+        $deleteConfirm.prop('disabled', false);
+      });
+
+      $deleteConfirm.on('click', function() {
+        const deleteUrl = $deleteModal.data('delete-url');
+        if (!deleteUrl) {
+          return;
+        }
+        $deleteError.addClass('d-none').empty();
+        $deleteConfirm.prop('disabled', true);
+
+        $.ajax({
+            url: deleteUrl,
+            method: 'POST',
+          })
+          .done(function() {
+            window.location.reload();
+          })
+          .fail(function() {
+            $deleteError.text('Unable to delete experimental ID. Please try again.').removeClass('d-none');
+            $deleteConfirm.prop('disabled', false);
+          });
+      });
+
+      $experimentalIdModal.on('hidden.bs.modal', function() {
+        resetExperimentalIdForm();
+      });
+
+      $detailModal.on('hidden.bs.modal', function() {
+        clearDetailModal();
+      });
+
+      $deleteModal.on('hidden.bs.modal', function() {
+        $deleteError.addClass('d-none').empty();
+        $deleteConfirm.prop('disabled', false);
       });
     });
   </script>

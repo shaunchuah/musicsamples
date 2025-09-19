@@ -10,6 +10,9 @@ from ..views.box_views import (
     box_filter_export_csv,
     box_search,
     create_experimental_id,
+    experimental_id_delete,
+    experimental_id_detail,
+    experimental_id_update,
     export_boxes_csv,
 )
 
@@ -25,5 +28,8 @@ urlpatterns = [
     path("delete/<int:pk>/", BasicScienceBoxDeleteView.as_view(), name="delete"),
     path("search/", box_search, name="search"),
     path("create-experimental-id/", create_experimental_id, name="create_experimental_id"),
+    path("experimental-id/<int:pk>/", experimental_id_detail, name="experimental_id_detail"),
+    path("experimental-id/<int:pk>/update/", experimental_id_update, name="experimental_id_update"),
+    path("experimental-id/<int:pk>/delete/", experimental_id_delete, name="experimental_id_delete"),
     path("export_csv/", export_boxes_csv, name="export_csv"),
 ]

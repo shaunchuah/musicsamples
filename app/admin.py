@@ -2,7 +2,7 @@ from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
-from app.models import BasicScienceBox, ClinicalData, DataStore, Sample, StudyIdentifier
+from app.models import BasicScienceBox, ClinicalData, DataStore, ExperimentalID, Sample, StudyIdentifier
 
 
 @admin.register(StudyIdentifier)
@@ -74,3 +74,25 @@ class BasicScienceBoxAdmin(admin.ModelAdmin):
         "created_by",
         "last_modified_by",
     ]
+
+
+@admin.register(ExperimentalID)
+class ExperimentalIDAdmin(admin.ModelAdmin):
+    list_display = [
+        "name",
+        "description",
+        "get_sample_types",
+        "get_tissue_types",
+        "created",
+        "created_by",
+        "last_modified",
+        "last_modified_by",
+    ]
+
+    @admin.display(description="Sample Types")
+    def get_sample_types(self, obj):
+        return ", ".join([st.label or st.name for st in obj.sample_types.all()])
+
+    @admin.display(description="Tissue Types")
+    def get_tissue_types(self, obj):
+        return ", ".join([tt.label or tt.name for tt in obj.tissue_types.all()])
