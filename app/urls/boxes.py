@@ -6,13 +6,20 @@ from ..views.box_views import (
     BasicScienceBoxDetailView,
     BasicScienceBoxListView,
     BasicScienceBoxUpdateView,
+    ExperimentalIdCreateView,
+    ExperimentalIdDeleteView,
     ExperimentalIdDetailView,
     ExperimentalIdListView,
+    ExperimentalIdUpdateView,
     box_filter,
     box_filter_export_csv,
     box_search,
     create_experimental_id,
+    experiment_filter,
+    experiment_search,
+    experimental_id_filter_export_csv,
     export_boxes_csv,
+    export_experiments_csv,
 )
 
 app_name = "boxes"
@@ -29,5 +36,16 @@ urlpatterns = [
     path("create-experimental-id/", create_experimental_id, name="create_experimental_id"),
     path("export_csv/", export_boxes_csv, name="export_csv"),
     path("experimental_ids/", ExperimentalIdListView.as_view(), name="experimental_id_list"),
-    path("experimental_ids/<int:pk>/", ExperimentalIdDetailView.as_view(), name="experimental_id_detail"),
+    path("experimental_ids/create/", ExperimentalIdCreateView.as_view(), name="experimental_id_create"),
+    path("experimental_ids/view/<int:pk>/", ExperimentalIdDetailView.as_view(), name="experimental_id_detail"),
+    path("experimental_ids/edit/<int:pk>/", ExperimentalIdUpdateView.as_view(), name="experimental_id_edit"),
+    path("experimental_ids/delete/<int:pk>/", ExperimentalIdDeleteView.as_view(), name="experimental_id_delete"),
+    path("experimental_ids/search/", experiment_search, name="experimental_id_search"),
+    path("experimental_ids/export_csv/", export_experiments_csv, name="experimental_id_export_csv"),
+    path("experimental_ids/filter/", experiment_filter, name="experimental_id_filter"),
+    path(
+        "experimental_ids/filter/export_csv/",
+        experimental_id_filter_export_csv,
+        name="experimental_id_filter_export_csv",
+    ),
 ]

@@ -1,0 +1,96 @@
+{% extends "layouts/base.html" %}
+
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Filter Experimental IDs</h3>
+        </div>
+        <div class="card-body">
+          <form id="searchform" method="get">
+            {% load widget_tweaks %}
+
+            <div class="row">
+              <div class="col-md-3">
+                <div class="form-group">
+                  {{ experimental_id_filter.form.species.label_tag }}
+                  {% render_field experimental_id_filter.form.species class="form-control" %}
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  {{ experimental_id_filter.form.sample_types.label_tag }}
+                  {% render_field experimental_id_filter.form.sample_types class="form-control"|attr:"size:7" %}
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  {{ experimental_id_filter.form.tissue_types.label_tag }}
+                  {% render_field experimental_id_filter.form.tissue_types class="form-control"|attr:"size:7" %}
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  {{ experimental_id_filter.form.date.label_tag }}
+                  <div class="d-flex flex-row align-items-center">
+                    {% render_field experimental_id_filter.form.date class="form-control" %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <button type="submit" class="btn btn-fill btn-success">Filter</button>
+              <a href="{% url 'boxes:experimental_id_filter' %}"
+                 class="btn btn-fill btn-secondary">Clear</a>
+            <a href="{% url 'boxes:filter_export_csv' %}?{{ parameter_string }}"
+               class="btn btn-success float-lg-right"><i class="tim-icons icon-cloud-download-93"></i>
+          Export CSV</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Filtered Experiments</h3>
+      </div>
+      {% include 'boxes/includes/experimental_id_table.html' %}
+    </div>
+  </div>
+</div>
+{% endblock content %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+  <script>
+    $(document).ready(function() {
+      $('[data-toggle="tooltip"]').tooltip();
+      $("#mainTable").tablesorter({
+        sortReset: true,
+        dateFormat: "ddmmyyyy",
+        headers: {
+          9: {
+            sorter: false
+          },
+          11: {
+            sorter: false
+          },
+          12: {
+            sorter: false
+          },
+          13: {
+            sorter: false
+          },
+          14: {
+            sorter: false
+          }
+        },
+      });
+    });
+  </script>
+{% endblock javascripts %}

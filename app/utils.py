@@ -15,7 +15,7 @@ def export_csv(queryset, file_prefix="gtrac", file_name="samples", include_relat
     file_name: optional, default is samples
     include_related: optional, default True. If True, includes foreign key fields
 
-    By default takes in a queryset and returns gtrac_samples_<current_date>.csv
+    By default takes in a queryset and returns gtrac_samples_[current_date].csv
     """
     from django.db.models.fields.related import ForeignKey, OneToOneField
 
@@ -227,7 +227,7 @@ def create_sample_type_pivot(qs: QuerySet, study_name: str):
         index=["study_id", "sample_date"],
         columns="sample_type",
         values="sample_id",
-        aggfunc=pd.unique,
+        aggfunc=pd.unique,  # type:ignore
         fill_value="None",
     )
 

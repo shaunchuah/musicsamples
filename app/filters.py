@@ -11,6 +11,7 @@ from app.choices import (
     RowChoices,
     SampleTypeChoices,
     SexChoices,
+    SpeciesChoices,
     StudyCenterChoices,
     StudyGroupChoices,
     StudyNameChoices,
@@ -197,8 +198,6 @@ class BasicScienceBoxFilter(django_filters.FilterSet):
 
 
 class ExperimentalIDFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(lookup_expr="icontains", label="Experimental ID")
-    description = django_filters.CharFilter(lookup_expr="icontains", label="Description")
     date = django_filters.DateFromToRangeFilter(
         widget=RangeWidget(attrs={"type": "date"}),
         label="Date Range",
@@ -207,13 +206,11 @@ class ExperimentalIDFilter(django_filters.FilterSet):
         label="Sample Types", queryset=BasicScienceSampleType.objects.all()
     )
     tissue_types = django_filters.ModelMultipleChoiceFilter(label="Tissue Types", queryset=TissueType.objects.all())
-    species = django_filters.ChoiceFilter(label="Species", choices=SampleTypeChoices.choices)
+    species = django_filters.ChoiceFilter(label="Species", choices=SpeciesChoices.choices)
 
     class Meta:
         model = ExperimentalID
         fields = [
-            "name",
-            "description",
             "date",
             "sample_types",
             "tissue_types",

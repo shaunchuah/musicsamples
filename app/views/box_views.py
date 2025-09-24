@@ -9,7 +9,7 @@ from django.urls import reverse_lazy
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
-from app.filters import BasicScienceBoxFilter
+from app.filters import BasicScienceBoxFilter, ExperimentalIDFilter
 from app.forms import BasicScienceBoxForm, ExperimentalIDForm
 from app.models import BasicScienceBox, ExperimentalID
 from app.utils import export_csv, historical_changes
@@ -381,6 +381,20 @@ class ExperimentalIdListView(LoginRequiredMixin, PermissionRequiredMixin, ListVi
         return context
 
 
+class ExperimentalIdCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    model = ExperimentalID
+    form_class = ExperimentalIDForm
+    template_name = "boxes/experimental_id_form.html"
+    success_url = reverse_lazy("boxes:experimental_id_list")
+    permission_required = "app.add_basicsciencebox"
+
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        form.instance.last_modified_by = self.request.user
+        messages.success(self.request, "Experiment registered successfully.")
+        return super().form_valid(form)
+
+
 class ExperimentalIdDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     model = ExperimentalID
     template_name = "boxes/experimental_id_detail.html"
@@ -403,3 +417,142 @@ class ExperimentalIdDetailView(LoginRequiredMixin, PermissionRequiredMixin, Deta
             }
         )
         return context
+
+
+class ExperimentalIdUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    model = ExperimentalID
+    form_class = ExperimentalIDForm
+    template_name = "boxes/experimental_id_form.html"
+    success_url = reverse_lazy("boxes:experimental_id_list")
+    permission_required = "app.change_basicsciencebox"
+
+    def form_valid(self, form):
+        form.instance.last_modified_by = self.request.user
+        messages.success(self.request, "Experiment updated successfully.")
+        return super().form_valid(form)
+
+
+class ExperimentalIdDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    model = ExperimentalID
+    template_name = "boxes/experimental_id_confirm_delete.html"
+    success_url = reverse_lazy("boxes:experimental_id_list")
+    permission_required = "app.delete_basicsciencebox"
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        self.object.is_deleted = True  # type: ignore
+        self.object.last_modified_by = self.request.user  # type: ignore
+        self.object.save()
+        messages.success(self.request, "Experiment deleted successfully.")
+        return HttpResponseRedirect(success_url)
+
+
+@login_required(login_url="/login/")
+@permission_required("app.view_basicsciencebox", raise_exception=True)
+def experiment_search(request):
+    query_string = ""
+    if ("q" in request.GET) and request.GET["q"].strip():
+        query_string = request.GET.get("q")
+
+        queryset = (
+            ExperimentalID.objects.filter(Q(name__icontains=query_string) | Q(description__icontains=query_string))
+            .filter(is_deleted=False)
+            .prefetch_related("boxes", "sample_types", "tissue_types")
+            .select_related("created_by", "last_modified_by")
+            .distinct()
+        )
+
+        experimental_ids = queryset
+        experimental_id_count = experimental_ids.count()
+        context = {
+            "query_string": query_string,
+            "experimental_ids": experimental_ids,
+            "experimental_id_count": experimental_id_count,
+        }
+        return render(request, "boxes/experimental_id_list.html", context)
+    else:
+        context = {
+            "query_string": "Null",
+            "experimental_id_count": 0,
+            "experimental_ids": ExperimentalID.objects.none(),
+        }
+        return render(request, "boxes/experimental_id_list.html", context)
+
+
+@login_required(login_url="/login/")
+@permission_required("app.view_basicsciencebox", raise_exception=True)
+def export_experiments_csv(request):
+    """
+    Exports boxes to CSV based on search query or all boxes if no query.
+    """
+    query_string = ""
+    if ("q" in request.GET) and request.GET["q"].strip():
+        query_string = request.GET.get("q")
+        queryset = (
+            ExperimentalID.objects.filter(Q(name__icontains=query_string) | Q(description__icontains=query_string))
+            .filter(is_deleted=False)
+            .prefetch_related("boxes", "sample_types", "tissue_types")
+            .select_related("created_by", "last_modified_by")
+            .distinct()
+        )
+    else:
+        queryset = (
+            ExperimentalID.objects.exclude(is_deleted=True)
+            .prefetch_related("boxes", "sample_types", "tissue_types")
+            .select_related("created_by", "last_modified_by")
+        )
+
+    return export_csv(queryset, file_prefix="gtrac", file_name="experimental_ids")
+
+
+@login_required(login_url="/login/")
+@permission_required("app.view_basicsciencebox", raise_exception=True)
+def experiment_filter(request):
+    queryset = (
+        ExperimentalID.objects.all()
+        .prefetch_related("boxes", "sample_types", "tissue_types")
+        .select_related("created_by", "last_modified_by")
+    )
+    experimental_id_filter = ExperimentalIDFilter(request.GET, queryset=queryset)
+    experimental_ids = experimental_id_filter.qs
+    experimental_id_count = experimental_ids.count()
+
+    # Pagination
+    page = request.GET.get("page", 1)
+    paginator = Paginator(experimental_ids, 25)  # Using same pagination size as BasicScienceBoxListView
+    try:
+        experimental_ids = paginator.page(page)
+    except PageNotAnInteger:
+        experimental_ids = paginator.page(1)
+    except EmptyPage:
+        experimental_ids = paginator.page(paginator.num_pages)
+
+    # Allows paginator to reconstruct the initial query string
+    parameter_string = ""
+    for i in request.GET:
+        if i != "page":
+            val = request.GET.get(i)
+            parameter_string += f"&{i}={val}"
+
+    context = {
+        "experimental_ids": experimental_ids,
+        "page_obj": experimental_ids,
+        "experimental_id_count": experimental_id_count,
+        "experimental_id_filter": experimental_id_filter,
+        "parameter_string": parameter_string,
+    }
+    return render(request, "boxes/experimental_id_filter.html", context)
+
+
+@login_required(login_url="/login/")
+@permission_required("app.view_basicsciencebox", raise_exception=True)
+def experimental_id_filter_export_csv(request):
+    queryset = (
+        ExperimentalID.objects.all()
+        .prefetch_related("boxes", "sample_types", "tissue_types")
+        .select_related("created_by", "last_modified_by")
+    )
+    experimental_id_filter = ExperimentalIDFilter(request.GET, queryset=queryset)
+    experimental_ids = experimental_id_filter.qs
+    return export_csv(experimental_ids, file_prefix="gtrac", file_name="filtered_experimental_ids")

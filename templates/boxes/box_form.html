@@ -156,6 +156,10 @@
               {{ experimental_form.description|add_class:"form-control" }}
             </div>
             <div class="form-group">
+              {{ experimental_form.species.label_tag }}
+              {{ experimental_form.species|add_class:"form-control" }}
+            </div>
+            <div class="form-group">
               {{ experimental_form.date.label_tag }}
               {{ experimental_form.date|add_class:"form-control" }}
             </div>
@@ -206,6 +210,7 @@
               // Close modal and reset form
               $('#experimentModal').modal('hide');
               $('#experimentForm')[0].reset();
+              $('#experimentForm #id_species').prop('selectedIndex', 0);
               $('#id_sample_types').val([]);
               $('#id_tissue_types').val([]);
 
@@ -242,6 +247,7 @@
       // Reset form when modal is hidden
       $('#experimentModal').on('hidden.bs.modal', function() {
         $('#experimentForm')[0].reset();
+        $('#experimentForm #id_species').prop('selectedIndex', 0);
         $('#experimentFormErrors').addClass('d-none').empty();
       });
     });

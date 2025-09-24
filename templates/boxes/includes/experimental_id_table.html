@@ -49,15 +49,15 @@
               <a href="{% url 'boxes:experimental_id_detail' experimental_id.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
             </td>
             <td>
-              <a href="{% url 'boxes:edit' experimental_id.pk %}"><i class="tim-icons icon-pencil"></i> Edit</a>
+              <a href="{% url 'boxes:experimental_id_edit' experimental_id.pk %}"><i class="tim-icons icon-pencil"></i> Edit</a>
             </td>
             <td>
-              <a href="{% url 'boxes:delete' experimental_id.pk %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
+              <a href="{% url 'boxes:experimental_id_delete' experimental_id.pk %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
             </td>
           </tr>
         {% empty %}
           <tr>
-            <td colspan="11" class="text-center">No experimental IDs found.</td>
+            <td colspan="12" class="text-center">No experimental IDs found.</td>
           </tr>
         {% endfor %}
       </tbody>

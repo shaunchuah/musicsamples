@@ -14,24 +14,17 @@
           <h3 class="card-title">Search Experimental IDs</h3>
         </div>
         <div class="card-body">
-          <form id="searchform" action="{% url 'boxes:search' %}" method="get">
+          <form id="searchform"
+                action="{% url 'boxes:experimental_id_search' %}"
+                method="get">
             <div class="form-group">
               <input type="text" autofocus name="q" class="form-control" />
-            </div>
-            <div class="form-check">
-              <input type="checkbox"
-                     class="form-check-input mr-2"
-                     id="id_include_used_boxes"
-                     name="include_used_boxes"
-                     value="True"
-                     class="form-control" />
-              <label for="id_include_used_boxes" class="form-check-label">Include deleted experimental IDs?</label>
             </div>
             <div>
               <button type="submit" class="btn btn-fill btn-success">Search</button>
               <a href="{% url 'boxes:experimental_id_list' %}"
                  class="btn btn-fill btn-secondary">Clear</a>
-              <a href="{% url 'boxes:filter' %}"
+              <a href="{% url 'boxes:experimental_id_filter' %}"
                  class="btn btn-fill btn-success float-lg-right">Advanced Filtering</a>
             </div>
           </form>
@@ -46,8 +39,9 @@
           <h3 class="card-title">Experiment IDs</h3>
         </div>
         <div class="card-footer">
-          <a href="{% url 'boxes:create' %}" class="btn btn-fill btn-success">Add New Experiment ID</a>
-          <a href="{% url 'boxes:export_csv' %}?q={{ query_string }}"
+          <a href="{% url 'boxes:experimental_id_create' %}"
+             class="btn btn-fill btn-success">Add New Experiment</a>
+          <a href="{% url 'boxes:experimental_id_export_csv' %}?q={{ query_string }}"
              class="btn btn-success float-lg-right"
              data-toggle="tooltip"
              data-placement="bottom"
