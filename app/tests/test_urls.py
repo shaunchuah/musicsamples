@@ -6,7 +6,6 @@ from app.views.box_views import (
     box_filter,
     box_filter_export_csv,
     box_search,
-    create_experimental_id,
     export_boxes_csv,
 )
 from datasets.views import (
@@ -300,10 +299,6 @@ class TestBoxUrls(SimpleTestCase):
     def test_box_search_url_resolves(self):
         url = reverse("boxes:search")
         self.assertEqual(resolve(url).func, box_search)
-
-    def test_box_create_experimental_id_url_resolves(self):
-        url = reverse("boxes:create_experimental_id")
-        self.assertEqual(resolve(url).func, create_experimental_id)
 
     def test_box_export_csv_url_resolves(self):
         url = reverse("boxes:export_csv")

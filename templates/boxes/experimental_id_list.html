@@ -11,7 +11,7 @@
     <div class="col">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Search Boxes</h3>
+          <h3 class="card-title">Search Experimental IDs</h3>
         </div>
         <div class="card-body">
           <form id="searchform" action="{% url 'boxes:search' %}" method="get">
@@ -25,11 +25,12 @@
                      name="include_used_boxes"
                      value="True"
                      class="form-control" />
-              <label for="id_include_used_boxes" class="form-check-label">Include used boxes?</label>
+              <label for="id_include_used_boxes" class="form-check-label">Include deleted experimental IDs?</label>
             </div>
             <div>
               <button type="submit" class="btn btn-fill btn-success">Search</button>
-              <a href="{% url 'boxes:list' %}" class="btn btn-fill btn-secondary">Clear</a>
+              <a href="{% url 'boxes:experimental_id_list' %}"
+                 class="btn btn-fill btn-secondary">Clear</a>
               <a href="{% url 'boxes:filter' %}"
                  class="btn btn-fill btn-success float-lg-right">Advanced Filtering</a>
             </div>
@@ -42,10 +43,10 @@
     <div class="col">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Basic Science Boxes</h3>
+          <h3 class="card-title">Experiment IDs</h3>
         </div>
         <div class="card-footer">
-          <a href="{% url 'boxes:create' %}" class="btn btn-fill btn-success">Add New Box</a>
+          <a href="{% url 'boxes:create' %}" class="btn btn-fill btn-success">Add New Experiment ID</a>
           <a href="{% url 'boxes:export_csv' %}?q={{ query_string }}"
              class="btn btn-success float-lg-right"
              data-toggle="tooltip"
@@ -53,7 +54,7 @@
              data-html="true"
              title="Tip: Customise the export by searching for the set of samples you wish to download."><i class="tim-icons icon-cloud-download-93"></i> Export Current View to CSV</a>
         </div>
-        {% include 'boxes/includes/box_table.html' with box_list=boxes %}
+        {% include 'boxes/includes/experimental_id_table.html' %}
       </div>
     </div>
   </div>

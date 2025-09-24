@@ -225,7 +225,6 @@ class BasicScienceBoxForm(ModelForm):
             "basic_science_group",
             "box_id",
             "box_type",
-            "species",
             "location",
             "row",
             "column",
@@ -266,7 +265,7 @@ class ExperimentalIDForm(ModelForm):
 
     class Meta:
         model = ExperimentalID
-        fields = ["name", "description", "date", "sample_types", "tissue_types"]
+        fields = ["name", "description", "date", "sample_types", "tissue_types", "species"]
         widgets = {
             "date": DateInput(),
             "description": forms.Textarea(attrs={"rows": 3}),

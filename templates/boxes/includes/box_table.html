@@ -10,7 +10,6 @@
           <th>Location</th>
           <th>Sublocation</th>
           <th>Box Type</th>
-          <th>Species</th>
           <th>Sample Types</th>
           <th>Tissue Types</th>
           <th>Comments</th>
@@ -35,7 +34,6 @@
             <td>{{ box.get_location_display }}</td>
             <td>{{ box.row }}{{ box.column }}{{ box.depth }}</td>
             <td>{{ box.get_box_type_display }}</td>
-            <td>{{ box.get_species_display }}</td>
             <td>
               {% with sample_labels=box.get_sample_type_labels %}
                 {% if sample_labels %}

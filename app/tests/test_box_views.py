@@ -1,10 +1,8 @@
-from datetime import timedelta
 from unittest.mock import patch
 
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory, TestCase
 from django.urls import reverse, reverse_lazy
-from django.utils import timezone
 
 from app.factories import (
     BasicScienceBoxFactory,
@@ -12,7 +10,7 @@ from app.factories import (
     ExperimentalIDFactory,
     TissueTypeFactory,
 )
-from app.models import BasicScienceBox, ExperimentalID
+from app.models import BasicScienceBox
 from app.views.box_views import (
     BasicScienceBoxCreateView,
     BasicScienceBoxDeleteView,
@@ -289,69 +287,6 @@ class BasicScienceBoxListViewTest(TestCase):
         self.assertIn(self.box2, boxes)
         self.assertNotIn(self.box3, boxes)
 
-    def test_view_context_contains_filter(self):
-        """Test that the view context contains the filter"""
-        # Add permission
-        self.user.user_permissions.add(
-            self.user.user_permissions.model.objects.get_or_create(
-                codename="view_basicsciencebox", defaults={"name": "Can view basic science box"}
-            )[0]
-        )
-
-        # Use Django's test client for context testing
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-
-        # Check context
-        self.assertIn("filter", response.context)
-
-    def test_view_context_includes_experimental_data(self):
-        """Ensure experimental IDs and form are present in context"""
-        self.user.user_permissions.add(
-            self.user.user_permissions.model.objects.get_or_create(
-                codename="view_basicsciencebox", defaults={"name": "Can view basic science box"}
-            )[0]
-        )
-        ExperimentalIDFactory()
-
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-
-        self.assertIn("experimental_ids", response.context)
-        self.assertIn("experimental_form", response.context)
-        self.assertIn("box_count", response.context)
-        # Two active boxes were created in setUp
-        self.assertEqual(response.context["box_count"], 2)
-
-    def test_experimental_ids_paginated_and_ordered(self):
-        """Experimental IDs are ordered by newest date and paginated."""
-        self.user.user_permissions.add(
-            self.user.user_permissions.model.objects.get_or_create(
-                codename="view_basicsciencebox", defaults={"name": "Can view basic science box"}
-            )[0]
-        )
-        # Reset to predictable state
-        ExperimentalID.objects.all().delete()
-
-        today = timezone.now().date()
-        latest = ExperimentalIDFactory(name="Latest", date=today)
-        for i in range(1, 12):
-            ExperimentalIDFactory(name=f"Older-{i}", date=today - timedelta(days=i))
-
-        self.client.force_login(self.user)
-        response = self.client.get(self.url)
-        page = response.context["experimental_ids"]
-
-        self.assertEqual(page.number, 1)
-        self.assertEqual(page.paginator.per_page, 10)
-        self.assertEqual(page.object_list[0], latest)
-
-        response_page2 = self.client.get(f"{self.url}?exp_page=2")
-        page2 = response_page2.context["experimental_ids"]
-        self.assertEqual(page2.number, 2)
-        self.assertGreaterEqual(page2.paginator.num_pages, 2)
-        self.assertGreater(len(page2.object_list), 0)
-
     def test_queryset_excludes_used_boxes(self):
         """Test that get_queryset excludes boxes where is_used=True"""
         # Add permission
@@ -398,7 +333,6 @@ class BasicScienceBoxCreateViewTest(TestCase):
             "basic_science_group": "bain",
             "box_id": "TEST001",
             "box_type": "basic_science_samples",
-            "species": "human",
             "location": "sii_freezer_1",
         }
 
@@ -605,7 +539,6 @@ class BasicScienceBoxUpdateViewTest(TestCase):
             "basic_science_group": "bain",
             "box_id": "UPDATED001",
             "box_type": "basic_science_samples",
-            "species": "human",
             "location": "sii_freezer_1",
         }
 
@@ -792,8 +725,6 @@ class FunctionBasedViewsTest(TestCase):
         response = self.client.get(reverse("boxes:search"), {"q": self.box.box_id})
         self.assertEqual(response.status_code, 200)
         self.assertIn(self.box, response.context["boxes"])
-        self.assertIn("experimental_ids", response.context)
-        self.assertIn("experimental_form", response.context)
         self.assertIn("box_count", response.context)
         self.assertGreaterEqual(response.context["box_count"], 1)
 
@@ -808,8 +739,6 @@ class FunctionBasedViewsTest(TestCase):
         response = self.client.get(reverse("boxes:search"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["query_string"], "Null")
-        self.assertIn("experimental_ids", response.context)
-        self.assertIn("experimental_form", response.context)
         self.assertIn("box_count", response.context)
 
     def test_box_search_with_include_used_boxes(self):
@@ -823,130 +752,7 @@ class FunctionBasedViewsTest(TestCase):
         response = self.client.get(reverse("boxes:search"), {"q": self.used_box.box_id, "include_used_boxes": "1"})
         self.assertEqual(response.status_code, 200)
         self.assertIn(self.used_box, response.context["boxes"])
-        self.assertIn("experimental_ids", response.context)
-        self.assertIn("experimental_form", response.context)
         self.assertIn("box_count", response.context)
-
-    def test_create_experimental_id_success(self):
-        """Test create_experimental_id with valid data"""
-        self.user.user_permissions.add(
-            self.user.user_permissions.model.objects.get_or_create(
-                codename="view_basicsciencebox", defaults={"name": "Can view basic science box"}
-            )[0]
-        )
-        self.client.force_login(self.user)
-        sample_type = BasicScienceSampleTypeFactory()
-        tissue_type = TissueTypeFactory()
-        data = {
-            "name": "Test Exp",
-            "description": "Test description",
-            "date": "2024-01-01",
-            "sample_types": [sample_type.pk],
-            "tissue_types": [tissue_type.pk],
-        }
-        response = self.client.post(reverse("boxes:create_experimental_id"), data)
-        self.assertEqual(response.status_code, 200)
-        json_response = response.json()
-        self.assertTrue(json_response["success"])
-        experimental = ExperimentalID.objects.get(name="Test Exp")
-        self.assertIn(sample_type, experimental.sample_types.all())
-        self.assertIn(tissue_type, experimental.tissue_types.all())
-        self.assertEqual(experimental.created_by, self.user)
-        self.assertEqual(json_response["experimental_id"]["sample_type_ids"], [sample_type.pk])
-        self.assertEqual(json_response["experimental_id"]["tissue_type_ids"], [tissue_type.pk])
-
-    def test_create_experimental_id_invalid(self):
-        """Test create_experimental_id with invalid data"""
-        self.user.user_permissions.add(
-            self.user.user_permissions.model.objects.get_or_create(
-                codename="view_basicsciencebox", defaults={"name": "Can view basic science box"}
-            )[0]
-        )
-        self.client.force_login(self.user)
-        data = {}  # Invalid data
-        response = self.client.post(reverse("boxes:create_experimental_id"), data)
-        self.assertEqual(response.status_code, 400)
-        json_response = response.json()
-        self.assertFalse(json_response["success"])
-
-    def test_experimental_id_detail(self):
-        """Ensure detail endpoint returns serialized experiment"""
-        self.user.user_permissions.add(
-            self.user.user_permissions.model.objects.get_or_create(
-                codename="view_basicsciencebox", defaults={"name": "Can view basic science box"}
-            )[0]
-        )
-        experimental = ExperimentalIDFactory()
-        self.client.force_login(self.user)
-
-        response = self.client.get(reverse("boxes:experimental_id_detail", args=[experimental.pk]))
-        self.assertEqual(response.status_code, 200)
-        data = response.json()["experimental_id"]
-        self.assertEqual(data["id"], experimental.pk)
-        self.assertIn("sample_types", data)
-        self.assertIn("tissue_types", data)
-
-    def test_experimental_id_update_success(self):
-        """Update endpoint modifies experiment and returns payload"""
-        self.user.user_permissions.add(
-            self.user.user_permissions.model.objects.get_or_create(
-                codename="view_basicsciencebox", defaults={"name": "Can view basic science box"}
-            )[0]
-        )
-        experimental = ExperimentalIDFactory(name="Original")
-        sample_type = BasicScienceSampleTypeFactory()
-        self.client.force_login(self.user)
-
-        data = {
-            "name": "Updated Name",
-            "description": "Updated description",
-            "date": "2024-02-02",
-            "sample_types": [sample_type.pk],
-            "tissue_types": [],
-        }
-        response = self.client.post(reverse("boxes:experimental_id_update", args=[experimental.pk]), data)
-        self.assertEqual(response.status_code, 200)
-        payload = response.json()
-        self.assertTrue(payload["success"])
-
-        experimental.refresh_from_db()
-        self.assertEqual(experimental.name, "Updated Name")
-        self.assertEqual(experimental.last_modified_by, self.user)
-        self.assertIn(sample_type, experimental.sample_types.all())
-
-    def test_experimental_id_update_invalid(self):
-        """Missing fields should return validation errors"""
-        self.user.user_permissions.add(
-            self.user.user_permissions.model.objects.get_or_create(
-                codename="view_basicsciencebox", defaults={"name": "Can view basic science box"}
-            )[0]
-        )
-        experimental = ExperimentalIDFactory(name="Original")
-        self.client.force_login(self.user)
-
-        response = self.client.post(reverse("boxes:experimental_id_update", args=[experimental.pk]), {"name": ""})
-        self.assertEqual(response.status_code, 400)
-        self.assertFalse(response.json()["success"])
-
-    def test_experimental_id_delete_success(self):
-        """Deleting an experimental ID removes links but keeps boxes"""
-        self.user.user_permissions.add(
-            self.user.user_permissions.model.objects.get_or_create(
-                codename="view_basicsciencebox", defaults={"name": "Can view basic science box"}
-            )[0]
-        )
-        experimental = ExperimentalIDFactory()
-        box = BasicScienceBoxFactory(experimental_ids=[experimental])
-        self.client.force_login(self.user)
-
-        response = self.client.post(reverse("boxes:experimental_id_delete", args=[experimental.pk]))
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.json()["success"])
-        self.assertIn(box.pk, response.json()["removed_box_ids"])
-        self.assertFalse(ExperimentalID.objects.filter(pk=experimental.pk).exists())
-        box.refresh_from_db()
-        self.assertEqual(box.experimental_ids.count(), 0)
-        self.assertEqual(box.last_modified_by, self.user)
 
     def test_export_boxes_csv_with_query(self):
         """Test export_boxes_csv with query"""

@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Prefetch, Q
 from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
@@ -18,93 +18,6 @@ EXPERIMENT_PREFETCH = Prefetch(
     "experimental_ids",
     queryset=ExperimentalID.objects.prefetch_related("sample_types", "tissue_types"),
 )
-
-
-def get_experimental_id_context(request) -> dict:
-    """Reusable context for experimental ID listings and forms."""
-    experimental_ids = (
-        ExperimentalID.objects.all()
-        .prefetch_related("sample_types", "tissue_types", "boxes")
-        .order_by("-date", "-created")
-    )
-    paginator = Paginator(experimental_ids, 10)
-    page_number = request.GET.get("exp_page")
-    try:
-        page_obj = paginator.page(page_number)
-    except PageNotAnInteger:
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)
-
-    query_params = request.GET.copy()
-    if "exp_page" in query_params:
-        query_params.pop("exp_page")
-    base_query = query_params.urlencode()
-
-    return {
-        "experimental_ids": page_obj,
-        "experimental_ids_page_obj": page_obj,
-        "experimental_ids_paginator": paginator,
-        "experimental_ids_querystring": base_query,
-        "experimental_form": ExperimentalIDForm(),
-    }
-
-
-def serialize_experimental_id(experimental_id: ExperimentalID) -> dict:
-    """Serialize an ExperimentalID for JSON responses."""
-
-    def format_timestamp(value, user):
-        if not value:
-            return None
-        formatted = value.strftime("%d %b %Y %H:%M")
-        if user:
-            return f"{formatted} · {user.email}"
-        return formatted
-
-    sample_types = [
-        {
-            "id": sample_type.pk,
-            "name": sample_type.name,
-            "label": sample_type.label,
-            "display": sample_type.label or sample_type.name,
-        }
-        for sample_type in experimental_id.sample_types.all()
-    ]
-    tissue_types = [
-        {
-            "id": tissue_type.pk,
-            "name": tissue_type.name,
-            "label": tissue_type.label,
-            "display": tissue_type.label or tissue_type.name,
-        }
-        for tissue_type in experimental_id.tissue_types.all()
-    ]
-    boxes = [
-        {
-            "id": box.pk,
-            "box_id": box.box_id,
-            "display": str(box),
-        }
-        for box in experimental_id.boxes.all()  # type: ignore
-    ]
-    return {
-        "id": experimental_id.pk,
-        "name": experimental_id.name,
-        "description": experimental_id.description,
-        "date": experimental_id.date.isoformat() if experimental_id.date else None,
-        "date_display": experimental_id.date.strftime("%d %b %Y") if experimental_id.date else None,
-        "sample_types": sample_types,
-        "tissue_types": tissue_types,
-        "sample_type_ids": [sample_type["id"] for sample_type in sample_types],
-        "tissue_type_ids": [tissue_type["id"] for tissue_type in tissue_types],
-        "boxes": boxes,
-        "created": experimental_id.created.isoformat() if experimental_id.created else None,
-        "created_by": experimental_id.created_by.email if experimental_id.created_by else None,
-        "created_display": format_timestamp(experimental_id.created, experimental_id.created_by),
-        "last_modified": experimental_id.last_modified.isoformat() if experimental_id.last_modified else None,
-        "last_modified_by": experimental_id.last_modified_by.email if experimental_id.last_modified_by else None,
-        "last_modified_display": format_timestamp(experimental_id.last_modified, experimental_id.last_modified_by),
-    }
 
 
 class BasicScienceBoxDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
@@ -151,15 +64,11 @@ class BasicScienceBoxListView(LoginRequiredMixin, PermissionRequiredMixin, ListV
             .prefetch_related(EXPERIMENT_PREFETCH)
             .select_related("created_by", "last_modified_by")
         )
-        self.filterset = BasicScienceBoxFilter(self.request.GET, queryset=queryset)
-        return self.filterset.qs
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["filter"] = self.filterset
-        context["query_string"] = self.request.GET.get("q", "")
-        context["box_count"] = self.filterset.qs.count()
-        context.update(get_experimental_id_context(self.request))
+        context["box_count"] = self.get_queryset().count()
         return context
 
 
@@ -262,90 +171,10 @@ def box_search(request):
             "boxes": box_list,
             "box_count": box_count,
         }
-        context.update(get_experimental_id_context(request))
         return render(request, "boxes/box_list.html", context)
     else:
         context = {"query_string": "Null", "box_count": 0, "boxes": BasicScienceBox.objects.none()}
-        context.update(get_experimental_id_context(request))
         return render(request, "boxes/box_list.html", context)
-
-
-@login_required
-@permission_required("app.view_basicsciencebox", raise_exception=True)
-@require_http_methods(["POST"])
-def create_experimental_id(request):
-    """AJAX view to create a new ExperimentalID."""
-    form = ExperimentalIDForm(request.POST)
-
-    if form.is_valid():
-        experimental_id = form.save(commit=False)
-        experimental_id.created_by = request.user
-        experimental_id.last_modified_by = request.user
-        experimental_id.save()
-        form.save_m2m()
-        experimental_id = (
-            ExperimentalID.objects.prefetch_related("sample_types", "tissue_types", "boxes")
-            .select_related("created_by", "last_modified_by")
-            .get(pk=experimental_id.pk)
-        )
-        return JsonResponse({"success": True, "experimental_id": serialize_experimental_id(experimental_id)})
-    return JsonResponse({"success": False, "errors": form.errors}, status=400)
-
-
-@login_required(login_url="/login/")
-@permission_required("app.view_basicsciencebox", raise_exception=True)
-def experimental_id_detail(request, pk: int):
-    experimental_id = get_object_or_404(
-        ExperimentalID.objects.prefetch_related("sample_types", "tissue_types", "boxes").select_related(
-            "created_by", "last_modified_by"
-        ),
-        pk=pk,
-    )
-    return JsonResponse({"success": True, "experimental_id": serialize_experimental_id(experimental_id)})
-
-
-@login_required(login_url="/login/")
-@permission_required("app.view_basicsciencebox", raise_exception=True)
-@require_http_methods(["POST"])
-def experimental_id_update(request, pk: int):
-    experimental_id = get_object_or_404(ExperimentalID, pk=pk)
-    form = ExperimentalIDForm(request.POST, instance=experimental_id)
-    if form.is_valid():
-        experimental_id = form.save(commit=False)
-        experimental_id.last_modified_by = request.user
-        experimental_id.save()
-        form.save_m2m()
-        experimental_id = (
-            ExperimentalID.objects.prefetch_related("sample_types", "tissue_types", "boxes")
-            .select_related("created_by", "last_modified_by")
-            .get(pk=pk)
-        )
-        return JsonResponse({"success": True, "experimental_id": serialize_experimental_id(experimental_id)})
-    return JsonResponse({"success": False, "errors": form.errors}, status=400)
-
-
-@login_required(login_url="/login/")
-@permission_required("app.view_basicsciencebox", raise_exception=True)
-@require_http_methods(["POST"])
-def experimental_id_delete(request, pk: int):
-    experimental_id = get_object_or_404(
-        ExperimentalID.objects.prefetch_related("boxes").select_related("created_by", "last_modified_by"), pk=pk
-    )
-    related_boxes = list(experimental_id.boxes.all())  # type: ignore
-
-    for box in related_boxes:
-        box.experimental_ids.remove(experimental_id)
-        box.last_modified_by = request.user
-        box.save(update_fields=["last_modified_by", "last_modified"])
-
-    experimental_id.delete()
-
-    return JsonResponse(
-        {
-            "success": True,
-            "removed_box_ids": [box.pk for box in related_boxes],
-        }
-    )
 
 
 @login_required(login_url="/login/")
@@ -448,3 +277,129 @@ def box_filter_export_csv(request):
     box_filter = BasicScienceBoxFilter(request.GET, queryset=queryset)
     box_list = box_filter.qs
     return export_csv(box_list, file_prefix="gtrac", file_name="filtered_basic_science_boxes")
+
+
+def serialize_experimental_id(experimental_id: ExperimentalID) -> dict:
+    """Serialize an ExperimentalID for JSON responses."""
+
+    def format_timestamp(value, user):
+        if not value:
+            return None
+        formatted = value.strftime("%d %b %Y %H:%M")
+        if user:
+            return f"{formatted} · {user.email}"
+        return formatted
+
+    sample_types = [
+        {
+            "id": sample_type.pk,
+            "name": sample_type.name,
+            "label": sample_type.label,
+            "display": sample_type.label or sample_type.name,
+        }
+        for sample_type in experimental_id.sample_types.all()
+    ]
+    tissue_types = [
+        {
+            "id": tissue_type.pk,
+            "name": tissue_type.name,
+            "label": tissue_type.label,
+            "display": tissue_type.label or tissue_type.name,
+        }
+        for tissue_type in experimental_id.tissue_types.all()
+    ]
+    boxes = [
+        {
+            "id": box.pk,
+            "box_id": box.box_id,
+            "display": str(box),
+        }
+        for box in experimental_id.boxes.all()  # type: ignore
+    ]
+    return {
+        "id": experimental_id.pk,
+        "name": experimental_id.name,
+        "description": experimental_id.description,
+        "date": experimental_id.date.isoformat() if experimental_id.date else None,
+        "date_display": experimental_id.date.strftime("%d %b %Y") if experimental_id.date else None,
+        "sample_types": sample_types,
+        "tissue_types": tissue_types,
+        "sample_type_ids": [sample_type["id"] for sample_type in sample_types],
+        "tissue_type_ids": [tissue_type["id"] for tissue_type in tissue_types],
+        "boxes": boxes,
+        "created": experimental_id.created.isoformat() if experimental_id.created else None,
+        "created_by": experimental_id.created_by.email if experimental_id.created_by else None,
+        "created_display": format_timestamp(experimental_id.created, experimental_id.created_by),
+        "last_modified": experimental_id.last_modified.isoformat() if experimental_id.last_modified else None,
+        "last_modified_by": experimental_id.last_modified_by.email if experimental_id.last_modified_by else None,
+        "last_modified_display": format_timestamp(experimental_id.last_modified, experimental_id.last_modified_by),
+    }
+
+
+@login_required
+@permission_required("app.view_basicsciencebox", raise_exception=True)
+@require_http_methods(["POST"])
+def create_experimental_id(request):
+    """AJAX view to create a new ExperimentalID."""
+    form = ExperimentalIDForm(request.POST)
+
+    if form.is_valid():
+        experimental_id = form.save(commit=False)
+        experimental_id.created_by = request.user
+        experimental_id.last_modified_by = request.user
+        experimental_id.save()
+        form.save_m2m()
+        experimental_id = (
+            ExperimentalID.objects.prefetch_related("sample_types", "tissue_types", "boxes")
+            .select_related("created_by", "last_modified_by")
+            .get(pk=experimental_id.pk)
+        )
+        return JsonResponse({"success": True, "experimental_id": serialize_experimental_id(experimental_id)})
+    return JsonResponse({"success": False, "errors": form.errors}, status=400)
+
+
+class ExperimentalIdListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    model = ExperimentalID
+    template_name = "boxes/experimental_id_list.html"
+    context_object_name = "experimental_ids"
+    paginate_by = 20
+    permission_required = "app.view_basicsciencebox"
+
+    def get_queryset(self):
+        queryset = (
+            super()
+            .get_queryset()
+            .exclude(is_deleted=True)
+            .prefetch_related("sample_types", "tissue_types", "boxes")
+            .select_related("created_by", "last_modified_by")
+        )
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["experimental_id_count"] = self.get_queryset().count()
+        return context
+
+
+class ExperimentalIdDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    model = ExperimentalID
+    template_name = "boxes/experimental_id_detail.html"
+    context_object_name = "experimental_id"
+    permission_required = "app.view_basicsciencebox"
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("created_by", "last_modified_by").prefetch_related("boxes")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        experimental_id = self.get_object()
+        experimental_id_history = experimental_id.history.filter(id=experimental_id.pk)  # type: ignore
+        changes = historical_changes(experimental_id_history)
+        first_change = experimental_id_history.first()
+        context.update(
+            {
+                "changes": changes,
+                "first": first_change,
+            }
+        )
+        return context

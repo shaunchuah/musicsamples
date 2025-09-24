@@ -59,6 +59,7 @@ class ExperimentalIDFactory(DjangoModelFactory):
     name = Sequence(lambda n: "EXP-%03d" % n)
     description = Faker("sentence")
     date = Faker("date_this_year")
+    species = LazyAttribute(lambda x: choice(SpeciesChoices.values))
 
     @PostGeneration
     def sample_types(self, create, extracted, **kwargs):
@@ -134,7 +135,6 @@ class BasicScienceBoxFactory(DjangoModelFactory):
     basic_science_group = LazyAttribute(lambda x: choice(BasicScienceGroupChoices.values))
     box_id = Sequence(lambda n: "BOX-%04d" % n)
     box_type = LazyAttribute(lambda x: choice(BasicScienceBoxTypeChoices.values))
-    species = LazyAttribute(lambda x: choice(SpeciesChoices.values))
     location = LazyAttribute(lambda x: choice(FreezerLocationChoices.values))
     row = LazyAttribute(lambda x: choice(RowChoices.values))
     column = LazyAttribute(lambda x: choice(ColumnChoices.values))

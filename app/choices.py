@@ -129,6 +129,7 @@ class BasicScienceSampleTypeChoices(models.TextChoices):
     TISSUE = "tissue", "Tissue"
     CELLS = "cells", "Cells"
     SUPERNATANTS = "supernatants", "Supernatants"
+    OCT_COMPOUND = "oct_compound", "OCT Compound"
     OTHER = "other", "Other"
 
 

@@ -45,8 +45,10 @@ class ExperimentalID(models.Model):
         related_name="experimental_ids",
         blank=True,
     )
+    species = models.CharField(max_length=100, choices=SpeciesChoices.choices)
 
     # Tracking
+    is_deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -79,7 +81,6 @@ class BasicScienceBox(models.Model):
     basic_science_group = models.CharField(max_length=200, choices=BasicScienceGroupChoices.choices)
     box_id = models.CharField(max_length=200, unique=True)
     box_type = models.CharField(max_length=200, choices=BasicScienceBoxTypeChoices.choices)
-    species = models.CharField(max_length=100, choices=SpeciesChoices.choices)
 
     # Location and metadata
     location = models.CharField(max_length=200, choices=FreezerLocationChoices.choices)

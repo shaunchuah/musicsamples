@@ -1,0 +1,67 @@
+<div class="card-body">
+  <div class="d-flex flex-row-reverse pb-3">Total Count: {{ experimental_id_count }}</div>
+  <div class="table-responsive">
+    <table class="table tablesorter" id="mainTable">
+      <thead class="text-primary">
+        <tr>
+          <th>Date</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Sample Types</th>
+          <th>Tissue Types</th>
+          <th>Species</th>
+          <th>Boxes</th>
+          <th>Created</th>
+          <th>Created By</th>
+          <th>View</th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for experimental_id in experimental_ids %}
+          <tr>
+            <td>{{ experimental_id.date|date:'d M Y' }}</td>
+            <td>{{ experimental_id.name }}</td>
+            <td>{{ experimental_id.description }}</td>
+            <td>
+              {% for sample_type in experimental_id.sample_types.all %}
+                {{ sample_type.label|default:sample_type.name }}
+                {% if not forloop.last %}<br />{% endif %}
+              {% endfor %}
+            </td>
+            <td>
+              {% for tissue_type in experimental_id.tissue_types.all %}
+                {{ tissue_type.label|default:tissue_type.name }}
+                {% if not forloop.last %}<br />{% endif %}
+              {% endfor %}
+            </td>
+            <td>{{ experimental_id.get_species_display }}</td>
+            <td>
+              {% for box in experimental_id.boxes.all %}
+                <a href="{% url 'boxes:detail' box.pk %}">{{ box }}</a>
+                {% if not forloop.last %}<br />{% endif %}
+              {% endfor %}
+            </td>
+            <td>{{ experimental_id.created|date:'d M Y' }}</td>
+            <td>{{ experimental_id.created_by.email }}</td>
+            <td>
+              <a href="{% url 'boxes:experimental_id_detail' experimental_id.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
+            </td>
+            <td>
+              <a href="{% url 'boxes:edit' experimental_id.pk %}"><i class="tim-icons icon-pencil"></i> Edit</a>
+            </td>
+            <td>
+              <a href="{% url 'boxes:delete' experimental_id.pk %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="11" class="text-center">No experimental IDs found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include "layouts/pagination.html" %}
+</div>
