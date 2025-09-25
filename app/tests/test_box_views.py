@@ -1,25 +1,36 @@
 from unittest.mock import patch
 
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, Permission
 from django.test import RequestFactory, TestCase
 from django.urls import reverse, reverse_lazy
 
-from app.choices import BasicScienceGroupChoices
+from app.choices import BasicScienceGroupChoices, SpeciesChoices
 from app.factories import (
     BasicScienceBoxFactory,
     BasicScienceSampleTypeFactory,
     ExperimentalIDFactory,
     TissueTypeFactory,
 )
-from app.models import BasicScienceBox
+from app.models import BasicScienceBox, ExperimentalID
 from app.views.box_views import (
     BasicScienceBoxCreateView,
     BasicScienceBoxDeleteView,
     BasicScienceBoxDetailView,
     BasicScienceBoxListView,
     BasicScienceBoxUpdateView,
+    ExperimentalIdCreateView,
+    ExperimentalIdDeleteView,
+    ExperimentalIdDetailView,
+    ExperimentalIdListView,
+    ExperimentalIdUpdateView,
 )
 from users.factories import UserFactory
+
+
+class PermissionHelperMixin:
+    def grant_permission(self, codename: str) -> None:
+        permission = Permission.objects.get(codename=codename, content_type__app_label="app")
+        self.user.user_permissions.add(permission)  # type: ignore
 
 
 class BasicScienceBoxDetailViewTest(TestCase):
@@ -715,6 +726,10 @@ class FunctionBasedViewsTest(TestCase):
         self.group_experimental_id = ExperimentalIDFactory(basic_science_group=BasicScienceGroupChoices.BAIN)
         self.group_box = BasicScienceBoxFactory(experimental_ids=[self.group_experimental_id])
 
+    def _grant_permission(self, codename: str) -> None:
+        permission = Permission.objects.get(codename=codename, content_type__app_label="app")
+        self.user.user_permissions.add(permission)
+
     def test_box_search_with_query(self):
         """Test box_search with a valid query"""
         self.user.user_permissions.add(
@@ -837,7 +852,7 @@ class FunctionBasedViewsTest(TestCase):
         """Test box_filter with pagination"""
         # Create enough boxes for pagination
         for _ in range(30):
-            BasicScienceBoxFactory()
+            BasicScienceBoxFactory(created_by=self.user, last_modified_by=self.user)
         self.user.user_permissions.add(
             self.user.user_permissions.model.objects.get_or_create(
                 codename="view_basicsciencebox", defaults={"name": "Can view basic science box"}
@@ -858,5 +873,339 @@ class FunctionBasedViewsTest(TestCase):
         )
         self.client.force_login(self.user)
         response = self.client.get(reverse("boxes:filter_export_csv"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/csv")
+
+    def test_create_experimental_id_requires_login(self):
+        url = reverse("boxes:create_experimental_id")
+        response = self.client.post(url, {})
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login/", response["Location"])
+
+    def test_create_experimental_id_requires_permission(self):
+        url = reverse("boxes:create_experimental_id")
+        self.client.force_login(self.user)
+        response = self.client.post(url, {})
+        self.assertEqual(response.status_code, 403)
+
+    def test_create_experimental_id_success_returns_serialized_payload(self):
+        url = reverse("boxes:create_experimental_id")
+        sample_type = BasicScienceSampleTypeFactory()
+        tissue_type = TissueTypeFactory()
+        self.client.force_login(self.user)
+        self._grant_permission("view_basicsciencebox")
+        self._grant_permission("add_experimentalid")
+        payload = {
+            "basic_science_group": BasicScienceGroupChoices.BAIN.value,
+            "name": "EXP-TEST-001",
+            "description": "Test experiment",
+            "date": "2024-01-01",
+            "sample_types": [sample_type.pk],
+            "tissue_types": [tissue_type.pk],
+            "species": SpeciesChoices.HUMAN.value,
+        }
+        response = self.client.post(url, payload)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        experimental_id = data["experimental_id"]
+        self.assertEqual(experimental_id["name"], payload["name"])
+        self.assertEqual(experimental_id["basic_science_group"], payload["basic_science_group"])
+        self.assertIn(sample_type.pk, experimental_id["sample_type_ids"])
+        self.assertEqual(experimental_id["created_by"], self.user.email)
+        saved_experiment = ExperimentalID.objects.get(name=payload["name"])
+        self.assertEqual(saved_experiment.created_by, self.user)
+        self.assertTrue(saved_experiment.sample_types.filter(pk=sample_type.pk).exists())
+        self.assertTrue(saved_experiment.tissue_types.filter(pk=tissue_type.pk).exists())
+
+    def test_create_experimental_id_invalid_returns_errors(self):
+        url = reverse("boxes:create_experimental_id")
+        self.client.force_login(self.user)
+        self._grant_permission("view_basicsciencebox")
+        initial_count = ExperimentalID.objects.count()
+        response = self.client.post(
+            url,
+            {"basic_science_group": BasicScienceGroupChoices.BAIN.value, "species": SpeciesChoices.HUMAN.value},
+        )
+        self.assertEqual(response.status_code, 400)
+        data = response.json()
+        self.assertFalse(data["success"])
+        self.assertIn("errors", data)
+        self.assertIn("name", data["errors"])
+        self.assertEqual(ExperimentalID.objects.count(), initial_count)
+
+
+class ExperimentalIdListViewTest(PermissionHelperMixin, TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = UserFactory()
+        self.url = reverse("boxes:experimental_id_list")
+        self.active_experiment = ExperimentalIDFactory()
+        self.deleted_experiment = ExperimentalIDFactory()
+        self.deleted_experiment.is_deleted = True
+        self.deleted_experiment.save()
+
+    def test_view_requires_login(self):
+        request = self.factory.get(self.url)
+        request.user = AnonymousUser()
+
+        response = ExperimentalIdListView.as_view()(request)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login/", response["Location"])
+
+    def test_view_lists_only_active_experiments(self):
+        self.client.force_login(self.user)
+        self.grant_permission("view_basicsciencebox")
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        experiments = list(response.context["experimental_ids"])
+        self.assertIn(self.active_experiment, experiments)
+        self.assertNotIn(self.deleted_experiment, experiments)
+
+
+class ExperimentalIdCreateViewTest(PermissionHelperMixin, TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = UserFactory()
+        self.url = reverse("boxes:experimental_id_create")
+        self.sample_type = BasicScienceSampleTypeFactory()
+        self.tissue_type = TissueTypeFactory()
+        self.valid_data = {
+            "basic_science_group": BasicScienceGroupChoices.BAIN.value,
+            "name": "EXP-CREATE-001",
+            "description": "Created via test",
+            "date": "2024-01-01",
+            "sample_types": [self.sample_type.pk],
+            "tissue_types": [self.tissue_type.pk],
+            "species": SpeciesChoices.HUMAN.value,
+        }
+
+    def test_view_requires_permission(self):
+        from django.core.exceptions import PermissionDenied
+
+        request = self.factory.get(self.url)
+        request.user = self.user
+        view = ExperimentalIdCreateView()
+        view.request = request
+
+        with self.assertRaises(PermissionDenied):
+            view.dispatch(request)
+
+    def test_valid_post_creates_experiment(self):
+        self.client.force_login(self.user)
+        self.grant_permission("add_basicsciencebox")
+
+        response = self.client.post(self.url, self.valid_data)
+
+        self.assertEqual(response.status_code, 302)
+        experiment = ExperimentalID.objects.get(name=self.valid_data["name"])
+        self.assertEqual(experiment.created_by, self.user)
+        self.assertTrue(experiment.sample_types.filter(pk=self.sample_type.pk).exists())
+        self.assertTrue(experiment.tissue_types.filter(pk=self.tissue_type.pk).exists())
+
+    def test_invalid_post_returns_errors(self):
+        self.client.force_login(self.user)
+        self.grant_permission("add_basicsciencebox")
+
+        response = self.client.post(
+            self.url,
+            {"basic_science_group": BasicScienceGroupChoices.BAIN.value, "species": SpeciesChoices.HUMAN.value},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        form = response.context["form"]
+        self.assertIn("name", form.errors)
+        self.assertIn("This field is required.", form.errors["name"])
+
+
+class ExperimentalIdDetailViewTest(PermissionHelperMixin, TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = UserFactory()
+        self.experimental_id = ExperimentalIDFactory()
+        self.url = reverse("boxes:experimental_id_detail", kwargs={"pk": self.experimental_id.pk})
+
+    def test_view_requires_login(self):
+        request = self.factory.get(self.url)
+        request.user = AnonymousUser()
+
+        response = ExperimentalIdDetailView.as_view()(request, pk=self.experimental_id.pk)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login/", response["Location"])
+
+    def test_view_with_permission_returns_experiment(self):
+        self.client.force_login(self.user)
+        self.grant_permission("view_basicsciencebox")
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["experimental_id"], self.experimental_id)
+        self.assertIn("changes", response.context)
+
+
+class ExperimentalIdUpdateViewTest(PermissionHelperMixin, TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = UserFactory()
+        self.experimental_id = ExperimentalIDFactory(name="EXP-ORIGINAL")
+        self.sample_type = BasicScienceSampleTypeFactory()
+        self.url = reverse("boxes:experimental_id_edit", kwargs={"pk": self.experimental_id.pk})
+        date_value = self.experimental_id.date.strftime("%Y-%m-%d") if self.experimental_id.date else "2024-01-01"
+        self.valid_data = {
+            "basic_science_group": self.experimental_id.basic_science_group,
+            "name": "EXP-UPDATED",
+            "description": "Updated description",
+            "date": date_value,
+            "sample_types": [self.sample_type.pk],
+            "tissue_types": [],
+            "species": self.experimental_id.species,
+        }
+
+    def test_view_requires_permission(self):
+        from django.core.exceptions import PermissionDenied
+
+        request = self.factory.get(self.url)
+        request.user = self.user
+        view = ExperimentalIdUpdateView()
+        view.request = request
+
+        with self.assertRaises(PermissionDenied):
+            view.dispatch(request, pk=self.experimental_id.pk)
+
+    def test_valid_post_updates_experiment(self):
+        self.client.force_login(self.user)
+        self.grant_permission("change_basicsciencebox")
+
+        response = self.client.post(self.url, self.valid_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.experimental_id.refresh_from_db()
+        self.assertEqual(self.experimental_id.name, "EXP-UPDATED")
+        self.assertEqual(self.experimental_id.last_modified_by, self.user)
+
+
+class ExperimentalIdDeleteViewTest(PermissionHelperMixin, TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = UserFactory()
+        self.experimental_id = ExperimentalIDFactory(is_deleted=False)
+        self.url = reverse("boxes:experimental_id_delete", kwargs={"pk": self.experimental_id.pk})
+
+    def test_view_requires_login(self):
+        request = self.factory.post(self.url)
+        request.user = AnonymousUser()
+
+        response = ExperimentalIdDeleteView.as_view()(request, pk=self.experimental_id.pk)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login/", response["Location"])
+
+    def test_post_requires_permission(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_post_marks_experiment_deleted(self):
+        self.client.force_login(self.user)
+        self.grant_permission("delete_basicsciencebox")
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 302)
+        self.experimental_id.refresh_from_db()
+        self.assertTrue(self.experimental_id.is_deleted)
+        self.assertEqual(self.experimental_id.last_modified_by, self.user)
+
+
+class ExperimentalIdRestoreViewTest(PermissionHelperMixin, TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.experimental_id = ExperimentalIDFactory(is_deleted=True)
+        self.url = reverse("boxes:experimental_id_restore", kwargs={"pk": self.experimental_id.pk})
+
+    def test_post_requires_permission(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_post_restores_experiment(self):
+        self.client.force_login(self.user)
+        self.grant_permission("delete_basicsciencebox")
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 302)
+        self.experimental_id.refresh_from_db()
+        self.assertFalse(self.experimental_id.is_deleted)
+        self.assertEqual(self.experimental_id.last_modified_by, self.user)
+
+
+class ExperimentalIdFunctionViewsTest(PermissionHelperMixin, TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.experiment = ExperimentalIDFactory(name="Search Target", description="Interesting experiment")
+        self.other_experiment = ExperimentalIDFactory(name="Background", description="Other")
+
+    def test_experiment_search_requires_login(self):
+        url = reverse("boxes:experimental_id_search")
+
+        response = self.client.get(url, {"q": "Search"})
+
+        self.assertEqual(response.status_code, 302)
+
+    def test_experiment_search_returns_matches(self):
+        url = reverse("boxes:experimental_id_search")
+        self.client.force_login(self.user)
+        self.grant_permission("view_basicsciencebox")
+
+        response = self.client.get(url, {"q": "Search"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(self.experiment, response.context["experimental_ids"])
+
+    def test_export_experiments_csv_returns_csv(self):
+        url = reverse("boxes:experimental_id_export_csv")
+        self.client.force_login(self.user)
+        self.grant_permission("view_basicsciencebox")
+
+        response = self.client.get(url, {"q": self.experiment.name})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/csv")
+
+    def test_experiment_filter_requires_permission(self):
+        url = reverse("boxes:experimental_id_filter")
+        self.client.force_login(self.user)
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_experiment_filter_returns_context(self):
+        url = reverse("boxes:experimental_id_filter")
+        self.client.force_login(self.user)
+        self.grant_permission("view_basicsciencebox")
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("experimental_id_filter", response.context)
+
+    def test_experimental_id_filter_export_csv_returns_csv(self):
+        url = reverse("boxes:experimental_id_filter_export_csv")
+        self.client.force_login(self.user)
+        self.grant_permission("view_basicsciencebox")
+
+        response = self.client.get(url)
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "text/csv")

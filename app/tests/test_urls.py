@@ -3,10 +3,21 @@ from django.urls import resolve, reverse
 
 from app import views
 from app.views.box_views import (
+    ExperimentalIdCreateView,
+    ExperimentalIdDeleteView,
+    ExperimentalIdDetailView,
+    ExperimentalIdListView,
+    ExperimentalIdRestoreView,
+    ExperimentalIdUpdateView,
     box_filter,
     box_filter_export_csv,
     box_search,
+    create_experimental_id,
+    experiment_filter,
+    experiment_search,
+    experimental_id_filter_export_csv,
     export_boxes_csv,
+    export_experiments_csv,
 )
 from datasets.views import (
     dataset_access_history,
@@ -303,6 +314,68 @@ class TestBoxUrls(SimpleTestCase):
     def test_box_export_csv_url_resolves(self):
         url = reverse("boxes:export_csv")
         self.assertEqual(resolve(url).func, export_boxes_csv)
+
+    def test_box_create_experimental_id_url_resolves(self):
+        url = reverse("boxes:create_experimental_id")
+        self.assertEqual(resolve(url).func, create_experimental_id)
+
+    def test_experimental_id_list_url_resolves(self):
+        url = reverse("boxes:experimental_id_list")
+        resolved = resolve(url)
+        self.assertEqual(resolved.func.view_class, ExperimentalIdListView)  # type: ignore
+        self.assertEqual(resolved.url_name, "experimental_id_list")
+        self.assertEqual(resolved.namespace, "boxes")
+
+    def test_experimental_id_create_url_resolves(self):
+        url = reverse("boxes:experimental_id_create")
+        resolved = resolve(url)
+        self.assertEqual(resolved.func.view_class, ExperimentalIdCreateView)  # type: ignore
+        self.assertEqual(resolved.url_name, "experimental_id_create")
+        self.assertEqual(resolved.namespace, "boxes")
+
+    def test_experimental_id_detail_url_resolves(self):
+        url = reverse("boxes:experimental_id_detail", kwargs={"pk": 1})
+        resolved = resolve(url)
+        self.assertEqual(resolved.func.view_class, ExperimentalIdDetailView)  # type: ignore
+        self.assertEqual(resolved.url_name, "experimental_id_detail")
+        self.assertEqual(resolved.namespace, "boxes")
+
+    def test_experimental_id_edit_url_resolves(self):
+        url = reverse("boxes:experimental_id_edit", kwargs={"pk": 1})
+        resolved = resolve(url)
+        self.assertEqual(resolved.func.view_class, ExperimentalIdUpdateView)  # type: ignore
+        self.assertEqual(resolved.url_name, "experimental_id_edit")
+        self.assertEqual(resolved.namespace, "boxes")
+
+    def test_experimental_id_delete_url_resolves(self):
+        url = reverse("boxes:experimental_id_delete", kwargs={"pk": 1})
+        resolved = resolve(url)
+        self.assertEqual(resolved.func.view_class, ExperimentalIdDeleteView)  # type: ignore
+        self.assertEqual(resolved.url_name, "experimental_id_delete")
+        self.assertEqual(resolved.namespace, "boxes")
+
+    def test_experimental_id_restore_url_resolves(self):
+        url = reverse("boxes:experimental_id_restore", kwargs={"pk": 1})
+        resolved = resolve(url)
+        self.assertEqual(resolved.func.view_class, ExperimentalIdRestoreView)  # type: ignore
+        self.assertEqual(resolved.url_name, "experimental_id_restore")
+        self.assertEqual(resolved.namespace, "boxes")
+
+    def test_experimental_id_search_url_resolves(self):
+        url = reverse("boxes:experimental_id_search")
+        self.assertEqual(resolve(url).func, experiment_search)
+
+    def test_experimental_id_export_csv_url_resolves(self):
+        url = reverse("boxes:experimental_id_export_csv")
+        self.assertEqual(resolve(url).func, export_experiments_csv)
+
+    def test_experimental_id_filter_url_resolves(self):
+        url = reverse("boxes:experimental_id_filter")
+        self.assertEqual(resolve(url).func, experiment_filter)
+
+    def test_experimental_id_filter_export_csv_url_resolves(self):
+        url = reverse("boxes:experimental_id_filter_export_csv")
+        self.assertEqual(resolve(url).func, experimental_id_filter_export_csv)
 
 
 class TestDatasetUrls(SimpleTestCase):
