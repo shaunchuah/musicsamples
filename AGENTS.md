@@ -17,13 +17,17 @@
 To run the django development server:
 
 ```bash
-source venv/bin/activate
-python manage.py runserver
+source venv/bin/activate && python manage.py runserver
 ```
 
 To run tests:
 
 ```bash
-source venv/bin/activate
-pytest
+source venv/bin/activate && pytest
 ```
+
+## Tech Stack
+
+Django with django templates
+Sqlite
+Bootstrap template known as black dashboard
