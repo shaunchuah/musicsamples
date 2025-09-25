@@ -53,12 +53,6 @@
             <div class="row">
               <div class="col-md-4">
                 <div class="form-group">
-                  {{ form.basic_science_group.label_tag }}
-                  {{ form.basic_science_group|add_class:"form-control" }}
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="form-group">
                   {{ form.box_type.label_tag }}
                   {{ form.box_type|add_class:"form-control" }}
                 </div>
@@ -148,6 +142,10 @@
             <div id="experimentFormErrors" class="alert alert-danger d-none"></div>
             {% csrf_token %}
             <div class="form-group">
+              {{ experimental_form.basic_science_group.label_tag }}
+              {{ experimental_form.basic_science_group|add_class:"form-control" }}
+            </div>
+            <div class="form-group">
               {{ experimental_form.name.label_tag }}
               {{ experimental_form.name|add_class:"form-control" }}
             </div>
@@ -204,19 +202,20 @@
             if (response.success) {
               // Add new option to the experimental_ids select field
               var selectField = $('#id_experimental_ids');
-              var newOption = new Option(response.experimental_id.name, response.experimental_id.id, false, false);
+              var newOption = new Option(response.experimental_id.display, response.experimental_id.id, false, false);
               selectField.append(newOption).trigger('change');
 
               // Close modal and reset form
               $('#experimentModal').modal('hide');
               $('#experimentForm')[0].reset();
+              $('#experimentForm #id_basic_science_group').prop('selectedIndex', 0);
               $('#experimentForm #id_species').prop('selectedIndex', 0);
               $('#id_sample_types').val([]);
               $('#id_tissue_types').val([]);
 
               // Show success message (optional)
               var successMsg = '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
-                'Experiment "' + response.experimental_id.name + '" has been successfully added!' +
+                'Experiment "' + response.experimental_id.display + '" has been successfully added!' +
                 '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
                 '<span aria-hidden="true">&times;</span></button></div>';
               $('.card-body').prepend(successMsg);
@@ -247,6 +246,7 @@
       // Reset form when modal is hidden
       $('#experimentModal').on('hidden.bs.modal', function() {
         $('#experimentForm')[0].reset();
+        $('#experimentForm #id_basic_science_group').prop('selectedIndex', 0);
         $('#experimentForm #id_species').prop('selectedIndex', 0);
         $('#experimentFormErrors').addClass('d-none').empty();
       });

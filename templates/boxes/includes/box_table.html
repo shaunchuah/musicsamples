@@ -5,7 +5,7 @@
       <thead class="text-primary">
         <tr>
           <th>Box ID</th>
-          <th>Group</th>
+          <th>Groups</th>
           <th>Experimental IDs</th>
           <th>Location</th>
           <th>Sublocation</th>
@@ -24,11 +24,19 @@
         {% for box in box_list %}
           <tr>
             <td>{{ box.box_id }}</td>
-            <td>{{ box.get_basic_science_group_display }}</td>
+            <td>
+              {% if box.basic_science_groups_display %}
+                {{ box.basic_science_groups_display }}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
             <td>
               {% for exp_id in box.experimental_ids.all %}
-                {{ exp_id.name }} {{ exp_id.date|date:'d M Y' }}
+                {{ exp_id.get_basic_science_group_display }} - {{ exp_id.name }} {{ exp_id.date|date:'d M Y' }}
                 {% if not forloop.last %}<br />{% endif %}
+              {% empty %}
+                N/A
               {% endfor %}
             </td>
             <td>{{ box.get_location_display }}</td>
@@ -73,7 +81,7 @@
           </tr>
         {% empty %}
           <tr>
-            <td colspan="15" class="text-center">No boxes found.</td>
+            <td colspan="14" class="text-center">No boxes found.</td>
           </tr>
         {% endfor %}
       </tbody>

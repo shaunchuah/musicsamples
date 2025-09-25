@@ -56,6 +56,7 @@ class ExperimentalIDFactory(DjangoModelFactory):
     class Meta:  # type:ignore
         model = ExperimentalID
 
+    basic_science_group = LazyAttribute(lambda x: choice(BasicScienceGroupChoices.values))
     name = Sequence(lambda n: "EXP-%03d" % n)
     description = Faker("sentence")
     date = Faker("date_this_year")
@@ -132,7 +133,6 @@ class BasicScienceBoxFactory(DjangoModelFactory):
     class Meta:  # type:ignore
         model = BasicScienceBox
 
-    basic_science_group = LazyAttribute(lambda x: choice(BasicScienceGroupChoices.values))
     box_id = Sequence(lambda n: "BOX-%04d" % n)
     box_type = LazyAttribute(lambda x: choice(BasicScienceBoxTypeChoices.values))
     location = LazyAttribute(lambda x: choice(FreezerLocationChoices.values))

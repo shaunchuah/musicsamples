@@ -4,6 +4,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory, TestCase
 from django.urls import reverse, reverse_lazy
 
+from app.choices import BasicScienceGroupChoices
 from app.factories import (
     BasicScienceBoxFactory,
     BasicScienceSampleTypeFactory,
@@ -330,7 +331,6 @@ class BasicScienceBoxCreateViewTest(TestCase):
         self.user = UserFactory()
         self.url = reverse("boxes:create")
         self.valid_data = {
-            "basic_science_group": "bain",
             "box_id": "TEST001",
             "box_type": "basic_science_samples",
             "location": "sii_freezer_1",
@@ -536,7 +536,6 @@ class BasicScienceBoxUpdateViewTest(TestCase):
         self.box = BasicScienceBoxFactory()
         self.url = reverse("boxes:edit", kwargs={"pk": self.box.pk})
         self.valid_data = {
-            "basic_science_group": "bain",
             "box_id": "UPDATED001",
             "box_type": "basic_science_samples",
             "location": "sii_freezer_1",
@@ -713,6 +712,8 @@ class FunctionBasedViewsTest(TestCase):
         self.user = UserFactory()
         self.box = BasicScienceBoxFactory()
         self.used_box = BasicScienceBoxFactory(is_used=True)
+        self.group_experimental_id = ExperimentalIDFactory(basic_science_group=BasicScienceGroupChoices.BAIN)
+        self.group_box = BasicScienceBoxFactory(experimental_ids=[self.group_experimental_id])
 
     def test_box_search_with_query(self):
         """Test box_search with a valid query"""
@@ -727,6 +728,18 @@ class FunctionBasedViewsTest(TestCase):
         self.assertIn(self.box, response.context["boxes"])
         self.assertIn("box_count", response.context)
         self.assertGreaterEqual(response.context["box_count"], 1)
+
+    def test_box_search_matches_basic_science_group(self):
+        """Test box_search matches queries against experiment groups"""
+        self.user.user_permissions.add(
+            self.user.user_permissions.model.objects.get_or_create(
+                codename="view_basicsciencebox", defaults={"name": "Can view basic science box"}
+            )[0]
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("boxes:search"), {"q": BasicScienceGroupChoices.BAIN.value})
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(self.group_box, response.context["boxes"])
 
     def test_box_search_no_query(self):
         """Test box_search without query"""
@@ -801,6 +814,24 @@ class FunctionBasedViewsTest(TestCase):
         response = self.client.get(reverse("boxes:filter"))
         self.assertEqual(response.status_code, 200)
         self.assertIn("box_filter", response.context)
+
+    def test_box_filter_filters_by_basic_science_group(self):
+        """Test box_filter respects the experiment group filter"""
+        other_exp = ExperimentalIDFactory(basic_science_group=BasicScienceGroupChoices.JONES)
+        other_box = BasicScienceBoxFactory(experimental_ids=[other_exp])
+        self.user.user_permissions.add(
+            self.user.user_permissions.model.objects.get_or_create(
+                codename="view_basicsciencebox", defaults={"name": "Can view basic science box"}
+            )[0]
+        )
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse("boxes:filter"), {"basic_science_group": BasicScienceGroupChoices.BAIN.value}
+        )
+        self.assertEqual(response.status_code, 200)
+        page = response.context["box_list"]
+        self.assertIn(self.group_box, list(page))
+        self.assertNotIn(other_box, list(page))
 
     def test_box_filter_pagination(self):
         """Test box_filter with pagination"""

@@ -135,9 +135,9 @@ def box_search(request):
         queryset = (
             BasicScienceBox.objects.filter(
                 Q(box_id__icontains=query_string)
-                | Q(basic_science_group__icontains=query_string)
                 | Q(location__icontains=query_string)
                 | Q(comments__icontains=query_string)
+                | Q(experimental_ids__basic_science_group__icontains=query_string)
                 | Q(experimental_ids__name__icontains=query_string)
                 | Q(experimental_ids__sample_types__name__icontains=query_string)
                 | Q(experimental_ids__tissue_types__name__icontains=query_string)
@@ -152,9 +152,9 @@ def box_search(request):
             queryset = (
                 BasicScienceBox.objects.filter(
                     Q(box_id__icontains=query_string)
-                    | Q(basic_science_group__icontains=query_string)
                     | Q(location__icontains=query_string)
                     | Q(comments__icontains=query_string)
+                    | Q(experimental_ids__basic_science_group__icontains=query_string)
                     | Q(experimental_ids__name__icontains=query_string)
                     | Q(experimental_ids__sample_types__name__icontains=query_string)
                     | Q(experimental_ids__tissue_types__name__icontains=query_string)
@@ -189,9 +189,9 @@ def export_boxes_csv(request):
         queryset = (
             BasicScienceBox.objects.filter(
                 Q(box_id__icontains=query_string)
-                | Q(basic_science_group__icontains=query_string)
                 | Q(location__icontains=query_string)
                 | Q(comments__icontains=query_string)
+                | Q(experimental_ids__basic_science_group__icontains=query_string)
                 | Q(experimental_ids__name__icontains=query_string)
                 | Q(experimental_ids__sample_types__name__icontains=query_string)
                 | Q(experimental_ids__tissue_types__name__icontains=query_string)
@@ -206,9 +206,9 @@ def export_boxes_csv(request):
             queryset = (
                 BasicScienceBox.objects.filter(
                     Q(box_id__icontains=query_string)
-                    | Q(basic_science_group__icontains=query_string)
                     | Q(location__icontains=query_string)
                     | Q(comments__icontains=query_string)
+                    | Q(experimental_ids__basic_science_group__icontains=query_string)
                     | Q(experimental_ids__name__icontains=query_string)
                     | Q(experimental_ids__sample_types__name__icontains=query_string)
                     | Q(experimental_ids__tissue_types__name__icontains=query_string)
@@ -318,6 +318,8 @@ def serialize_experimental_id(experimental_id: ExperimentalID) -> dict:
     ]
     return {
         "id": experimental_id.pk,
+        "basic_science_group": experimental_id.basic_science_group,
+        "basic_science_group_display": experimental_id.get_basic_science_group_display(),
         "name": experimental_id.name,
         "description": experimental_id.description,
         "date": experimental_id.date.isoformat() if experimental_id.date else None,
@@ -327,6 +329,7 @@ def serialize_experimental_id(experimental_id: ExperimentalID) -> dict:
         "sample_type_ids": [sample_type["id"] for sample_type in sample_types],
         "tissue_type_ids": [tissue_type["id"] for tissue_type in tissue_types],
         "boxes": boxes,
+        "display": f"{experimental_id.get_basic_science_group_display()} - {experimental_id.name}",
         "created": experimental_id.created.isoformat() if experimental_id.created else None,
         "created_by": experimental_id.created_by.email if experimental_id.created_by else None,
         "created_display": format_timestamp(experimental_id.created, experimental_id.created_by),

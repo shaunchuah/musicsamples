@@ -67,17 +67,22 @@ class BasicScienceBoxAdmin(admin.ModelAdmin):
     list_display = [
         "box_id",
         "box_type",
-        "basic_science_group",
+        "get_basic_science_groups",
         "location",
         "is_used",
         "created_by",
         "last_modified_by",
     ]
 
+    @admin.display(description="Basic Science Groups")
+    def get_basic_science_groups(self, obj):
+        return obj.basic_science_groups_display or "-"
+
 
 @admin.register(ExperimentalID)
 class ExperimentalIDAdmin(admin.ModelAdmin):
     list_display = [
+        "basic_science_group",
         "name",
         "description",
         "get_sample_types",

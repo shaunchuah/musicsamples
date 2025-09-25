@@ -32,6 +32,7 @@ class TissueType(models.Model):
 
 
 class ExperimentalID(models.Model):
+    basic_science_group = models.CharField(max_length=200, choices=BasicScienceGroupChoices.choices)
     name = models.CharField(max_length=200, unique=True)  # e.g., "EXP-001"
     description = models.TextField(blank=True, null=True)
     date = models.DateField(blank=True, null=True)
@@ -78,7 +79,6 @@ class ExperimentalID(models.Model):
 
 class BasicScienceBox(models.Model):
     # Core fields
-    basic_science_group = models.CharField(max_length=200, choices=BasicScienceGroupChoices.choices)
     box_id = models.CharField(max_length=200, unique=True)
     box_type = models.CharField(max_length=200, choices=BasicScienceBoxTypeChoices.choices)
 
@@ -107,7 +107,7 @@ class BasicScienceBox(models.Model):
     history = HistoricalRecords()
 
     def __str__(self):
-        return f"{self.box_id} ({self.box_type})"
+        return f"{self.box_id}"
 
     def distinct_sample_types(self):
         unique = {}
@@ -129,6 +129,14 @@ class BasicScienceBox(models.Model):
     def get_tissue_type_labels(self):
         return [tissue_type.label or tissue_type.name for tissue_type in self.distinct_tissue_types()]
 
+    def basic_science_groups(self):
+        """Return a sorted list of unique basic science group values for linked experiments."""
+        groups = {experimental_id.basic_science_group for experimental_id in self.experimental_ids.all()}
+        return sorted(groups)
+
+    def get_basic_science_group_labels(self):
+        return [BasicScienceGroupChoices(group).label for group in self.basic_science_groups()]
+
     @property
     def sample_type_labels_display(self):
         return ", ".join(self.get_sample_type_labels())
@@ -136,6 +144,10 @@ class BasicScienceBox(models.Model):
     @property
     def tissue_type_labels_display(self):
         return ", ".join(self.get_tissue_type_labels())
+
+    @property
+    def basic_science_groups_display(self):
+        return ", ".join(self.get_basic_science_group_labels())
 
     class Meta:
         ordering = ["-created"]

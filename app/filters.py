@@ -137,7 +137,7 @@ class DataStoreFilter(django_filters.FilterSet):
 
 class BasicScienceBoxFilter(django_filters.FilterSet):
     basic_science_group = django_filters.ChoiceFilter(
-        label="Basic Science Group", choices=BasicScienceGroupChoices.choices
+        label="Basic Science Group", choices=BasicScienceGroupChoices.choices, method="filter_basic_science_group"
     )
     box_type = django_filters.ChoiceFilter(label="Box Type", choices=BasicScienceBoxTypeChoices.choices)
     location = django_filters.ChoiceFilter(label="Location", choices=FreezerLocationChoices.choices)
@@ -159,6 +159,11 @@ class BasicScienceBoxFilter(django_filters.FilterSet):
         label="Tissue Types", queryset=TissueType.objects.all(), method="filter_tissue_types"
     )
     is_used = django_filters.BooleanFilter(label="Used?")
+
+    def filter_basic_science_group(self, queryset, name, value):
+        if value:
+            return queryset.filter(experimental_ids__basic_science_group=value).distinct()
+        return queryset
 
     def filter_experimental_ids(self, queryset, name, value):
         if value:
@@ -198,6 +203,9 @@ class BasicScienceBoxFilter(django_filters.FilterSet):
 
 
 class ExperimentalIDFilter(django_filters.FilterSet):
+    basic_science_group = django_filters.ChoiceFilter(
+        label="Basic Science Group", choices=BasicScienceGroupChoices.choices
+    )
     date = django_filters.DateFromToRangeFilter(
         widget=RangeWidget(attrs={"type": "date"}),
         label="Date Range",
@@ -211,6 +219,7 @@ class ExperimentalIDFilter(django_filters.FilterSet):
     class Meta:
         model = ExperimentalID
         fields = [
+            "basic_science_group",
             "date",
             "sample_types",
             "tissue_types",
