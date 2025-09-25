@@ -5,6 +5,7 @@
       <thead class="text-primary">
         <tr>
           <th>Date</th>
+          <th>Group</th>
           <th>Name</th>
           <th>Description</th>
           <th>Sample Types</th>
@@ -22,6 +23,7 @@
         {% for experimental_id in experimental_ids %}
           <tr>
             <td>{{ experimental_id.date|date:'d M Y' }}</td>
+            <td>{{ experimental_id.get_basic_science_group_display }}</td>
             <td>{{ experimental_id.name }}</td>
             <td>{{ experimental_id.description }}</td>
             <td>

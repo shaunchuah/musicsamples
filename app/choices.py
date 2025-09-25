@@ -113,8 +113,9 @@ class SexChoices(models.TextChoices):
 
 
 class BasicScienceGroupChoices(models.TextChoices):
-    BAIN = "bain", "BAIN"
-    JONES = "jones", "JONES"
+    BAIN = "bain", "Bain"
+    JONES = "jones", "Jones"
+    HO = "ho", "Ho"
     OTHER = "other", "Other"
 
 

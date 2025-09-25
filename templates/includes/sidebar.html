@@ -49,18 +49,6 @@
             <p>Reference</p>
           </a>
         </li> {% endcomment %}
-        <li class="{% if request.path == '/data_export/' %}active{% endif %}">
-          <a href="{% url 'data_export' %}">
-            <i class="tim-icons icon-upload"></i>
-            <p>Data Export</p>
-          </a>
-        </li>
-        <li class="{% if request.path == '/study_id/' %}active{% endif %}">
-          <a href="{% url 'study_id_list' %}">
-            <i class="tim-icons icon-badge"></i>
-            <p>Study ID</p>
-          </a>
-        </li>
         {% if perms.app.view_datastore %}
           <li class="{% if 'datastore' in request.path %}active{% endif %}">
             <a href="{% url 'datastore:list' %}">
@@ -77,33 +65,35 @@
             </a>
           </li>
         {% endif %}
-      </ul>
-      <div class="mt-4">
-        <ul class="nav">
-          <li class="{% if request.path == '/used_samples/' %}active{% endif %}">
-            <a href="{% url 'used_samples' %}">
-              <i class="tim-icons icon-send"></i>
-              <p>Used Samples</p>
+        <li class="{% if request.path == '/data_export/' %}active{% endif %}">
+          <a href="{% url 'data_export' %}">
+            <i class="tim-icons icon-upload"></i>
+            <p>Data Export</p>
+          </a>
+        </li>
+        <li class="{% if request.path == '/study_id/' %}active{% endif %}">
+          <a href="{% url 'study_id_list' %}">
+            <i class="tim-icons icon-badge"></i>
+            <p>Study ID</p>
+          </a>
+        </li>
+        {% if request.user.is_staff %}
+          <li class="{% if request.path == '/users/' %}active{% endif %}">
+            <a href="{% url 'user_list' %}">
+              <i class="tim-icons icon-single-02"></i>
+              <p>Users</p>
             </a>
           </li>
-          {% if request.user.is_staff %}
-            <li class="{% if request.path == '/users/' %}active{% endif %}">
-              <a href="{% url 'user_list' %}">
-                <i class="tim-icons icon-single-02"></i>
-                <p>Users</p>
-              </a>
-            </li>
-          {% endif %}
-          {% if request.user.is_superuser %}
-            <li class="{% if request.path == '/management/' %}active{% endif %}">
-              <a href="{% url 'management' %}">
-                <i class="tim-icons icon-settings-gear-63"></i>
-                <p>Admin</p>
-              </a>
-            </li>
-          {% endif %}
-        </ul>
-      </div>
+        {% endif %}
+        {% if request.user.is_superuser %}
+          <li class="{% if request.path == '/management/' %}active{% endif %}">
+            <a href="{% url 'management' %}">
+              <i class="tim-icons icon-settings-gear-63"></i>
+              <p>Admin</p>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
     {% endif %}
   </div>
 </div>

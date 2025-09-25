@@ -33,7 +33,7 @@
             </td>
             <td>
               {% for exp_id in box.experimental_ids.all %}
-                {{ exp_id.get_basic_science_group_display }} - {{ exp_id.name }} {{ exp_id.date|date:'d M Y' }}
+                {{ exp_id.name }} {{ exp_id.date|date:'d/m/y' }}
                 {% if not forloop.last %}<br />{% endif %}
               {% empty %}
                 N/A
