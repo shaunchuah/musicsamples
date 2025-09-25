@@ -224,4 +224,5 @@ class ExperimentalIDFilter(django_filters.FilterSet):
             "sample_types",
             "tissue_types",
             "species",
+            "is_deleted",
         ]

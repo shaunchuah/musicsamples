@@ -54,7 +54,11 @@
               <a href="{% url 'boxes:experimental_id_edit' experimental_id.pk %}"><i class="tim-icons icon-pencil"></i> Edit</a>
             </td>
             <td>
-              <a href="{% url 'boxes:experimental_id_delete' experimental_id.pk %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
+              {% if experimental_id.is_deleted %}
+                <a href="{% url 'boxes:experimental_id_restore' experimental_id.pk %}"><i class="tim-icons icon-refresh-02"></i> Restore</a>
+              {% else %}
+                <a href="{% url 'boxes:experimental_id_delete' experimental_id.pk %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
+              {% endif %}
             </td>
           </tr>
         {% empty %}

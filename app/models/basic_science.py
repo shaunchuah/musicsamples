@@ -33,7 +33,7 @@ class TissueType(models.Model):
 
 class ExperimentalID(models.Model):
     basic_science_group = models.CharField(max_length=200, choices=BasicScienceGroupChoices.choices)
-    name = models.CharField(max_length=200, unique=True)  # e.g., "EXP-001"
+    name = models.CharField(max_length=200)  # e.g., "EXP-001"
     description = models.TextField(blank=True, null=True)
     date = models.DateField(blank=True, null=True)
     sample_types = models.ManyToManyField(
@@ -75,6 +75,7 @@ class ExperimentalID(models.Model):
     class Meta:
         ordering = ["-created"]
         verbose_name_plural = "Experimental IDs"
+        unique_together = [["basic_science_group", "name"]]
 
 
 class BasicScienceBox(models.Model):

@@ -3,6 +3,11 @@
 {% block stylesheets %}
 {% endblock stylesheets %}
 {% block content %}
+  <div class="row mb-2">
+    <div class="col">
+      <a href="{% url 'boxes:list' %}">&larr; Back to Boxes List</a>
+    </div>
+  </div>
   <div class="row">
     <div class="col">
       <div class="card">

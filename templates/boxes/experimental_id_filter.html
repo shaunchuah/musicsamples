@@ -3,6 +3,11 @@
 {% block stylesheets %}
 {% endblock stylesheets %}
 {% block content %}
+  <div class="row mb-2">
+    <div class="col">
+      <a href="{% url 'boxes:experimental_id_list' %}">&larr; Back to Experiments</a>
+    </div>
+  </div>
   <div class="row">
     <div class="col">
       <div class="card">
@@ -14,6 +19,12 @@
             {% load widget_tweaks %}
 
             <div class="row">
+              <div class="col-md-3">
+                <div class="form-group">
+                  {{ experimental_id_filter.form.basic_science_group.label_tag }}
+                  {% render_field experimental_id_filter.form.basic_science_group class="form-control" %}
+                </div>
+              </div>
               <div class="col-md-3">
                 <div class="form-group">
                   {{ experimental_id_filter.form.species.label_tag }}
@@ -32,7 +43,9 @@
                   {% render_field experimental_id_filter.form.tissue_types class="form-control"|attr:"size:7" %}
                 </div>
               </div>
-              <div class="col-md-3">
+            </div>
+            <div class="row">
+              <div class="col-md-6">
                 <div class="form-group">
                   {{ experimental_id_filter.form.date.label_tag }}
                   <div class="d-flex flex-row align-items-center">
@@ -40,17 +53,21 @@
                   </div>
                 </div>
               </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  {{ experimental_id_filter.form.is_deleted.label_tag }}
+                  {% render_field experimental_id_filter.form.is_deleted class="form-control" %}
+                </div>
+              </div>
             </div>
-            <div>
-              <button type="submit" class="btn btn-fill btn-success">Filter</button>
-              <a href="{% url 'boxes:experimental_id_filter' %}"
-                 class="btn btn-fill btn-secondary">Clear</a>
-            <a href="{% url 'boxes:filter_export_csv' %}?{{ parameter_string }}"
-               class="btn btn-success float-lg-right"><i class="tim-icons icon-cloud-download-93"></i>
-          Export CSV</a>
-        </div>
-      </form>
-    </div>
+            <button type="submit" class="btn btn-fill btn-success">Filter</button>
+            <a href="{% url 'boxes:experimental_id_filter' %}"
+               class="btn btn-fill btn-secondary">Clear</a>
+          <a href="{% url 'boxes:experimental_id_filter_export_csv' %}?{{ parameter_string }}"
+             class="btn btn-success float-lg-right"><i class="tim-icons icon-cloud-download-93"></i>
+        Export CSV</a>
+      </div>
+    </form>
   </div>
 </div>
 </div>

@@ -319,7 +319,7 @@ def serialize_experimental_id(experimental_id: ExperimentalID) -> dict:
     return {
         "id": experimental_id.pk,
         "basic_science_group": experimental_id.basic_science_group,
-        "basic_science_group_display": experimental_id.get_basic_science_group_display(),
+        "basic_science_group_display": experimental_id.get_basic_science_group_display(),  # type: ignore
         "name": experimental_id.name,
         "description": experimental_id.description,
         "date": experimental_id.date.isoformat() if experimental_id.date else None,
@@ -329,7 +329,7 @@ def serialize_experimental_id(experimental_id: ExperimentalID) -> dict:
         "sample_type_ids": [sample_type["id"] for sample_type in sample_types],
         "tissue_type_ids": [tissue_type["id"] for tissue_type in tissue_types],
         "boxes": boxes,
-        "display": f"{experimental_id.get_basic_science_group_display()} - {experimental_id.name}",
+        "display": f"{experimental_id.get_basic_science_group_display()} - {experimental_id.name}",  # type: ignore
         "created": experimental_id.created.isoformat() if experimental_id.created else None,
         "created_by": experimental_id.created_by.email if experimental_id.created_by else None,
         "created_display": format_timestamp(experimental_id.created, experimental_id.created_by),
@@ -448,6 +448,22 @@ class ExperimentalIdDeleteView(LoginRequiredMixin, PermissionRequiredMixin, Dele
         self.object.last_modified_by = self.request.user  # type: ignore
         self.object.save()
         messages.success(self.request, "Experiment deleted successfully.")
+        return HttpResponseRedirect(success_url)
+
+
+class ExperimentalIdRestoreView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    model = ExperimentalID
+    template_name = "boxes/experimental_id_confirm_restore.html"
+    success_url = reverse_lazy("boxes:experimental_id_list")
+    permission_required = "app.delete_basicsciencebox"
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        self.object.is_deleted = False  # type: ignore
+        self.object.last_modified_by = self.request.user  # type: ignore
+        self.object.save()
+        messages.success(self.request, "Experiment restored successfully.")
         return HttpResponseRedirect(success_url)
 
 

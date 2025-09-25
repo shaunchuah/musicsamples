@@ -42,7 +42,9 @@ def export_csv(queryset, file_prefix="gtrac", file_name="samples", include_relat
 
     # Custom derived fields for specific models
     if queryset.model.__name__ == "BasicScienceBox":
-        fields.extend(["sample_type_labels_display", "tissue_type_labels_display"])
+        fields.extend(["sample_type_labels_display", "tissue_type_labels_display", "basic_science_groups_display"])
+    elif queryset.model.__name__ == "ExperimentalID":
+        fields.append("boxes")
 
     # Then add the related fields
     if include_related:
@@ -60,6 +62,12 @@ def export_csv(queryset, file_prefix="gtrac", file_name="samples", include_relat
                             # Skip excluded related fields
                             if related_name not in excluded_related_fields:
                                 fields.append(related_name)
+
+    # Move specific fields to the end
+    special_fields = ["created", "created_by", "last_modified", "last_modified_by"]
+    regular_fields = [f for f in fields if f not in special_fields]
+    special_fields_present = [f for f in special_fields if f in fields]
+    fields = regular_fields + special_fields_present
 
     # Write header row
     writer.writerow(fields)
