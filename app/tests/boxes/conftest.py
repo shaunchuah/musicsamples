@@ -28,3 +28,18 @@ def box_detail_url(basic_science_box):
 @pytest.fixture
 def box_list_url():
     return reverse("boxes:list")
+
+
+@pytest.fixture
+def box_create_url():
+    return reverse("boxes:create")
+
+
+@pytest.fixture
+def box_edit_url(basic_science_box):
+    return reverse("boxes:edit", kwargs={"pk": basic_science_box.pk})
+
+
+@pytest.fixture
+def box_delete_url(basic_science_box):
+    return reverse("boxes:delete", kwargs={"pk": basic_science_box.pk})
