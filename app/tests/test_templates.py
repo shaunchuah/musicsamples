@@ -52,11 +52,6 @@ class TestTemplates(TestCase):
         response = self.client.get(path)
         assertTemplateUsed(response, "barcode/add_multiple.html")
 
-    def test_reference(self):
-        path = reverse("reference")
-        response = self.client.get(path)
-        assertTemplateUsed(response, "samples/reference.html")
-
     def test_analytics(self):
         path = reverse("analytics")
         response = self.client.get(path)

@@ -169,12 +169,6 @@ def used_samples_archive_all(request):
 
 
 @login_required(login_url="/login/")
-def reference(request):
-    # Reference static page for publishing lab protocols
-    return render(request, "samples/reference.html")
-
-
-@login_required(login_url="/login/")
 def account(request):
     # User account page showing last 20 recently accessed samples
     sample_list = (
