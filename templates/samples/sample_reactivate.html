@@ -1,8 +1,5 @@
 {% extends "layouts/base.html" %}
 
-{% block title %}
-  Dashboard
-{% endblock title %}
 {% block content %}
   {% if form.errors %}
     {% for field in form %}
@@ -28,7 +25,7 @@
     <div class="col-md-5">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Mark Sample as Used?</h3>
+          <h3 class="card-title">Restore Used Sample</h3>
         </div>
         <div class="card-body">
           <form method="post">
@@ -44,7 +41,7 @@
               </div>
             {% endfor %}
             <div class="card-footer">
-              <button type="submit" value="submit" class="btn btn-fill btn-success">Mark as Used</button>
+              <button type="submit" value="submit" class="btn btn-fill btn-success">Restore</button>
             </div>
           </form>
         </div>

@@ -10,7 +10,6 @@ from app import views
         ("home", {}, views.index),
         ("analytics", {}, views.analytics),
         ("sample_types_pivot", {"study_name": "mini_music"}, views.sample_types_pivot),
-        ("reference", {}, views.reference),
         ("account", {}, views.account),
         ("data_export", {}, views.data_export),
         ("management", {}, views.management),

@@ -368,4 +368,4 @@ def reactivate_sample(request, pk):
                 return redirect("/")
     else:
         form = ReactivateForm(instance=sample)
-    return render(request, "samples/sample-reactivate.html", {"form": form})
+    return render(request, "samples/sample_reactivate.html", {"form": form})

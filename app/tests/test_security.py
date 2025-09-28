@@ -18,12 +18,6 @@ class TestUnauthorized(TestCase):
         assert response.status_code == 302
         assert "login" in response.url
 
-    def test_reference_unauthorized(self):
-        path = reverse("reference")
-        response = self.client.get(path)
-        assert response.status_code == 302
-        assert "login" in response.url
-
     def test_sample_add_unauthorized(self):
         path = reverse("sample_add")
         response = self.client.get(path)

@@ -44,7 +44,7 @@ def test_sample_reactivate(auto_login_user):
     path = reverse("reactivate_sample", kwargs={"pk": 1})
 
     response = client.get(path)
-    assertTemplateUsed(response, "samples/sample-reactivate.html")
+    assertTemplateUsed(response, "samples/sample_reactivate.html")
 
     response = client.post(path, data={"is_used": False})
 
