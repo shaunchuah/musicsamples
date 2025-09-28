@@ -1,0 +1,358 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+  Dashboard
+{% endblock title %}
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+{% endblock stylesheets %}
+{% block content %}
+  <div class="row">
+    <div class="col-lg-8">
+      <h2>
+        <i class="tim-icons icon-notes"></i> Reference
+      </h2>
+      <div class="row">
+        <div class="col">
+          <div class="notes card">
+            <div class="card-header">
+              <h2 class="card-title">GI-DAMPs Sampling Overview</h2>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table>
+                  <thead>
+                    <th>Blood</th>
+                    <th>Notes</th>
+                    <th>Processing/Storage</th>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>PaxGene ccfDNA tube x1</td>
+                      <td>
+                        <strong><span class="text-primary">** Don't freeze, room temp up to 7 days **</span></strong>
+                      </td>
+                      <td>
+                        Perform <a href="#ccfdna_extraction">plasma extraction</a> <strong>within 7 days</strong> and
+                        store extract in -80
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>PaxGene RNA tube x1</td>
+                      <td>Room temp up to 3 days, -20 or -80 up to 4 years</td>
+                      <td>Store directly into freezer, no processing required</td>
+                    </tr>
+                    <tr>
+                      <td>EDTA 10ml tube x1</td>
+                      <td>
+                        <span class="text-primary"><strong>Process within 6 hours</strong></span>
+                      </td>
+                      <td>
+                        Perform <a href="#edta_extraction">plasma extraction</a> <strong>within 6 hours</strong> and
+                        store extract in -80
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <span class="text-primary">EDTA 4.9ml tube x1 (Main difference with MUSIC)</span>
+                      </td>
+                      <td>Room temp up to 24 hours</td>
+                      <td>Store directly into freezer, no processing required</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="notes card">
+            <div class="card-header">
+              <h2 class="card-title">MUSIC Sampling Overview</h2>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table>
+                  <thead>
+                    <th>Blood</th>
+                    <th>Notes</th>
+                    <th>Processing/Storage</th>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>NHS EDTA x1</td>
+                      <td>FBC</td>
+                      <td>Send to local NHS lab</td>
+                    </tr>
+                    <tr>
+                      <td>NHS Serum x1</td>
+                      <td>U&amp;E/calcium/albumin/LFTs/CRP</td>
+                      <td>Send to local NHS lab</td>
+                    </tr>
+                    <tr>
+                      <td>PaxGene ccfDNA tube x1</td>
+                      <td>
+                        <strong><span class="text-primary">** Don't freeze, room temp up to 7 days **</span></strong>
+                      </td>
+                      <td>
+                        Perform <a href="#ccfdna_extraction">plasma extraction</a> <strong>within 7 days</strong> and
+                        store extract in -80
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>PaxGene RNA tube x1</td>
+                      <td>Room temp up to 3 days, -20 or -80 up to 4 years</td>
+                      <td>Store directly into freezer, no processing required</td>
+                    </tr>
+                    <tr>
+                      <td>EDTA 10ml tube x2</td>
+                      <td>
+                        <span class="text-primary"><strong>Process within 6 hours</strong></span>
+                      </td>
+                      <td>
+                        Perform <a href="#edta_extraction">plasma extraction</a> <strong>within 6 hours</strong> and
+                        store extract in -80
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="table-responsive">
+                <table>
+                  <thead>
+                    <th>Stool</th>
+                    <th>Processing/Storage</th>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>NHS Calprotectin x1</td>
+                      <td>Send to local NHS lab</td>
+                    </tr>
+                    <tr>
+                      <td>qFIT x1</td>
+                      <td>Post directly to Dundee with NHS request form containing patient details</td>
+                    </tr>
+                    <tr>
+                      <td>OmniGut x1</td>
+                      <td>Store directly in -80</td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">Previous standard stool container removed on latest amendment</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="table-responsive">
+                <table>
+                  <thead>
+                    <th>Saliva</th>
+                    <th>Processing/Storage</th>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>TBC</td>
+                      <td>TBC</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="notes card" id="edta_extraction">
+            <div class="card-header">
+              <h3 class="card-title">EDTA Plasma Spin</h3>
+            </div>
+            <div class="card-body">
+              <h5>Equipment:</h5>
+              <ul>
+                <li>Refrigerated centrifuge(s)</li>
+                <li>15ml sterile tubes</li>
+                <li>2ml screw-top tubes</li>
+                <li>QR labels</li>
+                <li>Pipette and 1ml tips</li>
+              </ul>
+              <h5>Steps:</h5>
+              <ol>
+                <li>
+                  <strong>1000 x g for 10mins at room temp</strong>
+                </li>
+                <li>Transfer plasma to sterile tube</li>
+                <li>
+                  <strong>3000 x g for 10mins at room temp</strong>
+                </li>
+                <li>Divide into 1 ml aliquots in screw-top tubes</li>
+                <li>Label and register each aliquot G-Trac</li>
+                <li>Freeze at -80°C</li>
+              </ol>
+            </div>
+            <div class="card-footer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="notes card" id="ccfdna_extraction">
+            <div class="card-header">
+              <h3 class="card-title">PAXgene ccfDNA Plasma Spin</h3>
+            </div>
+            <div class="card-body">
+              <h5>Equipment:</h5>
+              <ul>
+                <li>Refrigerated centrifuge(s)</li>
+                <li>2ml eppendorf tubes</li>
+                <li>2ml cryotubes</li>
+                <li>QR labels</li>
+                <li>Pipette and 1ml tips</li>
+              </ul>
+              <h5>Notes:</h5>
+              <ul>
+                <li>Gentle acceleration/deceleration – suggestion set to 5/5 respectively.</li>
+                <li>
+                  Score haemolysis by assessing colour of plasma using chart (available on add new sample page). Plasma
+                  with a score of 4 or higher (100 mg/dL) not to be used for MUSIC
+                </li>
+                <li>
+                  To enable automated calculation of time to processing: please fill in sample created datetime as
+                  datetime of original blood sample and record processing datetime as datetime of finishing this process
+                </li>
+                <li>Perform this protocol as sterile as possible</li>
+              </ul>
+              <h5>Steps:</h5>
+              <ol>
+                <li>
+                  <strong>1,600 x g for 10 mins at room temp</strong>
+                </li>
+                <li>Transfer plasma in 2ml aliquots into 2ml eppendorf tube leaving ~1cm buffer between cells and plasma</li>
+                <li>Record haemolysis levels</li>
+                <li>
+                  <strong>16,000 x g for 10mins at room temp</strong>
+                </li>
+                <li>Transfer in 2 ml aliquots into cryotubes</li>
+                <li>Label and register each aliquot onto G-Trac</li>
+                <li>Freeze at -80°C</li>
+              </ol>
+            </div>
+            <div class="card-footer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="notes card" id="ccfdna_extraction">
+            <div class="card-header">
+              <h3 class="card-title">cfDNA Extraction</h3>
+            </div>
+            <div class="card-body">
+              <h5>Protocol:</h5>
+              <ul>
+                <li>
+                  QIAmp circulating nucleic acid handbook:
+                  <a href="https://www.qiagen.com/us/resources/download.aspx?id=0c4b31ab-f4fb-425f-99bf-10ab9538c061&lang=en"
+                     target="_blank"
+                     rel="noopener">Download here</a>. Protocol starts on page 26. Use 2ml plasma
+                  extraction steps.
+                </li>
+                <li>
+                  Qubit hsDNA assay:
+                  <a href="https://assets.thermofisher.com/TFS-Assets/LSG/manuals/Qubit_dsDNA_HS_Assay_UG.pdf"
+                     target="_blank"
+                     rel="noopener">Download here</a>.
+                </li>
+              </ul>
+              <h5>Notes:</h5>
+              <ul>
+                <li>For elution we use ultrapure water rather than buffer AVE in step 15.</li>
+                <li>Elution volume is 25ul as of 10 Aug 2021. Prior to that elution volumes were 20ul.</li>
+                <li>QC step with Qubit hsDNA assay - use 2ul of sample and 198ul of working solution.</li>
+              </ul>
+            </div>
+            <div class="card-header">
+              <h3 class="card-title">ddPCR Protocol</h3>
+            </div>
+            <div class="card-body">
+              <h5>Protocol:</h5>
+              <p>
+                <a href="https://github.com/1-gut/ddPCR_protocol"
+                   target="_blank"
+                   rel="noopener">Link to protocol</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% load static %}
+
+    <div class="col-lg-4">
+      <h2>
+        <i class="tim-icons icon-cloud-download-93"></i> Downloads
+      </h2>
+      <div class="card notes">
+        <div class="card-header">
+          <h2 class="card-title">MUSIC Files</h2>
+        </div>
+        <div class="card-body music-files">
+          <h3>Endoscopy Scoring Form</h3>
+          <a target='_blank'
+             rel="noopener"
+             href="{% static 'assets/files/IBD Endoscopy Scores - GGC Branding.pdf' %}">
+            <i class="tim-icons icon-paper"></i> IBD Endoscopy Scores - GGC Branding.pdf
+          </a>
+          <a target='_blank'
+             rel="noopener"
+             href="{% static 'assets/files/IBD Endoscopy Scores - Lothian Branding.pdf' %}">
+            <i class="tim-icons icon-paper"></i> IBD Endoscopy Scores - Lothian Branding.pdf
+          </a>
+          <a target='_blank'
+             rel="noopener"
+             href="{% static 'assets/files/IBD Endoscopy Scores - Tayside Branding.pdf' %}">
+            <i class="tim-icons icon-paper"></i> IBD Endoscopy Scores - Tayside Branding.pdf
+          </a>
+          <h3>Information Sheets</h3>
+          <a target='_blank'
+             rel="noopener"
+             href="{% static 'assets/files/MUSIC PIS Summary V1.0 Unbranded.pdf' %}">
+            <i class="tim-icons icon-paper"></i> Patient Information Summary
+          </a>
+          <a target='_blank'
+             rel="noopener"
+             href="{% static 'assets/files/2020-09-04 MUSIC Patient Information Sheet V3.0.pdf' %}">
+            <i class="tim-icons icon-paper"></i> Patient Information Full
+          </a>
+          <a target='_blank'
+             rel="noopener"
+             href="{% static 'assets/files/MUSIC Stool Instructions v1.0.pdf' %}">
+            <i class="tim-icons icon-paper"></i> Stool Sampling Instructions
+          </a>
+          <h3>Study Protocol</h3>
+          <a target='_blank'
+             rel="noopener"
+             href="{% static 'assets/files/MUSIC Protocol V3.0.pdf' %}">
+            <i class="tim-icons icon-paper"></i> Full Study Protocol
+          </a>
+          <h3>WGH Treatment Guidelines 2021</h3>
+          <a target='_blank'
+             rel="noopener"
+             href="{% static 'assets/files/uc_treatment_2021.pdf' %}">
+            <i class="tim-icons icon-paper"></i> Ulcerative Colitis
+          </a>
+          <a target='_blank'
+             rel="noopener"
+             href="{% static 'assets/files/cd_treatment_2021.pdf' %}">
+            <i class="tim-icons icon-paper"></i> Crohn's
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+  <script></script>
+{% endblock javascripts %}

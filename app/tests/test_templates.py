@@ -30,7 +30,7 @@ class TestTemplates(TestCase):
     def test_account_page(self):
         path = reverse("account")
         response = self.client.get(path)
-        assertTemplateUsed(response, "account.html")
+        assertTemplateUsed(response, "samples/account.html")
 
     def test_used_samples(self):
         path = reverse("used_samples")
@@ -55,12 +55,12 @@ class TestTemplates(TestCase):
     def test_reference(self):
         path = reverse("reference")
         response = self.client.get(path)
-        assertTemplateUsed(response, "reference.html")
+        assertTemplateUsed(response, "samples/reference.html")
 
     def test_analytics(self):
         path = reverse("analytics")
         response = self.client.get(path)
-        assertTemplateUsed(response, "analytics.html")
+        assertTemplateUsed(response, "analytics/analytics.html")
 
     def test_sample_checkout(self):
         path = reverse("sample_checkout", kwargs={"pk": 1})

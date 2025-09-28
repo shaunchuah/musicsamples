@@ -11,7 +11,7 @@ User = get_user_model()
 
 @login_required(login_url="/login/")
 def data_export(request):
-    return render(request, "data_export.html")
+    return render(request, "export/data_export.html")
 
 
 @login_required(login_url="/login/")

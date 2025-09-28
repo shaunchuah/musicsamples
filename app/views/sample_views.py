@@ -171,7 +171,7 @@ def used_samples_archive_all(request):
 @login_required(login_url="/login/")
 def reference(request):
     # Reference static page for publishing lab protocols
-    return render(request, "reference.html")
+    return render(request, "samples/reference.html")
 
 
 @login_required(login_url="/login/")
@@ -183,7 +183,7 @@ def account(request):
         .order_by("-last_modified")[:20]
     )
     context = {"sample_list": sample_list}
-    return render(request, "account.html", context)
+    return render(request, "samples/account.html", context)
 
 
 @login_required(login_url="/login/")
@@ -194,7 +194,7 @@ def management(request):
         user_email_list.append(user.email)
     user_email_list = ";".join(user_email_list)
     context = {"user_email_list": user_email_list}
-    return render(request, "management.html", context)
+    return render(request, "samples/management.html", context)
 
 
 @login_required(login_url="/login/")
