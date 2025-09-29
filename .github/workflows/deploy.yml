@@ -98,6 +98,12 @@ jobs:
         run: ssh deploy '${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
       - name: Run frontend deployment script
         run: ssh deploy 'bash ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_frontend.sh'
+      - name: Install frontend dependencies and build
+        run: ssh deploy 'cd ~/music_frontend/current && npm ci --omit=dev'
+      - name: Restarting or starting PM2 process
+        run: |
+          ssh deploy 'pm2 restart music_frontend || pm2 start ecosystem.config.js'
+          ssh deploy 'pm2 save'
       - name: Restart services
         run: |
           ssh deploy 'sudo systemctl restart gunicorn'

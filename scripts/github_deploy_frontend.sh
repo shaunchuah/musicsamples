@@ -30,31 +30,4 @@ fi
 echo "Changing to current directory"
 cd ~/music_frontend/current
 
-
-
-NPM_BIN=$(command -v npm)
-PM2_BIN=$(command -v pm2)
-
-echo "DEBUG: Current directory after cd: $(pwd)"
-echo "DEBUG: Contents of current directory: $(ls -la)"
-echo "DEBUG: NPM_BIN=$NPM_BIN, PM2_BIN=$PM2_BIN"
-
-if [[ -z "$NPM_BIN" ]]; then
-  echo "npm not found on PATH." >&2
-  exit 127
-fi
-
-if [[ -z "$PM2_BIN" ]]; then
-  echo "pm2 not found on PATH." >&2
-  exit 127
-fi
-
-echo "Installing dependencies"
-"$NPM_BIN" ci --omit=dev
-
-echo "Restarting or starting PM2 process"
-# Restart if the process exists, otherwise launch using the PM2 ecosystem config shipped with the release.
-"$PM2_BIN" restart music-frontend || "$PM2_BIN" start ecosystem.config.js
-"$PM2_BIN" save
-
-echo "Deployment completed successfully"
+echo "Files copied and deployed successfully"
