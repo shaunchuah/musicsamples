@@ -103,7 +103,7 @@ jobs:
         run: ssh deploy '${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
 
       - name: Run frontend deployment script
-        run: ssh deploy '${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_frontend.sh'
+        run: ssh deploy 'bash ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_frontend.sh'
 
       - name: Restart gunicorn
         run: ssh deploy 'sudo systemctl restart gunicorn'
