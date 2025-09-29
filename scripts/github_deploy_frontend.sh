@@ -30,4 +30,13 @@ fi
 echo "Changing to current directory"
 cd ~/music_frontend/current
 
+# Source nvm and activate the specific Node version
+source ~/.nvm/nvm.sh
+nvm use v22.20.0
+
+# Install dependencies and manage the PM2 process
+npm ci --omit=dev
+pm2 restart music_frontend || pm2 start ecosystem.config.js
+pm2 save
+
 echo "Files copied and deployed successfully"
