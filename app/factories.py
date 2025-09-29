@@ -20,7 +20,7 @@ from app.choices import (
 from app.models import (
     BasicScienceBox,
     BasicScienceSampleType,
-    ExperimentalID,
+    Experiment,
     Sample,
     StudyIdentifier,
     TissueType,
@@ -52,9 +52,9 @@ class SampleFactory(DjangoModelFactory):
     last_modified_by = Faker("email")
 
 
-class ExperimentalIDFactory(DjangoModelFactory):
+class ExperimentFactory(DjangoModelFactory):
     class Meta:  # type:ignore
-        model = ExperimentalID
+        model = Experiment
 
     basic_science_group = LazyAttribute(lambda x: choice(BasicScienceGroupChoices.values))
     name = Sequence(lambda n: "EXP-%03d" % n)
@@ -145,13 +145,13 @@ class BasicScienceBoxFactory(DjangoModelFactory):
     last_modified_by = SubFactory(UserFactory)
 
     @PostGeneration
-    def experimental_ids(self, create, extracted, **kwargs):
+    def experiments(self, create, extracted, **kwargs):
         if not create:
             return
         if extracted:
-            for experimental_id in extracted:
-                self.experimental_ids.add(experimental_id)  # type:ignore
+            for experiment in extracted:
+                self.experiments.add(experiment)  # type:ignore
         else:
-            # Create 1-3 experimental IDs by default
+            # Create 1-3 experiments by default
             for _ in range(choice([1, 2, 3])):
-                self.experimental_ids.add(ExperimentalIDFactory())  # type:ignore
+                self.experiments.add(ExperimentFactory())  # type:ignore

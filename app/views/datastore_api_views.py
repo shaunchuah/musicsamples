@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from app.models import DataStore
-from app.services import FileDirectUploadService
+from core.services.uploads import FileDirectUploadService
 
 
 class FileDirectUploadStartApi(APIView):

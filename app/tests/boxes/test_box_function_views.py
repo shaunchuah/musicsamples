@@ -2,7 +2,7 @@ import pytest
 from django.urls import reverse
 
 from app.choices import BasicScienceGroupChoices
-from app.factories import BasicScienceBoxFactory, ExperimentalIDFactory
+from app.factories import BasicScienceBoxFactory, ExperimentFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -20,8 +20,8 @@ def test_box_search_with_query(client, box_user_with_permission):
 
 
 def test_box_search_matches_basic_science_group(client, box_user_with_permission):
-    experimental = ExperimentalIDFactory(basic_science_group=BasicScienceGroupChoices.BAIN)
-    group_box = BasicScienceBoxFactory(experimental_ids=[experimental])
+    experiments = ExperimentFactory(basic_science_group=BasicScienceGroupChoices.BAIN)
+    group_box = BasicScienceBoxFactory(experiments=[experiments])
     client.force_login(box_user_with_permission)
 
     response = client.get(reverse("boxes:search"), {"q": BasicScienceGroupChoices.BAIN.value})
@@ -89,10 +89,10 @@ def test_box_filter(client, box_user_with_permission):
 
 
 def test_box_filter_filters_by_basic_science_group(client, box_user_with_permission):
-    target_exp = ExperimentalIDFactory(basic_science_group=BasicScienceGroupChoices.BAIN)
-    included_box = BasicScienceBoxFactory(experimental_ids=[target_exp])
+    target_exp = ExperimentFactory(basic_science_group=BasicScienceGroupChoices.BAIN)
+    included_box = BasicScienceBoxFactory(experiments=[target_exp])
     other_box = BasicScienceBoxFactory(
-        experimental_ids=[ExperimentalIDFactory(basic_science_group=BasicScienceGroupChoices.JONES)]
+        experiments=[ExperimentFactory(basic_science_group=BasicScienceGroupChoices.JONES)]
     )
     client.force_login(box_user_with_permission)
 

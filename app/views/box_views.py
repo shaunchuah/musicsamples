@@ -9,14 +9,15 @@ from django.urls import reverse_lazy
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
-from app.filters import BasicScienceBoxFilter, ExperimentalIDFilter
-from app.forms import BasicScienceBoxForm, ExperimentalIDForm
-from app.models import BasicScienceBox, ExperimentalID
-from app.utils import export_csv, historical_changes
+from app.filters import BasicScienceBoxFilter, ExperimentFilter
+from app.forms import BasicScienceBoxForm, ExperimentForm
+from app.models import BasicScienceBox, Experiment
+from core.utils.export import export_csv
+from core.utils.history import historical_changes
 
 EXPERIMENT_PREFETCH = Prefetch(
-    "experimental_ids",
-    queryset=ExperimentalID.objects.prefetch_related("sample_types", "tissue_types"),
+    "experiments",
+    queryset=Experiment.objects.prefetch_related("sample_types", "tissue_types"),
 )
 
 
@@ -81,7 +82,7 @@ class BasicScienceBoxCreateView(LoginRequiredMixin, PermissionRequiredMixin, Cre
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.setdefault("experimental_form", ExperimentalIDForm())
+        context.setdefault("experiment_form", ExperimentForm())
         return context
 
     def form_valid(self, form):
@@ -100,7 +101,7 @@ class BasicScienceBoxUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Upd
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.setdefault("experimental_form", ExperimentalIDForm())
+        context.setdefault("experiment_form", ExperimentForm())
         return context
 
     def form_valid(self, form):
@@ -137,10 +138,10 @@ def box_search(request):
                 Q(box_id__icontains=query_string)
                 | Q(location__icontains=query_string)
                 | Q(comments__icontains=query_string)
-                | Q(experimental_ids__basic_science_group__icontains=query_string)
-                | Q(experimental_ids__name__icontains=query_string)
-                | Q(experimental_ids__sample_types__name__icontains=query_string)
-                | Q(experimental_ids__tissue_types__name__icontains=query_string)
+                | Q(experiments__basic_science_group__icontains=query_string)
+                | Q(experiments__name__icontains=query_string)
+                | Q(experiments__sample_types__name__icontains=query_string)
+                | Q(experiments__tissue_types__name__icontains=query_string)
             )
             .filter(is_used=False)
             .prefetch_related(EXPERIMENT_PREFETCH)
@@ -154,10 +155,10 @@ def box_search(request):
                     Q(box_id__icontains=query_string)
                     | Q(location__icontains=query_string)
                     | Q(comments__icontains=query_string)
-                    | Q(experimental_ids__basic_science_group__icontains=query_string)
-                    | Q(experimental_ids__name__icontains=query_string)
-                    | Q(experimental_ids__sample_types__name__icontains=query_string)
-                    | Q(experimental_ids__tissue_types__name__icontains=query_string)
+                    | Q(experiments__basic_science_group__icontains=query_string)
+                    | Q(experiments__name__icontains=query_string)
+                    | Q(experiments__sample_types__name__icontains=query_string)
+                    | Q(experiments__tissue_types__name__icontains=query_string)
                 )
                 .prefetch_related(EXPERIMENT_PREFETCH)
                 .select_related("created_by", "last_modified_by")
@@ -191,10 +192,10 @@ def export_boxes_csv(request):
                 Q(box_id__icontains=query_string)
                 | Q(location__icontains=query_string)
                 | Q(comments__icontains=query_string)
-                | Q(experimental_ids__basic_science_group__icontains=query_string)
-                | Q(experimental_ids__name__icontains=query_string)
-                | Q(experimental_ids__sample_types__name__icontains=query_string)
-                | Q(experimental_ids__tissue_types__name__icontains=query_string)
+                | Q(experiments__basic_science_group__icontains=query_string)
+                | Q(experiments__name__icontains=query_string)
+                | Q(experiments__sample_types__name__icontains=query_string)
+                | Q(experiments__tissue_types__name__icontains=query_string)
             )
             .filter(is_used=False)
             .prefetch_related(EXPERIMENT_PREFETCH)
@@ -208,10 +209,10 @@ def export_boxes_csv(request):
                     Q(box_id__icontains=query_string)
                     | Q(location__icontains=query_string)
                     | Q(comments__icontains=query_string)
-                    | Q(experimental_ids__basic_science_group__icontains=query_string)
-                    | Q(experimental_ids__name__icontains=query_string)
-                    | Q(experimental_ids__sample_types__name__icontains=query_string)
-                    | Q(experimental_ids__tissue_types__name__icontains=query_string)
+                    | Q(experiments__basic_science_group__icontains=query_string)
+                    | Q(experiments__name__icontains=query_string)
+                    | Q(experiments__sample_types__name__icontains=query_string)
+                    | Q(experiments__tissue_types__name__icontains=query_string)
                 )
                 .prefetch_related(EXPERIMENT_PREFETCH)
                 .select_related("created_by", "last_modified_by")
@@ -279,8 +280,8 @@ def box_filter_export_csv(request):
     return export_csv(box_list, file_prefix="gtrac", file_name="filtered_basic_science_boxes")
 
 
-def serialize_experimental_id(experimental_id: ExperimentalID) -> dict:
-    """Serialize an ExperimentalID for JSON responses."""
+def serialize_experiment(experiment: Experiment) -> dict:
+    """Serialize an Experiment for JSON responses."""
 
     def format_timestamp(value, user):
         if not value:
@@ -297,7 +298,7 @@ def serialize_experimental_id(experimental_id: ExperimentalID) -> dict:
             "label": sample_type.label,
             "display": sample_type.label or sample_type.name,
         }
-        for sample_type in experimental_id.sample_types.all()
+        for sample_type in experiment.sample_types.all()
     ]
     tissue_types = [
         {
@@ -306,7 +307,7 @@ def serialize_experimental_id(experimental_id: ExperimentalID) -> dict:
             "label": tissue_type.label,
             "display": tissue_type.label or tissue_type.name,
         }
-        for tissue_type in experimental_id.tissue_types.all()
+        for tissue_type in experiment.tissue_types.all()
     ]
     boxes = [
         {
@@ -314,57 +315,57 @@ def serialize_experimental_id(experimental_id: ExperimentalID) -> dict:
             "box_id": box.box_id,
             "display": str(box),
         }
-        for box in experimental_id.boxes.all()  # type: ignore
+        for box in experiment.boxes.all()  # type: ignore
     ]
     return {
-        "id": experimental_id.pk,
-        "basic_science_group": experimental_id.basic_science_group,
-        "basic_science_group_display": experimental_id.get_basic_science_group_display(),  # type: ignore
-        "name": experimental_id.name,
-        "description": experimental_id.description,
-        "date": experimental_id.date.isoformat() if experimental_id.date else None,
-        "date_display": experimental_id.date.strftime("%d %b %Y") if experimental_id.date else None,
+        "id": experiment.pk,
+        "basic_science_group": experiment.basic_science_group,
+        "basic_science_group_display": experiment.get_basic_science_group_display(),  # type: ignore
+        "name": experiment.name,
+        "description": experiment.description,
+        "date": experiment.date.isoformat() if experiment.date else None,
+        "date_display": experiment.date.strftime("%d %b %Y") if experiment.date else None,
         "sample_types": sample_types,
         "tissue_types": tissue_types,
         "sample_type_ids": [sample_type["id"] for sample_type in sample_types],
         "tissue_type_ids": [tissue_type["id"] for tissue_type in tissue_types],
         "boxes": boxes,
-        "display": f"{experimental_id.get_basic_science_group_display()} - {experimental_id.name}",  # type: ignore
-        "created": experimental_id.created.isoformat() if experimental_id.created else None,
-        "created_by": experimental_id.created_by.email if experimental_id.created_by else None,
-        "created_display": format_timestamp(experimental_id.created, experimental_id.created_by),
-        "last_modified": experimental_id.last_modified.isoformat() if experimental_id.last_modified else None,
-        "last_modified_by": experimental_id.last_modified_by.email if experimental_id.last_modified_by else None,
-        "last_modified_display": format_timestamp(experimental_id.last_modified, experimental_id.last_modified_by),
+        "display": f"{experiment.get_basic_science_group_display()} - {experiment.name}",  # type: ignore
+        "created": experiment.created.isoformat() if experiment.created else None,
+        "created_by": experiment.created_by.email if experiment.created_by else None,
+        "created_display": format_timestamp(experiment.created, experiment.created_by),
+        "last_modified": experiment.last_modified.isoformat() if experiment.last_modified else None,
+        "last_modified_by": experiment.last_modified_by.email if experiment.last_modified_by else None,
+        "last_modified_display": format_timestamp(experiment.last_modified, experiment.last_modified_by),
     }
 
 
 @login_required
 @permission_required("app.view_basicsciencebox", raise_exception=True)
 @require_http_methods(["POST"])
-def create_experimental_id(request):
-    """AJAX view to create a new ExperimentalID."""
-    form = ExperimentalIDForm(request.POST)
+def create_experiment(request):
+    """AJAX view to create a new Experiment."""
+    form = ExperimentForm(request.POST)
 
     if form.is_valid():
-        experimental_id = form.save(commit=False)
-        experimental_id.created_by = request.user
-        experimental_id.last_modified_by = request.user
-        experimental_id.save()
+        experiment = form.save(commit=False)
+        experiment.created_by = request.user
+        experiment.last_modified_by = request.user
+        experiment.save()
         form.save_m2m()
-        experimental_id = (
-            ExperimentalID.objects.prefetch_related("sample_types", "tissue_types", "boxes")
+        experiment = (
+            Experiment.objects.prefetch_related("sample_types", "tissue_types", "boxes")
             .select_related("created_by", "last_modified_by")
-            .get(pk=experimental_id.pk)
+            .get(pk=experiment.pk)
         )
-        return JsonResponse({"success": True, "experimental_id": serialize_experimental_id(experimental_id)})
+        return JsonResponse({"success": True, "experiment": serialize_experiment(experiment)})
     return JsonResponse({"success": False, "errors": form.errors}, status=400)
 
 
-class ExperimentalIdListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
-    model = ExperimentalID
-    template_name = "boxes/experimental_id_list.html"
-    context_object_name = "experimental_ids"
+class ExperimentListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    model = Experiment
+    template_name = "boxes/experiment_list.html"
+    context_object_name = "experiments"
     paginate_by = 20
     permission_required = "app.view_basicsciencebox"
 
@@ -380,15 +381,15 @@ class ExperimentalIdListView(LoginRequiredMixin, PermissionRequiredMixin, ListVi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["experimental_id_count"] = self.get_queryset().count()
+        context["experiment_count"] = self.get_queryset().count()
         return context
 
 
-class ExperimentalIdCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    model = ExperimentalID
-    form_class = ExperimentalIDForm
-    template_name = "boxes/experimental_id_form.html"
-    success_url = reverse_lazy("boxes:experimental_id_list")
+class ExperimentCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+    model = Experiment
+    form_class = ExperimentForm
+    template_name = "boxes/experiment_form.html"
+    success_url = reverse_lazy("boxes:experiment_list")
     permission_required = "app.add_basicsciencebox"
 
     def form_valid(self, form):
@@ -398,10 +399,10 @@ class ExperimentalIdCreateView(LoginRequiredMixin, PermissionRequiredMixin, Crea
         return super().form_valid(form)
 
 
-class ExperimentalIdDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
-    model = ExperimentalID
-    template_name = "boxes/experimental_id_detail.html"
-    context_object_name = "experimental_id"
+class ExperimentDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+    model = Experiment
+    template_name = "boxes/experiment_detail.html"
+    context_object_name = "experiment"
     permission_required = "app.view_basicsciencebox"
 
     def get_queryset(self):
@@ -409,10 +410,10 @@ class ExperimentalIdDetailView(LoginRequiredMixin, PermissionRequiredMixin, Deta
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        experimental_id = self.get_object()
-        experimental_id_history = experimental_id.history.filter(id=experimental_id.pk)  # type: ignore
-        changes = historical_changes(experimental_id_history)
-        first_change = experimental_id_history.first()
+        experiment = self.get_object()
+        experiment_history = experiment.history.filter(id=experiment.pk)  # type: ignore
+        changes = historical_changes(experiment_history)
+        first_change = experiment_history.first()
         context.update(
             {
                 "changes": changes,
@@ -422,11 +423,11 @@ class ExperimentalIdDetailView(LoginRequiredMixin, PermissionRequiredMixin, Deta
         return context
 
 
-class ExperimentalIdUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    model = ExperimentalID
-    form_class = ExperimentalIDForm
-    template_name = "boxes/experimental_id_form.html"
-    success_url = reverse_lazy("boxes:experimental_id_list")
+class ExperimentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+    model = Experiment
+    form_class = ExperimentForm
+    template_name = "boxes/experiment_form.html"
+    success_url = reverse_lazy("boxes:experiment_list")
     permission_required = "app.change_basicsciencebox"
 
     def form_valid(self, form):
@@ -435,10 +436,10 @@ class ExperimentalIdUpdateView(LoginRequiredMixin, PermissionRequiredMixin, Upda
         return super().form_valid(form)
 
 
-class ExperimentalIdDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
-    model = ExperimentalID
-    template_name = "boxes/experimental_id_confirm_delete.html"
-    success_url = reverse_lazy("boxes:experimental_id_list")
+class ExperimentDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    model = Experiment
+    template_name = "boxes/experiment_confirm_delete.html"
+    success_url = reverse_lazy("boxes:experiment_list")
     permission_required = "app.delete_basicsciencebox"
 
     def post(self, request, *args, **kwargs):
@@ -451,10 +452,10 @@ class ExperimentalIdDeleteView(LoginRequiredMixin, PermissionRequiredMixin, Dele
         return HttpResponseRedirect(success_url)
 
 
-class ExperimentalIdRestoreView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
-    model = ExperimentalID
-    template_name = "boxes/experimental_id_confirm_restore.html"
-    success_url = reverse_lazy("boxes:experimental_id_list")
+class ExperimentRestoreView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+    model = Experiment
+    template_name = "boxes/experiment_confirm_restore.html"
+    success_url = reverse_lazy("boxes:experiment_list")
     permission_required = "app.delete_basicsciencebox"
 
     def post(self, request, *args, **kwargs):
@@ -475,28 +476,28 @@ def experiment_search(request):
         query_string = request.GET.get("q")
 
         queryset = (
-            ExperimentalID.objects.filter(Q(name__icontains=query_string) | Q(description__icontains=query_string))
+            Experiment.objects.filter(Q(name__icontains=query_string) | Q(description__icontains=query_string))
             .filter(is_deleted=False)
             .prefetch_related("boxes", "sample_types", "tissue_types")
             .select_related("created_by", "last_modified_by")
             .distinct()
         )
 
-        experimental_ids = queryset
-        experimental_id_count = experimental_ids.count()
+        experiments = queryset
+        experiment_count = experiments.count()
         context = {
             "query_string": query_string,
-            "experimental_ids": experimental_ids,
-            "experimental_id_count": experimental_id_count,
+            "experiments": experiments,
+            "experiment_count": experiment_count,
         }
-        return render(request, "boxes/experimental_id_list.html", context)
+        return render(request, "boxes/experiment_list.html", context)
     else:
         context = {
             "query_string": "Null",
-            "experimental_id_count": 0,
-            "experimental_ids": ExperimentalID.objects.none(),
+            "experiment_count": 0,
+            "experiments": Experiment.objects.none(),
         }
-        return render(request, "boxes/experimental_id_list.html", context)
+        return render(request, "boxes/experiment_list.html", context)
 
 
 @login_required(login_url="/login/")
@@ -509,7 +510,7 @@ def export_experiments_csv(request):
     if ("q" in request.GET) and request.GET["q"].strip():
         query_string = request.GET.get("q")
         queryset = (
-            ExperimentalID.objects.filter(Q(name__icontains=query_string) | Q(description__icontains=query_string))
+            Experiment.objects.filter(Q(name__icontains=query_string) | Q(description__icontains=query_string))
             .filter(is_deleted=False)
             .prefetch_related("boxes", "sample_types", "tissue_types")
             .select_related("created_by", "last_modified_by")
@@ -517,35 +518,35 @@ def export_experiments_csv(request):
         )
     else:
         queryset = (
-            ExperimentalID.objects.exclude(is_deleted=True)
+            Experiment.objects.exclude(is_deleted=True)
             .prefetch_related("boxes", "sample_types", "tissue_types")
             .select_related("created_by", "last_modified_by")
         )
 
-    return export_csv(queryset, file_prefix="gtrac", file_name="experimental_ids")
+    return export_csv(queryset, file_prefix="gtrac", file_name="experiments")
 
 
 @login_required(login_url="/login/")
 @permission_required("app.view_basicsciencebox", raise_exception=True)
 def experiment_filter(request):
     queryset = (
-        ExperimentalID.objects.all()
+        Experiment.objects.all()
         .prefetch_related("boxes", "sample_types", "tissue_types")
         .select_related("created_by", "last_modified_by")
     )
-    experimental_id_filter = ExperimentalIDFilter(request.GET, queryset=queryset)
-    experimental_ids = experimental_id_filter.qs
-    experimental_id_count = experimental_ids.count()
+    experiment_filter = ExperimentFilter(request.GET, queryset=queryset)
+    experiments = experiment_filter.qs
+    experiment_count = experiments.count()
 
     # Pagination
     page = request.GET.get("page", 1)
-    paginator = Paginator(experimental_ids, 25)  # Using same pagination size as BasicScienceBoxListView
+    paginator = Paginator(experiments, 25)  # Using same pagination size as BasicScienceBoxListView
     try:
-        experimental_ids = paginator.page(page)
+        experiments = paginator.page(page)
     except PageNotAnInteger:
-        experimental_ids = paginator.page(1)
+        experiments = paginator.page(1)
     except EmptyPage:
-        experimental_ids = paginator.page(paginator.num_pages)
+        experiments = paginator.page(paginator.num_pages)
 
     # Allows paginator to reconstruct the initial query string
     parameter_string = ""
@@ -555,23 +556,23 @@ def experiment_filter(request):
             parameter_string += f"&{i}={val}"
 
     context = {
-        "experimental_ids": experimental_ids,
-        "page_obj": experimental_ids,
-        "experimental_id_count": experimental_id_count,
-        "experimental_id_filter": experimental_id_filter,
+        "experiments": experiments,
+        "page_obj": experiments,
+        "experiment_count": experiment_count,
+        "experiment_filter": experiment_filter,
         "parameter_string": parameter_string,
     }
-    return render(request, "boxes/experimental_id_filter.html", context)
+    return render(request, "boxes/experiment_filter.html", context)
 
 
 @login_required(login_url="/login/")
 @permission_required("app.view_basicsciencebox", raise_exception=True)
-def experimental_id_filter_export_csv(request):
+def experiment_filter_export_csv(request):
     queryset = (
-        ExperimentalID.objects.all()
+        Experiment.objects.all()
         .prefetch_related("boxes", "sample_types", "tissue_types")
         .select_related("created_by", "last_modified_by")
     )
-    experimental_id_filter = ExperimentalIDFilter(request.GET, queryset=queryset)
-    experimental_ids = experimental_id_filter.qs
-    return export_csv(experimental_ids, file_prefix="gtrac", file_name="filtered_experimental_ids")
+    experiment_filter = ExperimentFilter(request.GET, queryset=queryset)
+    experiments = experiment_filter.qs
+    return export_csv(experiments, file_prefix="gtrac", file_name="filtered_experiments")

@@ -58,7 +58,7 @@
             </div>
             <div class="row">
               {% for field in box_filter.form %}
-                {% if field.name == 'experimental_ids' %}
+                {% if field.name == 'experiments' %}
                   <div class="col-md-4">
                     <div class="form-group">{{ field.label_tag }} {% render_field field class="form-control" %}</div>
                   </div>
@@ -75,7 +75,7 @@
             </div>
             <div class="row mb-4">
               {% for field in box_filter.form %}
-                {% if field.name == 'experimental_ids_date' %}
+                {% if field.name == 'experiments_date' %}
                   <div class="col-md-6">
                     {{ field.label_tag }}
                     <div class="d-flex flex-row align-items-center">{% render_field field class="form-control" %}</div>

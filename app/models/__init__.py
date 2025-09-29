@@ -2,7 +2,7 @@
 from .basic_science import (
     BasicScienceBox,
     BasicScienceSampleType,
-    ExperimentalID,
+    Experiment,
     TissueType,
 )
 from .clinical import (
@@ -23,7 +23,7 @@ __all__ = [
     "file_upload_path",
     "file_generate_name",
     # Basic science models
-    "ExperimentalID",
+    "Experiment",
     "BasicScienceSampleType",
     "TissueType",
     "BasicScienceBox",

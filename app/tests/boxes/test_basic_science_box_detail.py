@@ -9,7 +9,7 @@ from pytest_django.asserts import assertTemplateUsed
 from app.factories import (
     BasicScienceBoxFactory,
     BasicScienceSampleTypeFactory,
-    ExperimentalIDFactory,
+    ExperimentFactory,
     TissueTypeFactory,
 )
 from app.models import BasicScienceBox
@@ -131,10 +131,10 @@ def test_get_context_data_method(mock_get_object, rf, box_user_with_permission):
 def test_distinct_sample_and_tissue_labels_helpers():
     sample_type = BasicScienceSampleTypeFactory()
     tissue_type = TissueTypeFactory()
-    experimental = ExperimentalIDFactory()
-    experimental.sample_types.add(sample_type)
-    experimental.tissue_types.add(tissue_type)
-    box = BasicScienceBoxFactory(experimental_ids=[experimental])
+    experiments = ExperimentFactory()
+    experiments.sample_types.add(sample_type)
+    experiments.tissue_types.add(tissue_type)
+    box = BasicScienceBoxFactory(experiments=[experiments])
 
     assert sample_type.label or sample_type.name in box.get_sample_type_labels()
     assert tissue_type.label or tissue_type.name in box.get_tissue_type_labels()

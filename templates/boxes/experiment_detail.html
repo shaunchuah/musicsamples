@@ -9,7 +9,7 @@
 {% block content %}
   <div class="row mb-2">
     <div class="col">
-      <a href="{% url 'boxes:experimental_id_list' %}">&larr; Back to Experiments</a>
+      <a href="{% url 'boxes:experiment_list' %}">&larr; Back to Experiments</a>
     </div>
   </div>
   {% if form.errors %}
@@ -42,20 +42,20 @@
               <tbody>
                 <tr>
                   <td>Name</td>
-                  <td>{{ experimental_id.name }}</td>
+                  <td>{{ experiment.name }}</td>
                 </tr>
                 <tr>
                   <td>Description</td>
-                  <td>{{ experimental_id.description }}</td>
+                  <td>{{ experiment.description }}</td>
                 </tr>
                 <tr>
                   <td>Date</td>
-                  <td>{{ experimental_id.date|date:'d M Y' }}</td>
+                  <td>{{ experiment.date|date:'d M Y' }}</td>
                 </tr>
                 <tr>
                   <td>Sample Types</td>
                   <td>
-                    {% for sample_type in experimental_id.sample_types.all %}
+                    {% for sample_type in experiment.sample_types.all %}
                       {{ sample_type.label|default:sample_type.name }}
                       {% if not forloop.last %},{% endif %}
                     {% endfor %}
@@ -64,7 +64,7 @@
                 <tr>
                   <td>Tissue Types</td>
                   <td>
-                    {% for tissue_type in experimental_id.tissue_types.all %}
+                    {% for tissue_type in experiment.tissue_types.all %}
                       {{ tissue_type.label|default:tissue_type.name }}
                       {% if not forloop.last %},{% endif %}
                     {% endfor %}
@@ -72,12 +72,12 @@
                 </tr>
                 <tr>
                   <td>Species</td>
-                  <td>{{ experimental_id.get_species_display }}</td>
+                  <td>{{ experiment.get_species_display }}</td>
                 </tr>
                 <tr>
                   <td>Boxes</td>
                   <td>
-                    {% for box in experimental_id.boxes.all %}
+                    {% for box in experiment.boxes.all %}
                       <a href="{% url 'boxes:detail' box.pk %}">{{ box }}</a>
                       {% if not forloop.last %},{% endif %}
                     {% endfor %}
@@ -88,7 +88,7 @@
           </div>
         </div>
         <div class="card-footer">
-          <a href="{% url 'boxes:edit' pk=experimental_id.pk %}"
+          <a href="{% url 'boxes:edit' pk=experiment.pk %}"
              class="btn btn-fill btn-success">Edit</a>
         </div>
       </div>
@@ -102,19 +102,19 @@
               <tbody>
                 <tr>
                   <td>First Registered</td>
-                  <td>{{ experimental_id.created }}</td>
+                  <td>{{ experiment.created }}</td>
                 </tr>
                 <tr>
                   <td>Created By</td>
-                  <td>{{ experimental_id.created_by }}</td>
+                  <td>{{ experiment.created_by }}</td>
                 </tr>
                 <tr>
                   <td>Last Modified</td>
-                  <td>{{ experimental_id.last_modified }}</td>
+                  <td>{{ experiment.last_modified }}</td>
                 </tr>
                 <tr>
                   <td>Modified By</td>
-                  <td>{{ experimental_id.last_modified_by }}</td>
+                  <td>{{ experiment.last_modified_by }}</td>
                 </tr>
               </tbody>
             </table>
@@ -152,9 +152,9 @@
                   </tr>
                 {% endfor %}
                 <tr>
-                  <td>{{ experimental_id.created }}</td>
+                  <td>{{ experiment.created }}</td>
                   <td>First Created</td>
-                  <td>{{ experimental_id.created_by }}</td>
+                  <td>{{ experiment.created_by }}</td>
                 </tr>
               </tbody>
             </table>

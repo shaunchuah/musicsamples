@@ -91,9 +91,9 @@
               </div>
             </div>
             <div class="form-group">
-              {{ form.experimental_ids.label_tag }}
+              {{ form.experiments.label_tag }}
               <div class="d-flex align-items-center">
-                {{ form.experimental_ids|add_class:"form-control" }}
+                {{ form.experiments|add_class:"form-control" }}
                 <button type="button"
                         class="btn btn-info btn-sm ml-2 flex-shrink-0"
                         data-toggle="modal"
@@ -122,7 +122,7 @@
       </div>
     </div>
   </div>
-  <!-- Experimental ID Modal -->
+  <!-- Experiment Modal -->
   <div class="modal fade"
        id="experimentModal"
        tabindex="-1"
@@ -142,32 +142,32 @@
             <div id="experimentFormErrors" class="alert alert-danger d-none"></div>
             {% csrf_token %}
             <div class="form-group">
-              {{ experimental_form.basic_science_group.label_tag }}
-              {{ experimental_form.basic_science_group|add_class:"form-control" }}
+              {{ experiment_form.basic_science_group.label_tag }}
+              {{ experiment_form.basic_science_group|add_class:"form-control" }}
             </div>
             <div class="form-group">
-              {{ experimental_form.name.label_tag }}
-              {{ experimental_form.name|add_class:"form-control" }}
+              {{ experiment_form.name.label_tag }}
+              {{ experiment_form.name|add_class:"form-control" }}
             </div>
             <div class="form-group">
-              {{ experimental_form.description.label_tag }}
-              {{ experimental_form.description|add_class:"form-control" }}
+              {{ experiment_form.description.label_tag }}
+              {{ experiment_form.description|add_class:"form-control" }}
             </div>
             <div class="form-group">
-              {{ experimental_form.species.label_tag }}
-              {{ experimental_form.species|add_class:"form-control" }}
+              {{ experiment_form.species.label_tag }}
+              {{ experiment_form.species|add_class:"form-control" }}
             </div>
             <div class="form-group">
-              {{ experimental_form.date.label_tag }}
-              {{ experimental_form.date|add_class:"form-control" }}
+              {{ experiment_form.date.label_tag }}
+              {{ experiment_form.date|add_class:"form-control" }}
             </div>
             <div class="form-group">
-              {{ experimental_form.sample_types.label_tag }}
-              {{ experimental_form.sample_types|add_class:"form-control" }}
+              {{ experiment_form.sample_types.label_tag }}
+              {{ experiment_form.sample_types|add_class:"form-control" }}
             </div>
             <div class="form-group">
-              {{ experimental_form.tissue_types.label_tag }}
-              {{ experimental_form.tissue_types|add_class:"form-control" }}
+              {{ experiment_form.tissue_types.label_tag }}
+              {{ experiment_form.tissue_types|add_class:"form-control" }}
             </div>
           </div>
           <div class="modal-footer">
@@ -195,14 +195,14 @@
 
         // Submit form via AJAX
         $.ajax({
-          url: '{% url "boxes:create_experimental_id" %}',
+          url: '{% url "boxes:create_experiment" %}',
           type: 'POST',
           data: formData,
           success: function(response) {
             if (response.success) {
-              // Add new option to the experimental_ids select field
-              var selectField = $('#id_experimental_ids');
-              var newOption = new Option(response.experimental_id.display, response.experimental_id.id, false, false);
+              // Add new option to the experiments select field
+              var selectField = $('#id_experiments');
+              var newOption = new Option(response.experiment.display, response.experiment.id, false, false);
               selectField.append(newOption).trigger('change');
 
               // Close modal and reset form
@@ -215,7 +215,7 @@
 
               // Show success message (optional)
               var successMsg = '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
-                'Experiment "' + response.experimental_id.display + '" has been successfully added!' +
+                'Experiment "' + response.experiment.display + '" has been successfully added!' +
                 '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
                 '<span aria-hidden="true">&times;</span></button></div>';
               $('.card-body').prepend(successMsg);

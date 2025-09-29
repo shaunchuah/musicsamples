@@ -7,7 +7,7 @@ from app.models import (
     BasicScienceBox,
     BasicScienceSampleType,
     DataStore,
-    ExperimentalID,
+    Experiment,
     Sample,
     StudyIdentifier,
     TissueType,
@@ -212,11 +212,11 @@ class StudyIdUpdateForm(ModelForm):
 
 
 class BasicScienceBoxForm(ModelForm):
-    experimental_ids = forms.ModelMultipleChoiceField(
-        queryset=ExperimentalID.objects.all(),
+    experiments = forms.ModelMultipleChoiceField(
+        queryset=Experiment.objects.all(),
         widget=forms.SelectMultiple(attrs={"class": "form-control"}),
         required=False,
-        label="Experimental IDs",
+        label="Experiments",
     )
 
     class Meta:
@@ -229,8 +229,7 @@ class BasicScienceBoxForm(ModelForm):
             "column",
             "depth",
             "comments",
-            "experimental_ids",
-            "is_used",
+            "experiments",
         ]
         widgets = {
             "comments": forms.Textarea(attrs={"rows": 3}),
@@ -248,7 +247,7 @@ class BasicScienceBoxForm(ModelForm):
                 del self.fields["is_used"]
 
 
-class ExperimentalIDForm(ModelForm):
+class ExperimentForm(ModelForm):
     sample_types = forms.ModelMultipleChoiceField(
         queryset=BasicScienceSampleType.objects.all(),
         widget=forms.SelectMultiple(attrs={"class": "form-control"}),
@@ -263,7 +262,7 @@ class ExperimentalIDForm(ModelForm):
     )
 
     class Meta:
-        model = ExperimentalID
+        model = Experiment
         fields = ["basic_science_group", "name", "description", "date", "sample_types", "tissue_types", "species"]
         widgets = {
             "basic_science_group": forms.Select(attrs={"class": "form-control"}),

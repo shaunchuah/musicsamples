@@ -2,7 +2,7 @@ import pandas as pd
 from django.test import TestCase
 
 from app.models import StudyIdentifier
-from app.services import StudyIdentifierImportService
+from core.services.imports import StudyIdentifierImportService
 
 
 class TestStudyIdentifierImportService(TestCase):

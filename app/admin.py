@@ -2,7 +2,7 @@ from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
-from app.models import BasicScienceBox, ClinicalData, DataStore, ExperimentalID, Sample, StudyIdentifier
+from app.models import BasicScienceBox, ClinicalData, DataStore, Experiment, Sample, StudyIdentifier
 
 
 @admin.register(StudyIdentifier)
@@ -79,8 +79,8 @@ class BasicScienceBoxAdmin(admin.ModelAdmin):
         return obj.basic_science_groups_display or "-"
 
 
-@admin.register(ExperimentalID)
-class ExperimentalIDAdmin(admin.ModelAdmin):
+@admin.register(Experiment)
+class ExperimentAdmin(admin.ModelAdmin):
     list_display = [
         "basic_science_group",
         "name",

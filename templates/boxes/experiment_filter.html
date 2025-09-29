@@ -5,14 +5,14 @@
 {% block content %}
   <div class="row mb-2">
     <div class="col">
-      <a href="{% url 'boxes:experimental_id_list' %}">&larr; Back to Experiments</a>
+      <a href="{% url 'boxes:experiment_list' %}">&larr; Back to Experiments</a>
     </div>
   </div>
   <div class="row">
     <div class="col">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Filter Experimental IDs</h3>
+          <h3 class="card-title">Filter Experiment IDs</h3>
         </div>
         <div class="card-body">
           <form id="searchform" method="get">
@@ -21,49 +21,49 @@
             <div class="row">
               <div class="col-md-3">
                 <div class="form-group">
-                  {{ experimental_id_filter.form.basic_science_group.label_tag }}
-                  {% render_field experimental_id_filter.form.basic_science_group class="form-control" %}
+                  {{ experiment_filter.form.basic_science_group.label_tag }}
+                  {% render_field experiment_filter.form.basic_science_group class="form-control" %}
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="form-group">
-                  {{ experimental_id_filter.form.species.label_tag }}
-                  {% render_field experimental_id_filter.form.species class="form-control" %}
+                  {{ experiment_filter.form.species.label_tag }}
+                  {% render_field experiment_filter.form.species class="form-control" %}
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="form-group">
-                  {{ experimental_id_filter.form.sample_types.label_tag }}
-                  {% render_field experimental_id_filter.form.sample_types class="form-control"|attr:"size:7" %}
+                  {{ experiment_filter.form.sample_types.label_tag }}
+                  {% render_field experiment_filter.form.sample_types class="form-control"|attr:"size:7" %}
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="form-group">
-                  {{ experimental_id_filter.form.tissue_types.label_tag }}
-                  {% render_field experimental_id_filter.form.tissue_types class="form-control"|attr:"size:7" %}
+                  {{ experiment_filter.form.tissue_types.label_tag }}
+                  {% render_field experiment_filter.form.tissue_types class="form-control"|attr:"size:7" %}
                 </div>
               </div>
             </div>
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
-                  {{ experimental_id_filter.form.date.label_tag }}
+                  {{ experiment_filter.form.date.label_tag }}
                   <div class="d-flex flex-row align-items-center">
-                    {% render_field experimental_id_filter.form.date class="form-control" %}
+                    {% render_field experiment_filter.form.date class="form-control" %}
                   </div>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  {{ experimental_id_filter.form.is_deleted.label_tag }}
-                  {% render_field experimental_id_filter.form.is_deleted class="form-control" %}
+                  {{ experiment_filter.form.is_deleted.label_tag }}
+                  {% render_field experiment_filter.form.is_deleted class="form-control" %}
                 </div>
               </div>
             </div>
             <button type="submit" class="btn btn-fill btn-success">Filter</button>
-            <a href="{% url 'boxes:experimental_id_filter' %}"
+            <a href="{% url 'boxes:experiment_filter' %}"
                class="btn btn-fill btn-secondary">Clear</a>
-          <a href="{% url 'boxes:experimental_id_filter_export_csv' %}?{{ parameter_string }}"
+          <a href="{% url 'boxes:experiment_filter_export_csv' %}?{{ parameter_string }}"
              class="btn btn-success float-lg-right"><i class="tim-icons icon-cloud-download-93"></i>
         Export CSV</a>
       </div>
@@ -77,7 +77,7 @@
       <div class="card-header">
         <h3 class="card-title">Filtered Experiments</h3>
       </div>
-      {% include 'boxes/includes/experimental_id_table.html' %}
+      {% include 'boxes/includes/experiment_table.html' %}
     </div>
   </div>
 </div>

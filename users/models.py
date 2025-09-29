@@ -4,6 +4,8 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from users.choices import JobTitleChoices, PrimaryOrganisationChoices
+
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -41,6 +43,10 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_("first name"), max_length=150, blank=True)
     last_name = models.CharField(_("last name"), max_length=150, blank=True)
+    job_title = models.CharField(_("job title"), max_length=255, choices=JobTitleChoices.choices, blank=True)
+    primary_organisation = models.CharField(
+        _("primary organisation"), max_length=255, choices=PrimaryOrganisationChoices.choices, blank=True
+    )
     email = models.EmailField(
         unique=True,
         max_length=255,

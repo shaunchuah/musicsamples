@@ -41,7 +41,7 @@ Bootstrap template known as black dashboard
 
 EVERY new file HAS TO start with "header comments":
 
-1. exact file location in codebase
+1. Relative file location in codebase
 2. clear description of what this file does
 3. clear description of WHY this file exists
 

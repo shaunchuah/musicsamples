@@ -11,7 +11,7 @@ env.read_env(str(BASE_DIR / ".env"))
 
 SECRET_KEY = env(
     "SECRET_KEY",
-    default="Wwy2cId28vACTsIOqIWuFpfHVv0l3VqyeJUHm602d0Iu5RyyhhY4vm3CseqFxm0L",
+    default="Wwy2cId28vACTsIOqIWuFpfHVv0l3VqyeJUHm602d0Iu5RyyhhY4vm3CseqFxm0L",  # type: ignore
 )
 
 # DATABASES
@@ -61,16 +61,17 @@ THIRD_PARTY_APPS = [
     "rest_framework_simplejwt",
     "storages",
     "django_filters",
-    "oauth2_provider",
     "corsheaders",
     "guardian",
     "django_extensions",
+    "django_browser_reload",
 ]
 
 LOCAL_APPS = [
     "app",
     "users",
     "datasets",
+    "core",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -181,17 +182,6 @@ REST_FRAMEWORK = {
 SELECT2_CACHE_BACKEND = "default"
 INTERNAL_IPS = ["127.0.0.1"]
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
-
-
-OAUTH2_PROVIDER = {
-    "OIDC_ENABLED": True,
-    "SCOPES": {
-        "read": "Read scope",
-        "write": "Write scope",
-        "openid": "OpenID Connect scope",
-    },
-    "ERROR_RESPONSE_WITH_SCOPES": True,
-}
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",

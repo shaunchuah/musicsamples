@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from app.factories import BasicScienceBoxFactory, SampleFactory
-from app.models import BasicScienceBox, ExperimentalID, Sample, StudyIdentifier
+from app.models import BasicScienceBox, Experiment, Sample, StudyIdentifier
 from users.models import User
 
 NUM_SAMPLES = 358
@@ -19,7 +19,7 @@ class Command(BaseCommand):
         if settings.DEBUG:
             self.stdout.write("Deleting old data...")
 
-            models = [BasicScienceBox, Sample, ExperimentalID]
+            models = [BasicScienceBox, Sample, Experiment]
             for m in models:
                 m.objects.all().delete()
 

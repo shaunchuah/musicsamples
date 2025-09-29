@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
-from app.services import ClinicalDataImportService
+from core.services.imports import ClinicalDataImportService
 
 logger = logging.getLogger(__name__)
 
