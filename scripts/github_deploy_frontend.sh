@@ -24,13 +24,6 @@ ln -sfn "$TARGET" ~/music_frontend/current
 echo "Changing to current directory"
 cd ~/music_frontend/current
 
-echo "Copying .env.local if it exists"
-if [ -f ~/music_frontend/shared/.env.local ]; then
-  cp ~/music_frontend/shared/.env.local .
-else
-  echo "Warning: ~/music_frontend/shared/.env.local not found, skipping copy"
-fi
-
 NPM_BIN=$(command -v npm)
 PM2_BIN=$(command -v pm2)
 
