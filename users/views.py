@@ -84,7 +84,7 @@ def new_user_view(request):
                 password = generate_random_password()
                 user = User.objects.create_user(
                     email=email, password=password, first_name=first_name, last_name=last_name
-                )
+                )  # type:ignore
                 user.save()
 
                 send_welcome_email(user, request)
@@ -149,7 +149,7 @@ def edit_profile_view(request):
 
 @staff_member_required
 def user_list_view(request):
-    users = User.objects.filter(is_superuser=False).order_by("email")
+    users = User.objects.filter(is_superuser=False).order_by("-is_active", "-last_login")
     context = {"users": users}
     return render(request, "accounts/user_list.html", context)
 
