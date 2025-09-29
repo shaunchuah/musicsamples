@@ -87,7 +87,10 @@ jobs:
 
       - name: Make deployment script executable
         run: ssh deploy 'chmod +x ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
-
+        
+      - name: Make frontend deployment script executable
+        run: ssh deploy 'chmod +x ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_frontend.sh'
+      
       - name: Download frontend artifact
         uses: actions/download-artifact@v4
         with:
@@ -95,9 +98,6 @@ jobs:
 
       - name: Copy frontend bundle to server
         run: scp -i ~/.ssh/staging.key frontend.tar.gz deploy:~/music_frontend/releases/frontend.tar.gz
-
-      - name: Make frontend deployment script executable
-        run: ssh deploy 'chmod +x ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_frontend.sh'
 
       - name: Run django deployment script
         run: ssh deploy '${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
