@@ -64,6 +64,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "guardian",
     "django_extensions",
+    "django_browser_reload",
 ]
 
 LOCAL_APPS = [
@@ -86,6 +87,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
