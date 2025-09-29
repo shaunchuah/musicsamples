@@ -20,8 +20,21 @@ cd ~/music_frontend/current
 
 cp ~/music_frontend/shared/.env.local .
 
-npm ci --omit=dev
+NPM_BIN=$(command -v npm)
+PM2_BIN=$(command -v pm2)
+
+if [[ -z "$NPM_BIN" ]]; then
+  echo "npm not found on PATH." >&2
+  exit 127
+fi
+
+if [[ -z "$PM2_BIN" ]]; then
+  echo "pm2 not found on PATH." >&2
+  exit 127
+fi
+
+"$NPM_BIN" ci --omit=dev
 
 # Restart if the process exists, otherwise launch using the PM2 ecosystem config shipped with the release.
-pm2 restart music-frontend || pm2 start ecosystem.config.js
-pm2 save
+"$PM2_BIN" restart music-frontend || "$PM2_BIN" start ecosystem.config.js
+"$PM2_BIN" save
