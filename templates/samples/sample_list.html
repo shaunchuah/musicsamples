@@ -43,29 +43,6 @@
     <div class="col">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Samples by Study</h3>
-        </div>
-        <div class="card-footer">
-          <div>
-            <a href="{% url 'filter' %}?study_name=music"
-               class="btn btn-fill btn-success">MUSIC</a>
-            <a href="{% url 'filter' %}?study_name=gidamps"
-               class="btn btn-fill btn-success">GI-DAMPs</a>
-            <a href="{% url 'filter' %}?study_name=mini_music"
-               class="btn btn-fill btn-success">Mini-Music</a>
-            <a href="{% url 'filter' %}?study_name=marvel"
-               class="btn btn-fill btn-success">MARVEL</a>
-            <a href="{% url 'filter' %}?study_name=fate_cd"
-               class="btn btn-fill btn-success">FATE-CD</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <div class="card">
-        <div class="card-header">
           <h3 class="card-title">
             Active Samples
             {% if study_name %}- ({{ study_name }}){% endif %}
@@ -74,7 +51,6 @@
         <div class="card-footer">
           <a href="{% url 'sample_add' %}" class="btn btn-fill btn-success">Add New Sample</a>
           <a href="{% url 'barcode' %}" class="btn btn-fill btn-success">Barcode Location Scanning</a>
-          <!--<a href="/bulkadd/" class="btn btn-success">Bulk Add Samples</a>-->
           <a href="{% url 'export_csv' study_name='all' %}?q={{ query_string }}"
              class="btn btn-success float-lg-right"
              data-toggle="tooltip"

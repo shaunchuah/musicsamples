@@ -16,3 +16,8 @@
 
 - Dataset HTML views, API serializers, and access tracking logic live in a single module (`datasets/views.py`), making it harder to evolve API contracts independently of the dashboard.
 - Split into `datasets/api/views.py` and `datasets/web/views.py`, and add a thin service layer to encapsulate history tracking and export logic (`datasets/utils.py`) so both entry points reuse the same orchestration code.
+
+## 4. Decouple Azure storage dependencies for local workflows
+
+- Local settings force Azure Blob Storage for the default file backend and expect credentials to exist (`config/settings/local.py`), while upload utilities reach directly into Azure SDK calls (`core/services/storage.py`, `core/services/uploads.py`). Contributors without Azure secrets can’t run uploads or tests without stubbing those settings.
+- Introduce a storage abstraction that delegates to Django’s `default_storage` by default, and only swap in Azure-specific behaviour when the related environment variables are present. Provide a filesystem-backed default for local/test runs so developers can exercise file flows without cloud credentials.
