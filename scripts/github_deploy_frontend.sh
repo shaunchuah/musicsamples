@@ -21,6 +21,12 @@ rm "$RELEASE_ROOT/frontend.tar.gz"
 echo "Updating current symlink"
 ln -sfn "$TARGET" ~/music_frontend/current
 
+echo "Symlink created: $(ls -la ~/music_frontend/current)"
+if [ ! -d ~/music_frontend/current ]; then
+  echo "Error: ~/music_frontend/current is not a directory"
+  exit 1
+fi
+
 echo "Changing to current directory"
 cd ~/music_frontend/current
 
