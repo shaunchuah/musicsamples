@@ -30,8 +30,14 @@ fi
 echo "Changing to current directory"
 cd ~/music_frontend/current
 
+
+
 NPM_BIN=$(command -v npm)
 PM2_BIN=$(command -v pm2)
+
+echo "DEBUG: Current directory after cd: $(pwd)"
+echo "DEBUG: Contents of current directory: $(ls -la)"
+echo "DEBUG: NPM_BIN=$NPM_BIN, PM2_BIN=$PM2_BIN"
 
 if [[ -z "$NPM_BIN" ]]; then
   echo "npm not found on PATH." >&2
