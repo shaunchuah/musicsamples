@@ -83,7 +83,7 @@ jobs:
           SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
           SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
       - name: Checkout specific commit on server
-        run: ssh deploy 'cd ${{ secrets.INSTALLATION_DIRECTORY }} && git fetch origin && git checkout ${{ github.sha }}'
+        run: ssh deploy 'cd ${{ secrets.INSTALLATION_DIRECTORY }} && git reset --hard HEAD && git fetch origin && git checkout ${{ github.sha }}'
       - name: Make deployment scripts executable
         run: |
           ssh deploy 'chmod +x ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
