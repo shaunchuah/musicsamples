@@ -16,7 +16,7 @@ from app.choices import (
     StudyGroupChoices,
     StudyNameChoices,
 )
-from app.models import BasicScienceBox, BasicScienceSampleType, DataStore, ExperimentalID, Sample, TissueType
+from app.models import BasicScienceBox, BasicScienceSampleType, DataStore, Experiment, Sample, TissueType
 
 
 class SampleFilter(django_filters.FilterSet):
@@ -144,13 +144,13 @@ class BasicScienceBoxFilter(django_filters.FilterSet):
     row = django_filters.ChoiceFilter(label="Row", choices=RowChoices.choices)
     column = django_filters.ChoiceFilter(label="Column", choices=ColumnChoices.choices)
     depth = django_filters.ChoiceFilter(label="Depth", choices=DepthChoices.choices)
-    experimental_ids = django_filters.ModelMultipleChoiceFilter(
-        label="Experimental IDs", queryset=ExperimentalID.objects.all(), method="filter_experimental_ids"
+    experiments = django_filters.ModelMultipleChoiceFilter(
+        label="Experiments", queryset=Experiment.objects.all(), method="filter_experiments"
     )
-    experimental_ids_date = django_filters.DateFromToRangeFilter(
-        label="Experimental IDs Date Range",
+    experiments_date = django_filters.DateFromToRangeFilter(
+        label="Experiments Date Range",
         widget=RangeWidget(attrs={"type": "date"}),
-        method="filter_experimental_ids_date",
+        method="filter_experiments_date",
     )
     sample_types = django_filters.ModelMultipleChoiceFilter(
         label="Sample Types", queryset=BasicScienceSampleType.objects.all(), method="filter_sample_types"
@@ -162,31 +162,31 @@ class BasicScienceBoxFilter(django_filters.FilterSet):
 
     def filter_basic_science_group(self, queryset, name, value):
         if value:
-            return queryset.filter(experimental_ids__basic_science_group=value).distinct()
+            return queryset.filter(experiments__basic_science_group=value).distinct()
         return queryset
 
-    def filter_experimental_ids(self, queryset, name, value):
+    def filter_experiments(self, queryset, name, value):
         if value:
-            return queryset.filter(experimental_ids__in=value).distinct()
+            return queryset.filter(experiments__in=value).distinct()
         return queryset
 
-    def filter_experimental_ids_date(self, queryset, name, value):
+    def filter_experiments_date(self, queryset, name, value):
         if value:
             if value.start:
-                queryset = queryset.filter(experimental_ids__date__gte=value.start)
+                queryset = queryset.filter(experiments__date__gte=value.start)
             if value.stop:
-                queryset = queryset.filter(experimental_ids__date__lte=value.stop)
+                queryset = queryset.filter(experiments__date__lte=value.stop)
             queryset = queryset.distinct()
         return queryset
 
     def filter_sample_types(self, queryset, name, value):
         if value:
-            return queryset.filter(experimental_ids__sample_types__in=value).distinct()
+            return queryset.filter(experiments__sample_types__in=value).distinct()
         return queryset
 
     def filter_tissue_types(self, queryset, name, value):
         if value:
-            return queryset.filter(experimental_ids__tissue_types__in=value).distinct()
+            return queryset.filter(experiments__tissue_types__in=value).distinct()
         return queryset
 
     class Meta:
@@ -202,7 +202,7 @@ class BasicScienceBoxFilter(django_filters.FilterSet):
         ]
 
 
-class ExperimentalIDFilter(django_filters.FilterSet):
+class ExperimentFilter(django_filters.FilterSet):
     basic_science_group = django_filters.ChoiceFilter(
         label="Basic Science Group", choices=BasicScienceGroupChoices.choices
     )
@@ -217,7 +217,7 @@ class ExperimentalIDFilter(django_filters.FilterSet):
     species = django_filters.ChoiceFilter(label="Species", choices=SpeciesChoices.choices)
 
     class Meta:
-        model = ExperimentalID
+        model = Experiment
         fields = [
             "basic_science_group",
             "date",

@@ -44,7 +44,7 @@ def export_csv(queryset, file_prefix="gtrac", file_name="samples", include_relat
     # Custom derived fields for specific models
     if queryset.model.__name__ == "BasicScienceBox":
         fields.extend(["sample_type_labels_display", "tissue_type_labels_display", "basic_science_groups_display"])
-    elif queryset.model.__name__ == "ExperimentalID":
+    elif queryset.model.__name__ == "Experiment":
         fields.append("boxes")
 
     # Then add the related fields

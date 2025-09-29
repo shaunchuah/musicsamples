@@ -1,5 +1,5 @@
 <div class="card-body">
-  <div class="d-flex flex-row-reverse pb-3">Total Count: {{ experimental_id_count }}</div>
+  <div class="d-flex flex-row-reverse pb-3">Total Count: {{ experiment_count }}</div>
   <div class="table-responsive">
     <table class="table tablesorter" id="mainTable">
       <thead class="text-primary">
@@ -20,50 +20,50 @@
         </tr>
       </thead>
       <tbody>
-        {% for experimental_id in experimental_ids %}
+        {% for experiment in experiments %}
           <tr>
-            <td>{{ experimental_id.date|date:'d M Y' }}</td>
-            <td>{{ experimental_id.get_basic_science_group_display }}</td>
-            <td>{{ experimental_id.name }}</td>
-            <td>{{ experimental_id.description }}</td>
+            <td>{{ experiment.date|date:'d M Y' }}</td>
+            <td>{{ experiment.get_basic_science_group_display }}</td>
+            <td>{{ experiment.name }}</td>
+            <td>{{ experiment.description }}</td>
             <td>
-              {% for sample_type in experimental_id.sample_types.all %}
+              {% for sample_type in experiment.sample_types.all %}
                 {{ sample_type.label|default:sample_type.name }}
                 {% if not forloop.last %}<br />{% endif %}
               {% endfor %}
             </td>
             <td>
-              {% for tissue_type in experimental_id.tissue_types.all %}
+              {% for tissue_type in experiment.tissue_types.all %}
                 {{ tissue_type.label|default:tissue_type.name }}
                 {% if not forloop.last %}<br />{% endif %}
               {% endfor %}
             </td>
-            <td>{{ experimental_id.get_species_display }}</td>
+            <td>{{ experiment.get_species_display }}</td>
             <td>
-              {% for box in experimental_id.boxes.all %}
+              {% for box in experiment.boxes.all %}
                 <a href="{% url 'boxes:detail' box.pk %}">{{ box }}</a>
                 {% if not forloop.last %}<br />{% endif %}
               {% endfor %}
             </td>
-            <td>{{ experimental_id.created|date:'d M Y' }}</td>
-            <td>{{ experimental_id.created_by.email }}</td>
+            <td>{{ experiment.created|date:'d M Y' }}</td>
+            <td>{{ experiment.created_by.email }}</td>
             <td>
-              <a href="{% url 'boxes:experimental_id_detail' experimental_id.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
+              <a href="{% url 'boxes:experiment_detail' experiment.pk %}"><i class="tim-icons icon-zoom-split"></i> View</a>
             </td>
             <td>
-              <a href="{% url 'boxes:experimental_id_edit' experimental_id.pk %}"><i class="tim-icons icon-pencil"></i> Edit</a>
+              <a href="{% url 'boxes:experiment_edit' experiment.pk %}"><i class="tim-icons icon-pencil"></i> Edit</a>
             </td>
             <td>
-              {% if experimental_id.is_deleted %}
-                <a href="{% url 'boxes:experimental_id_restore' experimental_id.pk %}"><i class="tim-icons icon-refresh-02"></i> Restore</a>
+              {% if experiment.is_deleted %}
+                <a href="{% url 'boxes:experiment_restore' experiment.pk %}"><i class="tim-icons icon-refresh-02"></i> Restore</a>
               {% else %}
-                <a href="{% url 'boxes:experimental_id_delete' experimental_id.pk %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
+                <a href="{% url 'boxes:experiment_delete' experiment.pk %}"><i class="tim-icons icon-send align-center"></i> Delete</a>
               {% endif %}
             </td>
           </tr>
         {% empty %}
           <tr>
-            <td colspan="12" class="text-center">No experimental IDs found.</td>
+            <td colspan="12" class="text-center">No experiments found.</td>
           </tr>
         {% endfor %}
       </tbody>

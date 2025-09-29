@@ -11,20 +11,20 @@
     <div class="col">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Search Experimental IDs</h3>
+          <h3 class="card-title">Search Experiment IDs</h3>
         </div>
         <div class="card-body">
           <form id="searchform"
-                action="{% url 'boxes:experimental_id_search' %}"
+                action="{% url 'boxes:experiment_search' %}"
                 method="get">
             <div class="form-group">
               <input type="text" autofocus name="q" class="form-control" />
             </div>
             <div>
               <button type="submit" class="btn btn-fill btn-success">Search</button>
-              <a href="{% url 'boxes:experimental_id_list' %}"
+              <a href="{% url 'boxes:experiment_list' %}"
                  class="btn btn-fill btn-secondary">Clear</a>
-              <a href="{% url 'boxes:experimental_id_filter' %}"
+              <a href="{% url 'boxes:experiment_filter' %}"
                  class="btn btn-fill btn-success float-lg-right">Advanced Filtering</a>
             </div>
           </form>
@@ -39,16 +39,16 @@
           <h3 class="card-title">Experiment IDs</h3>
         </div>
         <div class="card-footer">
-          <a href="{% url 'boxes:experimental_id_create' %}"
+          <a href="{% url 'boxes:experiment_create' %}"
              class="btn btn-fill btn-success">Add New Experiment</a>
-          <a href="{% url 'boxes:experimental_id_export_csv' %}?q={{ query_string }}"
+          <a href="{% url 'boxes:experiment_export_csv' %}?q={{ query_string }}"
              class="btn btn-success float-lg-right"
              data-toggle="tooltip"
              data-placement="bottom"
              data-html="true"
              title="Tip: Customise the export by searching for the set of samples you wish to download."><i class="tim-icons icon-cloud-download-93"></i> Export Current View to CSV</a>
         </div>
-        {% include 'boxes/includes/experimental_id_table.html' %}
+        {% include 'boxes/includes/experiment_table.html' %}
       </div>
     </div>
   </div>

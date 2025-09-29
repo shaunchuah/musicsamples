@@ -6,7 +6,7 @@
         <tr>
           <th>Box ID</th>
           <th>Groups</th>
-          <th>Experimental IDs</th>
+          <th>Experiment IDs</th>
           <th>Species</th>
           <th>Location</th>
           <th>Sublocation</th>
@@ -33,7 +33,7 @@
               {% endif %}
             </td>
             <td>
-              {% for exp_id in box.experimental_ids.all %}
+              {% for exp_id in box.experiments.all %}
                 {{ exp_id.name }} {{ exp_id.date|date:'d/m/y' }}
                 {% if not forloop.last %}<br />{% endif %}
               {% empty %}
