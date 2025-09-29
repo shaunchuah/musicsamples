@@ -61,7 +61,6 @@ THIRD_PARTY_APPS = [
     "rest_framework_simplejwt",
     "storages",
     "django_filters",
-    "oauth2_provider",
     "corsheaders",
     "guardian",
     "django_extensions",
@@ -182,17 +181,6 @@ REST_FRAMEWORK = {
 SELECT2_CACHE_BACKEND = "default"
 INTERNAL_IPS = ["127.0.0.1"]
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
-
-
-OAUTH2_PROVIDER = {
-    "OIDC_ENABLED": True,
-    "SCOPES": {
-        "read": "Read scope",
-        "write": "Write scope",
-        "openid": "OpenID Connect scope",
-    },
-    "ERROR_RESPONSE_WITH_SCOPES": True,
-}
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
