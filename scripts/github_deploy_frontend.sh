@@ -5,20 +5,31 @@
 
 set -e
 
+echo "Starting frontend deployment script"
+
 RELEASE_ROOT=~/music_frontend/releases
 TIMESTAMP=$(date +"%Y%m%d%H%M%S")
 TARGET="$RELEASE_ROOT/$TIMESTAMP"
 
+echo "Creating target directory: $TARGET"
 mkdir -p "$TARGET"
 
+echo "Extracting frontend.tar.gz to $TARGET"
 tar -xzf "$RELEASE_ROOT/frontend.tar.gz" -C "$TARGET"
 rm "$RELEASE_ROOT/frontend.tar.gz"
 
+echo "Updating current symlink"
 ln -sfn "$TARGET" ~/music_frontend/current
 
+echo "Changing to current directory"
 cd ~/music_frontend/current
 
-cp ~/music_frontend/shared/.env.local .
+echo "Copying .env.local if it exists"
+if [ -f ~/music_frontend/shared/.env.local ]; then
+  cp ~/music_frontend/shared/.env.local .
+else
+  echo "Warning: ~/music_frontend/shared/.env.local not found, skipping copy"
+fi
 
 NPM_BIN=$(command -v npm)
 PM2_BIN=$(command -v pm2)
@@ -33,8 +44,12 @@ if [[ -z "$PM2_BIN" ]]; then
   exit 127
 fi
 
+echo "Installing dependencies"
 "$NPM_BIN" ci --omit=dev
 
+echo "Restarting or starting PM2 process"
 # Restart if the process exists, otherwise launch using the PM2 ecosystem config shipped with the release.
 "$PM2_BIN" restart music-frontend || "$PM2_BIN" start ecosystem.config.js
 "$PM2_BIN" save
+
+echo "Deployment completed successfully"
