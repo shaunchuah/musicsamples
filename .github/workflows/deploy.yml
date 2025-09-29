@@ -99,11 +99,11 @@ jobs:
       - name: Run frontend deployment script
         run: ssh deploy 'bash ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_frontend.sh'
       - name: Install frontend dependencies and build
-        run: ssh deploy 'source ~/.bashrc && cd ~/music_frontend/current && npm ci --omit=dev'
+        run: ssh deploy '/home/gtrac/.nvm/versions/node/v22.20.0/bin/npm ci --omit=dev'
       - name: Restarting or starting PM2 process
         run: |
-          ssh deploy 'source ~/.bashrc && pm2 restart music_frontend || pm2 start ecosystem.config.js'
-          ssh deploy 'source ~/.bashrc && pm2 save'
+          ssh deploy '/home/gtrac/.nvm/versions/node/v22.20.0/bin/pm2 restart music_frontend || /home/gtrac/.nvm/versions/node/v22.20.0/bin/pm2 start ecosystem.config.js'
+          ssh deploy '/home/gtrac/.nvm/versions/node/v22.20.0/bin/pm2 save'
       - name: Restart services
         run: |
           ssh deploy 'sudo systemctl restart gunicorn'
