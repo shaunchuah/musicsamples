@@ -5,6 +5,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from users.views import (
     PasswordChangeView,
+    account,
     activate_account_view,
     deactivate_account_view,
     delete_token,
@@ -13,6 +14,7 @@ from users.views import (
     generate_token,
     login_view,
     make_staff_view,
+    management,
     new_user_view,
     refresh_token,
     remove_staff_view,
@@ -69,4 +71,6 @@ urlpatterns = [
     path("deactivate/<int:user_id>/", deactivate_account_view, name="deactivate_account"),
     path("edit_user/<int:user_id>/", edit_user_view, name="edit_user"),
     path("edit_profile/", edit_profile_view, name="edit_profile"),
+    path("account/", account, name="account"),
+    path("management/", management, name="management"),
 ]

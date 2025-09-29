@@ -2,6 +2,7 @@ import pytest
 from django.urls import resolve, reverse
 
 from app import views
+from users import views as user_views
 
 
 @pytest.mark.parametrize(
@@ -10,9 +11,9 @@ from app import views
         ("home", {}, views.index),
         ("analytics", {}, views.analytics),
         ("sample_types_pivot", {"study_name": "mini_music"}, views.sample_types_pivot),
-        ("account", {}, views.account),
+        ("account", {}, user_views.account),
         ("data_export", {}, views.data_export),
-        ("management", {}, views.management),
+        ("management", {}, user_views.management),
         ("export_users", {}, views.export_users),
         ("export_samples", {}, views.export_samples),
         ("export_historical_samples", {}, views.export_historical_samples),

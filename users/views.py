@@ -14,6 +14,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import FormView
 from rest_framework.authtoken.models import Token
 
+from app.models import Sample
 from users.forms import LoginForm, NewUserForm
 from users.utils import generate_random_password, send_welcome_email
 
@@ -223,3 +224,26 @@ class PasswordChangeView(PasswordContextMixin, FormView):
         # except the current one.
         update_session_auth_hash(self.request, form.user)
         return super().form_valid(form)
+
+
+@login_required(login_url="/login/")
+def account(request):
+    # User account page showing last 20 recently accessed samples
+    sample_list = (
+        Sample.objects.filter(last_modified_by=request.user.email)
+        .select_related("study_id")
+        .order_by("-last_modified")[:20]
+    )
+    context = {"sample_list": sample_list}
+    return render(request, "accounts/account.html", context)
+
+
+@login_required(login_url="/login/")
+def management(request):
+    users = User.objects.all()
+    user_email_list = []
+    for user in users:
+        user_email_list.append(user.email)
+    user_email_list = ";".join(user_email_list)
+    context = {"user_email_list": user_email_list}
+    return render(request, "accounts/management.html", context)

@@ -30,7 +30,7 @@ class TestTemplates(TestCase):
     def test_account_page(self):
         path = reverse("account")
         response = self.client.get(path)
-        assertTemplateUsed(response, "samples/account.html")
+        assertTemplateUsed(response, "accounts/account.html")
 
     def test_used_samples(self):
         path = reverse("used_samples")
