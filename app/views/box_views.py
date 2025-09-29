@@ -12,7 +12,8 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 from app.filters import BasicScienceBoxFilter, ExperimentalIDFilter
 from app.forms import BasicScienceBoxForm, ExperimentalIDForm
 from app.models import BasicScienceBox, ExperimentalID
-from app.utils import export_csv, historical_changes
+from core.utils.export import export_csv
+from core.utils.history import historical_changes
 
 EXPERIMENT_PREFETCH = Prefetch(
     "experimental_ids",

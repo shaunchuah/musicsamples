@@ -6,7 +6,8 @@ from django.db.models.functions import Trunc
 from django.shortcuts import render
 
 from app.models import Sample
-from app.utils import create_sample_type_pivot, render_dataframe_to_csv_response
+from core.utils.dataframes import create_sample_type_pivot
+from core.utils.export import render_dataframe_to_csv_response
 from datasets.models import DatasetAnalytics
 
 

@@ -10,11 +10,9 @@ from django.urls import reverse
 from app.filters import SampleFilter
 from app.forms import CheckoutForm, ReactivateForm, SampleForm, UsedForm
 from app.models import Sample
-from app.services import get_samples_with_clinical_data
-from app.utils import (
-    export_csv,
-    historical_changes,
-)
+from core.clinical import get_samples_with_clinical_data
+from core.utils.export import export_csv
+from core.utils.history import historical_changes
 
 # from django.views.decorators.cache import cache_page
 

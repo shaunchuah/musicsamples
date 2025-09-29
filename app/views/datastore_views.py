@@ -12,8 +12,9 @@ from django.urls import reverse
 from app.filters import DataStoreFilter
 from app.forms import DataStoreForm, DataStoreUpdateForm
 from app.models import DataStore, file_generate_name
-from app.services import azure_delete_file, azure_generate_download_link
-from app.utils import export_csv, historical_changes
+from core.services.storage import azure_delete_file, azure_generate_download_link
+from core.utils.export import export_csv
+from core.utils.history import historical_changes
 
 DATASTORE_PAGINATION_SIZE = settings.DATASTORE_PAGINATION_SIZE
 User = get_user_model()
@@ -22,7 +23,7 @@ User = get_user_model()
 @login_required()
 @permission_required("app.view_datastore", raise_exception=True)
 def datastore_list_view(request):
-    datastores = DataStore.objects.select_related("study_id").all()
+    datastores = DataStore.objects.select_related("study_id", "uploaded_by").all()
     user_access_list = User.objects.filter(groups__name="datastores").order_by("first_name")
     return render(
         request, "datastore/datastore_list.html", {"datastores": datastores, "user_access_list": user_access_list}

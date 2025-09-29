@@ -16,8 +16,8 @@ from rest_framework.response import Response
 
 from app.forms import StudyIdUpdateForm
 from app.models import StudyIdentifier
-from app.services import StudyIdentifierImportService
-from app.utils import historical_changes
+from core.services.imports import StudyIdentifierImportService
+from core.utils.history import historical_changes
 
 STUDY_ID_PAGINATION_SIZE = settings.STUDY_ID_PAGINATION_SIZE
 

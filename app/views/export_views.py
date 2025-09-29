@@ -4,7 +4,8 @@ from django.db.models import Q
 from django.shortcuts import render
 
 from app.models import Sample
-from app.utils import export_csv, queryset_by_study_name
+from core.utils.export import export_csv
+from core.utils.queries import queryset_by_study_name
 
 User = get_user_model()
 

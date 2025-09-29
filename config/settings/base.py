@@ -11,7 +11,7 @@ env.read_env(str(BASE_DIR / ".env"))
 
 SECRET_KEY = env(
     "SECRET_KEY",
-    default="Wwy2cId28vACTsIOqIWuFpfHVv0l3VqyeJUHm602d0Iu5RyyhhY4vm3CseqFxm0L",
+    default="Wwy2cId28vACTsIOqIWuFpfHVv0l3VqyeJUHm602d0Iu5RyyhhY4vm3CseqFxm0L",  # type: ignore
 )
 
 # DATABASES
@@ -71,6 +71,7 @@ LOCAL_APPS = [
     "app",
     "users",
     "datasets",
+    "core",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
