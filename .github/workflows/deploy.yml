@@ -7,6 +7,14 @@ on:
 jobs:
   backend-test:
     runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: githubactionstestingkey
+      DB_ENGINE: django.db.backends.sqlite3
+      DB_USER:
+      DB_PASSWORD:
+      DB_NAME: ":memory:"
+      DB_HOST:
+      DB_PORT:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.12
@@ -24,15 +32,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Run Ruff (format and lint)
-        uses: astral-sh/ruff-action@v3
-        with:
-          args: "format --check && ruff check"
-          version: "0.9.1"
-      - name: Run Tests with Coverage
-        run: |
-          pip install pytest-cov
-          pytest --cov=. --cov-report=html
+      - name: Run Ruff
+        run: ruff format --check && ruff check
+      - name: Run Tests and Coverage Report
+        run: pytest --cov=.
 
   frontend-build:
     runs-on: ubuntu-latest
