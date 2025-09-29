@@ -80,7 +80,7 @@ def analytics(request):
         "gidamps_participants_by_new_diagnosis_of_ibd": gidamps_participants_by_new_diagnosis_of_ibd,
         "gidamps_montreal_classification": gidamps_montreal_classification,
     }
-    return render(request, "analytics.html", context)
+    return render(request, "analytics/analytics.html", context)
 
 
 @login_required(login_url="/login/")

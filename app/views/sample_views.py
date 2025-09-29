@@ -169,12 +169,6 @@ def used_samples_archive_all(request):
 
 
 @login_required(login_url="/login/")
-def reference(request):
-    # Reference static page for publishing lab protocols
-    return render(request, "reference.html")
-
-
-@login_required(login_url="/login/")
 def account(request):
     # User account page showing last 20 recently accessed samples
     sample_list = (
@@ -183,7 +177,7 @@ def account(request):
         .order_by("-last_modified")[:20]
     )
     context = {"sample_list": sample_list}
-    return render(request, "account.html", context)
+    return render(request, "samples/account.html", context)
 
 
 @login_required(login_url="/login/")
@@ -194,7 +188,7 @@ def management(request):
         user_email_list.append(user.email)
     user_email_list = ";".join(user_email_list)
     context = {"user_email_list": user_email_list}
-    return render(request, "management.html", context)
+    return render(request, "samples/management.html", context)
 
 
 @login_required(login_url="/login/")
@@ -215,7 +209,7 @@ def sample_add(request):
         form = SampleForm()
     return render(
         request,
-        "samples/sample-add.html",
+        "samples/sample_add.html",
         {"form": form, "page_title": "Add New Sample"},
     )
 
@@ -233,7 +227,7 @@ def sample_detail(request, pk):
         processing_time = int(time_difference.total_seconds() / 60)
     return render(
         request,
-        "samples/sample-detail.html",
+        "samples/sample_detail.html",
         {
             "sample": sample,
             "changes": changes,
@@ -263,7 +257,7 @@ def sample_edit(request, pk):
         form = SampleForm(instance=sample)
     return render(
         request,
-        "samples/sample-add.html",
+        "samples/sample_add.html",
         {"form": form, "page_title": "Update Sample"},
     )
 
@@ -332,7 +326,7 @@ def sample_checkout(request, pk):
                 return redirect("/")
     else:
         form = CheckoutForm(instance=sample)
-    return render(request, "samples/sample-checkout.html", {"form": form})
+    return render(request, "samples/sample_checkout.html", {"form": form})
 
 
 @login_required(login_url="/login/")
@@ -353,7 +347,7 @@ def sample_used(request, pk):
                 return redirect("/")
     else:
         form = UsedForm(instance=sample)
-    return render(request, "samples/sample-used.html", {"form": form})
+    return render(request, "samples/sample_used.html", {"form": form})
 
 
 @login_required(login_url="/login/")
@@ -374,4 +368,4 @@ def reactivate_sample(request, pk):
                 return redirect("/")
     else:
         form = ReactivateForm(instance=sample)
-    return render(request, "samples/sample-reactivate.html", {"form": form})
+    return render(request, "samples/sample_reactivate.html", {"form": form})

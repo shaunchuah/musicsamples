@@ -16,7 +16,7 @@ Unipath==1.1
 whitenoise==6.4.0
 sentry-sdk==2.8.0
 django-select2==8.3.0
-djangorestframework==3.15.2
+djangorestframework==3.16.1
 django-filter==24.2
 boto3==1.34.137
 django-storages[azure]==1.14.4
@@ -46,6 +46,6 @@ django-debug-toolbar==4.4.6
 # ------------------------------------------------------------------------------
 djlint==1.34.1
 pre-commit==2.15.0
-ruff==0.9.1
+ruff==0.13.2
 django-browser-reload==1.17.0
 mkdocs-material==9.5.47

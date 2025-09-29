@@ -130,6 +130,18 @@ class BasicScienceBox(models.Model):
     def get_tissue_type_labels(self):
         return [tissue_type.label or tissue_type.name for tissue_type in self.distinct_tissue_types()]
 
+    def distinct_species(self):
+        """Return unique species labels found in linked experiments."""
+        species_labels = {
+            experimental_id.get_species_display()
+            for experimental_id in self.experimental_ids.all()
+            if experimental_id.species
+        }
+        return sorted(species_labels)
+
+    def get_species_labels(self):
+        return self.distinct_species()
+
     def basic_science_groups(self):
         """Return a sorted list of unique basic science group values for linked experiments."""
         groups = {experimental_id.basic_science_group for experimental_id in self.experimental_ids.all()}
@@ -149,6 +161,10 @@ class BasicScienceBox(models.Model):
     @property
     def basic_science_groups_display(self):
         return ", ".join(self.get_basic_science_group_labels())
+
+    @property
+    def species_display(self):
+        return ", ".join(self.get_species_labels())
 
     class Meta:
         ordering = ["-created"]
