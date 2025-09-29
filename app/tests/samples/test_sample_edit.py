@@ -14,5 +14,5 @@ def test_sample_edit_page(auto_login_user):
 
     response = client.get(reverse("sample_edit", kwargs={"pk": 2}))
 
-    assertTemplateUsed(response, "samples/sample-add.html")
+    assertTemplateUsed(response, "samples/sample_add.html")
     assert response.context["form"].initial["sample_id"] == "TEST003"

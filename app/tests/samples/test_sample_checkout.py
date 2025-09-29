@@ -30,7 +30,7 @@ def test_sample_used(auto_login_user):
     path = reverse("sample_used", kwargs={"pk": 1})
 
     response = client.get(path)
-    assertTemplateUsed(response, "samples/sample-used.html")
+    assertTemplateUsed(response, "samples/sample_used.html")
 
     response = client.post(path, data={"is_used": True})
 

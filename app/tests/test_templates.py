@@ -60,7 +60,7 @@ class TestTemplates(TestCase):
     def test_sample_checkout(self):
         path = reverse("sample_checkout", kwargs={"pk": 1})
         response = self.client.get(path)
-        assertTemplateUsed(response, "samples/sample-checkout.html")
+        assertTemplateUsed(response, "samples/sample_checkout.html")
 
     def test_error_404_template(self):
         path = "/doesnotexist.html"

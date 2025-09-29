@@ -209,7 +209,7 @@ def sample_add(request):
         form = SampleForm()
     return render(
         request,
-        "samples/sample-add.html",
+        "samples/sample_add.html",
         {"form": form, "page_title": "Add New Sample"},
     )
 
@@ -227,7 +227,7 @@ def sample_detail(request, pk):
         processing_time = int(time_difference.total_seconds() / 60)
     return render(
         request,
-        "samples/sample-detail.html",
+        "samples/sample_detail.html",
         {
             "sample": sample,
             "changes": changes,
@@ -257,7 +257,7 @@ def sample_edit(request, pk):
         form = SampleForm(instance=sample)
     return render(
         request,
-        "samples/sample-add.html",
+        "samples/sample_add.html",
         {"form": form, "page_title": "Update Sample"},
     )
 
@@ -326,7 +326,7 @@ def sample_checkout(request, pk):
                 return redirect("/")
     else:
         form = CheckoutForm(instance=sample)
-    return render(request, "samples/sample-checkout.html", {"form": form})
+    return render(request, "samples/sample_checkout.html", {"form": form})
 
 
 @login_required(login_url="/login/")
@@ -347,7 +347,7 @@ def sample_used(request, pk):
                 return redirect("/")
     else:
         form = UsedForm(instance=sample)
-    return render(request, "samples/sample-used.html", {"form": form})
+    return render(request, "samples/sample_used.html", {"form": form})
 
 
 @login_required(login_url="/login/")
