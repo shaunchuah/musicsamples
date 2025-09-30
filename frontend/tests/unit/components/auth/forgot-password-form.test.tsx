@@ -6,7 +6,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 
-import { ForgotPasswordForm } from "./forgot-password-form";
+import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 
 const fetchMock = vi.fn<typeof fetch>();
 
@@ -50,7 +50,9 @@ describe("ForgotPasswordForm", () => {
     );
 
     expect(
-      await screen.findByText("If an account exists for that email, we have sent a password reset link."),
+      await screen.findByText(
+        "If an account exists for that email, we have sent a password reset link.",
+      ),
     ).toBeInTheDocument();
   });
 

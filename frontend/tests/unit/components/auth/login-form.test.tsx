@@ -6,7 +6,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 
-import { LoginForm } from "./login-form";
+import { LoginForm } from "@/components/auth/login-form";
 
 const replaceMock = vi.fn();
 const refreshMock = vi.fn();

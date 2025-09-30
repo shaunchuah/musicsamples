@@ -51,7 +51,6 @@ function BreadcrumbLink({
 
 function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
   return (
-    // biome-ignore lint/a11y: this is not an active link
     <span
       data-slot="breadcrumb-page"
       role="link"
