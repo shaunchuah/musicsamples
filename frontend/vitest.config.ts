@@ -10,19 +10,19 @@ import { defineConfig } from "vitest/config";
 const projectRoot = fileURLToPath(new URL("./", import.meta.url));
 
 export default defineConfig({
-	esbuild: {
-		jsx: "automatic",
-		jsxImportSource: "react",
-	},
-	resolve: {
-		alias: {
-			"@": projectRoot,
-		},
-	},
-	test: {
-		environment: "jsdom",
-		globals: true,
-		setupFiles: [resolve(projectRoot, "vitest.setup.ts")],
-		css: true,
-	},
+  esbuild: {
+    jsx: "automatic",
+    jsxImportSource: "react",
+  },
+  resolve: {
+    alias: {
+      "@": projectRoot,
+    },
+  },
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: [resolve(projectRoot, "vitest.setup.ts")],
+    css: true,
+  },
 });

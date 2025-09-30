@@ -10,38 +10,32 @@ import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { isJwtExpired } from "@/lib/jwt";
 
 type LoginSearchParams = {
-	next?: string;
+  next?: string;
 };
 
 type LoginPageProps = {
-	searchParams?: LoginSearchParams | Promise<LoginSearchParams>;
+  searchParams?: LoginSearchParams | Promise<LoginSearchParams>;
 };
 
 export default async function LoginPage(props: LoginPageProps) {
-	const searchParams = await props.searchParams;
-	const token = (await cookies()).get(AUTH_COOKIE_NAME)?.value;
+  const searchParams = await props.searchParams;
+  const token = (await cookies()).get(AUTH_COOKIE_NAME)?.value;
 
-	if (token && !isJwtExpired(token)) {
-		redirect(
-			searchParams?.next && searchParams.next !== "/login"
-				? searchParams.next
-				: "/",
-		);
-	}
+  if (token && !isJwtExpired(token)) {
+    redirect(searchParams?.next && searchParams.next !== "/login" ? searchParams.next : "/");
+  }
 
-	return (
-		<main className="flex min-h-screen flex-col items-center justify-center bg-muted/40 px-6 py-12">
-			<div className="w-full max-w-sm rounded-xl border border-border bg-background p-8 shadow-lg">
-				<div className="mb-6 text-center">
-					<h1 className="text-2xl font-semibold tracking-tight">
-						Welcome to G-Trac v3
-					</h1>
-					<p className="text-sm text-muted-foreground">
-						Sign in to continue to the Music Samples dashboard.
-					</p>
-				</div>
-				<LoginForm redirectTo={searchParams?.next ?? null} />
-			</div>
-		</main>
-	);
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center bg-muted/40 px-6 py-12">
+      <div className="w-full max-w-sm rounded-xl border border-border bg-background p-8 shadow-lg">
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight">Welcome to G-Trac v3</h1>
+          <p className="text-sm text-muted-foreground">
+            Sign in to continue to the Music Samples dashboard.
+          </p>
+        </div>
+        <LoginForm redirectTo={searchParams?.next ?? null} />
+      </div>
+    </main>
+  );
 }
