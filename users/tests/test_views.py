@@ -2,9 +2,12 @@ import json
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from pytest_django.asserts import assertTemplateUsed
 
 pytestmark = pytest.mark.django_db
@@ -78,6 +81,9 @@ class PasswordResetApiTests(TestCase):
         assert len(mail.outbox) == 1
         assert mail.outbox[0].to == [user.email]
 
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        assert f"/reset-password/{uid}/" in mail.outbox[0].body
+
     def test_password_reset_api_rejects_invalid_email(self):
         response = self.client.post(
             self.url,
@@ -88,3 +94,62 @@ class PasswordResetApiTests(TestCase):
         assert response.status_code == 400
         assert response.json()["error"] == "Enter a valid email address."
         assert len(mail.outbox) == 0
+
+
+class PasswordResetConfirmApiTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse("password_reset_confirm_api")
+        self.user = User.objects.create_user(email="confirm@example.com", password="initial123")
+        self.uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        self.token = default_token_generator.make_token(self.user)
+
+    def test_password_reset_confirm_api_updates_password(self):
+        payload = {
+            "uid": self.uid,
+            "token": self.token,
+            "new_password": "newstrongpass1",
+        }
+
+        response = self.client.post(
+            self.url,
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"success": True}
+        self.user.refresh_from_db()
+        assert self.user.check_password("newstrongpass1")
+
+    def test_password_reset_confirm_api_rejects_invalid_token(self):
+        payload = {
+            "uid": self.uid,
+            "token": "invalid-token",
+            "new_password": "anotherStrong1",
+        }
+
+        response = self.client.post(
+            self.url,
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 400
+        assert response.json()["error"] == "Reset link is invalid or has expired."
+
+    def test_password_reset_confirm_api_enforces_password_policy(self):
+        payload = {
+            "uid": self.uid,
+            "token": self.token,
+            "new_password": "short",
+        }
+
+        response = self.client.post(
+            self.url,
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 400
+        assert response.json()["error"]

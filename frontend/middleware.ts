@@ -14,7 +14,8 @@ import {
 import { isJwtExpired, shouldRefreshAccessToken } from "@/lib/jwt";
 
 const PUBLIC_FILE = /\.(.*)$/;
-const PUBLIC_PATHS = new Set(["/login", "/forgot-password"]);
+const PUBLIC_EXACT_PATHS = new Set(["/login", "/forgot-password"]);
+const PUBLIC_PATH_PREFIXES = ["/reset-password"];
 
 type RefreshedTokens = {
   access: string;
@@ -130,13 +131,20 @@ export async function middleware(request: NextRequest) {
     return res;
   };
 
-  if (PUBLIC_PATHS.has(pathname)) {
-    if (accessToken && !isJwtExpired(accessToken)) {
+  const isPublicPath =
+    PUBLIC_EXACT_PATHS.has(pathname) ||
+    PUBLIC_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+
+  if (isPublicPath) {
+    const shouldRedirectWhenAuthenticated = PUBLIC_EXACT_PATHS.has(pathname);
+
+    if (shouldRedirectWhenAuthenticated && accessToken && !isJwtExpired(accessToken)) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/";
       redirectUrl.search = "";
       return applyCookies(NextResponse.redirect(redirectUrl));
     }
+
     return applyCookies(NextResponse.next());
   }
 

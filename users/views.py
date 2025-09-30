@@ -1,8 +1,10 @@
 import json
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, get_user_model, login, update_session_auth_hash
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.views import PasswordContextMixin
@@ -11,6 +13,8 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
@@ -65,15 +69,59 @@ def password_reset_api(request):
     if not form.is_valid():
         return JsonResponse({"error": "Enter a valid email address."}, status=400)
 
+    frontend_base_url = getattr(settings, "FRONTEND_BASE_URL", "").rstrip("/")
+    extra_email_context = {"frontend_base_url": frontend_base_url} if frontend_base_url else None
+
     form.save(
         request=request,
         use_https=request.is_secure(),
         subject_template_name="accounts/password_reset_subject.txt",
         email_template_name="emails/password_reset_email.txt",
         html_email_template_name="emails/password_reset_email.html",
+        extra_email_context=extra_email_context,
     )
 
     return JsonResponse({"success": True})
+
+
+@csrf_exempt
+@require_POST
+def password_reset_confirm_api(request):
+    try:
+        payload = json.loads(request.body or "{}")
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON payload."}, status=400)
+
+    uidb64 = payload.get("uid") if isinstance(payload.get("uid"), str) else ""
+    token = payload.get("token") if isinstance(payload.get("token"), str) else ""
+    new_password = payload.get("new_password") if isinstance(payload.get("new_password"), str) else ""
+
+    if not uidb64 or not token or not new_password:
+        return JsonResponse({"error": "All fields are required."}, status=400)
+
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User._default_manager.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        return JsonResponse({"error": "Reset link is invalid or has expired."}, status=400)
+
+    if not default_token_generator.check_token(user, token):
+        return JsonResponse({"error": "Reset link is invalid or has expired."}, status=400)
+
+    form = SetPasswordForm(user, data={"new_password1": new_password, "new_password2": new_password})
+
+    if form.is_valid():
+        form.save()
+        return JsonResponse({"success": True})
+
+    error_messages = []
+    for field_errors in form.errors.values():
+        error_messages.extend(field_errors)
+
+    return JsonResponse(
+        {"error": error_messages[0] if error_messages else "Unable to reset password."},
+        status=400,
+    )
 
 
 @login_required
