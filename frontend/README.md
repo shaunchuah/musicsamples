@@ -26,7 +26,7 @@ This frontend exists to modernize the UI, improve performance, and support incre
 - **Styling**: Tailwind CSS with custom utilities
 - **State Management**: Alpine.js (for legacy compatibility, if needed) and React hooks
 - **Authentication**: HTTP-only cookies (`authToken`, `refreshToken`) managed via Next.js API routes
-- **Build Tools**: ESLint, PostCSS, Tailwind
+- **Build Tools**: Biome, PostCSS, Tailwind
 - **Deployment**: PM2 for process management, Nginx for reverse proxy
 
 ## Getting Started
@@ -57,6 +57,7 @@ This frontend exists to modernize the UI, improve performance, and support incre
    ```bash
    cp .env.example .env.local
    ```
+
    Edit `.env.local` to configure:
    - `BACKEND_URL`: URL of the Django backend (e.g., `http://localhost:8000` for dev, `https://samples.musicstudy.uk` for prod)
    - Other variables as needed (see `frontend/lib/auth.ts` for defaults)
@@ -116,7 +117,7 @@ All other data requests should proxy through these or directly to the backend vi
 
 ## Contributing
 
-1. Follow the existing code style (ESLint config in `eslint.config.mjs`).
+1. Follow the existing code style (Biome config in `biome.json`).
 2. Use TypeScript for all new components.
 3. Test authentication flows thoroughly, as they integrate with the Django backend.
 4. For UI changes, reference `codex_frontend_review.md` for modernization guidelines.
@@ -128,6 +129,10 @@ Run linting and type checks:
 
 ```bash
 pnpm lint
+```
+
+```bash
+pnpm type-check
 ```
 
 No unit tests are currently set up; consider adding Jest or Vitest for future development.
