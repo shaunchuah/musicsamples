@@ -69,7 +69,24 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
           return;
         }
 
-        const target = redirectTo && redirectTo !== "/login" ? redirectTo : "/";
+        const target = (() => {
+          // Guard against open redirects by only honouring relative paths we issued ourselves.
+          if (typeof redirectTo !== "string") {
+            return "/";
+          }
+
+          const trimmed = redirectTo.trim();
+          if (!trimmed || trimmed === "/login") {
+            return "/";
+          }
+
+          if (!trimmed.startsWith("/") || trimmed.startsWith("//")) {
+            return "/";
+          }
+
+          return trimmed;
+        })();
+
         router.replace(target);
         router.refresh();
       } catch {

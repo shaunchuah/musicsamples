@@ -1,3 +1,7 @@
+// frontend/lib/jwt.ts
+// Provides utility helpers for decoding and inspecting JWT payloads on the frontend.
+// Exists so authentication logic (middleware, API routes, components) can safely reason about token expiry.
+
 import { ACCESS_TOKEN_REFRESH_THRESHOLD } from "@/lib/auth";
 
 type JwtPayload = {
@@ -39,8 +43,8 @@ export function parseJwt(token: string): JwtPayload | null {
 
 export function isJwtExpired(token: string, skewSeconds = 0): boolean {
   const payload = parseJwt(token);
-  if (!payload?.exp) {
-    return false;
+  if (!payload?.exp || typeof payload.exp !== "number") {
+    return true;
   }
 
   const expiresAt = payload.exp * 1000;
