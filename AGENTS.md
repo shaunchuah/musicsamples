@@ -45,6 +45,12 @@ Lint:
 pnpm lint
 ```
 
+Tests:
+
+```bash
+pnpm test
+```
+
 ## Tech Stack
 
 Django with django templates

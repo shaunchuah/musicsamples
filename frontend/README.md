@@ -23,8 +23,7 @@ This frontend exists to modernize the UI, improve performance, and support incre
 
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS with custom utilities
-- **State Management**: Alpine.js (for legacy compatibility, if needed) and React hooks
+- **Styling**: Tailwind CSS, shadcn/ui components, phosphor-react icons
 - **Authentication**: HTTP-only cookies (`authToken`, `refreshToken`) managed via Next.js API routes
 - **Build Tools**: Biome, PostCSS, Tailwind
 - **Deployment**: PM2 for process management, Nginx for reverse proxy
@@ -135,7 +134,11 @@ pnpm lint
 pnpm type-check
 ```
 
-No unit tests are currently set up; consider adding Jest or Vitest for future development.
+Run the Vitest-powered unit tests for client components:
+
+```bash
+pnpm test
+```
 
 ## Deployment
 

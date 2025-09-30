@@ -4,115 +4,147 @@
 
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useState } from "react";
+import { useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 type LoginFormProps = {
 	redirectTo?: string | null;
 };
 
-type LoginResponse = {
-	error?: string;
-	success?: boolean;
-};
-
 export function LoginForm({ redirectTo }: LoginFormProps) {
 	const router = useRouter();
-	const [error, setError] = useState<string | null>(null);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const loginSchema = z.object({
+		email: z.string().email("Enter a valid email address."),
+		password: z.string().min(1, "Password is required."),
+	});
 
-	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-		event.preventDefault();
+	type LoginFormValues = z.infer<typeof loginSchema>;
 
-		setError(null);
-		setIsSubmitting(true);
+	const form = useForm<LoginFormValues>({
+		resolver: zodResolver(loginSchema),
+		defaultValues: {
+			email: "",
+			password: "",
+		},
+	});
 
-		const formData = new FormData(event.currentTarget);
-		const email = formData.get("email");
-		const password = formData.get("password");
+	// memoized so react-hook-form keeps stable submit handler reference across renders
+	const onSubmit = useCallback(
+		async (values: LoginFormValues) => {
+			form.clearErrors("root");
 
-		if (typeof email !== "string" || typeof password !== "string") {
-			setError("Email and password are required.");
-			setIsSubmitting(false);
-			return;
-		}
+			try {
+				const response = await fetch("/api/auth/login", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(values),
+				});
 
-		try {
-			const response = await fetch("/api/auth/login", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ email, password }),
-			});
+				const payload = (await response.json()) as {
+					error?: string;
+					success?: boolean;
+				};
 
-			const payload = (await response.json()) as LoginResponse;
+				if (!response.ok || !payload?.success) {
+					form.setError("root", {
+						message:
+							payload?.error || "Unable to sign in with those credentials.",
+					});
+					return;
+				}
 
-			if (!response.ok || !payload?.success) {
-				setError(payload?.error || "Unable to sign in with those credentials.");
-				setIsSubmitting(false);
-				return;
+				const target = redirectTo && redirectTo !== "/login" ? redirectTo : "/";
+				router.replace(target);
+				router.refresh();
+			} catch {
+				form.setError("root", {
+					message: "Something went wrong. Please try again.",
+				});
 			}
-
-			const target = redirectTo && redirectTo !== "/login" ? redirectTo : "/";
-			router.replace(target);
-			router.refresh();
-		} catch {
-			setError("Something went wrong. Please try again.");
-			setIsSubmitting(false);
-		}
-	}
+		},
+		[form, redirectTo, router],
+	);
 
 	return (
-		<form onSubmit={handleSubmit} className="space-y-6">
-			<div className="space-y-2">
-				<label
-					htmlFor="email"
-					className="block text-sm font-medium text-foreground/80"
-				>
-					Email
-				</label>
-				<input
-					id="email"
+		<Form {...form}>
+			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+				<FormField
+					control={form.control}
 					name="email"
-					type="email"
-					autoComplete="email"
-					required
-					className="w-full rounded-md border border-border bg-background px-3 py-2 text-base shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Email</FormLabel>
+							<FormControl>
+								<Input
+									type="email"
+									autoComplete="email"
+									placeholder="Email"
+									{...field}
+								/>
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
 				/>
-			</div>
-
-			<div className="space-y-2">
-				<label
-					htmlFor="password"
-					className="block text-sm font-medium text-foreground/80"
-				>
-					Password
-				</label>
-				<input
-					id="password"
+				<FormField
+					control={form.control}
 					name="password"
-					type="password"
-					autoComplete="current-password"
-					required
-					className="w-full rounded-md border border-border bg-background px-3 py-2 text-base shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Password</FormLabel>
+							<FormControl>
+								<Input
+									type="password"
+									autoComplete="current-password"
+									placeholder="Password"
+									{...field}
+								/>
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
 				/>
-			</div>
-
-			{error ? (
-				<p
-					className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
-					role="alert"
+				{form.formState.errors.root ? (
+					<p
+						className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
+						role="alert"
+					>
+						{form.formState.errors.root.message}
+					</p>
+				) : null}
+				<Button
+					type="submit"
+					className="w-full"
+					disabled={form.formState.isSubmitting}
 				>
-					{error}
-				</p>
-			) : null}
-
-			<Button type="submit" className="w-full" disabled={isSubmitting}>
-				{isSubmitting ? "Signing in..." : "Sign in"}
-			</Button>
-		</form>
+					{form.formState.isSubmitting ? "Signing in..." : "Sign in"}
+				</Button>
+			</form>
+			<div className="text-muted-foreground text-sm text-center mt-4">
+				Need an account? Please email{" "}
+				<a
+					href="mailto:shaun.chuah@glasgow.ac.uk"
+					className="underline hover:text-accent-foreground"
+				>
+					shaun.chuah@glasgow.ac.uk
+				</a>
+			</div>
+		</Form>
 	);
 }

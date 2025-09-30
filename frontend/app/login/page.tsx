@@ -9,13 +9,16 @@ import { LoginForm } from "@/components/auth/login-form";
 import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { isJwtExpired } from "@/lib/jwt";
 
-type LoginPageProps = {
-	searchParams?: {
-		next?: string;
-	};
+type LoginSearchParams = {
+	next?: string;
 };
 
-export default async function LoginPage({ searchParams }: LoginPageProps) {
+type LoginPageProps = {
+	searchParams?: LoginSearchParams | Promise<LoginSearchParams>;
+};
+
+export default async function LoginPage(props: LoginPageProps) {
+	const searchParams = await props.searchParams;
 	const token = (await cookies()).get(AUTH_COOKIE_NAME)?.value;
 
 	if (token && !isJwtExpired(token)) {
@@ -31,7 +34,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 			<div className="w-full max-w-sm rounded-xl border border-border bg-background p-8 shadow-lg">
 				<div className="mb-6 text-center">
 					<h1 className="text-2xl font-semibold tracking-tight">
-						Welcome back
+						Welcome to G-Trac v3
 					</h1>
 					<p className="text-sm text-muted-foreground">
 						Sign in to continue to the Music Samples dashboard.
