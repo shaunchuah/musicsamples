@@ -5,24 +5,28 @@
 
 ## 1. VM Preparation
 
-- SSH into the Azure VM and install Node.js LTS (e.g., 20.x). If using NodeSource: `curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -` then `sudo apt-get install -y nodejs`.
+- SSH into the Azure VM and install Node.js 20.x (using nvm for version management).
+- Install nvm if not present: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash` then `source ~/.bashrc` and `nvm install 20 && nvm use 20`.
 - Choose a deployment root. Example assumes `~/music_frontend` with subfolders `releases/` and `shared/`.
 - Ensure the VM user owns the directory (`sudo chown -R $USER:$USER ~/music_frontend`).
-- Add `~/music_frontend/shared/.env.local` with at least `BACKEND_URL=https://samples.musicstudy.uk` so the frontend calls the live Django host.
+- If needed, add environment variables in `~/music_frontend/shared/.env.local` (e.g., `BACKEND_URL=https://samples.musicstudy.uk`), but currently handled via defaults in code.
 
 ## 2. First-Time Frontend Release
 
-- Copy the repository’s `frontend/` directory (or a build artifact) to the VM. Place each release under `~/music_frontend/releases/<timestamp>/`.
+- The frontend is built in CI as part of the GitHub Actions workflow (see section 5).
+- For manual setup, copy the built artifact or repository's `frontend/` directory to the VM.
+- Place each release under `~/music_frontend/releases/<timestamp>/`.
 - Point the `current` symlink at the release: `ln -sfn ~/music_frontend/releases/<timestamp> ~/music_frontend/current`.
-- Install dependencies and build once:
+- Install production dependencies (build is pre-done in CI):
 
   ```bash
   cd ~/music_frontend/current
-  npm ci
-  npm run build
+  source ~/.nvm/nvm.sh
+  nvm use 20
+  npm ci --omit=dev
   ```
 
-- Keep `node_modules/` inside each release so the runtime resolves packages.
+- No `node_modules/` is included in releases; dependencies are installed on deploy.
 
 ## 3. Runtime Process (PM2)
 
@@ -59,27 +63,33 @@
 
 ## 5. GitHub Actions / CI Updates
 
-- Extend `.github/workflows/deploy.yml` so the `build` job also compiles the frontend:
+- The `.github/workflows/deploy.yml` includes a `frontend-build` job that compiles the frontend:
 
   ```yaml
-  - name: Set up Node
-    uses: actions/setup-node@v4
-    with:
-      node-version: "20"
-  - name: Install frontend dependencies
-    working-directory: frontend
-    run: npm ci
-  - name: Build frontend
-    working-directory: frontend
-    run: npm run build
-  - name: Archive frontend bundle
-    run: |
-      tar -czf frontend.tar.gz -C frontend .next package.json package-lock.json public ecosystem.config.js
-  - name: Upload frontend artifact
-    uses: actions/upload-artifact@v4
-    with:
-      name: frontend-build
-      path: frontend.tar.gz
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+      - name: Archive frontend bundle
+        run: |
+          tar -czf frontend.tar.gz --exclude='node_modules' -C frontend .
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend.tar.gz
   ```
 
 - In the `deploy` job, download the artifact and upload it to the VM before running scripts:
@@ -95,7 +105,7 @@
 
 ## 6. Deploy Script on VM
 
-- Create `~/scripts/github_deploy_frontend.sh` to unpack and activate each release:
+- The `scripts/github_deploy_frontend.sh` automates rollout:
 
   ```bash
   #!/bin/bash
@@ -108,7 +118,8 @@
   rm "$RELEASE_ROOT/frontend.tar.gz"
   ln -sfn "$TARGET" ~/music_frontend/current
   cd ~/music_frontend/current
-  cp ~/music_frontend/shared/.env.local .
+  source ~/.nvm/nvm.sh
+  nvm use 20
   npm ci --omit=dev
   pm2 restart music-frontend || pm2 start ecosystem.config.js
   pm2 save
@@ -118,9 +129,11 @@
 
   ```yaml
   - name: Run frontend deployment script
-    run: ssh deploy '${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_frontend.sh'
-  - name: Restart nginx
-    run: ssh deploy 'sudo systemctl reload nginx'
+    run: ssh deploy 'bash ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_frontend.sh'
+  - name: Restart services
+    run: |
+      ssh deploy 'sudo systemctl restart gunicorn'
+      ssh deploy 'sudo systemctl restart nginx'
   ```
 
 ## 7. Smoke Testing
