@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { AlertError, AlertDescription } from "../ui/alert";
 
 type LoginFormProps = {
   redirectTo?: string | null;
@@ -28,8 +29,8 @@ type LoginFormProps = {
 export function LoginForm({ redirectTo }: LoginFormProps) {
   const router = useRouter();
   const loginSchema = z.object({
-    email: z.string().email("Enter a valid email address."),
-    password: z.string().min(1, "Password is required."),
+    email: z.email("Enter a valid email address."),
+    password: z.string().min(8, "Password is required."),
   });
 
   type LoginFormValues = z.infer<typeof loginSchema>;
@@ -83,6 +84,13 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {form.formState.errors.root ? (
+          <AlertError>
+            <AlertDescription>
+            {form.formState.errors.root.message}
+            </AlertDescription>
+          </AlertError>
+        ) : null}
         <FormField
           control={form.control}
           name="email"
@@ -114,14 +122,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
             </FormItem>
           )}
         />
-        {form.formState.errors.root ? (
-          <p
-            className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
-            role="alert"
-          >
-            {form.formState.errors.root.message}
-          </p>
-        ) : null}
+
         <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
         </Button>

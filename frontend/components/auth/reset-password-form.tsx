@@ -6,7 +6,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { AlertError, AlertDescription } from "../ui/alert";
 
 const resetPasswordSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters."),
@@ -34,7 +35,6 @@ type ResetPasswordFormProps = {
 
 export function ResetPasswordForm({ uid, token }: ResetPasswordFormProps) {
   const router = useRouter();
-  const [isComplete, setIsComplete] = useState(false);
 
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
@@ -72,8 +72,7 @@ export function ResetPasswordForm({ uid, token }: ResetPasswordFormProps) {
           return;
         }
 
-        setIsComplete(true);
-        router.prefetch("/login");
+        router.replace("/login?reset=success");
       } catch {
         form.setError("root", {
           message: "Something went wrong. Please try again.",
@@ -83,22 +82,16 @@ export function ResetPasswordForm({ uid, token }: ResetPasswordFormProps) {
     [form, router, token, uid],
   );
 
-  if (isComplete) {
-    return (
-      <div className="space-y-4 text-center">
-        <p className="text-sm text-muted-foreground">
-          Your password has been updated. You can now sign in with your new password.
-        </p>
-        <Button type="button" className="w-full" onClick={() => router.replace("/login")}>
-          Back to sign in
-        </Button>
-      </div>
-    );
-  }
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {form.formState.errors.root ? (
+          <AlertError>
+            <AlertDescription>
+            {form.formState.errors.root.message}
+            </AlertDescription>
+          </AlertError>
+        ) : null}
         <FormField
           control={form.control}
           name="password"
@@ -117,14 +110,6 @@ export function ResetPasswordForm({ uid, token }: ResetPasswordFormProps) {
             </FormItem>
           )}
         />
-        {form.formState.errors.root ? (
-          <p
-            className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
-            role="alert"
-          >
-            {form.formState.errors.root.message}
-          </p>
-        ) : null}
         <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? "Saving..." : "Reset password"}
         </Button>

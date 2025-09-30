@@ -5,13 +5,14 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-
 import { LoginForm } from "@/components/auth/login-form";
+import { AlertDescription, AlertSuccess } from "@/components/ui/alert";
 import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { isJwtExpired } from "@/lib/jwt";
 
 type LoginSearchParams = {
   next?: string;
+  reset?: string;
 };
 
 type LoginPageProps = {
@@ -21,6 +22,7 @@ type LoginPageProps = {
 export default async function LoginPage(props: LoginPageProps) {
   const searchParams = await props.searchParams;
   const token = (await cookies()).get(AUTH_COOKIE_NAME)?.value;
+  const shouldShowResetSuccess = searchParams?.reset === "success";
 
   if (token && !isJwtExpired(token)) {
     redirect(searchParams?.next && searchParams.next !== "/login" ? searchParams.next : "/");
@@ -33,6 +35,13 @@ export default async function LoginPage(props: LoginPageProps) {
           <h1 className="text-2xl font-semibold">G-Trac</h1>
           <p className="text-sm text-muted-foreground">Sign in to your account</p>
         </div>
+        {shouldShowResetSuccess ? (
+          <AlertSuccess className="mb-6">
+            <AlertDescription>
+              Your password has been updated. You can now sign in with your new password.
+            </AlertDescription>
+          </AlertSuccess>
+        ) : null}
         <LoginForm redirectTo={searchParams?.next ?? null} />
         <div className="mt-4 text-center text-sm">
           <Link

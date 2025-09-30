@@ -20,7 +20,9 @@ export default function ResetPasswordPage({ params }: ResetPasswordPageProps) {
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold">Reset password</h1>
           <p className="text-sm text-muted-foreground">
-            Enter a new password for your account. This link can only be used once.
+            Enter a new password for your account.
+            <br />
+            This link can only be used once.
           </p>
         </div>
         <ResetPasswordForm uid={params.uid} token={params.token} />

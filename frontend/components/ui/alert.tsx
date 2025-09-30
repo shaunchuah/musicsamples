@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import { AlertTriangle, CheckCircle, Info, XCircle } from "lucide-react";
 import type * as React from "react";
-
 import { cn } from "@/lib/utils";
 
 const alertVariants = cva(
@@ -11,6 +11,13 @@ const alertVariants = cva(
         default: "bg-card text-card-foreground",
         destructive:
           "text-destructive bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90",
+        error:
+          "bg-card text-red-700 bg-red-50 border border-red-400 [&>svg]:text-red-700",
+        success:
+          "bg-card text-green-700 bg-green-50 border border-green-400 [&>svg]:text-green-700",
+        warning:
+          "bg-card text-yellow-700 bg-yellow-50 border border-yellow-400 [&>svg]:text-yellow-700",
+        info: "bg-card text-blue-700 bg-blue-50 border border-blue-400 [&>svg]:text-blue-700",
       },
     },
     defaultVariants: {
@@ -49,7 +56,7 @@ function AlertDescription({ className, ...props }: React.ComponentProps<"div">) 
     <div
       data-slot="alert-description"
       className={cn(
-        "text-muted-foreground col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
+        "col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
         className,
       )}
       {...props}
@@ -57,4 +64,40 @@ function AlertDescription({ className, ...props }: React.ComponentProps<"div">) 
   );
 }
 
-export { Alert, AlertTitle, AlertDescription };
+function AlertSuccess({ className, children, ...props }: React.ComponentProps<"div">) {
+  return (
+    <Alert variant="success" className={className} {...props}>
+      <CheckCircle />
+      {children}
+    </Alert>
+  );
+}
+
+function AlertWarning({ className, children, ...props }: React.ComponentProps<"div">) {
+  return (
+    <Alert variant="warning" className={className} {...props}>
+      <AlertTriangle />
+      {children}
+    </Alert>
+  );
+}
+
+function AlertError({ className, children, ...props }: React.ComponentProps<"div">) {
+  return (
+    <Alert variant="error" className={className} {...props}>
+      <XCircle />
+      {children}
+    </Alert>
+  );
+}
+
+function AlertInfo({ className, children, ...props }: React.ComponentProps<"div">) {
+  return (
+    <Alert variant="info" className={className} {...props}>
+      <Info />
+      {children}
+    </Alert>
+  );
+}
+
+export { Alert, AlertTitle, AlertDescription, AlertSuccess, AlertWarning, AlertError, AlertInfo };

@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
+import { AlertDescription, AlertError, AlertSuccess } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -77,6 +77,18 @@ export function ForgotPasswordForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {form.formState.errors.root ? (
+          <AlertError>
+            <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
+          </AlertError>
+        ) : null}
+        {requestSent ? (
+          <AlertSuccess>
+            <AlertDescription>
+              If an account exists for that email, we have sent a password reset link.
+            </AlertDescription>
+          </AlertSuccess>
+        ) : null}
         <FormField
           control={form.control}
           name="email"
@@ -90,19 +102,6 @@ export function ForgotPasswordForm() {
             </FormItem>
           )}
         />
-        {form.formState.errors.root ? (
-          <p
-            className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
-            role="alert"
-          >
-            {form.formState.errors.root.message}
-          </p>
-        ) : null}
-        {requestSent ? (
-          <p className="rounded-md bg-primary/10 px-3 py-2 text-sm text-primary">
-            If an account exists for that email, we have sent a password reset link.
-          </p>
-        ) : null}
         <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? "Sending..." : "Send reset link"}
         </Button>
