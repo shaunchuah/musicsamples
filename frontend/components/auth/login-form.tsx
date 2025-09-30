@@ -20,7 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { AlertError, AlertDescription } from "../ui/alert";
+import { AlertDescription, AlertError } from "../ui/alert";
 
 type LoginFormProps = {
   redirectTo?: string | null;
@@ -86,9 +86,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {form.formState.errors.root ? (
           <AlertError>
-            <AlertDescription>
-            {form.formState.errors.root.message}
-            </AlertDescription>
+            <AlertDescription>{form.formState.errors.root.message}</AlertDescription>
           </AlertError>
         ) : null}
         <FormField

@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "exec biome check --write",
+    "lint": "biome check --write",
     "type-check": "tsc --noEmit",
     "test": "vitest run"
   },
