@@ -2,8 +2,8 @@
 // Checks the /api/auth/refresh route handler covering refresh cookie lookups and backend token rotation outcomes.
 // Exists to ensure the session refresh proxy enforces presence of a refresh token and persists rotated tokens correctly.
 
+import type { NextResponse } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { NextResponse } from "next/server";
 
 import {
   ACCESS_TOKEN_MAX_AGE,

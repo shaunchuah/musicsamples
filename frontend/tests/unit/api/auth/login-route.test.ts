@@ -2,8 +2,8 @@
 // Exercises the /api/auth/login route handler to validate request parsing, backend error handling, and cookie management.
 // Exists to ensure the login proxy only accepts valid payloads and correctly persists tokens returned by the backend service.
 
+import type { NextResponse } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { NextResponse } from "next/server";
 import { POST } from "@/app/api/auth/login/route";
 import {
   ACCESS_TOKEN_MAX_AGE,

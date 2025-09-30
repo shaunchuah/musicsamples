@@ -1,3 +1,7 @@
+// frontend/app/api/auth/refresh/route.ts
+// Refreshes rotated JWT credentials by proxying token refresh requests to the Django backend.
+// Exists to keep the SPA session alive without exposing backend endpoints directly to the browser.
+
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 

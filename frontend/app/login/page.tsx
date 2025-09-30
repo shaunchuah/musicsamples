@@ -19,13 +19,31 @@ type LoginPageProps = {
   searchParams?: LoginSearchParams | Promise<LoginSearchParams>;
 };
 
+function resolveRedirectTarget(candidate?: string | null): string {
+  if (typeof candidate !== "string") {
+    return "/";
+  }
+
+  const trimmed = candidate.trim();
+  if (!trimmed || trimmed === "/login") {
+    return "/";
+  }
+
+  if (!trimmed.startsWith("/") || trimmed.startsWith("//")) {
+    return "/";
+  }
+
+  return trimmed;
+}
+
 export default async function LoginPage(props: LoginPageProps) {
   const searchParams = await props.searchParams;
   const token = (await cookies()).get(AUTH_COOKIE_NAME)?.value;
   const shouldShowResetSuccess = searchParams?.reset === "success";
+  const redirectTarget = resolveRedirectTarget(searchParams?.next ?? null);
 
   if (token && !isJwtExpired(token)) {
-    redirect(searchParams?.next && searchParams.next !== "/login" ? searchParams.next : "/");
+    redirect(redirectTarget);
   }
 
   return (

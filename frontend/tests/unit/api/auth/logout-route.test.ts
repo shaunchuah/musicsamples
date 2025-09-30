@@ -2,8 +2,8 @@
 // Ensures the /api/auth/logout route handler clears cookies and notifies the backend when possible.
 // Exists to verify the logout proxy invalidates tokens locally even if backend revocation is skipped or fails.
 
+import type { NextResponse } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { NextResponse } from "next/server";
 
 import { AUTH_COOKIE_NAME, REFRESH_COOKIE_NAME } from "@/lib/auth";
 
