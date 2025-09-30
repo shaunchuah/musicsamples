@@ -1,12 +1,11 @@
-// frontend/components/auth/login-form.tsx
-// Presents the login UI and wires form submissions to the Next.js authentication API route.
-// Lets users sign in from the React SPA while keeping the token in an HTTP-only cookie.
+// frontend/components/auth/forgot-password-form.tsx
+// Renders the forgot-password UI and connects submissions to the Next.js API route.
+// Exists so the reset flow behaves like other auth forms with shared validation and feedback patterns.
 
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -21,34 +20,31 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-type LoginFormProps = {
-  redirectTo?: string | null;
+type ForgotPasswordFormValues = {
+  email: string;
 };
 
-export function LoginForm({ redirectTo }: LoginFormProps) {
-  const router = useRouter();
-  const loginSchema = z.object({
-    email: z.string().email("Enter a valid email address."),
-    password: z.string().min(1, "Password is required."),
-  });
+const forgotPasswordSchema = z.object({
+  email: z.email("Enter a valid email address."),
+});
 
-  type LoginFormValues = z.infer<typeof loginSchema>;
+export function ForgotPasswordForm() {
+  const [requestSent, setRequestSent] = useState(false);
 
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  // memoized so react-hook-form keeps stable submit handler reference across renders
   const onSubmit = useCallback(
-    async (values: LoginFormValues) => {
+    async (values: ForgotPasswordFormValues) => {
+      setRequestSent(false);
       form.clearErrors("root");
 
       try {
-        const response = await fetch("/api/auth/login", {
+        const response = await fetch("/api/auth/forgot-password", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -63,21 +59,19 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
 
         if (!response.ok || !payload?.success) {
           form.setError("root", {
-            message: payload?.error || "Unable to sign in with those credentials.",
+            message: payload?.error || "Unable to send password reset instructions.",
           });
           return;
         }
 
-        const target = redirectTo && redirectTo !== "/login" ? redirectTo : "/";
-        router.replace(target);
-        router.refresh();
+        setRequestSent(true);
       } catch {
         form.setError("root", {
           message: "Something went wrong. Please try again.",
         });
       }
     },
-    [form, redirectTo, router],
+    [form],
   );
 
   return (
@@ -96,24 +90,6 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder="Password"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         {form.formState.errors.root ? (
           <p
             className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
@@ -122,8 +98,13 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
             {form.formState.errors.root.message}
           </p>
         ) : null}
+        {requestSent ? (
+          <p className="rounded-md bg-primary/10 px-3 py-2 text-sm text-primary">
+            If an account exists for that email, we have sent a password reset link.
+          </p>
+        ) : null}
         <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? "Signing in..." : "Sign in"}
+          {form.formState.isSubmitting ? "Sending..." : "Send reset link"}
         </Button>
       </form>
     </Form>

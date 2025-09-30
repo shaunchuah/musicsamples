@@ -1,16 +1,20 @@
+import json
+
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, get_user_model, login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.views import PasswordContextMixin
 from django.db import IntegrityError
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.http import require_POST
 from django.views.generic import FormView
 from rest_framework.authtoken.models import Token
 
@@ -40,6 +44,36 @@ def login_view(request):
             msg = "Error validating the form"
 
     return render(request, "accounts/login.html", {"form": form, "msg": msg})
+
+
+@csrf_exempt
+@require_POST
+def password_reset_api(request):
+    try:
+        payload = json.loads(request.body or "{}")
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON payload."}, status=400)
+
+    raw_email = payload.get("email")
+    email = raw_email.strip() if isinstance(raw_email, str) else ""
+
+    if not email:
+        return JsonResponse({"error": "Email is required."}, status=400)
+
+    form = PasswordResetForm({"email": email})
+
+    if not form.is_valid():
+        return JsonResponse({"error": "Enter a valid email address."}, status=400)
+
+    form.save(
+        request=request,
+        use_https=request.is_secure(),
+        subject_template_name="accounts/password_reset_subject.txt",
+        email_template_name="emails/password_reset_email.txt",
+        html_email_template_name="emails/password_reset_email.html",
+    )
+
+    return JsonResponse({"success": True})
 
 
 @login_required

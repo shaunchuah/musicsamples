@@ -14,7 +14,7 @@ import {
 import { isJwtExpired, shouldRefreshAccessToken } from "@/lib/jwt";
 
 const PUBLIC_FILE = /\.(.*)$/;
-const PUBLIC_PATHS = new Set(["/login"]);
+const PUBLIC_PATHS = new Set(["/login", "/forgot-password"]);
 
 type RefreshedTokens = {
   access: string;

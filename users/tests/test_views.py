@@ -1,5 +1,8 @@
+import json
+
 import pytest
 from django.contrib.auth import get_user_model
+from django.core import mail
 from django.test import Client, TestCase
 from django.urls import reverse
 from pytest_django.asserts import assertTemplateUsed
@@ -12,7 +15,7 @@ User = get_user_model()
 class NewUserViewTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create_user(email="testuser@example.com", password="password123", is_staff=True)
+        self.user = User.objects.create_user(email="testuser@example.com", password="password123", is_staff=True)  # type:ignore
         self.client.login(email="testuser@example.com", password="password123")
 
     def test_new_user_view_post_valid_data(self):
@@ -24,7 +27,7 @@ class NewUserViewTests(TestCase):
         }
         response = self.client.post(url, data=form_data)
         assert response.status_code == 302
-        assert response.url == reverse("user_list")
+        assert response.url == reverse("user_list")  # type:ignore
         assert User.objects.filter(email="testuser2@example.com").exists()
 
     def test_new_user_view_post_invalid_data(self):
@@ -42,7 +45,7 @@ class NewUserViewTests(TestCase):
             last_name="Existing User last name",
             email="existinguser@example.com",
             password="password123",
-        )
+        )  # type:ignore
         url = reverse("new_user")
         form_data = {
             "first_name": "New User",
@@ -54,3 +57,34 @@ class NewUserViewTests(TestCase):
         assertTemplateUsed(response, "accounts/new_user.html")
         assert "form" in response.context
         assert User.objects.filter(email="existinguser@example.com").count() == 1
+
+
+class PasswordResetApiTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse("password_reset_api")
+
+    def test_password_reset_api_sends_email_for_valid_user(self):
+        user = User.objects.create_user(email="reset@example.com", password="password123")  # type:ignore
+
+        response = self.client.post(
+            self.url,
+            data=json.dumps({"email": user.email}),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"success": True}
+        assert len(mail.outbox) == 1
+        assert mail.outbox[0].to == [user.email]
+
+    def test_password_reset_api_rejects_invalid_email(self):
+        response = self.client.post(
+            self.url,
+            data=json.dumps({"email": "not-an-email"}),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 400
+        assert response.json()["error"] == "Enter a valid email address."
+        assert len(mail.outbox) == 0
