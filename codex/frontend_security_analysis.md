@@ -2,84 +2,66 @@
 
 ## Current Authentication Architecture
 
-The frontend uses a Next.js application with middleware-based route protection, storing authentication tokens in HTTP-only cookies. Login/logout operations are handled through Next.js API routes that proxy to Django's REST Framework token authentication.
+The Next.js frontend now exchanges credentials for a JWT access/refresh pair via Django's SimpleJWT endpoints. Access tokens (`authToken`) and refresh tokens (`refreshToken`) are stored in HTTP-only cookies. Middleware inspects the access token on every request, silently rotating it when expiration nears by calling `/api/token/refresh/` and updating both cookies. Logout clears both cookies and invokes Django's blacklist endpoint so the refresh token cannot be reused. Legacy DRF token endpoints remain available for manual API access through the Django UI, but the SPA no longer depends on them.
 
 ## Security Strengths
 
-✅ **HTTP-Only Cookies**: The `authToken` is stored in an HTTP-only cookie, preventing XSS attacks from accessing the token via JavaScript.
+✅ **HTTP-Only Cookies**: Both access and refresh tokens live in HTTP-only cookies, keeping them out of reach of client-side scripts.
+
+✅ **Silent Refresh**: Middleware transparently refreshes expiring access tokens using the rotated refresh token, preventing surprise logouts while keeping access tokens short lived.
 
 ✅ **Secure Cookie Configuration**:
 
 - `secure` flag set in production
-- `sameSite: "lax"` provides CSRF protection
-- 8-hour expiration prevents long-lived sessions
+- `sameSite: "lax"` adds CSRF resistance for top-level navigations
+- Access cookie lifetime matches the 60-minute backend expiry; refresh cookie aligns with the 1-day rotation window
 
-✅ **Proper CORS Setup**:
+✅ **Backend Blacklisting**: Refresh tokens are blacklisted during logout, ensuring immediate revocation across devices that share cookie state.
 
-- Specific allowed origins (`localhost:3000`, production domains)
-- `CORS_ALLOW_CREDENTIALS = True` for cookie transmission
-
-✅ **CSRF Protection**: Django's CSRF middleware is enabled
-
-✅ **Token-Based Auth**: Uses Django REST Framework's token authentication
+✅ **Proper CORS + CSRF**: CORS settings remain locked to known origins and Django's CSRF middleware stays enabled for state-changing operations.
 
 ## Security Issues and Recommendations
 
-### 🔴 **Critical: No Authenticated API Calls**
+### 🔴 **Critical: No Authenticated API Calls Yet**
 
-The frontend currently only handles login/logout but doesn't make authenticated requests to the backend. When implemented, you'll need to decide how to transmit the token:
-
-**Option 1 (Recommended)**: Proxy all API calls through Next.js API routes
+Protected data fetches still need to be implemented. When wiring them in, proxy through Next.js API routes or server components to append the `Authorization: Bearer <access>` header server-side:
 
 ```typescript
-// In /app/api/data/route.ts
-export async function GET(request: Request) {
-  const token = request.cookies.get('authToken')?.value;
-  const response = await fetch(`${BACKEND_URL}/api/data`, {
-    headers: { 'Authorization': `Token ${token}` }
+export async function GET() {
+  const token = cookies().get('authToken')?.value;
+  if (!token) return NextResponse.redirect('/login');
+
+  const response = await fetch(`${getBackendBaseUrl()}/api/data/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: 'no-store',
   });
-  return response;
+
+  return NextResponse.json(await response.json());
 }
 ```
 
-**Option 2**: Use server components for data fetching (Next.js 13+ app router)
+Avoid exposing tokens to client-side JavaScript.
 
-**Option 3 (Not Recommended)**: Make cookies accessible to client-side JavaScript (removes XSS protection)
+### 🟡 **Rate Limiting Still Missing**
 
-### 🟡 **Token Expiration Handling**
+`/api/token/` and `/api/token/refresh/` are unthrottled. Add DRF throttling or Django middleware to slow brute-force attempts against login and refresh endpoints.
 
-- Tokens expire after 8 hours but there's no automatic refresh mechanism
-- Users will be abruptly logged out
-- Consider implementing token refresh or extending expiration
+### 🟡 **Mixed Authentication Modes**
 
-### 🟡 **No Rate Limiting**
+SimpleJWT, session auth, and DRF token auth are enabled simultaneously. The SPA now relies solely on JWT, but long-lived DRF tokens issued via the Django UI remain valid until manually revoked. Plan to migrate those manual API keys or tighten their scope to reduce exposure.
 
-- No visible rate limiting on login attempts
-- Vulnerable to brute force attacks
-- Add rate limiting middleware or use Django's built-in throttling
+### 🟢 **Session Invalidation**
 
-### 🟡 **Mixed Authentication Methods**
-
-The backend supports JWT, session, and token auth simultaneously. This could lead to confusion and potential security gaps. Consider standardizing on one method.
-
-### 🟡 **Token Storage**
-
-Using DRF's `Token` model which creates persistent tokens. While the cookie expires, the token itself remains valid until manually deleted.
-
-### 🟢 **Password Security**
-
-- Standard Django password validators are configured
-- No immediate concerns
+Logout blacklists refresh tokens, but remember that blacklisting requires regular cleanup and rotates the token set per use. Monitor the blacklist table size and consider periodic pruning.
 
 ## Overall Assessment
 
-The authentication setup is **reasonably secure** for a basic application, with good protection against common attacks like XSS and CSRF. However, the main concern is the incomplete implementation - the frontend doesn't yet make authenticated API calls, which is where most security issues would manifest.
+The frontend now employs rotating JWT access and refresh tokens with silent renewal, significantly improving session hygiene compared to the previous single-use DRF token cookie. Remaining work focuses on protecting the authentication endpoints with throttling, migrating any manual DRF token use cases, and ensuring future API integrations keep token handling server-side.
 
-**Priority Actions:**
+**Next Actions:**
 
-1. Implement secure token transmission for API calls (prefer server-side proxying)
-2. Add rate limiting to login endpoints
-3. Consider token refresh mechanism
-4. Audit when real API integration begins
-
-The setup follows security best practices where implemented, but needs completion for production use.
+1. Route upcoming API calls through Next.js server contexts and attach `Bearer` headers automatically.
+2. Enable throttling/rate limiting on login and refresh endpoints.
+3. Design a replacement for legacy DRF tokens (or aggressively monitor and expire them) before deprecating token authentication entirely.

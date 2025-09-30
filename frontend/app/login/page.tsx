@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 
 import { LoginForm } from "@/components/auth/login-form";
 import { AUTH_COOKIE_NAME } from "@/lib/auth";
+import { isJwtExpired } from "@/lib/jwt";
 
 type LoginPageProps = {
   searchParams?: {
@@ -17,7 +18,7 @@ type LoginPageProps = {
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const token = (await cookies()).get(AUTH_COOKIE_NAME)?.value;
 
-  if (token) {
+  if (token && !isJwtExpired(token)) {
     redirect(searchParams?.next && searchParams.next !== "/login" ? searchParams.next : "/");
   }
 

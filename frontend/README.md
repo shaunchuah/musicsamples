@@ -12,7 +12,7 @@ This frontend exists to modernize the UI, improve performance, and support incre
 
 ## Features
 
-- **Authentication**: Secure login/logout with cookie-based sessions, proxying to the Django backend.
+- **Authentication**: Secure login/logout via JWT access + refresh cookies with silent rotation handled by middleware.
 - **Responsive Design**: Built with Tailwind CSS for mobile-friendly layouts.
 - **API Integration**: Seamless communication with the Django REST API for data operations.
 - **TypeScript Support**: Type-safe development for better maintainability.
@@ -25,7 +25,7 @@ This frontend exists to modernize the UI, improve performance, and support incre
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS with custom utilities
 - **State Management**: Alpine.js (for legacy compatibility, if needed) and React hooks
-- **Authentication**: HTTP-only cookies with Next.js API routes
+- **Authentication**: HTTP-only cookies (`authToken`, `refreshToken`) managed via Next.js API routes
 - **Build Tools**: ESLint, PostCSS, Tailwind
 - **Deployment**: PM2 for process management, Nginx for reverse proxy
 
@@ -109,7 +109,8 @@ For full deployment steps, refer to `frontend_deployment.md`.
 ## API Routes
 
 - `/api/auth/login`: Proxies login requests to Django and sets auth cookies.
-- `/api/auth/logout`: Clears auth cookies.
+- `/api/auth/refresh`: Rotates expiring JWTs using the refresh token cookie.
+- `/api/auth/logout`: Clears auth cookies and blacklists the refresh token.
 
 All other data requests should proxy through these or directly to the backend via `lib/auth.ts`.
 
@@ -137,7 +138,7 @@ See `frontend_deployment.md` for detailed VM setup, CI/CD with GitHub Actions, a
 
 ## Troubleshooting
 
-- **Authentication Issues**: Ensure `BACKEND_URL` is correct and the Django server is running. Check browser cookies for `authToken`.
+- **Authentication Issues**: Ensure `BACKEND_URL` is correct and the Django server is running. Confirm the browser has valid `authToken` and `refreshToken` cookies.
 - **Build Errors**: Verify Node.js version and dependencies (`pnpm install`).
 - **Proxy Failures**: Confirm CORS settings in Django (`config/settings/base.py`).
 

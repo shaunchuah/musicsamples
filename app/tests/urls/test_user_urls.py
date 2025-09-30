@@ -52,7 +52,9 @@ def test_user_function_views(name, expected):
         "password_reset",
         "password_change",
         "password_change_done",
-        "obtain_auth_token",
+        "token_obtain_pair",
+        "token_refresh",
+        "token_blacklist",
     ],
 )
 def test_user_named_urls(name):

@@ -3,12 +3,13 @@ import { redirect } from "next/navigation";
 
 import { LogoutButton } from "@/components/auth/logout-button";
 import { AUTH_COOKIE_NAME } from "@/lib/auth";
+import { isJwtExpired } from "@/lib/jwt";
 
 export default async function HomePage() {
   const cookiesStore = await cookies();
   const token = cookiesStore.get(AUTH_COOKIE_NAME)?.value;
 
-  if (!token) {
+  if (!token || isJwtExpired(token)) {
     redirect("/login");
   }
 
