@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from app.models import Sample
+from app.pagination import SamplePageNumberPagination
 from app.serializers import SampleV2Serializer, SampleV3Serializer
 
 
@@ -77,3 +78,4 @@ class SampleV3ViewSet(viewsets.ReadOnlyModelViewSet):
         "sample_type",
         "is_used",
     ]
+    pagination_class = SamplePageNumberPagination

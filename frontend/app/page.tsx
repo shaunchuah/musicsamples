@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
 import type { DashboardUser } from "@/components/dashboard/user-profile-menu";
+import { SamplesTable } from "@/components/samples/samples-table";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -110,18 +111,13 @@ export default async function HomePage() {
             </section>
             <Card>
               <CardHeader>
-                <CardTitle>Welcome to G-Trac</CardTitle>
+                <CardTitle>Recent Samples</CardTitle>
                 <CardDescription>
-                  Build out widgets, tables, and charts here as you migrate functionality from the
-                  Django templates.
+                  Live data pulled directly from the api/v3 samples endpoint.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Start by wiring live data into the sections above. Each card is a placeholder for
-                  the real-time insights your team relies on: sample intake, dataset status, and
-                  operational alerts.
-                </p>
+                <SamplesTable />
               </CardContent>
             </Card>
           </main>
