@@ -4,6 +4,7 @@
 
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
   type ColumnDef,
@@ -41,7 +42,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-GB", {
 });
 
 const EMPTY_STATE: SampleRow[] = [];
-const DEFAULT_PAGE_SIZE = 50;
+const DEFAULT_PAGE_SIZE = 100;
 
 type PaginationControlsProps = {
   canPrevious: boolean;
@@ -208,6 +209,15 @@ export function SamplesTable() {
         header: "Status",
         accessorKey: "is_used",
         cell: ({ getValue }) => (getValue<boolean>() ? "Used" : "Available"),
+      },
+      {
+        id: "view",
+        header: "View",
+        cell: ({ row }) => (
+          <Link href={`/samples/${encodeURIComponent(row.original.sample_id)}`} className="text-primary underline">
+            View
+          </Link>
+        ),
       },
     ];
   }, []);

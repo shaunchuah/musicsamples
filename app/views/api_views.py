@@ -7,7 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from app.models import Sample
 from app.pagination import SamplePageNumberPagination
-from app.serializers import SampleV2Serializer, SampleV3Serializer
+from app.serializers import SampleV2Serializer, SampleV3DetailSerializer, SampleV3Serializer
 
 
 @api_view(["POST"])
@@ -79,3 +79,8 @@ class SampleV3ViewSet(viewsets.ReadOnlyModelViewSet):
         "is_used",
     ]
     pagination_class = SamplePageNumberPagination
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return SampleV3DetailSerializer
+        return super().get_serializer_class()
