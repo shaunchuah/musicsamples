@@ -109,6 +109,32 @@ class SampleFilter(django_filters.FilterSet):
         ]
 
 
+class SampleV3Filter(django_filters.FilterSet):
+    """
+    Filter set used by the api/v3 samples endpoint to support lightweight column filters.
+    """
+
+    study_name = django_filters.CharFilter(field_name="study_name", lookup_expr="icontains")
+    sample_id = django_filters.CharFilter(field_name="sample_id", lookup_expr="icontains")
+    study_identifier = django_filters.CharFilter(field_name="study_id__name", lookup_expr="icontains")
+    sample_location = django_filters.CharFilter(field_name="sample_location", lookup_expr="icontains")
+    sample_sublocation = django_filters.CharFilter(field_name="sample_sublocation", lookup_expr="icontains")
+    sample_type = django_filters.CharFilter(field_name="sample_type", lookup_expr="iexact")
+    is_used = django_filters.BooleanFilter(field_name="is_used")
+
+    class Meta:
+        model = Sample
+        fields = [
+            "study_name",
+            "sample_id",
+            "study_identifier",
+            "sample_location",
+            "sample_sublocation",
+            "sample_type",
+            "is_used",
+        ]
+
+
 class DataStoreFilter(django_filters.FilterSet):
     study_id__name = django_filters.AllValuesFilter(label="Study ID")
     study_id__study_group = django_filters.ChoiceFilter(label="Study Group", choices=StudyGroupChoices.choices)

@@ -32,21 +32,117 @@ class SampleV2Serializer(serializers.ModelSerializer):
 
 class SampleV3Serializer(serializers.ModelSerializer):
     """
-    Serializer for the v3 API returning essential sample details.
+    Serializer for the v3 API returning essential sample details aligned with the Django template.
     """
+
+    study_name_label = serializers.CharField(source="get_study_name_display", read_only=True)
+    sample_type_label = serializers.CharField(source="get_sample_type_display", read_only=True)
+    study_identifier = serializers.SerializerMethodField()
+    timepoint_label = serializers.SerializerMethodField()
+    study_group_label = serializers.SerializerMethodField()
+    age = serializers.IntegerField(source="study_id.age", allow_null=True, read_only=True)
+    sex_label = serializers.SerializerMethodField()
+    study_center_label = serializers.SerializerMethodField()
+    genotype_data_available = serializers.SerializerMethodField()
+    crp = serializers.SerializerMethodField()
+    calprotectin = serializers.SerializerMethodField()
+    endoscopic_mucosal_healing_at_3_6_months = serializers.SerializerMethodField()
+    endoscopic_mucosal_healing_at_12_months = serializers.SerializerMethodField()
 
     class Meta:
         model = Sample
         fields = [
+            "id",
             "sample_id",
             "study_name",
-            "sample_type",
-            "sample_datetime",
+            "study_name_label",
+            "study_identifier",
             "sample_location",
             "sample_sublocation",
+            "sample_type",
+            "sample_type_label",
+            "sample_datetime",
+            "timepoint_label",
+            "study_group_label",
+            "age",
+            "sex_label",
+            "study_center_label",
+            "crp",
+            "calprotectin",
+            "endoscopic_mucosal_healing_at_3_6_months",
+            "endoscopic_mucosal_healing_at_12_months",
+            "genotype_data_available",
+            "sample_comments",
             "is_used",
         ]
         lookup_field = "sample_id"
+
+    @staticmethod
+    def _format_choice(choice_value):
+        if choice_value in (None, ""):
+            return None
+        return choice_value
+
+    def get_study_identifier(self, obj: Sample):
+        if obj.study_id is None:
+            return None
+        return {
+            "id": obj.study_id.pk,
+            "name": str(obj.study_id),
+        }
+
+    def get_timepoint_label(self, obj: Sample):
+        if obj.music_timepoint:
+            return self._format_choice(obj.get_music_timepoint_display())
+        if obj.marvel_timepoint:
+            return self._format_choice(obj.get_marvel_timepoint_display())
+        return None
+
+    def get_study_group_label(self, obj: Sample):
+        if obj.study_id and obj.study_id.study_group:
+            return self._format_choice(obj.study_id.get_study_group_display())
+        return None
+
+    def get_sex_label(self, obj: Sample):
+        if obj.study_id and obj.study_id.sex:
+            return self._format_choice(obj.study_id.get_sex_display())
+        return None
+
+    def get_study_center_label(self, obj: Sample):
+        if obj.study_id and obj.study_id.study_center:
+            return self._format_choice(obj.study_id.get_study_center_display())
+        return None
+
+    def get_genotype_data_available(self, obj: Sample):
+        if obj.study_id is None:
+            return None
+        return obj.study_id.genotype_data_available
+
+    def _numeric_or_none(self, value):
+        if value is None:
+            return None
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
+    def get_crp(self, obj: Sample):
+        return self._numeric_or_none(getattr(obj, "crp", None))
+
+    def get_calprotectin(self, obj: Sample):
+        return self._numeric_or_none(getattr(obj, "calprotectin", None))
+
+    def get_endoscopic_mucosal_healing_at_3_6_months(self, obj: Sample):
+        value = getattr(obj, "endoscopic_mucosal_healing_at_3_6_months", None)
+        if value is None:
+            return None
+        return bool(value)
+
+    def get_endoscopic_mucosal_healing_at_12_months(self, obj: Sample):
+        value = getattr(obj, "endoscopic_mucosal_healing_at_12_months", None)
+        if value is None:
+            return None
+        return bool(value)
 
 
 class SampleHistoryChangeSerializer(serializers.Serializer):
