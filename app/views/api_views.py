@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from app.models import Sample
-from app.serializers import SampleV2Serializer
+from app.serializers import SampleV2Serializer, SampleV3Serializer
 
 
 @api_view(["POST"])
@@ -62,3 +62,18 @@ class SampleV2ViewSet(viewsets.ModelViewSet):
         serializer.save(
             last_modified_by=self.request.user.email,
         )
+
+
+class SampleV3ViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Read-only API for the v3 frontend that exposes key sample details.
+    """
+
+    queryset = Sample.objects.order_by("-sample_datetime")
+    serializer_class = SampleV3Serializer
+    lookup_field = "sample_id"
+    filterset_fields = [
+        "study_name",
+        "sample_type",
+        "is_used",
+    ]

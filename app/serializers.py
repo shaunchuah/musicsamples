@@ -29,6 +29,25 @@ class SampleV2Serializer(serializers.ModelSerializer):
         lookup_field = "sample_id"
 
 
+class SampleV3Serializer(serializers.ModelSerializer):
+    """
+    Serializer for the v3 API returning essential sample details.
+    """
+
+    class Meta:
+        model = Sample
+        fields = [
+            "sample_id",
+            "study_name",
+            "sample_type",
+            "sample_datetime",
+            "sample_location",
+            "sample_sublocation",
+            "is_used",
+        ]
+        lookup_field = "sample_id"
+
+
 class SampleIsUsedSerializer(serializers.ModelSerializer):
     """
     Serializer for marking samples as used
