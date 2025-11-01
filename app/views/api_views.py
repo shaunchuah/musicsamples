@@ -1,8 +1,8 @@
 from django.contrib.auth import authenticate
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
-from rest_framework.filters import OrderingFilter
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -10,7 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from app.filters import SampleV3Filter
 from app.models import Sample
 from app.pagination import SamplePageNumberPagination
-from app.serializers import SampleV2Serializer, SampleV3DetailSerializer, SampleV3Serializer
+from app.serializers import SampleV3DetailSerializer, SampleV3Serializer
 from core.clinical import get_samples_with_clinical_data
 
 
@@ -45,33 +45,9 @@ def login_view(request):
         return Response({"status": "error", "message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-class SampleV2ViewSet(viewsets.ModelViewSet):
+class SampleV3ViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows samples to be viewed and edited
-    Lookup field set to the barcode ID instead of the default Django
-    autoincrementing id system
-    """
-
-    queryset = Sample.objects.filter(is_used=False).order_by("-sample_datetime")
-    serializer_class = SampleV2Serializer
-    lookup_field = "sample_id"
-    filterset_fields = ["sample_type"]
-
-    def perform_create(self, serializer):
-        serializer.save(
-            created_by=self.request.user.email,
-            last_modified_by=self.request.user.email,
-        )
-
-    def perform_update(self, serializer):
-        serializer.save(
-            last_modified_by=self.request.user.email,
-        )
-
-
-class SampleV3ViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    Read-only API for the v3 frontend that exposes key sample details.
+    API for the v3 frontend that exposes key sample details.
     """
 
     queryset = Sample.objects.order_by("-sample_datetime")
