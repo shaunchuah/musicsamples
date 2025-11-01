@@ -3,23 +3,23 @@
 // Avoids leaking HTTP-only JWTs to the client when loading sample detail pages.
 
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 import { AUTH_COOKIE_NAME, buildBackendUrl } from "@/lib/auth";
 
 const SAMPLES_ENDPOINT = "/api/v3/samples/";
 
-type RouteParams = {
-  sampleId: string;
-};
-
-export async function GET(_request: Request, { params }: { params: RouteParams }) {
+export async function GET(
+  _request: NextRequest,
+  context: RouteContext<"/api/dashboard/samples/[sampleId]">,
+) {
   try {
     const token = (await cookies()).get(AUTH_COOKIE_NAME)?.value ?? null;
     if (!token) {
       return NextResponse.json({ detail: "Unauthorized" }, { status: 401 });
     }
 
+    const params = await context.params;
     const sampleId = params.sampleId;
     if (!sampleId) {
       return NextResponse.json({ detail: "Missing sample identifier" }, { status: 400 });

@@ -118,7 +118,11 @@ function getCsvValue(row: SampleRow, key: (typeof CSV_COLUMNS)[number]["key"]): 
 
   const value = row[key];
 
-  if (typeof value === "boolean" || key === "is_used" || key.startsWith("endoscopic_mucosal_healing")) {
+  if (
+    typeof value === "boolean" ||
+    key === "is_used" ||
+    key.startsWith("endoscopic_mucosal_healing")
+  ) {
     return formatBoolean(value as boolean | null | undefined);
   }
 
@@ -196,13 +200,15 @@ export async function GET(request: Request): Promise<Response> {
       const items: SampleRow[] = Array.isArray(payload)
         ? payload
         : Array.isArray(payload?.results)
-          ? payload.results ?? []
+          ? (payload.results ?? [])
           : [];
 
       rows.push(...items);
 
       const nextLink =
-        !Array.isArray(payload) && typeof payload?.next === "string" && payload.next.trim().length > 0
+        !Array.isArray(payload) &&
+        typeof payload?.next === "string" &&
+        payload.next.trim().length > 0
           ? payload.next
           : null;
 
@@ -214,10 +220,9 @@ export async function GET(request: Request): Promise<Response> {
     const now = new Date();
     const timestamp = `${now.getUTCFullYear()}${String(now.getUTCMonth() + 1).padStart(2, "0")}${String(
       now.getUTCDate(),
-    ).padStart(2, "0")}_${String(now.getUTCHours()).padStart(2, "0")}${String(now.getUTCMinutes()).padStart(
-      2,
-      "0",
-    )}${String(now.getUTCSeconds()).padStart(2, "0")}`;
+    ).padStart(2, "0")}_${String(now.getUTCHours()).padStart(2, "0")}${String(
+      now.getUTCMinutes(),
+    ).padStart(2, "0")}${String(now.getUTCSeconds()).padStart(2, "0")}`;
     const filename = `samples-export-${timestamp}.csv`;
 
     return new NextResponse(csvContents, {

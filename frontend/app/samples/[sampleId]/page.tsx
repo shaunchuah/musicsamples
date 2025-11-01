@@ -154,14 +154,20 @@ function resolveDashboardUser(token: string | null | undefined): DashboardUser {
   return { email, firstName, lastName };
 }
 
-async function fetchSampleDetail(sampleId: string, token: string): Promise<SampleDetailResponse | null> {
-  const response = await fetch(buildBackendUrl(`/api/v3/samples/${encodeURIComponent(sampleId)}/`), {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
+async function fetchSampleDetail(
+  sampleId: string,
+  token: string,
+): Promise<SampleDetailResponse | null> {
+  const response = await fetch(
+    buildBackendUrl(`/api/v3/samples/${encodeURIComponent(sampleId)}/`),
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
     },
-    cache: "no-store",
-  });
+  );
 
   if (response.status === 404) {
     return null;
@@ -223,7 +229,9 @@ function buildDetailRows(sample: SampleDetailResponse): DetailRow[] {
 
 function buildProcessingRows(sample: SampleDetailResponse): DetailRow[] {
   const volumeUnits = sample.sample_volume_units_label ?? sample.sample_volume_units ?? "";
-  const volume = sample.sample_volume ? `${sample.sample_volume}${volumeUnits ? ` ${volumeUnits}` : ""}` : null;
+  const volume = sample.sample_volume
+    ? `${sample.sample_volume}${volumeUnits ? ` ${volumeUnits}` : ""}`
+    : null;
   const haemolysis = sample.haemolysis_reference_label ?? sample.haemolysis_reference;
   const biopsyLocation = sample.biopsy_location_label ?? sample.biopsy_location;
   const biopsyStatus = sample.biopsy_inflamed_status_label ?? sample.biopsy_inflamed_status;
@@ -243,7 +251,10 @@ function buildProcessingRows(sample: SampleDetailResponse): DetailRow[] {
     },
     {
       label: "Time Between Sampling and Processing",
-      value: sample.processing_time_minutes !== null ? `${sample.processing_time_minutes} minutes` : "N/A",
+      value:
+        sample.processing_time_minutes !== null
+          ? `${sample.processing_time_minutes} minutes`
+          : "N/A",
     },
     {
       label: "Sample Volume Remaining",
@@ -276,7 +287,15 @@ function buildProcessingRows(sample: SampleDetailResponse): DetailRow[] {
   ];
 }
 
-function DetailCard({ title, description, rows }: { title: string; description?: string; rows: DetailRow[] }) {
+function DetailCard({
+  title,
+  description,
+  rows,
+}: {
+  title: string;
+  description?: string;
+  rows: DetailRow[];
+}) {
   return (
     <Card>
       <CardHeader>
