@@ -50,6 +50,7 @@ class SampleV3ViewSet(viewsets.ModelViewSet):
     API for the v3 frontend that exposes key sample details.
     """
 
+    # The ModelViewSet is read/write, so we must stamp audit metadata on mutations
     queryset = Sample.objects.order_by("-sample_datetime")
     serializer_class = SampleV3Serializer
     lookup_field = "sample_id"
@@ -88,3 +89,28 @@ class SampleV3ViewSet(viewsets.ModelViewSet):
         if self.action == "retrieve":
             return SampleV3DetailSerializer
         return super().get_serializer_class()
+
+    def _current_user_identifier(self) -> str:
+        """
+        Returns the best available identifier for the authenticated user.
+        """
+        user = getattr(self.request, "user", None)
+        if not user:
+            return ""
+        email = getattr(user, "email", "")
+        if email:
+            return email
+        if hasattr(user, "get_username"):
+            username = user.get_username()
+            if username:
+                return username
+        return str(user)
+
+    def perform_create(self, serializer):
+        # Ensure both audit fields are populated during record creation
+        user_identifier = self._current_user_identifier()
+        serializer.save(created_by=user_identifier, last_modified_by=user_identifier)
+
+    def perform_update(self, serializer):
+        # Maintain audit trail by updating the modifier on each change
+        serializer.save(last_modified_by=self._current_user_identifier())
