@@ -1,0 +1,115 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "**",
+      "!**/pnpm-lock.yaml",
+      "!**/node_modules",
+      "!**/.next",
+      "!**/public",
+      "!**/.vercel"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 100,
+    "formatWithErrors": false
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "useHtmlLang": "warn", // Not in recommended ruleset, turning on manually
+        "noHeaderScope": "warn", // Not in recommended ruleset, turning on manually
+        "useValidAriaRole": {
+          "level": "warn",
+          "options": {
+            "ignoreNonDom": false,
+            "allowInvalidRoles": ["none", "text"]
+          }
+        },
+        "useSemanticElements": "off", // Rule is buggy, revisit later
+        "noSvgWithoutTitle": "off", // We do not intend to adhere to this rule
+        "useMediaCaption": "off", // We would need a cultural change to turn this on
+        "noAutofocus": "off", // We're highly intentional about when we use autofocus
+        "useFocusableInteractive": "off", // Disable focusable interactive element requirement
+        "useAriaPropsForRole": "off", // Disable required ARIA attributes check
+        "useKeyWithClickEvents": "off", // Disable keyboard event requirement with click events,
+        "noStaticElementInteractions": "warn",
+        "useValidAutocomplete": "warn"
+      },
+      "complexity": {
+        "noUselessStringConcat": "warn", // Not in recommended ruleset, turning on manually
+        "noForEach": "off", // forEach is too familiar to ban
+        "noUselessSwitchCase": "off", // Turned off due to developer preferences
+        "noUselessThisAlias": "off", // Turned off due to developer preferences
+        "noBannedTypes": "off",
+        "noUselessContinue": "off" // Turned off due to developer preferences
+      },
+      "correctness": {
+        "noUnusedImports": "warn", // Not in recommended ruleset, turning on manually
+        "useJsxKeyInIterable": "off", // Rule is buggy, revisit later
+        "useExhaustiveDependencies": "off", // Community feedback on this rule has been poor, we will continue with ESLint
+        "noInvalidBuiltinInstantiation": "warn"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "off", // Covered by Conformance,
+        "noBlankTarget": "off"
+      },
+      "style": {
+        "useFragmentSyntax": "warn", // Not in recommended ruleset, turning on manually
+        "noYodaExpression": "warn", // Not in recommended ruleset, turning on manually
+        "useDefaultParameterLast": "warn", // Not in recommended ruleset, turning on manually
+        "useExponentiationOperator": "off", // Obscure and arguably not easily readable
+        "noUnusedTemplateLiteral": "off", // Stylistic opinion
+        "noUselessElse": "off", // Stylistic opinion,
+        "useArrayLiterals": "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "off", // We trust Vercelians to use any only when necessary,
+        "noHeadImportInDocument": "warn",
+        "noDocumentImportInPage": "warn",
+        "noDuplicateElseIf": "warn",
+        "noIrregularWhitespace": "warn"
+      },
+      "nursery": {}
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double"
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "json": {
+    "formatter": {
+      "enabled": true,
+      "trailingCommas": "none"
+    },
+    "parser": {
+      "allowComments": true,
+      "allowTrailingCommas": false
+    }
+  },
+  "css": {
+    "formatter": { "enabled": false },
+    "linter": { "enabled": false }
+  }
+}

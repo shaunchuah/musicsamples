@@ -7,6 +7,7 @@ from .base import env
 
 DEBUG = False
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["samples.musicstudy.uk"])  # type:ignore
+FRONTEND_BASE_URL = "https://app.musicstudy.uk"
 
 # Sentry
 # ------------------------------------------------------------------------------

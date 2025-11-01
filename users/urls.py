@@ -1,7 +1,7 @@
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LogoutView
 from django.urls import path
-from rest_framework.authtoken.views import obtain_auth_token
+from rest_framework_simplejwt.views import TokenBlacklistView, TokenObtainPairView, TokenRefreshView
 
 from users.views import (
     PasswordChangeView,
@@ -16,6 +16,8 @@ from users.views import (
     make_staff_view,
     management,
     new_user_view,
+    password_reset_api,
+    password_reset_confirm_api,
     refresh_token,
     remove_staff_view,
     user_list_view,
@@ -59,7 +61,15 @@ urlpatterns = [
         auth_views.PasswordChangeDoneView.as_view(template_name="accounts/password_change_done.html"),
         name="password_change_done",
     ),
-    path("get_api_token/", obtain_auth_token, name="obtain_auth_token"),
+    path("api/password-reset/", password_reset_api, name="password_reset_api"),
+    path(
+        "api/password-reset/confirm/",
+        password_reset_confirm_api,
+        name="password_reset_confirm_api",
+    ),
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/token/blacklist/", TokenBlacklistView.as_view(), name="token_blacklist"),
     path("generate_token/", generate_token, name="generate_token"),
     path("delete_token/", delete_token, name="delete_token"),
     path("refresh_token/", refresh_token, name="refresh_token"),

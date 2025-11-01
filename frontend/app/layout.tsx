@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Music Samples",
-  description: "Next.js frontend for the Music Samples management system.",
+  title: "G-Trac",
+  description:
+    "Research Data and Sample Management Platform for School of Infection and Immunity, University of Glasgow.",
 };
 
 export default function RootLayout({
@@ -24,7 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background font-sans text-foreground`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background font-sans text-foreground`}
+      >
         {children}
       </body>
     </html>

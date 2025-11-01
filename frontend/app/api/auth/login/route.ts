@@ -1,10 +1,16 @@
 // frontend/app/api/auth/login/route.ts
 // Proxies credential-based authentication requests to the Django backend.
-// Provides a Next.js API endpoint that stores the backend token inside an HTTP-only cookie for the SPA.
+// Provides a Next.js API endpoint that stores rotated access/refresh JWTs inside HTTP-only cookies for the SPA.
 
 import { NextResponse } from "next/server";
 
-import { AUTH_COOKIE_NAME, buildBackendUrl } from "@/lib/auth";
+import {
+  ACCESS_TOKEN_MAX_AGE,
+  AUTH_COOKIE_NAME,
+  buildBackendUrl,
+  REFRESH_COOKIE_MAX_AGE,
+  REFRESH_COOKIE_NAME,
+} from "@/lib/auth";
 
 type LoginPayload = {
   email?: unknown;
@@ -12,7 +18,8 @@ type LoginPayload = {
 };
 
 type BackendTokenResponse = {
-  token?: string;
+  access?: string;
+  refresh?: string;
   detail?: string;
   non_field_errors?: string[];
 };
@@ -36,12 +43,12 @@ export async function POST(request: Request): Promise<Response> {
   let backendResponse: Response;
 
   try {
-    backendResponse = await fetch(buildBackendUrl("/get_api_token/"), {
+    backendResponse = await fetch(buildBackendUrl("/api/token/"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username: email, password }),
+      body: JSON.stringify({ email, password }),
     });
   } catch {
     return NextResponse.json({ error: "Authentication service is unavailable." }, { status: 502 });
@@ -56,29 +63,41 @@ export async function POST(request: Request): Promise<Response> {
 
   if (!backendResponse.ok) {
     const errorMessage =
-      backendJson?.detail ||
-      backendJson?.non_field_errors?.[0] ||
-      "Invalid email or password.";
+      backendJson?.detail || backendJson?.non_field_errors?.[0] || "Invalid email or password.";
 
     return NextResponse.json({ error: errorMessage }, { status: backendResponse.status || 401 });
   }
 
-  const token = backendJson?.token;
+  const accessToken = backendJson?.access;
+  const refreshToken = backendJson?.refresh;
 
-  if (!token) {
-    return NextResponse.json({ error: "Authentication token missing from backend response." }, { status: 502 });
+  if (!accessToken || !refreshToken) {
+    return NextResponse.json(
+      { error: "Authentication tokens missing from backend response." },
+      { status: 502 },
+    );
   }
 
   const response = NextResponse.json({ success: true });
 
   response.cookies.set({
     name: AUTH_COOKIE_NAME,
-    value: token,
+    value: accessToken,
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 60 * 60 * 8,
+    maxAge: ACCESS_TOKEN_MAX_AGE,
+  });
+
+  response.cookies.set({
+    name: REFRESH_COOKIE_NAME,
+    value: refreshToken,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: REFRESH_COOKIE_MAX_AGE,
   });
 
   return response;

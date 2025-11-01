@@ -57,8 +57,10 @@ THIRD_PARTY_APPS = [
     "django_select2",
     "django_pandas",
     "rest_framework",
+    "drf_spectacular",
     "rest_framework.authtoken",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "storages",
     "django_filters",
     "corsheaders",
@@ -173,9 +175,9 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication",
     ],
     "DEFAULT_RENDERER_CLASSES": [
-        # "rest_framework.renderers.BrowsableAPIRenderer",
         "rest_framework.renderers.JSONRenderer",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 
@@ -197,6 +199,13 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100MB
 
 # App Configuration
 SAMPLE_PAGINATION_SIZE = 100
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Music Samples API",
+    "DESCRIPTION": "OpenAPI schema for the Music Samples backend.",
+    "VERSION": "3.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
 DATASTORE_PAGINATION_SIZE = 100
 STUDY_ID_PAGINATION_SIZE = 100
 
@@ -205,6 +214,7 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
     "SIGNING_KEY": SECRET_KEY,
     "ALGORITHM": "HS512",
 }

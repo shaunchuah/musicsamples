@@ -18,3 +18,4 @@ DEBUG = True
 ALLOWED_HOSTS = ["testserver"]  # noqa: S104
 
 SITE_URL = "http://testserver"
+FRONTEND_BASE_URL = "http://localhost:3000"

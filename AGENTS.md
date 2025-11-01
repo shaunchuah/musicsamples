@@ -31,6 +31,26 @@ To run tests:
 source venv/bin/activate && pytest
 ```
 
+For the frontend app in `frontend/`:
+
+Typecheck:
+
+```bash
+pnpm type-check
+```
+
+Lint:
+
+```bash
+pnpm lint
+```
+
+Tests:
+
+```bash
+pnpm test
+```
+
 ## Tech Stack
 
 Django with django templates

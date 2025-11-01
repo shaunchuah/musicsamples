@@ -1,12 +1,17 @@
 from django.contrib.auth import authenticate
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from app.filters import SampleV3Filter
 from app.models import Sample
-from app.serializers import SampleV2Serializer
+from app.pagination import SamplePageNumberPagination
+from app.serializers import SampleV3DetailSerializer, SampleV3Serializer
+from core.clinical import get_samples_with_clinical_data
 
 
 @api_view(["POST"])
@@ -40,25 +45,46 @@ def login_view(request):
         return Response({"status": "error", "message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-class SampleV2ViewSet(viewsets.ModelViewSet):
+class SampleV3ViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows samples to be viewed and edited
-    Lookup field set to the barcode ID instead of the default Django
-    autoincrementing id system
+    API for the v3 frontend that exposes key sample details.
     """
 
-    queryset = Sample.objects.filter(is_used=False).order_by("-sample_datetime")
-    serializer_class = SampleV2Serializer
+    queryset = Sample.objects.order_by("-sample_datetime")
+    serializer_class = SampleV3Serializer
     lookup_field = "sample_id"
-    filterset_fields = ["sample_type"]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = SampleV3Filter
+    ordering_fields = [
+        "sample_datetime",
+        "sample_id",
+        "study_name",
+        "sample_location",
+        "sample_sublocation",
+        "sample_type",
+        "study_id__name",
+        "id",
+    ]
+    ordering = ["-sample_datetime"]
+    pagination_class = SamplePageNumberPagination
 
-    def perform_create(self, serializer):
-        serializer.save(
-            created_by=self.request.user.email,
-            last_modified_by=self.request.user.email,
-        )
+    def get_queryset(self):
+        base_queryset = Sample.objects.select_related("study_id").order_by("-sample_datetime")
+        action = getattr(self, "action", None)
 
-    def perform_update(self, serializer):
-        serializer.save(
-            last_modified_by=self.request.user.email,
-        )
+        if action == "list":
+            request = getattr(self, "request", None)
+            include_used = False
+            has_is_used_filter = False
+            if request:
+                include_used = request.query_params.get("include_used") == "true"
+                has_is_used_filter = "is_used" in request.query_params
+            if not include_used and not has_is_used_filter:
+                base_queryset = base_queryset.filter(is_used=False)
+
+        return get_samples_with_clinical_data(base_queryset)
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return SampleV3DetailSerializer
+        return super().get_serializer_class()

@@ -5,6 +5,7 @@ from .base import INSTALLED_APPS, MIDDLEWARE, env
 # GENERAL
 # ------------------------------------------------------------------------------
 DEBUG = True
+FRONTEND_BASE_URL = "http://localhost:3000"
 
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "testserver", "host.docker.internal"]
 

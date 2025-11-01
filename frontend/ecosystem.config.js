@@ -5,12 +5,12 @@
 module.exports = {
   apps: [
     {
-      name: 'music-frontend',
-      script: 'npm',
-      args: 'start',
+      name: "music-frontend",
+      script: "npm",
+      args: "start",
       env: {
-        NODE_ENV: 'production'
-      }
-    }
-  ]
+        NODE_ENV: "production",
+      },
+    },
+  ],
 };
