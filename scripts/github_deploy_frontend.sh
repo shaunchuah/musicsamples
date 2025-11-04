@@ -33,7 +33,8 @@ echo "Building production bundle"
 pnpm run build
 
 echo "Restarting frontend process with PM2"
-pm2 restart music-frontend || pm2 start ecosystem.config.js
+pm2 delete music-frontend >/dev/null 2>&1 || true
+pm2 start ecosystem.config.js
 pm2 save
 
 echo "Frontend deployment completed successfully"

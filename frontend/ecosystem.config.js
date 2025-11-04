@@ -6,6 +6,7 @@ module.exports = {
   apps: [
     {
       name: "music-frontend",
+      cwd: __dirname,
       script: "pnpm",
       args: "start",
       env: {

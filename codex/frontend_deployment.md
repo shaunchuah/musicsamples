@@ -52,11 +52,12 @@
   pnpm install --frozen-lockfile
   pnpm run build
   pnpm prune --prod
-  pm2 restart music-frontend || pm2 start ecosystem.config.js
+  pm2 delete music-frontend >/dev/null 2>&1 || true
+  pm2 start ecosystem.config.js
   pm2 save
   ```
 
-- Because the build happens on the VM, no tarball or rotating `~/music_frontend/releases` directories are needed. Rollbacks can be achieved by checking out an earlier commit and rerunning the script.
+- Because the build happens on the VM, no tarball or rotating `~/music_frontend/releases` directories are needed. The PM2 config pins `cwd` to the `frontend/` directory, so every deploy uses the repo checkout. Rollbacks can be achieved by checking out an earlier commit and rerunning the script.
 
 ## 4. Nginx Configuration
 
