@@ -4,7 +4,6 @@
 
 import {
   ArchiveIcon,
-  Cloud,
   CloudUploadIcon,
   DatabaseIcon,
   FlaskRoundIcon,
@@ -31,8 +30,8 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import type { DashboardUser } from "@/types/dashboard";
 import { NavUser } from "./nav-user";
-import type { DashboardUser } from "./user-profile-menu";
 
 type NavItem = {
   label: string;

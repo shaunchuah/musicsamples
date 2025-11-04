@@ -2,14 +2,12 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
-import type { DashboardUser } from "@/components/dashboard/user-profile-menu";
 import { SamplesTable } from "@/components/samples/samples-table";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { isJwtExpired, parseJwt } from "@/lib/jwt";
+import type { DashboardUser } from "@/types/dashboard";
 
 function resolveDashboardUser(token: string | null | undefined): DashboardUser {
   if (!token) {

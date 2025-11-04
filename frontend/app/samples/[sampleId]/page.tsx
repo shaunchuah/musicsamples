@@ -7,7 +7,6 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
-import type { DashboardUser } from "@/components/dashboard/user-profile-menu";
 import { HistoryPanel } from "@/components/history/history-panel";
 import {
   Breadcrumb,
@@ -22,6 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AUTH_COOKIE_NAME, buildBackendUrl } from "@/lib/auth";
 import { isJwtExpired, parseJwt } from "@/lib/jwt";
+import type { DashboardUser } from "@/types/dashboard";
 
 type SampleHistoryChangeResponse = {
   field: string;
