@@ -20,13 +20,6 @@ echo "Changing to frontend directory"
 cd "$FRONTEND_DIR"
 
 source ~/.nvm/nvm.sh
-if ! nvm use 20 >/dev/null 2>&1; then
-  echo "Installing Node.js 20 via nvm"
-  nvm install 20
-  nvm use 20
-else
-  echo "Using Node.js $(node --version)"
-fi
 
 if ! command -v pnpm >/dev/null 2>&1; then
   echo "Error: pnpm is not installed or not on PATH."
@@ -38,9 +31,6 @@ pnpm install --frozen-lockfile
 
 echo "Building production bundle"
 pnpm run build
-
-echo "Removing development dependencies"
-pnpm prune --prod
 
 echo "Restarting frontend process with PM2"
 pm2 restart music-frontend || pm2 start ecosystem.config.js
