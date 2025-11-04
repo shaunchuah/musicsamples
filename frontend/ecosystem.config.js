@@ -10,6 +10,7 @@ module.exports = {
       args: "start",
       env: {
         NODE_ENV: "production",
+        AUTH_DEBUG: "true",
       },
     },
   ],

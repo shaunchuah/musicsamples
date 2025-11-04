@@ -12,6 +12,8 @@ import {
   REFRESH_COOKIE_NAME,
 } from "@/lib/auth";
 
+const AUTH_DEBUG_ENABLED = process.env.AUTH_DEBUG === "true";
+
 type LoginPayload = {
   email?: unknown;
   password?: unknown;
@@ -56,7 +58,11 @@ export async function POST(request: Request): Promise<Response> {
     });
   } catch (error) {
     console.error("[login] Backend fetch failed", { backendUrl, error });
-    return NextResponse.json({ error: "Authentication service is unavailable." }, { status: 502 });
+    const payload: Record<string, unknown> = { error: "Authentication service is unavailable." };
+    if (AUTH_DEBUG_ENABLED) {
+      payload.debug = { backendUrl, reason: "fetch_failed" };
+    }
+    return NextResponse.json(payload, { status: 502 });
   }
 
   let backendJson: BackendTokenResponse | null = null;
@@ -74,8 +80,16 @@ export async function POST(request: Request): Promise<Response> {
     });
     const errorMessage =
       backendJson?.detail || backendJson?.non_field_errors?.[0] || "Invalid email or password.";
+    const payload: Record<string, unknown> = { error: errorMessage };
+    if (AUTH_DEBUG_ENABLED) {
+      payload.debug = {
+        backendUrl,
+        backendStatus: backendResponse.status,
+        backendBody: backendJson,
+      };
+    }
 
-    return NextResponse.json({ error: errorMessage }, { status: backendResponse.status || 401 });
+    return NextResponse.json(payload, { status: backendResponse.status || 401 });
   }
 
   const accessToken = backendJson?.access;
@@ -83,10 +97,17 @@ export async function POST(request: Request): Promise<Response> {
 
   if (!accessToken || !refreshToken) {
     console.error("[login] Backend response missing tokens", { email, backendBody: backendJson });
-    return NextResponse.json(
-      { error: "Authentication tokens missing from backend response." },
-      { status: 502 },
-    );
+    const payload: Record<string, unknown> = {
+      error: "Authentication tokens missing from backend response.",
+    };
+    if (AUTH_DEBUG_ENABLED) {
+      payload.debug = {
+        backendUrl,
+        backendBody: backendJson,
+        reason: "missing_tokens",
+      };
+    }
+    return NextResponse.json(payload, { status: 502 });
   }
 
   console.info("[login] Authentication succeeded", { email });
