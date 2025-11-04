@@ -57,14 +57,6 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         run: pnpm run build
-      - name: Archive frontend bundle
-        run: |
-          tar -czf frontend.tar.gz --exclude='node_modules' -C frontend .
-      - name: Upload frontend artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build
-          path: frontend.tar.gz
 
   deploy:
     needs: [backend-test, frontend-build]
@@ -92,12 +84,6 @@ jobs:
         run: |
           ssh deploy 'chmod +x ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
           ssh deploy 'chmod +x ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_frontend.sh'
-      - name: Download frontend artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-build
-      - name: Copy frontend bundle to server
-        run: scp -i ~/.ssh/staging.key frontend.tar.gz deploy:~/music_frontend/releases/frontend.tar.gz
       - name: Run django deployment script
         run: ssh deploy '${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_django.sh'
       - name: Run frontend deployment script

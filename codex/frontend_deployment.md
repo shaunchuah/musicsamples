@@ -5,44 +5,62 @@
 
 ## 1. VM Preparation
 
-- SSH into the Azure VM and install Node.js 20.x (using nvm for version management).
-- Install nvm if not present: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash` then `source ~/.bashrc` and `nvm install 20 && nvm use 20`.
-- Choose a deployment root. Example assumes `~/music_frontend` with subfolders `releases/` and `shared/`.
-- Ensure the VM user owns the directory (`sudo chown -R $USER:$USER ~/music_frontend`).
-- If needed, add environment variables in `~/music_frontend/shared/.env.local` (e.g., `BACKEND_URL=https://samples.musicstudy.uk`), but currently handled via defaults in code.
+- SSH into the Azure VM and install Node.js 20.x with nvm.
+- Install nvm if not present: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash`, refresh your shell (`source ~/.bashrc`), then run `nvm install 20`.
+- Ensure PM2 is installed globally once (`npm install -g pm2`).
+- Verify `pnpm` is available on the VM (`pnpm --version`). If not, enable it via corepack (`corepack enable pnpm`) or install it manually.
+- Clone the repository into `$INSTALLATION_DIRECTORY` (same directory used for the Django deploy script). The deploy workflow already checks out the target commit there.
+- Add any frontend environment variables to `$INSTALLATION_DIRECTORY/frontend/.env.production` or export them in the shell before starting PM2. The app defaults to the production backend URL if unset.
 
-## 2. First-Time Frontend Release
+## 2. GitHub Actions Workflow
 
-- The frontend is built in CI as part of the GitHub Actions workflow (see section 5).
-- For manual setup, copy the built artifact or repository's `frontend/` directory to the VM.
-- Place each release under `~/music_frontend/releases/<timestamp>/`.
-- Point the `current` symlink at the release: `ln -sfn ~/music_frontend/releases/<timestamp> ~/music_frontend/current`.
-- Install production dependencies (build is pre-done in CI):
+- `.github/workflows/deploy.yml` now keeps the frontend checks lightweight:
 
-  ```bash
-  cd ~/music_frontend/current
-  source ~/.nvm/nvm.sh
-  nvm use 20
-  npm ci --omit=dev
+  ```yaml
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+        working-directory: frontend
+      - run: pnpm run build
+        working-directory: frontend
   ```
 
-- No `node_modules/` is included in releases; dependencies are installed on deploy.
+- The deploy job only needs the repository on the VM, so the artifact packaging, upload, and release directory juggling have been removed.
 
-## 3. Runtime Process (PM2)
+## 3. Deploy Script on the VM
 
-- Start the app with PM2 using the ecosystem config and persist the process list:
+- `scripts/github_deploy_frontend.sh` is executed over SSH after the Django deploy script. It reuses the checked-out repo, builds in place, prunes dev dependencies, and restarts PM2:
 
   ```bash
-  cd ~/music_frontend/current
-  pm2 start ecosystem.config.js
+  #!/bin/bash
+  set -euo pipefail
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  FRONTEND_DIR="$(dirname "$SCRIPT_DIR")/frontend"
+  cd "$FRONTEND_DIR"
+  source ~/.nvm/nvm.sh
+  nvm use 20 || { nvm install 20 && nvm use 20; }
+  pnpm install --frozen-lockfile
+  pnpm run build
+  pnpm prune --prod
+  pm2 restart music-frontend || pm2 start ecosystem.config.js
   pm2 save
   ```
 
-- Useful commands: `pm2 status`, `pm2 logs music-frontend`, `pm2 restart music-frontend`.
+- Because the build happens on the VM, no tarball or rotating `~/music_frontend/releases` directories are needed. Rollbacks can be achieved by checking out an earlier commit and rerunning the script.
 
 ## 4. Nginx Configuration
 
-- Create `/etc/nginx/sites-available/app.musicstudy.uk` referencing the Next.js service:
+- Continue to proxy traffic to the Next.js process with `/etc/nginx/sites-available/app.musicstudy.uk`:
 
   ```nginx
   server {
@@ -58,92 +76,16 @@
   }
   ```
 
-- Symlink into `sites-enabled`, test (`sudo nginx -t`), then reload (`sudo systemctl reload nginx`).
-- Issue HTTPS cert via certbot if needed: `sudo certbot --nginx -d app.musicstudy.uk`.
+- Symlink into `sites-enabled`, test with `sudo nginx -t`, then reload via `sudo systemctl reload nginx`. Use certbot for HTTPS: `sudo certbot --nginx -d app.musicstudy.uk`.
 
-## 5. GitHub Actions / CI Updates
+## 5. Smoke Testing
 
-- The `.github/workflows/deploy.yml` includes a `frontend-build` job that compiles the frontend:
+- Visit `https://app.musicstudy.uk/login` and confirm the login flow works end-to-end.
+- Monitor PM2 (`pm2 logs music-frontend`) and Nginx (`/var/log/nginx/app.musicstudy.uk.error.log`) for any immediate issues.
+- To roll back, run `git checkout <previous_commit>` inside `$INSTALLATION_DIRECTORY`, then rerun the frontend deploy script.
 
-  ```yaml
-  frontend-build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: npm ci
-      - name: Build frontend
-        working-directory: frontend
-        run: npm run build
-      - name: Archive frontend bundle
-        run: |
-          tar -czf frontend.tar.gz --exclude='node_modules' -C frontend .
-      - name: Upload frontend artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build
-          path: frontend.tar.gz
-  ```
+## 6. Ongoing Maintenance
 
-- In the `deploy` job, download the artifact and upload it to the VM before running scripts:
-
-  ```yaml
-  - name: Download frontend artifact
-    uses: actions/download-artifact@v4
-    with:
-      name: frontend-build
-  - name: Copy frontend bundle to server
-    run: scp -i ~/.ssh/staging.key frontend.tar.gz deploy:~/music_frontend/releases/frontend.tar.gz
-  ```
-
-## 6. Deploy Script on VM
-
-- The `scripts/github_deploy_frontend.sh` automates rollout:
-
-  ```bash
-  #!/bin/bash
-  set -e
-  RELEASE_ROOT=~/music_frontend/releases
-  TIMESTAMP=$(date +"%Y%m%d%H%M%S")
-  TARGET="$RELEASE_ROOT/$TIMESTAMP"
-  mkdir -p "$TARGET"
-  tar -xzf "$RELEASE_ROOT/frontend.tar.gz" -C "$TARGET"
-  rm "$RELEASE_ROOT/frontend.tar.gz"
-  ln -sfn "$TARGET" ~/music_frontend/current
-  cd ~/music_frontend/current
-  source ~/.nvm/nvm.sh
-  nvm use 20
-  npm ci --omit=dev
-  pm2 restart music-frontend || pm2 start ecosystem.config.js
-  pm2 save
-  ```
-
-- Make the script executable (`chmod +x`) and call it from the deploy workflow after the Django script:
-
-  ```yaml
-  - name: Run frontend deployment script
-    run: ssh deploy 'bash ${{ secrets.INSTALLATION_DIRECTORY }}/scripts/github_deploy_frontend.sh'
-  - name: Restart services
-    run: |
-      ssh deploy 'sudo systemctl restart gunicorn'
-      ssh deploy 'sudo systemctl restart nginx'
-  ```
-
-## 7. Smoke Testing
-
-- Visit `https://app.musicstudy.uk/login` to confirm the frontend redirects correctly after sign-in.
-- Verify API calls hit Django (`https://samples.musicstudy.uk`); watch logs (`pm2 logs`, `/var/log/nginx/app.musicstudy.uk.error.log`).
-- Roll back by updating `~/music_frontend/current` to a previous timestamp and restarting PM2.
-
-## 8. Ongoing Maintenance
-
-- Keep Node.js and PM2 updated on the VM (`sudo apt upgrade`, `pm2 update`).
-- Document any new environment variables in `shared/.env.local`.
-- When ready to retire the legacy UI, redirect `samples.musicstudy.uk` or migrate routes incrementally to Next.js.
+- Keep Node.js and PM2 updated on the VM (`nvm install --lts`, `pm2 update`).
+- Document additional environment variables alongside the repository so future deploys remain reproducible.
+- When the legacy UI is retired, ensure DNS and redirects continue to point users toward the Next.js frontend.

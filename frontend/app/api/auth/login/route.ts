@@ -12,8 +12,6 @@ import {
   REFRESH_COOKIE_NAME,
 } from "@/lib/auth";
 
-const AUTH_DEBUG_ENABLED = process.env.AUTH_DEBUG === "true";
-
 type LoginPayload = {
   email?: unknown;
   password?: unknown;
@@ -29,6 +27,7 @@ type BackendTokenResponse = {
 export async function POST(request: Request): Promise<Response> {
   let email: string | undefined;
   let password: string | undefined;
+  const authDebugEnabled = process.env.AUTH_DEBUG === "true";
 
   try {
     const body = (await request.json()) as LoginPayload;
@@ -59,7 +58,7 @@ export async function POST(request: Request): Promise<Response> {
   } catch (error) {
     console.error("[login] Backend fetch failed", { backendUrl, error });
     const payload: Record<string, unknown> = { error: "Authentication service is unavailable." };
-    if (AUTH_DEBUG_ENABLED) {
+    if (authDebugEnabled) {
       payload.debug = { backendUrl, reason: "fetch_failed" };
     }
     return NextResponse.json(payload, { status: 502 });
@@ -81,7 +80,7 @@ export async function POST(request: Request): Promise<Response> {
     const errorMessage =
       backendJson?.detail || backendJson?.non_field_errors?.[0] || "Invalid email or password.";
     const payload: Record<string, unknown> = { error: errorMessage };
-    if (AUTH_DEBUG_ENABLED) {
+    if (authDebugEnabled) {
       payload.debug = {
         backendUrl,
         backendStatus: backendResponse.status,
@@ -100,7 +99,7 @@ export async function POST(request: Request): Promise<Response> {
     const payload: Record<string, unknown> = {
       error: "Authentication tokens missing from backend response.",
     };
-    if (AUTH_DEBUG_ENABLED) {
+    if (authDebugEnabled) {
       payload.debug = {
         backendUrl,
         backendBody: backendJson,
