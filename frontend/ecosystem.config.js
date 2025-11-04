@@ -6,7 +6,7 @@ module.exports = {
   apps: [
     {
       name: "music-frontend",
-      script: "npm",
+      script: "pnpm",
       args: "start",
       env: {
         NODE_ENV: "production",
