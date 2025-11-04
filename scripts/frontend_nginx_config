@@ -1,0 +1,18 @@
+# scripts/frontend_nginx_config
+# Nginx server block for routing app.musicstudy.uk traffic to the Next.js frontend running on port 3000.
+# We keep this template alongside other deployment scripts so production hosts can copy it outside git and customise TLS paths safely.
+
+server {
+    server_name app.musicstudy.uk;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}

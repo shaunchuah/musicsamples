@@ -143,11 +143,13 @@ The following would be a simple deployment for a small group onto a single serve
 - Nginx
 - Gunicorn
 - Redis
+- NVM, node, pnpm, pm2 (for Next.js frontend)
+- AWS CLI or Azure CLI/azcopy (for database backups)
 
 ### External Service Dependency
 
 - AWS Simple Email Service for transactional emails
-- AWS S3 Bucket for database backups
+- AWS S3 or Azure Storage for database backups
 
 ### Suggested production deployment
 
@@ -169,35 +171,49 @@ The following would be a simple deployment for a small group onto a single serve
 9. Set up SSL encryption on your server using letsencrypt
 10. Edit `scripts/github_deploy_django.sh` and `.github/workflows/deploy.yml` to suit your server for automated deployments
 
+### Next.js Frontend Deployment
+
+The Next.js app lives in `frontend/` and serves `app.musicstudy.uk`. A typical production setup uses Node via `nvm`, installs dependencies with `pnpm`, and keeps the runtime alive with `pm2`.
+
+1. Install Node with `nvm` (Node 20 LTS is a safe target) and ensure `pnpm` is available globally: `npm install -g pnpm`.
+2. From `frontend/`, install dependencies and build once: `pnpm install && pnpm build`. Populate any required environment variables in `.env.production` (copy from `.env.example` if present).
+3. Start the production server with pm2 so it survives restarts. A common pattern:
+
+   ```sh
+   pm2 start pnpm --name gtrac-frontend -- start
+   pm2 save
+   ```
+
+   This runs `pnpm start`, binding to port 3000 by default.
+4. Copy `scripts/frontend_nginx_config` to your server (for example `/etc/nginx/sites-available/app.musicstudy.uk`) and adjust certificate paths if needed. Symlink it into `sites-enabled` and reload nginx.
+5. Keep the editable nginx file and any PM2 ecosystem configs outside this repository to avoid committing host-specific secrets or paths.
+
 ### Database Backups
 
-The stack has been simplified to use sqlite3 for ease of deployment. Backup is simple as well, copy the db.sqlite3 file to S3 storage. An example script is included in `scripts/db_backup_example.sh`.
+The stack uses sqlite3 for ease of deployment. Copying the `production.sqlite3` file on a schedule is usually enough; a few helper scripts live in `scripts/`.
+
+- `scripts/db_backup_example.sh` demonstrates a basic S3 upload.
+- `scripts/azure_db_backup.sh` copies the database and uploads it to Azure Blob Storage with `azcopy`. Copy this script into your home directory (`cp scripts/azure_db_backup.sh ~/azure_db_backup.sh && chmod +x ~/azure_db_backup.sh`) so the executable sits outside the repo and avoids accidental commits. The script relies on two environment variables:
+  - `AZURE_BACKUP_SAS_URL` – the SAS URL for the target container without any query string.
+  - `AZURE_BACKUP_SAS_TOKEN` – the full SAS token beginning with `?`.
+
+Store those exports in a private file (for example `~/azure_backup_secrets`), `chmod 600` it, and source it before the script runs so the credentials never live in the script itself:
+
+```sh
+. ~/azure_backup_secrets && /bin/bash ~/azure_db_backup.sh
+```
 
 #### Notes
 
-1. You will need to install either AWS CLI or Azure CLI and login from the server first.
-2. Make the right backup script executable
-3. Configure cron job to run the script at the desired time
+1. Install the required CLI (AWS CLI or Azure CLI) on the host and authenticate once to ensure azcopy/boto have what they need to run.
+2. `chmod +x` the backup script you intend to run.
+3. Configure a cron job to source your secrets file and execute the script at the desired schedule. Example:
 
-To make the script executable:
+   ```sh
+   0 2 * * * . ~/azure_backup_secrets && /bin/bash ~/azure_db_backup.sh >> ~/logs/azure_backup.log 2>&1
+   ```
 
-```sh
-chmod +x scripts/db_backup_example.sh
-```
-
-To configure a cron job:
-
-```sh
-crontab -e
-```
-
-Add the following line to the crontab file:
-
-```sh
-0 0 * * * /path/to/your/script/db_backup_example.sh
-```
-
-This copies production database to S3 at midnight every day
+This samples the database nightly at 02:00 and logs the result; adjust paths and cadence as needed.
 
 ## 💾 Database Transfer
 
@@ -241,6 +257,6 @@ University of Glasgow
 
 If you've used this to create something cool let me know about it!
 
-X: [@chershiong](https://x.com/chershiong) \
+X: [@drshaunchuah](https://x.com/drshaunchuah) \
 Email: [shaun.chuah@glasgow.ac.uk](mailto:shaun.chuah@glasgow.ac.uk) \
 Project Link: [https://github.com/shaunchuah/musicsamples](https://github.com/shaunchuah/musicsamples)
