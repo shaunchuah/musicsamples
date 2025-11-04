@@ -17,95 +17,58 @@ G-Trac is an open source laboratory sample tracking and data management system c
 2. Provide a unified data access layer for researchers to access their data
 3. Dynamic intelligence and analytics platform to direct future research efforts
 
-## 📋 Basic requirements
+## 🧰 Requirements
 
-- [Django](https://www.djangoproject.com/)
-- [Python](https://www.python.org/) 3.12+
-- [SQLite](https://www.sqlite.org/) (for database)
+### Development
 
-## 🚀 Production requirements
+- Python 3.12+ (includes `pip` and SQLite on most systems)
+- Django and supporting packages listed in `requirements.txt`
+- SQLite (default development database)
 
-- [Nginx](https://nginx.org/) (for production deployment)
-- [Gunicorn](https://gunicorn.org/) (for WSGI HTTP server)
-- [Redis](https://redis.io/) (for caching)
-- AWS S3 (for file storage and backups)
-- AWS SES (for email notifications)
+### Production extras
+
+- Nginx (reverse proxy)
+- Gunicorn (WSGI server)
+- Redis (caching)
+- AWS S3 (file storage and backups)
+- AWS SES (transactional email)
 
 ## 🚦 Getting Started
 
-To get a local copy up and running follow these steps. You need to have Python pre-installed on your machine. Rename `example.env` to `.env` to get development values set up.
+Use the steps below to stand up a local development environment. Copy `example.env` to `.env` before you start so Django has sensible defaults.
 
-## 🔧 Installation
-
-### 1. Clone the repo
+### 1. Clone the repository
 
 ```sh
 git clone https://github.com/shaunchuah/musicsamples.git
-```
-
-### 2. Setup a virtual environment for Django
-
-```sh
 cd musicsamples
-
-# Create a virtual environment
-python -m venv venv
-
-source venv/bin/activate # for mac/linux
-./venv/Scripts/activate # for windows
-
-# Install required dependencies
-pip install -r requirements.txt
 ```
 
-### 3. Get Django up and running
-
-First, copy the example.env file to .env and edit the values to suit your local development environment.
+### 2. Create your environment
 
 ```sh
+python -m venv venv
+source venv/bin/activate  # macOS/Linux
+./venv/Scripts/activate   # Windows PowerShell or CMD
+pip install -r requirements.txt
 cp example.env .env
 ```
 
-Edit the .env file with your desired values.
+Edit `.env` to match your local setup (database path, email settings, etc.).
 
-Run Django migrations, create superuser and startup the dev server:
+### 3. Boot the application
 
 ```sh
 python manage.py migrate
-python manage.py createsuperuser
+python manage.py createsuperuser  # optional
 python manage.py runserver
 ```
 
-Set up pre-commit hooks:
+### 4. (Optional) Enable local tooling
 
 ```sh
 pre-commit install
 ```
-
-## 📚 Documentation
-
-G-Trac includes extensive documentation for both the system itself and research protocols.
-
-### Orca Documentation
-
-Run the following command to serve the Orca documentation locally:
-
-```sh
-mkdocs serve
-```
-
-The documentation will be available at <http://127.0.0.1:8080>
-
-### Protocol Reference
-
-G-Trac includes built-in protocol references for sample handling procedures including:
-
-- EDTA plasma extraction
-- cfDNA extraction
-- Sample processing guidelines
-- Haemolysis reference
-
-These are accessible through the web interface under the reference section.
 
 ## 🧪 Sample Management
 
@@ -227,12 +190,6 @@ You will need to exclude contenttypes and auth.permission to switch between data
 
 Once the app is deployed, make 4 groups - default, datasets, datastores, basic_science. For datasets, assign the view_dataset permission. For datastores, assign the view_datastore permission. For basic_science, assign the Add/change/delete/view basic science box permission. You can switch people back to the default group to remove access to datasets and datastores.
 
-## 🏗️ Project Architecture
-
-- app: main G-Trac sample tracking logic
-- users: all authentication handling/views here
-- datasets: frontend for orca data platform
-
 ## 🐳 Orca Data Platform
 
 G-Trac integrates with the Orca data platform, providing:
@@ -252,11 +209,5 @@ Dr Shaun Chuah \
 Clinical Senior Research Fellow \
 School of Infection and Immunity \
 University of Glasgow
-
-## 📬 Contact
-
-If you've used this to create something cool let me know about it!
-
 X: [@drshaunchuah](https://x.com/drshaunchuah) \
 Email: [shaun.chuah@glasgow.ac.uk](mailto:shaun.chuah@glasgow.ac.uk) \
-Project Link: [https://github.com/shaunchuah/musicsamples](https://github.com/shaunchuah/musicsamples)
