@@ -32,25 +32,30 @@ export async function POST(request: Request): Promise<Response> {
     const body = (await request.json()) as LoginPayload;
     email = typeof body.email === "string" ? body.email.trim() : undefined;
     password = typeof body.password === "string" ? body.password : undefined;
-  } catch {
+  } catch (error) {
+    console.error("[login] Failed to parse request body", { error });
     return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
   }
 
   if (!email || !password) {
+    console.error("[login] Missing credentials", { hasEmail: Boolean(email), hasPassword: Boolean(password) });
     return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
   }
 
   let backendResponse: Response;
+  const backendUrl = buildBackendUrl("/api/token/");
 
   try {
-    backendResponse = await fetch(buildBackendUrl("/api/token/"), {
+    console.info("[login] Proxying auth request", { email, backendUrl });
+    backendResponse = await fetch(backendUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password }),
     });
-  } catch {
+  } catch (error) {
+    console.error("[login] Backend fetch failed", { backendUrl, error });
     return NextResponse.json({ error: "Authentication service is unavailable." }, { status: 502 });
   }
 
@@ -62,6 +67,11 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   if (!backendResponse.ok) {
+    console.error("[login] Backend rejected credentials", {
+      email,
+      backendStatus: backendResponse.status,
+      backendBody: backendJson,
+    });
     const errorMessage =
       backendJson?.detail || backendJson?.non_field_errors?.[0] || "Invalid email or password.";
 
@@ -72,12 +82,14 @@ export async function POST(request: Request): Promise<Response> {
   const refreshToken = backendJson?.refresh;
 
   if (!accessToken || !refreshToken) {
+    console.error("[login] Backend response missing tokens", { email, backendBody: backendJson });
     return NextResponse.json(
       { error: "Authentication tokens missing from backend response." },
       { status: 502 },
     );
   }
 
+  console.info("[login] Authentication succeeded", { email });
   const response = NextResponse.json({ success: true });
 
   response.cookies.set({
