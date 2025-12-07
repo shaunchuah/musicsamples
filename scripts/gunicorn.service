@@ -4,10 +4,10 @@ Requires=gunicorn.socket
 After=network.target
 
 [Service]
-User=root
-Group=root
-WorkingDirectory=/home/gtrac
-ExecStart=/home/trac/venv/bin/gunicorn \
+User=gtrac
+Group=gtrac
+WorkingDirectory=/home/gtrac/musicsamples
+ExecStart=/home/gtrac/musicsamples/venv/bin/gunicorn \
           --access-logfile - \
           --workers 3 \
           --bind unix:/run/gunicorn.sock \
