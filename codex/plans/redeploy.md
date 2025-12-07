@@ -156,6 +156,16 @@ Commands assume user `gtrac`, repo at `/home/gtrac/musicsamples`. Run all comman
     Optional local checks before deploy: `source venv/bin/activate && pytest && ruff format --check && ruff check`; in `frontend/`, run `pnpm lint && pnpm type-check && pnpm test && pnpm build`.
     Backup: run `/bin/bash ~/azure_db_backup.sh` once manually and confirm blob appears in the target container.
 
+10) Swapfile (as root) — set 4G swap:
+    sudo swapoff -a
+    sudo fallocate -l 4G /swapfile
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    sudo cp /etc/fstab /etc/fstab.bak
+    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+    swapon --show  # verify 4.0G active
+
 ## Validation and Acceptance
 
 Deployment is accepted when:
