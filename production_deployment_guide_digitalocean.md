@@ -18,13 +18,18 @@ apt update && apt upgrade -y
 apt install -y python3 python3-venv python3-pip python3-dev libpq-dev build-essential git nginx redis-server certbot python3-certbot-nginx unzip
 ufw allow OpenSSH && ufw allow 80 && ufw allow 443 && ufw --force enable
 systemctl enable --now redis-server
-# install azcopy
+
+# install aws cli and azcopy for backups
 cd /tmp
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
 rm -rf aws awscliv2.zip
+
+# if this doesn't work manually download the binary and upload it via sftp
+# https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10
 curl -L https://aka.ms/downloadazcopylinux64 -o azcopy.tar.gz
+
 tar -xf azcopy.tar.gz
 mv ./azcopy_linux_amd64_*/azcopy /usr/local/bin/azcopy
 chmod +x /usr/local/bin/azcopy
@@ -103,7 +108,9 @@ printf 'export AWS_BACKUP_BUCKET=your-s3-bucket\nexport AWS_BACKUP_PREFIX=musics
 chmod 600 ~/azure_backup_secrets ~/aws_backup_secrets
 mkdir -p ~/logs
 (crontab -l; echo '0 2 * * * . ~/azure_backup_secrets && /bin/bash ~/azure_db_backup.sh >> ~/logs/azure_backup.log 2>&1') | crontab -
-(crontab -l; echo '15 2 * * * . ~/aws_backup_secrets && /bin/bash ~/aws_db_backup.sh >> ~/logs/aws_backup.log 2>&1') | crontab -
+(crontab -l; echo '0 1 * * * . ~/aws_backup_secrets && /bin/bash ~/aws_db_backup.sh >> ~/logs/aws_backup.log 2>&1') | crontab -
+. ~/azure_backup_secrets && /bin/bash ~/azure_db_backup.sh
+. ~/aws_backup_secrets && /bin/bash ~/aws_db_backup.sh
 ```
 
 ## 8) CI/CD reconnect
