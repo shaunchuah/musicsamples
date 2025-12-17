@@ -1,27 +1,44 @@
-<!-- production_deployment_guide.md -->
-<!-- How to set up and deploy the Music Samples project on a fresh production VM. -->
-<!-- Exists to give operators a single, copy-pasteable runbook for rebuilding prod end-to-end. -->
-
 # G-Trac Production Deployment Guide
 
-Follow these steps on a fresh Ubuntu 24.04 VM. Commands assume deploy user `gtrac` and repo at `/home/gtrac/musicsamples`. Use a login shell, keep secrets out of git, and `chmod 600` any secret files.
+## DigitalOcean Setup
+Follow these steps on a fresh Ubuntu 24.04 droplet. Commands assume you start as `root`, create the `gtrac` user, and deploy to `/home/gtrac/musicsamples`. Use a login shell, keep secrets out of git, and `chmod 600` any secret files.
 
-## 1) VM prep (run once as root, then switch to gtrac)
+## Azure Setup
+When creating a VM on Azure, the user should be set to `gtrac` directly. Adjust commands accordingly (skip user creation steps). Ensure the VM has a public IP and necessary inbound port rules (SSH, HTTP, HTTPS).
+
+## 1) Droplet prep (run once as root, then switch to gtrac)
 
 ```bash
-sudo adduser gtrac && sudo usermod -aG sudo gtrac
-sudo rsync --archive --chown=gtrac:gtrac ~/.ssh /home/gtrac
-sudo apt update && sudo apt upgrade -y
+
+# Create gtrac user if starting as root
+adduser --disabled-password --gecos "" gtrac
+usermod -aG sudo gtrac
+printf 'gtrac ALL=(ALL) NOPASSWD:ALL\n' > /etc/sudoers.d/gtrac
+chmod 440 /etc/sudoers.d/gtrac
+rsync --archive --chown=gtrac:gtrac /root/.ssh /home/gtrac
+
+# Otherwise start here as gtrac
+sudo apt update && apt upgrade -y
 sudo apt install -y python3 python3-venv python3-pip python3-dev libpq-dev build-essential git nginx redis-server certbot python3-certbot-nginx unzip
-sudo ufw allow OpenSSH && sudo ufw allow 80 && sudo ufw allow 443 && sudo ufw --force enable
+sudo ufw allow OpenSSH && ufw allow 80 && ufw allow 443 && ufw --force enable
 sudo systemctl enable --now redis-server
-# install azcopy
+
+# install aws cli and azcopy for backups
 cd /tmp
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+rm -rf aws awscliv2.zip
+
+# if this doesn't work manually download the binary and upload it via sftp
+# https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-v10
 curl -L https://aka.ms/downloadazcopylinux64 -o azcopy.tar.gz
+
 tar -xf azcopy.tar.gz
-sudo mv ./azcopy_linux_amd64_*/azcopy /usr/local/bin/azcopy
-sudo chmod +x /usr/local/bin/azcopy
+mv ./azcopy_linux_amd64_*/azcopy /usr/local/bin/azcopy
+chmod +x /usr/local/bin/azcopy
 azcopy --version
+su - gtrac
 ```
 
 ## 2) Clone and configure backend (as gtrac)
@@ -78,27 +95,34 @@ pm2 startup systemd -u gtrac --hp /home/gtrac  # run the printed sudo command on
 ## 6) nginx for frontend (as root)
 
 ```bash
+cd /home/gtrac/musicsamples
 sudo cp scripts/frontend_nginx_config /etc/nginx/sites-available/music-frontend
 sudo ln -s /etc/nginx/sites-available/music-frontend /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 sudo certbot --nginx -d app.musicstudy.uk
 ```
 
-## 7) Backups (as gtrac)
+## 7) Backups to Azure and AWS S3 (as gtrac)
 
 ```bash
 cp scripts/azure_db_backup.sh ~/azure_db_backup.sh && chmod +x ~/azure_db_backup.sh
+cp scripts/aws_db_backup.sh ~/aws_db_backup.sh && chmod +x ~/aws_db_backup.sh
 printf 'export AZURE_BACKUP_SAS_URL=YOUR_CONTAINER_SAS_URL_WITHOUT_QUERY\nexport AZURE_BACKUP_SAS_TOKEN=?YOUR_FULL_SAS_TOKEN\n' > ~/azure_backup_secrets
-chmod 600 ~/azure_backup_secrets
+printf 'export AWS_BACKUP_BUCKET=your-s3-bucket\nexport AWS_BACKUP_PREFIX=musicsamples\nexport AWS_DEFAULT_REGION=us-east-1\nexport AWS_ACCESS_KEY_ID=your_access_key_id\nexport AWS_SECRET_ACCESS_KEY=your_secret_access_key\n' > ~/aws_backup_secrets
+chmod 600 ~/azure_backup_secrets ~/aws_backup_secrets
 mkdir -p ~/logs
+crontab -e
 (crontab -l; echo '0 2 * * * . ~/azure_backup_secrets && /bin/bash ~/azure_db_backup.sh >> ~/logs/azure_backup.log 2>&1') | crontab -
+(crontab -l; echo '0 1 * * * . ~/aws_backup_secrets && /bin/bash ~/aws_db_backup.sh >> ~/logs/aws_backup.log 2>&1') | crontab -
+. ~/azure_backup_secrets && /bin/bash ~/azure_db_backup.sh
+. ~/aws_backup_secrets && /bin/bash ~/aws_db_backup.sh
 ```
 
 ## 8) CI/CD reconnect
 
 - In GitHub repo settings, set secrets:
   - `PROD_SSH_USER=gtrac`
-  - `PROD_SSH_HOST=<vm-public-ip-or-domain>`
+  - `PROD_SSH_HOST=<droplet-public-ip-or-domain>`
   - `PROD_SSH_KEY=<new private key>`
   - `INSTALLATION_DIRECTORY=/home/gtrac/musicsamples`
 - Ensure `scripts/github_deploy_*.sh` are executable on the VM (`chmod +x`).
@@ -110,7 +134,7 @@ mkdir -p ~/logs
 - Redis: `redis-cli ping` (expect PONG).
 - Frontend: `curl -I https://app.musicstudy.uk` (expect 200); load login/logout end-to-end.
 - Optional local checks: `source venv/bin/activate && pytest && ruff format --check && ruff check`; in `frontend/`, run `pnpm lint && pnpm type-check && pnpm test && pnpm build`.
-- Backup: run `/bin/bash ~/azure_db_backup.sh` once and confirm blob upload.
+- Backup: run `/bin/bash ~/azure_db_backup.sh` and `/bin/bash ~/aws_db_backup.sh` once and confirm uploads.
 
 ## 10) Swapfile (as root) — set 4G swap to reduce OOM risk
 
