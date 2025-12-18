@@ -59,7 +59,7 @@ export default async function HomePage() {
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-muted/40">
         <AppSidebar user={user} activeHref="/" />
-        <SidebarInset>
+        <SidebarInset className="min-w-0">
           <header className="flex h-16 shrink-0 items-center gap-4 border-b px-4">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="-ml-1" />

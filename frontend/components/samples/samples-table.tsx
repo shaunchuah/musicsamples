@@ -359,7 +359,11 @@ export function SamplesTable() {
         header: ({ column }) => <SortableHeader column={column} title="Sample Type" />,
         accessorKey: "sample_type",
         enableSorting: true,
-        cell: ({ row }) => formatMaybe(row.original.sample_type_label ?? row.original.sample_type),
+        cell: ({ row }) => (
+          <span className="whitespace-normal break-words">
+            {formatMaybe(row.original.sample_type_label ?? row.original.sample_type)}
+          </span>
+        ),
       },
       {
         header: ({ column }) => <SortableHeader column={column} title="Collected At" />,
@@ -632,8 +636,8 @@ export function SamplesTable() {
         lastItemIndex={lastItemIndex}
         totalLabel={totalLabel}
       />
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[1200px] table-fixed border-collapse text-left text-sm">
+      <div className="max-w-full overflow-x-auto">
+        <table className="w-full min-w-[1200px] table-auto border-collapse text-left text-sm">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="border-b border-border/60">
