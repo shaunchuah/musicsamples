@@ -21,6 +21,7 @@ from rest_framework.views import APIView
 
 from api_v3.serializers import SampleV3Serializer
 from app.models import Sample
+from users.choices import JobTitleChoices, PrimaryOrganisationChoices
 from users.utils import generate_random_password, send_welcome_email
 
 User = get_user_model()
@@ -188,6 +189,8 @@ class PasswordChangeView(APIView):
 
 
 class StaffUserSerializer(serializers.ModelSerializer):
+    groups = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = (
@@ -199,11 +202,22 @@ class StaffUserSerializer(serializers.ModelSerializer):
             "primary_organisation",
             "is_staff",
             "is_active",
+            "last_login",
+            "date_joined",
+            "groups",
         )
-        read_only_fields = ("id", "is_staff", "is_active")
+        read_only_fields = ("id", "is_staff", "is_active", "last_login", "date_joined")
+
+    def get_groups(self, obj) -> list[str]:
+        return list(obj.groups.values_list("name", flat=True))
 
 
 class StaffUserUpdateSerializer(serializers.ModelSerializer):
+    job_title = serializers.ChoiceField(choices=JobTitleChoices.choices, required=False, allow_blank=True)
+    primary_organisation = serializers.ChoiceField(
+        choices=PrimaryOrganisationChoices.choices, required=False, allow_blank=True
+    )
+
     class Meta:
         model = User
         fields = ("email", "first_name", "last_name", "job_title", "primary_organisation")

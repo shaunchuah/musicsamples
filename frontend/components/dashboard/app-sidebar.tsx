@@ -75,7 +75,7 @@ const NAVIGATION: NavGroup[] = [
   {
     title: "Admin",
     items: [
-      { label: "Users", href: "/admin/users", icon: <UsersIcon className="size-4" /> },
+      { label: "Users", href: "/users", icon: <UsersIcon className="size-4" /> },
       { label: "Admin", href: "/admin", icon: <ShieldIcon className="size-4" /> },
     ],
   },

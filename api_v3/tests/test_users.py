@@ -4,6 +4,7 @@
 
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework.test import APIClient
 
 from app.factories import SampleFactory
@@ -150,3 +151,44 @@ def test_management_user_emails_requires_staff():
     response = client.get(url, format="json")
     assert response.status_code == 200
     assert "emails_joined" in response.json()
+
+
+def test_staff_user_list_includes_activity_fields():
+    staff = UserFactory(is_staff=True)
+    target = UserFactory(last_login=timezone.now())
+
+    client = APIClient()
+    client.force_authenticate(user=staff)
+
+    url = reverse("v3-users-list")
+    response = client.get(url, format="json")
+
+    assert response.status_code == 200
+    body = response.json()
+    users = body if isinstance(body, list) else body.get("results", [])
+    matching = next(user for user in users if user["email"] == target.email)
+    assert "last_login" in matching
+    assert "date_joined" in matching
+    assert "groups" in matching
+
+
+def test_staff_user_rejects_invalid_choices():
+    staff_user = UserFactory(is_staff=True)
+    client = APIClient()
+    client.force_authenticate(user=staff_user)
+
+    url = reverse("v3-users-list")
+    response = client.post(
+        url,
+        {
+            "email": "badchoice@example.com",
+            "first_name": "Bad",
+            "last_name": "Choice",
+            "job_title": "not-a-choice",
+        },
+        format="json",
+    )
+
+    assert response.status_code == 400
+    body = response.json()
+    assert "job_title" in body
