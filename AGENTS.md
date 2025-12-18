@@ -1,9 +1,5 @@
 # MUSIC Samples Web Application
 
-## ExecPlans
-
-When writing complex features or significant refactors, use an ExecPlan (as described in `codex/PLANS.md`) from design to implementation. Write new plans to the `codex/plans` dir. Place any temporary research, clones, etc., in a subdirectory of `codex`.
-
 ## Do
 
 - Activate the virtual environment before running any terminal commands:
@@ -15,6 +11,7 @@ When writing complex features or significant refactors, use an ExecPlan (as desc
 - default to small diffs
 - Prioritize simplicity and minimalism in your solutions.
 - if you want to make any Database-related change, suggest it first to the User
+- keep all plans in `codex/` for future reference
 
 ## Don't
 

@@ -5,8 +5,13 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from api_v3.views.auth import CurrentUserView, V3TokenBlacklistView, V3TokenObtainPairView, V3TokenRefreshView
-from api_v3.views.samples import SampleV3ViewSet
+from api_v3.views import (
+    CurrentUserView,
+    SampleV3ViewSet,
+    V3TokenBlacklistView,
+    V3TokenObtainPairView,
+    V3TokenRefreshView,
+)
 
 router = routers.DefaultRouter()
 router.register(r"samples", SampleV3ViewSet, "v3-samples")

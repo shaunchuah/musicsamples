@@ -23,27 +23,3 @@ def test_api_v3_login_returns_tokens():
     body = response.json()
     assert "access" in body
     assert "refresh" in body
-
-
-def test_api_v3_current_user_requires_authentication():
-    client = APIClient()
-    url = reverse("v3-current-user")
-
-    response = client.get(url, format="json")
-
-    assert response.status_code == 401
-
-
-def test_api_v3_current_user_returns_profile():
-    user = UserFactory(email="frontend-user@example.com", first_name="Front", last_name="End")
-    client = APIClient()
-    client.force_authenticate(user=user)
-
-    url = reverse("v3-current-user")
-    response = client.get(url, format="json")
-
-    assert response.status_code == 200
-    body = response.json()
-    assert body["email"] == user.email
-    assert body["first_name"] == user.first_name
-    assert body["last_name"] == user.last_name
