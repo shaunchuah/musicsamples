@@ -9,7 +9,7 @@ When writing complex features or significant refactors, use an ExecPlan (as desc
 - Activate the virtual environment before running any terminal commands:
 
   ```bash
-  source venv/bin/activate
+  source .venv/bin/activate
   ```
 
 - default to small diffs
@@ -26,13 +26,13 @@ When writing complex features or significant refactors, use an ExecPlan (as desc
 To run the django development server:
 
 ```bash
-source venv/bin/activate && python manage.py runserver
+source .venv/bin/activate && python manage.py runserver
 ```
 
 To run tests:
 
 ```bash
-source venv/bin/activate && pytest
+source .venv/bin/activate && pytest
 ```
 
 For the frontend app in `frontend/`:

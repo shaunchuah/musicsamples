@@ -13,6 +13,7 @@ def page_not_found_view(request):
 urlpatterns = [
     path("", include("app.urls")),
     path("", include("users.urls")),
+    path("api/v3/", include("api_v3.urls")),
     path("datasets/", include("datasets.urls", namespace="datasets")),
     path("select2/", include("django_select2.urls")),
     path("api-auth/", include("rest_framework.urls")),

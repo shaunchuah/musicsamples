@@ -1,50 +1,20 @@
-from django.contrib.auth import authenticate
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, viewsets
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.filters import OrderingFilter
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
+# api_v3/views/samples.py
+# Hosts the v3 sample API endpoints used by the Next.js frontend, including list/detail and CRUD with audit stamping.
+# Exists to decouple the API surface from legacy template views while keeping feature parity for samples.
 
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema
+from rest_framework import viewsets
+from rest_framework.filters import OrderingFilter
+
+from api_v3.serializers import SampleV3DetailSerializer, SampleV3Serializer
 from app.filters import SampleV3Filter
 from app.models import Sample
 from app.pagination import SamplePageNumberPagination
-from app.serializers import SampleV3DetailSerializer, SampleV3Serializer
 from core.clinical import get_samples_with_clinical_data
 
 
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def login_view(request):
-    email = request.data.get("email")
-    password = request.data.get("password")
-
-    user = authenticate(email=email, password=password)
-
-    if user is not None:
-        refresh = RefreshToken.for_user(user)
-
-        return Response(
-            {
-                "status": "success",
-                "user": {
-                    "email": user.email,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "is_staff": user.is_staff,
-                    "is_superuser": user.is_superuser,
-                    "groups": [group.name for group in user.groups.all()],
-                },
-                "token": str(refresh.access_token),
-                "refresh": str(refresh),
-                "expires_at": str(refresh.access_token.get("exp")),
-            }
-        )
-    else:
-        return Response({"status": "error", "message": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
-
-
+@extend_schema(tags=["v3"])
 class SampleV3ViewSet(viewsets.ModelViewSet):
     """
     API for the v3 frontend that exposes key sample details.

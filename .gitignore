@@ -12,11 +12,11 @@ htmlcov/
 *.sqlite3
 *.log
 *.sqlite
-dev_db_empty.sqlite
 
 # venv
 env
 venv
+.venv
 
 # other
 .DS_Store

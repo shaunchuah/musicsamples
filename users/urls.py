@@ -3,7 +3,6 @@ from django.contrib.auth.views import LogoutView
 from django.urls import path
 from rest_framework_simplejwt.views import TokenBlacklistView, TokenObtainPairView, TokenRefreshView
 
-from users.api_views import CurrentUserAPIView
 from users.views import (
     PasswordChangeView,
     account,
@@ -62,7 +61,6 @@ urlpatterns = [
         auth_views.PasswordChangeDoneView.as_view(template_name="accounts/password_change_done.html"),
         name="password_change_done",
     ),
-    path("api/v3/users/me/", CurrentUserAPIView.as_view(), name="current_user_api"),
     path("api/password-reset/", password_reset_api, name="password_reset_api"),
     path(
         "api/password-reset/confirm/",

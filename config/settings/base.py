@@ -74,6 +74,7 @@ LOCAL_APPS = [
     "users",
     "datasets",
     "core",
+    "api_v3",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -174,9 +175,6 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
-    "DEFAULT_RENDERER_CLASSES": [
-        "rest_framework.renderers.JSONRenderer",
-    ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
@@ -201,10 +199,13 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100MB
 SAMPLE_PAGINATION_SIZE = 100
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Music Samples API",
-    "DESCRIPTION": "OpenAPI schema for the Music Samples backend.",
+    "TITLE": "G-Trac API",
+    "DESCRIPTION": "OpenAPI schema for the G-Trac backend.",
     "VERSION": "3.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "TAGS": [
+        {"name": "v3", "description": "Endpoints for the v3 frontend"},
+    ],
 }
 DATASTORE_PAGINATION_SIZE = 100
 STUDY_ID_PAGINATION_SIZE = 100
