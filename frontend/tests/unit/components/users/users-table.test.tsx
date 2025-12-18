@@ -60,13 +60,6 @@ describe("UsersTable", () => {
       json: async () => ({ results: [], count: 0 }),
     } as Response);
 
-    // Management emails fetch
-    fetchMock.mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: async () => ({ emails: [], emails_joined: "" }),
-    } as Response);
-
     // Create call succeeds
     fetchMock.mockResolvedValueOnce({
       ok: true,
@@ -117,7 +110,7 @@ describe("UsersTable", () => {
       );
     });
 
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(4));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
     const nameMatches = await screen.findAllByText(/new user/i);
     expect(nameMatches.length).toBeGreaterThan(0);
     expect(screen.getByText("new.user@example.com")).toBeInTheDocument();

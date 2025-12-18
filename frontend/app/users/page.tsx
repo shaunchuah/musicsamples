@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { UserEmailListCard } from "@/components/users/user-email-list-card";
 import { UsersTable } from "@/components/users/users-table";
 import { AUTH_COOKIE_NAME, buildBackendUrl } from "@/lib/auth";
 import { isJwtExpired } from "@/lib/jwt";
@@ -108,6 +109,7 @@ export default async function UsersPage() {
             </div>
           </header>
           <main className="flex flex-1 flex-col gap-6 p-6">
+            <UserEmailListCard />
             <UsersTable />
           </main>
         </SidebarInset>
