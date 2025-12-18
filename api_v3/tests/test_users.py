@@ -6,6 +6,7 @@ import pytest
 from django.urls import reverse
 from rest_framework.test import APIClient
 
+from app.factories import SampleFactory
 from users.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
@@ -33,3 +34,119 @@ def test_api_v3_current_user_returns_profile():
     assert body["email"] == user.email
     assert body["first_name"] == user.first_name
     assert body["last_name"] == user.last_name
+
+
+def test_api_v3_current_user_patch_updates_profile():
+    user = UserFactory(email="edit-me@example.com", first_name="Old")
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("v3-current-user")
+    response = client.patch(url, {"first_name": "NewName"}, format="json")
+
+    assert response.status_code == 200
+    user.refresh_from_db()
+    assert user.first_name == "NewName"
+
+
+def test_password_reset_request_rejects_invalid_email():
+    client = APIClient()
+    url = reverse("v3-password-reset")
+
+    response = client.post(url, {"email": ""}, format="json")
+
+    assert response.status_code == 400
+    assert "error" in response.json()
+
+
+def test_password_change_updates_password():
+    user = UserFactory(email="changer@example.com")
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    url = reverse("v3-password-change")
+    response = client.post(url, {"new_password": "A-secure-pass-123"}, format="json")
+
+    assert response.status_code == 200
+    user.refresh_from_db()
+    assert user.check_password("A-secure-pass-123")
+
+
+def test_staff_user_create_and_welcome_email(settings, mailoutbox):
+    staff_user = UserFactory(is_staff=True)
+    client = APIClient()
+    client.force_authenticate(user=staff_user)
+
+    url = reverse("v3-users-list")
+    response = client.post(
+        url,
+        {"email": "newuser@example.com", "first_name": "New", "last_name": "User"},
+        format="json",
+    )
+
+    assert response.status_code == 201
+    assert mailoutbox  # welcome email sent
+
+
+def test_staff_cannot_remove_own_staff_status():
+    staff_user = UserFactory(is_staff=True)
+    client = APIClient()
+    client.force_authenticate(user=staff_user)
+
+    url = reverse("v3-users-remove-staff", args=[staff_user.id])
+    response = client.post(url, format="json")
+
+    assert response.status_code == 400
+    assert "error" in response.json()
+
+
+def test_token_refresh_creates_new_token():
+    user = UserFactory(email="token@example.com")
+    client = APIClient()
+    client.force_authenticate(user=user)
+
+    create_url = reverse("v3-current-user-token")
+    first = client.post(create_url, format="json").json()["token"]
+
+    refresh_url = reverse("v3-current-user-token-refresh")
+    refreshed = client.post(refresh_url, format="json").json()["token"]
+
+    assert refreshed
+    assert refreshed != first
+
+
+def test_recent_samples_returns_only_user_samples():
+    user = UserFactory(email="sampler@example.com")
+    client = APIClient()
+    client.force_authenticate(user=user)
+    # create >20 to ensure cap
+    for _ in range(25):
+        SampleFactory(last_modified_by=user.email)
+    SampleFactory(sample_id="OTHER-ID-123", last_modified_by="other@example.com")
+
+    url = reverse("v3-current-user-recent-samples")
+    response = client.get(url, format="json")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["count"] == 25  # only this user's samples count
+    results = body["results"]
+    assert len(results) == 20  # default page size
+    sample_ids = [sample["sample_id"] for sample in results]
+    assert "OTHER-ID-123" not in sample_ids
+
+
+def test_management_user_emails_requires_staff():
+    user = UserFactory()
+    staff = UserFactory(is_staff=True)
+    client = APIClient()
+
+    url = reverse("v3-management-user-emails")
+
+    client.force_authenticate(user=user)
+    assert client.get(url, format="json").status_code == 403
+
+    client.force_authenticate(user=staff)
+    response = client.get(url, format="json")
+    assert response.status_code == 200
+    assert "emails_joined" in response.json()

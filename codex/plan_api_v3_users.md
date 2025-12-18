@@ -31,3 +31,10 @@ Replicate the user/account behaviors currently implemented in `users/views.py` a
 6) **User activity data**: add endpoint returning the last 20 samples modified by the current user (matches `account` view) using existing sample serializers; add staff endpoint returning all user emails (semicolon-joined or list) used by management page.
 7) **Routing & docs**: register routes under `api_v3/urls.py` with clear namespacing (likely `/users/...` and `/management/...`) and annotate with `extend_schema` tags for Spectacular.
 8) **Tests**: add API tests covering each new endpoint (permissions, validation, email triggers, guardrails for self/superuser protections) and sample-query outputs.
+
+## API surface (implemented)
+- `/auth/login`, `/auth/refresh`, `/auth/blacklist`: SimpleJWT from `api_v3/views/auth.py`.
+- `/users/me` (GET/PATCH), `/users/me/password`, `/users/me/token`, `/users/me/token/refresh`, `/users/me/recent-samples`.
+- `/users/password-reset`, `/users/password-reset/confirm`.
+- Staff-only `/users/` list/create/update, plus `/users/{id}/make_staff`, `/users/{id}/remove_staff`, `/users/{id}/activate`, `/users/{id}/deactivate`.
+- Staff-only `/management/user-emails`.

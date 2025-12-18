@@ -8,4 +8,13 @@ from api_v3.views.auth import (  # noqa: F401
     V3TokenRefreshView,
 )
 from api_v3.views.samples import SampleV3ViewSet  # noqa: F401
-from api_v3.views.users import CurrentUserView  # noqa: F401
+from api_v3.views.users import (  # noqa: F401
+    CurrentUserRecentSamplesView,
+    CurrentUserTokenViewSet,
+    CurrentUserView,
+    ManagementUserEmailsView,
+    PasswordChangeView,
+    PasswordResetConfirmView,
+    PasswordResetRequestView,
+    StaffUserViewSet,
+)
