@@ -29,6 +29,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -390,7 +391,8 @@ export function UsersTable() {
   const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
   const [selectedUser, setSelectedUser] = useState<StaffUser | null>(null);
   const [actionInFlight, setActionInFlight] = useState<string | null>(null);
-  const [sorting, setSorting] = useState<SortingState>([{ id: "displayName", desc: false }]);
+  const [pendingAction, setPendingAction] = useState<{ user: DisplayUser; action: UserAction } | null>(null);
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [emails, setEmails] = useState<ManagementEmails | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
@@ -660,7 +662,7 @@ export function UsersTable() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleAction(user.id, staffAction)}
+              onClick={() => setPendingAction({ user, action: staffAction })}
               disabled={staffBusy || Boolean(actionInFlight)}
             >
               {staffBusy ? "Working..." : staffLabel}
@@ -682,7 +684,7 @@ export function UsersTable() {
             <Button
               variant={user.is_active ? "destructive" : "default"}
               size="sm"
-              onClick={() => handleAction(user.id, activeAction)}
+              onClick={() => setPendingAction({ user, action: activeAction })}
               disabled={activeBusy || Boolean(actionInFlight)}
             >
               {activeBusy ? "Working..." : activeLabel}
@@ -691,7 +693,7 @@ export function UsersTable() {
         },
       },
     ],
-    [actionInFlight, handleAction, startEdit],
+    [actionInFlight, startEdit],
   );
 
   const table = useReactTable({
@@ -712,9 +714,6 @@ export function UsersTable() {
         if (b === null || b === undefined) return 1;
         return a > b ? 1 : -1;
       },
-    },
-    initialState: {
-      sorting: [{ id: "displayName", desc: false }],
     },
   });
 
@@ -839,6 +838,64 @@ export function UsersTable() {
             defaultValues={selectedUser}
             onSubmit={handleDialogSubmit}
           />
+
+          <Dialog
+            open={Boolean(pendingAction)}
+            onOpenChange={(open) => {
+              if (!open) setPendingAction(null);
+            }}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  {pendingAction
+                    ? pendingAction.action === "deactivate"
+                      ? `Deactivate ${pendingAction.user.displayName}'s account?`
+                      : pendingAction.action === "activate"
+                        ? `Activate ${pendingAction.user.displayName}'s account?`
+                        : pendingAction.action === "make_staff"
+                          ? `Make ${pendingAction.user.displayName} a staff member?`
+                          : `Remove staff access for ${pendingAction.user.displayName}?`
+                    : ""}
+                </DialogTitle>
+                <DialogDescription>
+                  {pendingAction
+                    ? pendingAction.action === "deactivate"
+                      ? "They will no longer be able to sign in until reactivated."
+                      : pendingAction.action === "activate"
+                        ? "Restore their ability to access the dashboard."
+                        : pendingAction.action === "make_staff"
+                          ? "Grant staff permissions to manage users and data."
+                          : "Revoke staff permissions from this account."
+                    : ""}
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setPendingAction(null)}
+                  disabled={Boolean(actionInFlight)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant={
+                    pendingAction?.action === "deactivate" || pendingAction?.action === "remove_staff"
+                      ? "destructive"
+                      : "default"
+                  }
+                  onClick={() => {
+                    if (!pendingAction) return;
+                    void handleAction(pendingAction.user.id, pendingAction.action);
+                    setPendingAction(null);
+                  }}
+                  disabled={Boolean(actionInFlight)}
+                >
+                  {actionInFlight ? "Working..." : "Confirm"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </CardContent>
       </Card>
     </div>
@@ -852,16 +909,21 @@ type HeaderButtonProps = {
 
 function HeaderButton({ label, column }: HeaderButtonProps) {
   const state = column.getIsSorted();
+
   return (
     <button
       type="button"
-      className="flex items-center gap-1 font-medium"
-      onClick={() => column.toggleSorting(state === "asc")}
+      className="flex items-center gap-2 font-medium cursor-pointer"
+      onClick={() => column.toggleSorting()}
     >
       {label}
-      <span className="text-xs text-muted-foreground">
-        {state === "asc" ? "↑" : state === "desc" ? "↓" : ""}
-      </span>
+      {state === "asc" ? (
+        <ArrowUp className="h-4 w-4 text-foreground" aria-hidden />
+      ) : state === "desc" ? (
+        <ArrowDown className="h-4 w-4 text-foreground" aria-hidden />
+      ) : (
+        <ArrowUpDown className="h-4 w-4 text-muted-foreground" aria-hidden />
+      )}
     </button>
   );
 }

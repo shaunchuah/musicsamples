@@ -3,12 +3,15 @@
 # Exists to ensure duplicated auth/profile routes inside api_v3 behave as expected without relying on legacy URLs.
 
 import pytest
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework.test import APIClient
 
 from app.factories import SampleFactory
 from users.factories import UserFactory
+
+User = get_user_model()
 
 pytestmark = pytest.mark.django_db
 
@@ -140,6 +143,9 @@ def test_recent_samples_returns_only_user_samples():
 def test_management_user_emails_requires_staff():
     user = UserFactory()
     staff = UserFactory(is_staff=True)
+    anonymous_email = "AnonymousUser"
+    if not User.objects.filter(email=anonymous_email).exists():
+        UserFactory(email=anonymous_email)
     client = APIClient()
 
     url = reverse("v3-management-user-emails")
@@ -150,7 +156,10 @@ def test_management_user_emails_requires_staff():
     client.force_authenticate(user=staff)
     response = client.get(url, format="json")
     assert response.status_code == 200
-    assert "emails_joined" in response.json()
+    body = response.json()
+    assert "emails_joined" in body
+    assert anonymous_email not in body["emails"]
+    assert anonymous_email not in body["emails_joined"]
 
 
 def test_staff_user_list_includes_activity_fields():

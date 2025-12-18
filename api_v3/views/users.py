@@ -232,7 +232,9 @@ class StaffUserViewSet(
     Staff-only management for non-superusers: list, create, edit, and toggle staff/active flags.
     """
 
-    queryset = User.objects.filter(is_superuser=False).order_by("-is_active", "-last_login")
+    queryset = (
+        User.objects.filter(is_superuser=False).exclude(email="AnonymousUser").order_by("-is_active", "first_name")
+    )
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get_serializer_class(self):
@@ -400,5 +402,5 @@ class ManagementUserEmailsView(APIView):
 
     @extend_schema(tags=["v3"], description="Staff-only listing of all user emails (list and semicolon string).")
     def get(self, request):
-        emails = list(User.objects.values_list("email", flat=True))
+        emails = list(User.objects.exclude(email="AnonymousUser").values_list("email", flat=True))
         return Response({"emails": emails, "emails_joined": ";".join(emails)})
