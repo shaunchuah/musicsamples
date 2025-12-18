@@ -3,7 +3,7 @@
 // Exists to separate presentational table concerns from the data-fetching logic.
 
 import type { ColumnDef, HeaderContext, SortingFn } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, CheckIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -101,11 +101,11 @@ export function buildUserColumns({
       header: ({ column }) => <HeaderButton label="Staff" column={column} />,
       cell: ({ row }) => (
         <span
-          className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-            row.original.is_staff ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
+          className={`inline-flex items-center rounded-full p-1 text-xs font-medium ${
+            row.original.is_staff ? "bg-emerald-50 text-emerald-700" : null
           }`}
         >
-          {row.original.is_staff ? "Staff" : "Standard"}
+          {row.original.is_staff ? <CheckIcon size="12" /> : ""}
         </span>
       ),
       sortingFn: "basic",
@@ -128,7 +128,9 @@ export function buildUserColumns({
       accessorKey: "last_login",
       header: ({ column }) => <HeaderButton label="Last Login" column={column} />,
       cell: ({ row }) => (
-        <span className="text-muted-foreground">{formatDate(row.original.last_login)}</span>
+        <span className="text-muted-foreground whitespace-nowrap">
+          {formatDate(row.original.last_login)}
+        </span>
       ),
       sortingFn: "datetime",
     },
@@ -136,7 +138,9 @@ export function buildUserColumns({
       accessorKey: "date_joined",
       header: ({ column }) => <HeaderButton label="Date Joined" column={column} />,
       cell: ({ row }) => (
-        <span className="text-muted-foreground">{formatDate(row.original.date_joined)}</span>
+        <span className="text-muted-foreground whitespace-nowrap">
+          {formatDate(row.original.date_joined)}
+        </span>
       ),
       sortingFn: "datetime",
     },

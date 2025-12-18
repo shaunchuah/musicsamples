@@ -90,7 +90,7 @@ export function UserEmailListCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>User email list</CardTitle>
+        <CardTitle>User Email List</CardTitle>
         <CardDescription>Copy all user emails for bulk messages.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
