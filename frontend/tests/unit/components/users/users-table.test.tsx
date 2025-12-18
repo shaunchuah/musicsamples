@@ -38,6 +38,11 @@ describe("UsersTable", () => {
         count: 1,
       }),
     } as Response);
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({ groups: ["Admins", "Editors"] }),
+    } as Response);
 
     render(<UsersTable />);
 
@@ -48,6 +53,12 @@ describe("UsersTable", () => {
       "/api/dashboard/users",
       expect.objectContaining({ cache: "no-store" }),
     );
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/users/groups",
+        expect.objectContaining({ cache: "no-store" }),
+      );
+    });
   });
 
   it("creates a user through the dialog and refreshes the list", async () => {
@@ -58,6 +69,13 @@ describe("UsersTable", () => {
       ok: true,
       status: 200,
       json: async () => ({ results: [], count: 0 }),
+    } as Response);
+
+    // Available groups
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({ groups: ["Admins", "Editors"] }),
     } as Response);
 
     // Create call succeeds
@@ -110,7 +128,7 @@ describe("UsersTable", () => {
       );
     });
 
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(4));
     const nameMatches = await screen.findAllByText(/new user/i);
     expect(nameMatches.length).toBeGreaterThan(0);
     expect(screen.getByText("new.user@example.com")).toBeInTheDocument();
@@ -134,6 +152,11 @@ describe("UsersTable", () => {
           date_joined: "2024-03-01T00:00:00Z",
         },
       ],
+    } as Response);
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({ groups: [] }),
     } as Response);
 
     render(<UsersTable />);

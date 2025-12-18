@@ -4,6 +4,7 @@
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework.test import APIClient
@@ -201,3 +202,40 @@ def test_staff_user_rejects_invalid_choices():
     assert response.status_code == 400
     body = response.json()
     assert "job_title" in body
+
+
+def test_staff_user_patch_updates_groups():
+    staff_user = UserFactory(is_staff=True)
+    target_user = UserFactory()
+    group_a = Group.objects.create(name="Admins")
+    group_b = Group.objects.create(name="Editors")
+
+    client = APIClient()
+    client.force_authenticate(user=staff_user)
+
+    url = reverse("v3-users-detail", args=[target_user.id])
+    response = client.patch(
+        url,
+        {"groups": [group_a.name, group_b.name]},
+        format="json",
+    )
+
+    assert response.status_code == 200
+    target_user.refresh_from_db()
+    assert set(target_user.groups.values_list("name", flat=True)) == {group_a.name, group_b.name}
+
+
+def test_staff_user_groups_action_lists_available_groups():
+    staff_user = UserFactory(is_staff=True)
+    Group.objects.create(name="Admins")
+    Group.objects.create(name="Editors")
+
+    client = APIClient()
+    client.force_authenticate(user=staff_user)
+
+    url = reverse("v3-users-groups")
+    response = client.get(url, format="json")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert set(body.get("groups", [])) == {"Admins", "Editors"}

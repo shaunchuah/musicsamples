@@ -4,6 +4,7 @@
 
 from django.conf import settings
 from django.contrib.auth import get_user_model, update_session_auth_hash
+from django.contrib.auth.models import Group
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
 from django.db import IntegrityError
@@ -213,6 +214,11 @@ class StaffUserSerializer(serializers.ModelSerializer):
 
 
 class StaffUserUpdateSerializer(serializers.ModelSerializer):
+    groups = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+        allow_empty=True,
+    )
     job_title = serializers.ChoiceField(choices=JobTitleChoices.choices, required=False, allow_blank=True)
     primary_organisation = serializers.ChoiceField(
         choices=PrimaryOrganisationChoices.choices, required=False, allow_blank=True
@@ -220,8 +226,29 @@ class StaffUserUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("email", "first_name", "last_name", "job_title", "primary_organisation")
+        fields = ("email", "first_name", "last_name", "job_title", "primary_organisation", "groups")
         extra_kwargs = {"email": {"required": False}}
+
+    def validate_groups(self, value: list[str]) -> list[str]:
+        if value is None:
+            return []
+        cleaned = [name.strip() for name in value if name and name.strip()]
+        if not cleaned:
+            return []
+
+        found = set(Group.objects.filter(name__in=cleaned).values_list("name", flat=True))
+        missing = [name for name in cleaned if name not in found]
+        if missing:
+            raise serializers.ValidationError(f"Unknown groups: {', '.join(missing)}")
+
+        # Preserve original ordering without duplicates for deterministic assignment.
+        seen = set()
+        ordered = []
+        for name in cleaned:
+            if name not in seen:
+                ordered.append(name)
+                seen.add(name)
+        return ordered
 
 
 @extend_schema(tags=["v3"])
@@ -245,6 +272,7 @@ class StaffUserViewSet(
         return StaffUserSerializer
 
     def perform_create(self, serializer):
+        group_names = serializer.validated_data.pop("groups", None)
         random_password = generate_random_password()
         try:
             user = User.objects.create_user(password=random_password, **serializer.validated_data)  # type: ignore
@@ -252,15 +280,30 @@ class StaffUserViewSet(
             raise serializers.ValidationError({"email": "This email has already been registered."})
 
         send_welcome_email(user, self.request)
+        self._assign_groups(user, group_names)
 
     def partial_update(self, request, *args, **kwargs):
         user = self.get_object()
         if user.is_superuser:
             return Response({"error": "You cannot edit a superuser."}, status=status.HTTP_403_FORBIDDEN)
+
         serializer = self.get_serializer(user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
+        group_names = serializer.validated_data.pop("groups", None)
         serializer.save()
+        if group_names is not None:
+            self._assign_groups(user, group_names)
         return Response(StaffUserSerializer(user).data)
+
+    @extend_schema(
+        description="List all available group names for staff assignment.",
+        request=None,
+        responses={"200": serializers.Serializer},
+    )
+    @action(detail=False, methods=["get"])
+    def groups(self, request):
+        names = list(Group.objects.order_by("name").values_list("name", flat=True))
+        return Response({"groups": names})
 
     @extend_schema(
         description="Grant staff status to a user (superusers cannot be edited).",
@@ -317,6 +360,21 @@ class StaffUserViewSet(
         user.is_active = False
         user.save()
         return Response({"success": True, "message": f"{user.email} has been deactivated."})
+
+    def _assign_groups(self, user, group_names: list[str] | None):
+        """
+        Assign validated group names to the user; clears groups when an empty list is provided.
+        """
+
+        if group_names is None:
+            return
+
+        if not group_names:
+            user.groups.clear()
+            return
+
+        groups = list(Group.objects.filter(name__in=group_names))
+        user.groups.set(groups)
 
 
 class TokenResponseSerializer(serializers.Serializer):

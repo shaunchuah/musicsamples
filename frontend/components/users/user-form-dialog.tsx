@@ -41,6 +41,7 @@ const dialogSchema = z.object({
   last_name: z.string().min(1, "Last name is required."),
   job_title: z.union([z.literal(""), jobTitleEnum]),
   primary_organisation: z.union([z.literal(""), primaryOrgEnum]),
+  groups: z.array(z.string()),
 });
 
 function normalisePayload(values: UserFormValues): UserFormValues {
@@ -48,6 +49,7 @@ function normalisePayload(values: UserFormValues): UserFormValues {
     ...values,
     job_title: values.job_title?.trim() ?? "",
     primary_organisation: values.primary_organisation?.trim() ?? "",
+    groups: Array.from(new Set(values.groups ?? [])).filter(Boolean),
   };
 }
 
@@ -57,6 +59,9 @@ type UserFormDialogProps = {
   onOpenChange: (open: boolean) => void;
   defaultValues: StaffUser | null;
   onSubmit: (values: UserFormValues, userId?: number) => Promise<void>;
+  groupOptions: string[];
+  groupsLoading: boolean;
+  groupsError: string | null;
 };
 
 export function UserFormDialog({
@@ -65,6 +70,9 @@ export function UserFormDialog({
   onOpenChange,
   defaultValues,
   onSubmit,
+  groupOptions,
+  groupsLoading,
+  groupsError,
 }: UserFormDialogProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -76,6 +84,7 @@ export function UserFormDialog({
       last_name: "",
       job_title: "",
       primary_organisation: "",
+      groups: [],
     },
   });
 
@@ -86,6 +95,7 @@ export function UserFormDialog({
       last_name: defaultValues?.last_name ?? "",
       job_title: defaultValues?.job_title ?? "",
       primary_organisation: defaultValues?.primary_organisation ?? "",
+      groups: defaultValues?.groups ?? [],
     });
     setSubmitError(null);
   }, [defaultValues, form, open]);
@@ -222,6 +232,52 @@ export function UserFormDialog({
                         </option>
                       ))}
                     </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="groups"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Groups</FormLabel>
+                  <FormControl>
+                    <div className="space-y-2">
+                      {groupsLoading ? (
+                        <p className="text-sm text-muted-foreground">Loading groups...</p>
+                      ) : groupOptions.length ? (
+                        <div className="grid gap-2">
+                          {groupOptions.map((groupName) => {
+                            const checked = field.value?.includes(groupName) ?? false;
+                            return (
+                              <label key={groupName} className="flex items-center gap-2 text-sm">
+                                <input
+                                  type="checkbox"
+                                  className="h-4 w-4 rounded border-input"
+                                  checked={checked}
+                                  onChange={(event) => {
+                                    const current = field.value ?? [];
+                                    const next = event.target.checked
+                                      ? [...current, groupName]
+                                      : current.filter((name) => name !== groupName);
+                                    field.onChange(Array.from(new Set(next)));
+                                  }}
+                                />
+                                <span className="text-foreground">{groupName}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">No groups available.</p>
+                      )}
+                      {groupsError ? (
+                        <p className="text-sm text-destructive">{groupsError}</p>
+                      ) : null}
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

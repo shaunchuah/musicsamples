@@ -58,6 +58,9 @@ export function UsersTable() {
   const [actionInFlight, setActionInFlight] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [groupOptions, setGroupOptions] = useState<string[]>([]);
+  const [groupsLoading, setGroupsLoading] = useState(false);
+  const [groupsError, setGroupsError] = useState<string | null>(null);
 
   const loadUsers = useCallback(async () => {
     setIsLoading(true);
@@ -94,9 +97,35 @@ export function UsersTable() {
     }
   }, []);
 
+  const loadGroups = useCallback(async () => {
+    setGroupsLoading(true);
+    setGroupsError(null);
+
+    try {
+      const response = await fetch("/api/users/groups", { cache: "no-store" });
+      const payload = (await response.json().catch(() => null)) as
+        | { groups?: string[]; detail?: string; error?: string }
+        | null;
+
+      if (!response.ok) {
+        throw new Error(payload?.detail ?? payload?.error ?? "Unable to fetch groups.");
+      }
+
+      setGroupOptions(payload?.groups ?? []);
+    } catch (fetchError) {
+      const message =
+        fetchError instanceof Error ? fetchError.message : "Unable to fetch groups.";
+      setGroupOptions([]);
+      setGroupsError(message);
+    } finally {
+      setGroupsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     void loadUsers();
-  }, [loadUsers]);
+    void loadGroups();
+  }, [loadGroups, loadUsers]);
 
   const handleDialogSubmit = useCallback(
     async (values: UserFormValues, userId?: number) => {
@@ -291,6 +320,9 @@ export function UsersTable() {
             onOpenChange={setDialogOpen}
             defaultValues={selectedUser}
             onSubmit={handleDialogSubmit}
+            groupOptions={groupOptions}
+            groupsLoading={groupsLoading}
+            groupsError={groupsError}
           />
 
           <Dialog

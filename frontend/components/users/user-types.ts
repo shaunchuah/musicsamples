@@ -31,6 +31,7 @@ export type UserFormValues = {
   last_name: string;
   job_title: string;
   primary_organisation: string;
+  groups: string[];
 };
 
 export type StatusMessage = {
