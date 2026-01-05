@@ -16,6 +16,7 @@ from api_v3.serializers import (
     SampleLocationV3Serializer,
     SampleV3DetailSerializer,
     SampleV3Serializer,
+    SampleV3UpdateSerializer,
 )
 from app.filters import SampleV3Filter
 from app.models import Sample, StudyIdentifier
@@ -67,6 +68,8 @@ class SampleV3ViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "retrieve":
             return SampleV3DetailSerializer
+        if self.action in ("update", "partial_update"):
+            return SampleV3UpdateSerializer
         return super().get_serializer_class()
 
     def _current_user_identifier(self) -> str:

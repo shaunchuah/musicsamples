@@ -27,14 +27,22 @@ import {
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+import { AlertDescription, AlertError, AlertSuccess } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { buildBackendUrl } from "@/lib/auth";
 
 type StudyIdentifierSummary = {
   id: number;
@@ -213,6 +221,11 @@ export function SamplesTable() {
   const [rows, setRows] = useState<SampleRow[]>(EMPTY_STATE);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [usedDialogOpen, setUsedDialogOpen] = useState(false);
+  const [usedTarget, setUsedTarget] = useState<SampleRow | null>(null);
+  const [usedError, setUsedError] = useState<string | null>(null);
+  const [isMarkingUsed, setIsMarkingUsed] = useState(false);
+  const [usedStatusMessage, setUsedStatusMessage] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: DEFAULT_PAGE_SIZE,
@@ -241,6 +254,18 @@ export function SamplesTable() {
       return { ...previous, pageIndex: 0 };
     });
   }, [sorting]);
+
+  useEffect(() => {
+    if (!usedStatusMessage) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setUsedStatusMessage(null);
+    }, 3000);
+
+    return () => window.clearTimeout(timer);
+  }, [usedStatusMessage]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -319,6 +344,88 @@ export function SamplesTable() {
       controller.abort();
     };
   }, [pagination, sorting]);
+
+  const closeUsedDialog = (forceClose = false) => {
+    if (isMarkingUsed && !forceClose) {
+      return;
+    }
+    setUsedDialogOpen(false);
+    setUsedTarget(null);
+    setUsedError(null);
+  };
+
+  const openUsedDialog = (row: SampleRow) => {
+    setUsedTarget(row);
+    setUsedError(null);
+    setUsedDialogOpen(true);
+  };
+
+  const handleUsedDialogChange = (open: boolean) => {
+    if (!open) {
+      closeUsedDialog();
+      return;
+    }
+    setUsedDialogOpen(true);
+  };
+
+  const handleConfirmUsed = async () => {
+    if (!usedTarget) {
+      return;
+    }
+
+    setIsMarkingUsed(true);
+    setUsedError(null);
+
+    try {
+      const response = await fetch("/api/dashboard/qr-scan/mark-used", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ sample_id: usedTarget.sample_id }),
+      });
+
+      let payload: unknown = null;
+      try {
+        payload = await response.json();
+      } catch {
+        payload = null;
+      }
+
+      if (!response.ok) {
+        let errorDetail = "Unable to mark sample as used.";
+        if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+          const payloadRecord = payload as Record<string, unknown>;
+          if (typeof payloadRecord.detail === "string") {
+            errorDetail = payloadRecord.detail;
+          }
+          if (typeof payloadRecord.error === "string") {
+            errorDetail = payloadRecord.error;
+          }
+        } else if (typeof payload === "string") {
+          errorDetail = payload;
+        }
+        setUsedError(errorDetail);
+        return;
+      }
+
+      setRows((previous) => previous.filter((row) => row.sample_id !== usedTarget.sample_id));
+      setTotalCount((previous) => {
+        if (typeof previous !== "number") {
+          return previous;
+        }
+        const nextTotal = Math.max(previous - 1, 0);
+        setPageCount(nextTotal > 0 ? Math.ceil(nextTotal / pagination.pageSize) : 1);
+        return nextTotal;
+      });
+      setUsedStatusMessage(`Sample ${usedTarget.sample_id} marked as used.`);
+      closeUsedDialog(true);
+    } catch {
+      setUsedError("Something went wrong. Please try again.");
+    } finally {
+      setIsMarkingUsed(false);
+    }
+  };
 
   const columns = useMemo<ColumnDef<SampleRow>[]>(() => {
     return [
@@ -461,29 +568,30 @@ export function SamplesTable() {
               <Eye size={16} />
               View
             </Link>
-            {row.original.id && (
-              <a
-                href={buildBackendUrl(`/samples/${row.original.id}/edit/`)}
-                className="flex items-center gap-1 text-primary underline"
-              >
-                <Edit size={16} />
-                Edit
-              </a>
-            )}
-            {row.original.id && (
-              <a
-                href={buildBackendUrl(`/samples/${row.original.id}/used/`)}
-                className="flex items-center gap-1 text-primary underline"
-              >
-                <Archive size={16} />
-                Used
-              </a>
-            )}
+            <Link
+              href={`/samples/${encodeURIComponent(row.original.sample_id)}/edit?from=dashboard`}
+              className="flex items-center gap-1 text-primary underline"
+              prefetch={false}
+            >
+              <Edit size={16} />
+              Edit
+            </Link>
+            <Button
+              type="button"
+              variant="link"
+              size="sm"
+              className="h-auto p-0"
+              onClick={() => openUsedDialog(row.original)}
+              disabled={row.original.is_used || isMarkingUsed}
+            >
+              <Archive size={16} />
+              {row.original.is_used ? "Used" : "Mark used"}
+            </Button>
           </div>
         ),
       },
     ];
-  }, []);
+  }, [isMarkingUsed]);
 
   const table = useReactTable({
     data: rows,
@@ -503,19 +611,44 @@ export function SamplesTable() {
   });
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading samples…</p>;
+    return (
+      <div className="space-y-4">
+        {usedStatusMessage ? (
+          <AlertSuccess>
+            <AlertDescription>{usedStatusMessage}</AlertDescription>
+          </AlertSuccess>
+        ) : null}
+        <p className="text-sm text-muted-foreground">Loading samples…</p>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="rounded-md border border-destructive/50 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-        {error}
+      <div className="space-y-4">
+        {usedStatusMessage ? (
+          <AlertSuccess>
+            <AlertDescription>{usedStatusMessage}</AlertDescription>
+          </AlertSuccess>
+        ) : null}
+        <div className="rounded-md border border-destructive/50 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+          {error}
+        </div>
       </div>
     );
   }
 
   if (rows.length === 0) {
-    return <p className="text-sm text-muted-foreground">No samples found.</p>;
+    return (
+      <div className="space-y-4">
+        {usedStatusMessage ? (
+          <AlertSuccess>
+            <AlertDescription>{usedStatusMessage}</AlertDescription>
+          </AlertSuccess>
+        ) : null}
+        <p className="text-sm text-muted-foreground">No samples found.</p>
+      </div>
+    );
   }
 
   const canPreviousPage = table.getCanPreviousPage();
@@ -527,6 +660,11 @@ export function SamplesTable() {
 
   return (
     <div className="flex flex-col gap-4">
+      {usedStatusMessage ? (
+        <AlertSuccess>
+          <AlertDescription>{usedStatusMessage}</AlertDescription>
+        </AlertSuccess>
+      ) : null}
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <Button variant="outline" size="sm" asChild>
@@ -676,6 +814,36 @@ export function SamplesTable() {
         lastItemIndex={lastItemIndex}
         totalLabel={totalLabel}
       />
+      <Dialog open={usedDialogOpen} onOpenChange={handleUsedDialogChange}>
+        <DialogContent showCloseButton={!isMarkingUsed}>
+          <DialogHeader>
+            <DialogTitle>Mark sample as used?</DialogTitle>
+            <DialogDescription>
+              This will update sample{" "}
+              <span className="font-semibold text-foreground">{usedTarget?.sample_id ?? "—"}</span>{" "}
+              to used. You can restore it from the legacy views if needed.
+            </DialogDescription>
+          </DialogHeader>
+          {usedError ? (
+            <AlertError>
+              <AlertDescription>{usedError}</AlertDescription>
+            </AlertError>
+          ) : null}
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => closeUsedDialog()}
+              disabled={isMarkingUsed}
+            >
+              Cancel
+            </Button>
+            <Button type="button" onClick={handleConfirmUsed} disabled={isMarkingUsed}>
+              {isMarkingUsed ? "Marking..." : "Confirm"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
 import { HistoryPanel } from "@/components/history/history-panel";
+import { AlertDescription, AlertSuccess } from "@/components/ui/alert";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,6 +17,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -90,6 +92,10 @@ type SampleDetailResponse = {
 
 type PageParams = {
   sampleId: string;
+};
+
+type PageSearchParams = {
+  updated?: string;
 };
 
 type DetailRow = {
@@ -318,7 +324,13 @@ function DetailCard({
   );
 }
 
-export default async function SampleDetailPage({ params }: { params: PageParams }) {
+export default async function SampleDetailPage({
+  params,
+  searchParams,
+}: {
+  params: PageParams;
+  searchParams?: PageSearchParams;
+}) {
   const cookiesStore = await cookies();
   const token = cookiesStore.get(AUTH_COOKIE_NAME)?.value ?? null;
 
@@ -342,17 +354,31 @@ export default async function SampleDetailPage({ params }: { params: PageParams 
     lastModified: sample.history.last_modified,
     lastModifiedBy: sample.history.last_modified_by,
   };
+  const normalizeHistoryValue = (value: string | null) => {
+    if (value === null) {
+      return null;
+    }
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
+  };
   const historyEntries = sample.history.entries.map((entry) => ({
     timestamp: entry.timestamp,
     user: entry.user,
     summary: entry.summary ?? null,
-    changes: entry.changes.map((change) => ({
-      field: change.field,
-      label: change.label,
-      old: change.old,
-      new: change.new,
-    })),
+    changes: entry.changes
+      .map((change) => ({
+        field: change.field,
+        label: change.label,
+        old: change.old,
+        new: change.new,
+      }))
+      .filter((change) => {
+        const normalizedOld = normalizeHistoryValue(change.old);
+        const normalizedNew = normalizeHistoryValue(change.new);
+        return normalizedOld !== null || normalizedNew !== null;
+      }),
   }));
+  const showUpdatedMessage = searchParams?.updated === "1";
 
   return (
     <SidebarProvider>
@@ -384,6 +410,11 @@ export default async function SampleDetailPage({ params }: { params: PageParams 
             <Link href="/" className="text-sm text-primary underline">
               ← Back to Samples
             </Link>
+            {showUpdatedMessage ? (
+              <AlertSuccess>
+                <AlertDescription>Sample updated.</AlertDescription>
+              </AlertSuccess>
+            ) : null}
             <section className="grid gap-6 lg:grid-cols-3">
               <div className="lg:col-span-2 space-y-6">
                 <DetailCard
@@ -396,6 +427,11 @@ export default async function SampleDetailPage({ params }: { params: PageParams 
                   description="Processing metadata and laboratory handling notes."
                   rows={sampleProcessingRows}
                 />
+                <Button asChild className="w-full sm:w-auto">
+                  <Link href={`/samples/${encodeURIComponent(sample.sample_id)}/edit?from=detail`}>
+                    Edit sample
+                  </Link>
+                </Button>
               </div>
               <div className="lg:col-span-1">
                 <HistoryPanel

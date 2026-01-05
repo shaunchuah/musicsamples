@@ -1,26 +1,17 @@
-// frontend/components/samples/add-multiple-form.tsx
-// Renders the QR scan add-multiple form, including scan handling, errors, and history.
-// Exists to replicate the legacy barcode add-multiple workflow inside the Next.js dashboard.
+// frontend/components/samples/edit-sample-form.tsx
+// Renders the sample edit form with validation, autocomplete, and update handling.
+// Exists to give the dashboard a QR-scan-styled edit experience consistent with bulk add flows.
 
 "use client";
 
-import { ExternalLinkIcon } from "lucide-react";
-import type { KeyboardEvent } from "react";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useId, useMemo, useState } from "react";
 
-import { AlertDescription, AlertError, AlertSuccess } from "@/components/ui/alert";
+import { AlertDescription, AlertError } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 
 const STUDY_OPTIONS = [
@@ -112,6 +103,34 @@ const VOLUME_UNIT_OPTIONS = [
   { value: "ul", label: "ul" },
 ];
 
+type StudyIdentifierSummary = {
+  id: number;
+  name: string;
+};
+
+export type SampleEditData = {
+  sample_id: string;
+  study_name: string;
+  music_timepoint: string | null;
+  marvel_timepoint: string | null;
+  study_identifier: StudyIdentifierSummary | null;
+  sample_type: string;
+  sample_datetime: string | null;
+  sample_location: string;
+  sample_sublocation: string | null;
+  sample_comments: string | null;
+  processing_datetime: string | null;
+  frozen_datetime: string | null;
+  sample_volume: string | null;
+  sample_volume_units: string | null;
+  freeze_thaw_count: number | null;
+  haemolysis_reference: string | null;
+  biopsy_location: string | null;
+  biopsy_inflamed_status: string | null;
+  qubit_cfdna_ng_ul: string | null;
+  paraffin_block_key: string | null;
+};
+
 type FormState = {
   sample_location: string;
   sample_sublocation: string;
@@ -132,13 +151,6 @@ type FormState = {
   sample_volume: string;
   sample_volume_units: string;
   freeze_thaw_count: string;
-  sample_id: string;
-};
-
-type ScanHistoryEntry = {
-  sampleId: string;
-  status: "Success" | "Error";
-  message: string;
 };
 
 const FIELD_LABELS: Record<keyof FormState, string> = {
@@ -161,35 +173,24 @@ const FIELD_LABELS: Record<keyof FormState, string> = {
   sample_volume: "Volume Remaining",
   sample_volume_units: "Sample Volume Units",
   freeze_thaw_count: "Freeze-Thaw Count",
-  sample_id: "Sample ID",
-};
-
-const INITIAL_FORM_STATE: FormState = {
-  sample_location: "",
-  sample_sublocation: "",
-  study_name: "",
-  music_timepoint: "",
-  marvel_timepoint: "",
-  study_id: "",
-  sample_type: "",
-  qubit_cfdna_ng_ul: "",
-  haemolysis_reference: "",
-  paraffin_block_key: "",
-  biopsy_location: "",
-  biopsy_inflamed_status: "",
-  sample_datetime: "",
-  processing_datetime: "",
-  frozen_datetime: "",
-  sample_comments: "",
-  sample_volume: "",
-  sample_volume_units: "",
-  freeze_thaw_count: "0",
-  sample_id: "",
 };
 
 function emptyToNull(value: string): string | null {
   const trimmed = value.trim();
   return trimmed ? trimmed : null;
+}
+
+function toLocalDateTimeInput(value: string | null): string {
+  if (!value) {
+    return "";
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  // Convert to local time for datetime-local input controls.
+  const offsetMs = date.getTimezoneOffset() * 60 * 1000;
+  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
 }
 
 function useAutocomplete(endpoint: string) {
@@ -227,17 +228,46 @@ function useAutocomplete(endpoint: string) {
   return { options, requestOptions, error };
 }
 
-export function AddMultipleForm() {
+type EditSampleFormProps = {
+  sampleId: string;
+  initialData: SampleEditData;
+};
+
+export function EditSampleForm({ sampleId, initialData }: EditSampleFormProps) {
   const baseId = useId();
-  const [formState, setFormState] = useState<FormState>(INITIAL_FORM_STATE);
+  const initialFormState = useMemo<FormState>(() => {
+    return {
+      sample_location: initialData.sample_location ?? "",
+      sample_sublocation: initialData.sample_sublocation ?? "",
+      study_name: initialData.study_name ?? "",
+      music_timepoint: initialData.music_timepoint ?? "",
+      marvel_timepoint: initialData.marvel_timepoint ?? "",
+      study_id: initialData.study_identifier?.name ?? "",
+      sample_type: initialData.sample_type ?? "",
+      qubit_cfdna_ng_ul: initialData.qubit_cfdna_ng_ul ?? "",
+      haemolysis_reference: initialData.haemolysis_reference ?? "",
+      paraffin_block_key: initialData.paraffin_block_key ?? "",
+      biopsy_location: initialData.biopsy_location ?? "",
+      biopsy_inflamed_status: initialData.biopsy_inflamed_status ?? "",
+      sample_datetime: toLocalDateTimeInput(initialData.sample_datetime),
+      processing_datetime: toLocalDateTimeInput(initialData.processing_datetime),
+      frozen_datetime: toLocalDateTimeInput(initialData.frozen_datetime),
+      sample_comments: initialData.sample_comments ?? "",
+      sample_volume: initialData.sample_volume ?? "",
+      sample_volume_units: initialData.sample_volume_units ?? "",
+      freeze_thaw_count:
+        initialData.freeze_thaw_count !== null && initialData.freeze_thaw_count !== undefined
+          ? String(initialData.freeze_thaw_count)
+          : "",
+    };
+  }, [initialData]);
+
+  const [formState, setFormState] = useState<FormState>(initialFormState);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [nonFieldError, setNonFieldError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [scanHistory, setScanHistory] = useState<ScanHistoryEntry[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const sampleIdRef = useRef<HTMLInputElement | null>(null);
+  const router = useRouter();
 
   const locationAutocomplete = useAutocomplete("/api/dashboard/qr-scan/autocomplete/locations");
   const sublocationAutocomplete = useAutocomplete(
@@ -246,17 +276,20 @@ export function AddMultipleForm() {
   const studyIdAutocomplete = useAutocomplete("/api/dashboard/qr-scan/autocomplete/study-ids");
 
   useEffect(() => {
-    if (!successMessage && !errorMessage) {
+    setFormState(initialFormState);
+  }, [initialFormState]);
+
+  useEffect(() => {
+    if (!errorMessage) {
       return;
     }
 
     const timer = window.setTimeout(() => {
-      setSuccessMessage(null);
       setErrorMessage(null);
     }, 3000);
 
     return () => window.clearTimeout(timer);
-  }, [successMessage, errorMessage]);
+  }, [errorMessage]);
 
   const showMusicTimepoint =
     formState.study_name === "music" || formState.study_name === "mini_music";
@@ -287,22 +320,13 @@ export function AddMultipleForm() {
     setNonFieldError(null);
   };
 
-  const recordHistory = (entry: ScanHistoryEntry) => {
-    setScanHistory((prev) => [entry, ...prev]);
-  };
-
   const handleSubmit = async () => {
-    if (!formState.sample_id.trim()) {
-      setErrorMessage("Scan a sample ID to continue.");
-      return;
-    }
-
     setIsSubmitting(true);
     clearValidation();
 
     try {
-      const response = await fetch("/api/dashboard/qr-scan/add-multiple", {
-        method: "POST",
+      const response = await fetch(`/api/dashboard/samples/${encodeURIComponent(sampleId)}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
@@ -310,7 +334,6 @@ export function AddMultipleForm() {
           study_name: formState.study_name,
           music_timepoint: emptyToNull(formState.music_timepoint),
           marvel_timepoint: emptyToNull(formState.marvel_timepoint),
-          sample_id: formState.sample_id,
           sample_location: formState.sample_location,
           sample_sublocation: emptyToNull(formState.sample_sublocation),
           study_id: emptyToNull(formState.study_id),
@@ -339,8 +362,7 @@ export function AddMultipleForm() {
 
       if (!response.ok) {
         const nextFieldErrors: Record<string, string> = {};
-        let errorDetail = response.statusText || "Unable to save sample.";
-        const errorDetailsForHistory: string[] = [];
+        let errorDetail = response.statusText || "Unable to update sample.";
 
         if (payload && typeof payload === "object" && !Array.isArray(payload)) {
           const payloadRecord = payload as Record<string, unknown>;
@@ -348,9 +370,6 @@ export function AddMultipleForm() {
           if (Array.isArray(nonField)) {
             const nonFieldMessage = nonField.join(" ");
             setNonFieldError(nonFieldMessage);
-            if (nonFieldMessage) {
-              errorDetailsForHistory.push(nonFieldMessage);
-            }
           }
 
           Object.entries(payloadRecord).forEach(([key, value]) => {
@@ -358,66 +377,31 @@ export function AddMultipleForm() {
               return;
             }
             if (Array.isArray(value)) {
-              const fieldMessage = value.map(String).join(" ");
-              nextFieldErrors[key] = fieldMessage;
-              if (fieldMessage) {
-                errorDetailsForHistory.push(
-                  `${FIELD_LABELS[key as keyof FormState] ?? key}: ${fieldMessage}`,
-                );
-              }
+              nextFieldErrors[key] = value.map(String).join(" ");
             } else if (typeof value === "string") {
               nextFieldErrors[key] = value;
-              errorDetailsForHistory.push(
-                `${FIELD_LABELS[key as keyof FormState] ?? key}: ${value}`,
-              );
             }
           });
 
           if (typeof payloadRecord.detail === "string") {
             errorDetail = payloadRecord.detail;
-            errorDetailsForHistory.push(payloadRecord.detail);
           }
 
           if (typeof payloadRecord.error === "string") {
             errorDetail = payloadRecord.error;
-            errorDetailsForHistory.push(payloadRecord.error);
           }
         }
 
         setFieldErrors(nextFieldErrors);
-        setErrorMessage(`${errorDetail} (Scanned ID: ${formState.sample_id})`);
-        recordHistory({
-          sampleId: formState.sample_id,
-          status: "Error",
-          message: errorDetailsForHistory.length ? errorDetailsForHistory.join(" | ") : errorDetail,
-        });
+        setErrorMessage(errorDetail);
         return;
       }
 
-      setSuccessMessage("Success - Sample Updated");
-      recordHistory({
-        sampleId: formState.sample_id,
-        status: "Success",
-        message: `Sample ${formState.sample_id} captured.`,
-      });
+      router.push(`/samples/${encodeURIComponent(sampleId)}?updated=1`);
     } catch {
-      setErrorMessage(`Something went wrong. (Scanned ID: ${formState.sample_id})`);
-      recordHistory({
-        sampleId: formState.sample_id,
-        status: "Error",
-        message: "Something went wrong.",
-      });
+      setErrorMessage("Something went wrong.");
     } finally {
-      setFormState((prev) => ({ ...prev, sample_id: "" }));
       setIsSubmitting(false);
-      sampleIdRef.current?.focus();
-    }
-  };
-
-  const handleScanKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter" || event.key === "Tab") {
-      event.preventDefault();
-      handleSubmit();
     }
   };
 
@@ -438,27 +422,6 @@ export function AddMultipleForm() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Instructions</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 text-sm text-muted-foreground">
-          <p>
-            <span className="font-semibold text-foreground">Important Note:</span> Barcode scanners
-            work like keyboards. For most scanners, the default is to provide the enter key after
-            scanning a barcode. Some scanners may need to be configured to provide the enter or tab
-            key on scan. This page accepts both enter and tab keys from barcode scanners.
-          </p>
-          <div>
-            <p className="font-semibold text-foreground">Steps:</p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>Fill in the required details</li>
-              <li>Start scanning to tag samples with those details</li>
-            </ol>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
           <CardTitle>Sample Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -473,6 +436,11 @@ export function AddMultipleForm() {
               </AlertDescription>
             </AlertError>
           ) : null}
+
+          <div className="space-y-2">
+            <Label htmlFor={`${baseId}-sample-id`}>Sample ID</Label>
+            <Input id={`${baseId}-sample-id`} value={initialData.sample_id} disabled />
+          </div>
 
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
@@ -842,93 +810,16 @@ export function AddMultipleForm() {
               <p className="text-sm text-destructive">{fieldErrors.freeze_thaw_count}</p>
             ) : null}
           </div>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Barcode ID scanning area</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {successMessage ? (
-            <AlertSuccess>
-              <AlertDescription>{successMessage}</AlertDescription>
-            </AlertSuccess>
-          ) : null}
           {errorMessage ? (
             <AlertError>
               <AlertDescription>{errorMessage}</AlertDescription>
             </AlertError>
           ) : null}
 
-          <Input
-            id={`${baseId}-sample-id`}
-            ref={sampleIdRef}
-            value={formState.sample_id}
-            onChange={(event) => handleFieldChange("sample_id", event.target.value)}
-            onKeyDown={handleScanKeyDown}
-            placeholder="Click here and start scanning barcodes..."
-            aria-invalid={Boolean(fieldErrors.sample_id)}
-            disabled={isSubmitting}
-          />
-          {fieldErrors.sample_id ? (
-            <p className="text-sm text-destructive">{fieldErrors.sample_id}</p>
-          ) : null}
-
           <Button type="button" onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Submit scan"}
+            {isSubmitting ? "Saving..." : "Save changes"}
           </Button>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Scan History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Sample ID</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Message</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {scanHistory.length ? (
-                scanHistory.map((entry, index) => (
-                  <TableRow key={`${entry.sampleId}-${index}`}>
-                    <TableCell>{entry.sampleId}</TableCell>
-                    <TableCell>{entry.status}</TableCell>
-                    <TableCell>
-                      <span>{entry.message}</span>
-                      {entry.status === "Success" ? (
-                        <>
-                          {" "}
-                          (
-                          <a
-                            href={`/samples/${encodeURIComponent(entry.sampleId)}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline"
-                          >
-                            View sample <ExternalLinkIcon className="size-3" />
-                          </a>
-                          )
-                        </>
-                      ) : null}
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={3} className="text-muted-foreground">
-                    No scans yet.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
         </CardContent>
       </Card>
     </div>

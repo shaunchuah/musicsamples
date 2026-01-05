@@ -41,6 +41,11 @@ const INITIAL_FORM_STATE: FormState = {
   sample_id: "",
 };
 
+function emptyToNull(value: string): string | null {
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
+}
+
 function useAutocomplete(endpoint: string) {
   const [options, setOptions] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -139,7 +144,7 @@ export function UpdateLocationForm() {
         body: JSON.stringify({
           sample_id: formState.sample_id,
           sample_location: formState.sample_location,
-          sample_sublocation: formState.sample_sublocation,
+          sample_sublocation: emptyToNull(formState.sample_sublocation),
         }),
       });
 
