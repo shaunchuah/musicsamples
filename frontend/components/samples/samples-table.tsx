@@ -19,11 +19,13 @@ import {
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
+  CheckSquare,
   Download,
   Edit,
   Eye,
   Filter,
   Settings,
+  Square,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -43,6 +45,8 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
@@ -756,6 +760,31 @@ export function SamplesTable() {
     onSortingChange: setSorting,
   });
 
+  const columnToggleIds = [
+    "timepoint_label",
+    "study_group_label",
+    "age",
+    "sex_label",
+    "study_center_label",
+    "crp",
+    "calprotectin",
+    "endoscopic_mucosal_healing_at_3_6_months",
+    "endoscopic_mucosal_healing_at_12_months",
+    "genotype_data_available",
+  ];
+
+  const showAllColumns = () => {
+    for (const columnId of columnToggleIds) {
+      table.getColumn(columnId)?.toggleVisibility(true);
+    }
+  };
+
+  const hideAllColumns = () => {
+    for (const columnId of columnToggleIds) {
+      table.getColumn(columnId)?.toggleVisibility(false);
+    }
+  };
+
   const canPreviousPage = table.getCanPreviousPage();
   const canNextPage = table.getCanNextPage();
   const { pageIndex, pageSize } = pagination;
@@ -848,6 +877,25 @@ export function SamplesTable() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onSelect={(event) => {
+                  event.preventDefault();
+                  showAllColumns();
+                }}
+              >
+                <CheckSquare className="h-4 w-4" />
+                Select all
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={(event) => {
+                  event.preventDefault();
+                  hideAllColumns();
+                }}
+              >
+                <Square className="h-4 w-4" />
+                Unselect all
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem
                 checked={table.getColumn("timepoint_label")?.getIsVisible() ?? false}
                 onCheckedChange={(value) =>
