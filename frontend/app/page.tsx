@@ -116,10 +116,8 @@ export default async function HomePage() {
             </section>
             <Card>
               <CardHeader>
-                <CardTitle>Recent Samples</CardTitle>
-                <CardDescription>
-                  Live data pulled directly from the api/v3 samples endpoint.
-                </CardDescription>
+                <CardTitle>Samples</CardTitle>
+                <CardDescription>Search, filter, and export samples from G-Trac.</CardDescription>
               </CardHeader>
               <CardContent>
                 <SamplesTable />

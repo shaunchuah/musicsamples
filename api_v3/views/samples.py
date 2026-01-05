@@ -35,6 +35,7 @@ from app.filters import SampleV3Filter
 from app.models import Sample, StudyIdentifier
 from app.pagination import SamplePageNumberPagination
 from core.clinical import get_samples_with_clinical_data
+from core.utils.export import export_csv
 
 
 @extend_schema(tags=["v3"])
@@ -134,6 +135,50 @@ class SampleV3ViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+@extend_schema(tags=["v3"])
+class SampleExportView(APIView):
+    """
+    Export filtered samples as CSV to avoid paginated client aggregation.
+    """
+
+    permission_classes = [IsAuthenticated]
+    ordering_fields = [
+        "sample_datetime",
+        "sample_id",
+        "study_name",
+        "sample_location",
+        "sample_sublocation",
+        "sample_type",
+        "study_id__name",
+        "id",
+    ]
+    ordering = ["-sample_datetime"]
+
+    def get(self, request):
+        base_queryset = Sample.objects.select_related("study_id").order_by("-sample_datetime")
+        include_used = request.query_params.get("include_used") == "true"
+        has_is_used_filter = "is_used" in request.query_params
+        if not include_used and not has_is_used_filter:
+            base_queryset = base_queryset.filter(is_used=False)
+
+        queryset = get_samples_with_clinical_data(base_queryset)
+        query_string = request.query_params.get("query", "").strip()
+        if query_string:
+            queryset = queryset.filter(
+                Q(sample_id__icontains=query_string)
+                | Q(study_id__name__icontains=query_string)
+                | Q(sample_location__icontains=query_string)
+                | Q(sample_sublocation__icontains=query_string)
+                | Q(sample_type__icontains=query_string)
+                | Q(sample_comments__icontains=query_string)
+            )
+
+        queryset = SampleV3Filter(request.query_params, queryset=queryset).qs
+        queryset = OrderingFilter().filter_queryset(request, queryset, self)
+
+        return export_csv(queryset, file_prefix="samples", file_name="export")
 
 
 @extend_schema(tags=["v3"])

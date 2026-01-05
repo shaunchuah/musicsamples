@@ -31,7 +31,7 @@ import {
 import Link from "next/link";
 import { useEffect, useId, useMemo, useState } from "react";
 
-import { AlertDescription, AlertError, AlertSuccess } from "@/components/ui/alert";
+import { AlertDescription, AlertError, AlertSuccess, AlertWarning } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -181,6 +181,40 @@ const SORT_FIELD_MAP: Record<string, string> = {
   sample_datetime: "sample_datetime",
 };
 
+const SORT_LABELS: Record<string, string> = {
+  study_name: "Study",
+  sample_id: "Sample ID",
+  study_identifier: "Study ID",
+  sample_location: "Location",
+  sample_sublocation: "Sublocation",
+  sample_type: "Sample Type",
+  sample_datetime: "Collected at",
+};
+
+const FILTER_LABELS: Record<keyof SampleFilters, string> = {
+  study_name: "Study name",
+  sample_type: "Sample type",
+  study_id__name: "Study ID",
+  sample_location: "Location",
+  sample_sublocation: "Sublocation",
+  sample_comments: "Comments contain",
+  sample_datetime_after: "Collected after",
+  sample_datetime_before: "Collected before",
+  is_used: "Used samples",
+  study_id__study_group: "Study group",
+  study_id__study_center: "Study center",
+  study_id__sex: "Biological sex",
+  study_id__genotype_data_available: "Genotype data available",
+  study_id__nod2_mutation_present: "NOD2 mutation present",
+  study_id__il23r_mutation_present: "IL23R mutation present",
+  endoscopic_mucosal_healing_at_3_6_months: "Mucosal healing (3-6m)",
+  endoscopic_mucosal_healing_at_12_months: "Mucosal healing (12m)",
+  music_timepoint: "Music timepoint",
+  marvel_timepoint: "Marvel timepoint",
+  biopsy_location: "Biopsy location",
+  biopsy_inflamed_status: "Biopsy inflamed status",
+};
+
 type PaginationControlsProps = {
   canPrevious: boolean;
   canNext: boolean;
@@ -309,6 +343,7 @@ export function SamplesTable() {
   const [usedError, setUsedError] = useState<string | null>(null);
   const [isMarkingUsed, setIsMarkingUsed] = useState(false);
   const [usedStatusMessage, setUsedStatusMessage] = useState<string | null>(null);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [includeUsed, setIncludeUsed] = useState(false);
@@ -345,6 +380,27 @@ export function SamplesTable() {
     return Object.values(filters).filter((value) => value.trim() !== "").length;
   }, [filters]);
 
+  const orderingValues = useMemo(() => {
+    return sorting
+      .map(({ id, desc }) => {
+        const field = SORT_FIELD_MAP[id];
+        if (!field) {
+          return null;
+        }
+        return `${desc ? "-" : ""}${field}`;
+      })
+      .filter((value): value is string => Boolean(value));
+  }, [sorting]);
+
+  const orderingLabels = useMemo(() => {
+    return sorting
+      .map(({ id, desc }) => {
+        const label = SORT_LABELS[id] ?? id;
+        return `${label} (${desc ? "descending" : "ascending"})`;
+      })
+      .filter((value) => value.trim() !== "");
+  }, [sorting]);
+
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setSearchQuery(searchInput.trim());
@@ -373,6 +429,31 @@ export function SamplesTable() {
 
     return () => window.clearTimeout(timer);
   }, [usedStatusMessage]);
+
+  const buildSamplesQueryParams = () => {
+    const query = new URLSearchParams();
+
+    if (orderingValues.length > 0) {
+      query.set("ordering", orderingValues.join(","));
+    }
+
+    if (includeUsed) {
+      query.set("include_used", "true");
+    }
+
+    Object.entries(filters).forEach(([key, value]) => {
+      const trimmedValue = value.trim();
+      if (trimmedValue) {
+        query.set(key, trimmedValue);
+      }
+    });
+
+    if (searchQuery) {
+      query.set("query", searchQuery);
+    }
+
+    return query;
+  };
 
   useEffect(() => {
     const controller = new AbortController();
@@ -411,40 +492,11 @@ export function SamplesTable() {
 
       try {
         const { pageIndex, pageSize } = pagination;
-        const query = new URLSearchParams({
-          page: String(pageIndex + 1),
-          page_size: String(pageSize),
-        });
-
-        const orderingValues = sorting
-          .map(({ id, desc }) => {
-            const field = SORT_FIELD_MAP[id];
-            if (!field) {
-              return null;
-            }
-            return `${desc ? "-" : ""}${field}`;
-          })
-          .filter((value): value is string => Boolean(value));
-
-        if (orderingValues.length > 0) {
-          query.set("ordering", orderingValues.join(","));
-        }
-
-        if (includeUsed) {
-          query.set("include_used", "true");
-        }
-
-        Object.entries(filters).forEach(([key, value]) => {
-          const trimmedValue = value.trim();
-          if (trimmedValue) {
-            query.set(key, trimmedValue);
-          }
-        });
+        const query = buildSamplesQueryParams();
+        query.set("page", String(pageIndex + 1));
+        query.set("page_size", String(pageSize));
 
         const endpoint = searchQuery ? "/api/dashboard/samples/search" : "/api/dashboard/samples";
-        if (searchQuery) {
-          query.set("query", searchQuery);
-        }
 
         const response = await fetch(`${endpoint}?${query.toString()}`, {
           signal: controller.signal,
@@ -710,22 +762,24 @@ export function SamplesTable() {
         enableSorting: false,
         cell: ({ row }) => (
           <div className="flex gap-2">
-            <Link
-              href={`/samples/${encodeURIComponent(row.original.sample_id)}`}
-              className="flex items-center gap-1 text-primary underline"
-              prefetch={false}
-            >
-              <Eye size={16} />
-              View
-            </Link>
-            <Link
-              href={`/samples/${encodeURIComponent(row.original.sample_id)}/edit?from=dashboard`}
-              className="flex items-center gap-1 text-primary underline"
-              prefetch={false}
-            >
-              <Edit size={16} />
-              Edit
-            </Link>
+            <Button asChild variant="link" size="sm" className="h-auto p-0">
+              <Link
+                href={`/samples/${encodeURIComponent(row.original.sample_id)}`}
+                prefetch={false}
+              >
+                <Eye size={16} />
+                View
+              </Link>
+            </Button>
+            <Button asChild variant="link" size="sm" className="h-auto p-0">
+              <Link
+                href={`/samples/${encodeURIComponent(row.original.sample_id)}/edit?from=dashboard`}
+                prefetch={false}
+              >
+                <Edit size={16} />
+                Edit
+              </Link>
+            </Button>
             <Button
               type="button"
               variant="link"
@@ -792,6 +846,77 @@ export function SamplesTable() {
   const lastItemIndex = rows.length > 0 ? pageIndex * pageSize + rows.length : 0;
   const totalLabel = totalCount ?? "unknown";
   const booleanOptions = filterOptions?.boolean ?? DEFAULT_BOOLEAN_OPTIONS;
+  const hasExportConstraints = searchQuery.trim() !== "" || activeFilterCount > 0 || includeUsed;
+
+  const filterOptionLookup: Partial<Record<keyof SampleFilters, FilterOption[]>> = useMemo(
+    () => ({
+      study_name: filterOptions?.study_name ?? [],
+      sample_type: filterOptions?.sample_type ?? [],
+      study_id__name: [],
+      is_used: booleanOptions,
+      study_id__study_group: filterOptions?.study_group ?? [],
+      study_id__study_center: filterOptions?.study_center ?? [],
+      study_id__sex: filterOptions?.sex ?? [],
+      study_id__genotype_data_available: booleanOptions,
+      study_id__nod2_mutation_present: booleanOptions,
+      study_id__il23r_mutation_present: booleanOptions,
+      endoscopic_mucosal_healing_at_3_6_months: booleanOptions,
+      endoscopic_mucosal_healing_at_12_months: booleanOptions,
+      music_timepoint: filterOptions?.music_timepoint ?? [],
+      marvel_timepoint: filterOptions?.marvel_timepoint ?? [],
+      biopsy_location: filterOptions?.biopsy_location ?? [],
+      biopsy_inflamed_status: filterOptions?.biopsy_inflamed_status ?? [],
+    }),
+    [filterOptions, booleanOptions],
+  );
+
+  const exportParams = useMemo(() => {
+    const params: Array<{ label: string; value: string }> = [];
+
+    if (searchQuery.trim()) {
+      params.push({ label: "Search", value: searchQuery.trim() });
+    }
+
+    if (includeUsed) {
+      params.push({ label: "Include used samples", value: "Yes" });
+    }
+
+    Object.entries(filters).forEach(([key, value]) => {
+      const trimmedValue = value.trim();
+      if (!trimmedValue) {
+        return;
+      }
+
+      const options = filterOptionLookup[key as keyof SampleFilters];
+      const resolvedValue = options?.find(
+        (option: FilterOption) => option.value === trimmedValue,
+      )?.label;
+      params.push({
+        label: FILTER_LABELS[key as keyof SampleFilters] ?? key,
+        value: resolvedValue ?? trimmedValue,
+      });
+    });
+
+    if (orderingLabels.length > 0) {
+      params.push({ label: "Ordering", value: orderingLabels.join(", ") });
+    }
+
+    return params;
+  }, [filters, searchQuery, includeUsed, filterOptionLookup, orderingLabels]);
+
+  const buildExportUrl = () => {
+    const query = buildSamplesQueryParams();
+    const queryString = query.toString();
+    return queryString
+      ? `/api/dashboard/samples/export?${queryString}`
+      : "/api/dashboard/samples/export";
+  };
+
+  const handleExportConfirm = () => {
+    const exportUrl = buildExportUrl();
+    window.open(exportUrl, "_blank", "noopener,noreferrer");
+    setExportDialogOpen(false);
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -862,12 +987,6 @@ export function SamplesTable() {
                 {activeFilterCount}
               </span>
             ) : null}
-          </Button>
-          <Button variant="outline" size="sm" asChild>
-            <a href="/api/dashboard/samples/export" target="_blank" rel="noreferrer">
-              <Download className="mr-2 h-4 w-4" />
-              Export CSV
-            </a>
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -982,6 +1101,15 @@ export function SamplesTable() {
               </DropdownMenuCheckboxItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Button
+            variant="outline"
+            size="sm"
+            type="button"
+            onClick={() => setExportDialogOpen(true)}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Export CSV
+          </Button>
         </div>
       </div>
 
@@ -1517,6 +1645,57 @@ export function SamplesTable() {
         lastItemIndex={lastItemIndex}
         totalLabel={totalLabel}
       />
+      <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Export CSV</DialogTitle>
+            <DialogDescription>
+              Review the parameters that will be applied to this export.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <div className="flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:gap-4">
+              <span className="min-w-[160px] text-muted-foreground">Samples to export</span>
+              <span className="font-semibold text-foreground">
+                {typeof totalCount === "number" ? totalCount : "Unknown"}
+              </span>
+            </div>
+            {!hasExportConstraints ? (
+              <AlertWarning>
+                <AlertDescription>
+                  No search or filters are applied. You are about to export the entire dataset,
+                  which may take some time.
+                </AlertDescription>
+              </AlertWarning>
+            ) : null}
+            {exportParams.length > 0 ? (
+              <div className="space-y-2 text-sm">
+                {exportParams.map((param) => (
+                  <div
+                    key={`${param.label}-${param.value}`}
+                    className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-4"
+                  >
+                    <span className="min-w-[160px] text-muted-foreground">{param.label}</span>
+                    <span className="font-medium text-foreground break-words sm:flex-1">
+                      {param.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No search or filters are applied.</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setExportDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="button" onClick={handleExportConfirm}>
+              Confirm export
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Dialog open={usedDialogOpen} onOpenChange={handleUsedDialogChange}>
         <DialogContent showCloseButton={!isMarkingUsed}>
           <DialogHeader>

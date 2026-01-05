@@ -120,6 +120,7 @@ export function UserEmailListCard() {
                   }}
                   aria-label="Copy all user emails"
                   disabled={!emails?.emails_joined}
+                  className="cursor-pointer"
                 >
                   <Copy className="h-4 w-4" aria-hidden />
                   <span className="sr-only">Copy emails</span>
