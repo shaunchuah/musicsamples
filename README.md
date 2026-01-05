@@ -56,6 +56,14 @@ cp example.env .env
 
 Edit `.env` to match your local setup (database path, email settings, etc.).
 
+### 2a. (Optional) Run Mailpit for local email testing
+
+```sh
+docker run --rm -p 1025:1025 -p 8025:8025 axllent/mailpit
+```
+
+Mailpit UI is available at http://localhost:8025 and SMTP at localhost:1025.
+
 ### 3. Boot the application
 
 ```sh

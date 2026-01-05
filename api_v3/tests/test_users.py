@@ -93,6 +93,18 @@ def test_staff_user_create_and_welcome_email(settings, mailoutbox):
     assert mailoutbox  # welcome email sent
 
 
+def test_staff_user_create_requires_email():
+    staff_user = UserFactory(is_staff=True)
+    client = APIClient()
+    client.force_authenticate(user=staff_user)
+
+    url = reverse("v3-users-list")
+    response = client.post(url, {"first_name": "New", "last_name": "User"}, format="json")
+
+    assert response.status_code == 400
+    assert "email" in response.json()
+
+
 def test_staff_cannot_remove_own_staff_status():
     staff_user = UserFactory(is_staff=True)
     client = APIClient()

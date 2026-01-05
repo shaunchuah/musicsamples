@@ -4,8 +4,8 @@
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
+from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
 from django.db import IntegrityError
 from django.utils.encoding import force_str
@@ -224,6 +224,11 @@ class StaffUserUpdateSerializer(serializers.ModelSerializer):
         return ordered
 
 
+class StaffUserCreateSerializer(StaffUserUpdateSerializer):
+    class Meta(StaffUserUpdateSerializer.Meta):
+        extra_kwargs = {"email": {"required": True}}
+
+
 @extend_schema(tags=["v3"])
 class StaffUserViewSet(
     mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet
@@ -241,7 +246,7 @@ class StaffUserViewSet(
         if self.action in ("partial_update", "update"):
             return StaffUserUpdateSerializer
         if self.action == "create":
-            return StaffUserUpdateSerializer
+            return StaffUserCreateSerializer
         return StaffUserSerializer
 
     def perform_create(self, serializer):
