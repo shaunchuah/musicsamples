@@ -44,3 +44,67 @@ export async function GET(): Promise<Response> {
     return NextResponse.json({ detail: "Internal server error" }, { status: 500 });
   }
 }
+
+type UserProfileUpdatePayload = {
+  first_name?: unknown;
+  last_name?: unknown;
+  job_title?: unknown;
+  primary_organisation?: unknown;
+};
+
+export async function PATCH(request: Request): Promise<Response> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(AUTH_COOKIE_NAME)?.value ?? null;
+
+  if (!token) {
+    return NextResponse.json({ detail: "Unauthorized" }, { status: 401 });
+  }
+
+  let payload: UserProfileUpdatePayload;
+  try {
+    payload = (await request.json()) as UserProfileUpdatePayload;
+  } catch {
+    return NextResponse.json({ detail: "Invalid request body" }, { status: 400 });
+  }
+
+  const updatePayload = {
+    first_name: typeof payload.first_name === "string" ? payload.first_name.trim() : undefined,
+    last_name: typeof payload.last_name === "string" ? payload.last_name.trim() : undefined,
+    job_title: typeof payload.job_title === "string" ? payload.job_title.trim() : undefined,
+    primary_organisation:
+      typeof payload.primary_organisation === "string"
+        ? payload.primary_organisation.trim()
+        : undefined,
+  };
+
+  if (
+    !updatePayload.first_name &&
+    !updatePayload.last_name &&
+    updatePayload.job_title === undefined &&
+    updatePayload.primary_organisation === undefined
+  ) {
+    return NextResponse.json({ detail: "No updates provided" }, { status: 400 });
+  }
+
+  try {
+    const response = await fetch(buildBackendUrl(USER_PROFILE_ENDPOINT), {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatePayload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return NextResponse.json(data, { status: response.status });
+    }
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Failed to update user profile:", error);
+    return NextResponse.json({ detail: "Internal server error" }, { status: 500 });
+  }
+}

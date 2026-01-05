@@ -103,9 +103,11 @@ export function UsersTable() {
 
     try {
       const response = await fetch("/api/users/groups", { cache: "no-store" });
-      const payload = (await response.json().catch(() => null)) as
-        | { groups?: string[]; detail?: string; error?: string }
-        | null;
+      const payload = (await response.json().catch(() => null)) as {
+        groups?: string[];
+        detail?: string;
+        error?: string;
+      } | null;
 
       if (!response.ok) {
         throw new Error(payload?.detail ?? payload?.error ?? "Unable to fetch groups.");
@@ -113,8 +115,7 @@ export function UsersTable() {
 
       setGroupOptions(payload?.groups ?? []);
     } catch (fetchError) {
-      const message =
-        fetchError instanceof Error ? fetchError.message : "Unable to fetch groups.";
+      const message = fetchError instanceof Error ? fetchError.message : "Unable to fetch groups.";
       setGroupOptions([]);
       setGroupsError(message);
     } finally {

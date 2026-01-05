@@ -3,7 +3,7 @@
 # Exists to mirror legacy template-based user flows in an API form for the Next.js frontend.
 
 from django.conf import settings
-from django.contrib.auth import get_user_model, update_session_auth_hash
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 from django.contrib.auth.tokens import default_token_generator
@@ -33,7 +33,16 @@ class CurrentUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("email", "first_name", "last_name", "is_staff", "is_superuser", "groups")
+        fields = (
+            "email",
+            "first_name",
+            "last_name",
+            "job_title",
+            "primary_organisation",
+            "is_staff",
+            "is_superuser",
+            "groups",
+        )
 
     def get_groups(self, obj) -> list[str]:
         return list(obj.groups.values_list("name", flat=True))
@@ -150,42 +159,6 @@ class PasswordResetConfirmView(APIView):
         return Response(
             {"error": errors[0] if errors else "Unable to reset password."},
             status=status.HTTP_400_BAD_REQUEST,
-        )
-
-
-class PasswordChangeSerializer(serializers.Serializer):
-    new_password = serializers.CharField()
-
-
-class PasswordChangeView(APIView):
-    """
-    Change password for the authenticated user and preserve session.
-    """
-
-    permission_classes = [IsAuthenticated]
-
-    @extend_schema(tags=["v3"])
-    def post(self, request):
-        serializer = PasswordChangeSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        form = SetPasswordForm(
-            request.user,
-            data={
-                "new_password1": serializer.validated_data["new_password"],
-                "new_password2": serializer.validated_data["new_password"],
-            },
-        )
-        if form.is_valid():
-            form.save()
-            update_session_auth_hash(request, form.user)
-            return Response({"success": True})
-
-        errors = []
-        for field_errors in form.errors.values():
-            errors.extend(field_errors)
-        return Response(
-            {"error": errors[0] if errors else "Unable to change password."}, status=status.HTTP_400_BAD_REQUEST
         )
 
 

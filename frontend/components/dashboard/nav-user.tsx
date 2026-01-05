@@ -7,6 +7,8 @@
 import { ChevronsUpDown, CreditCard, LogOut, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AccountSettingsDialog } from "@/components/auth/account-settings-dialog";
+import { ChangePasswordDialog } from "@/components/auth/change-password-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -108,6 +110,8 @@ export function NavUser({ user }: NavUserProps) {
   const { isMobile } = useSidebar();
   const [serverUser, setServerUser] = useState<HydratedUser | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   useEffect(() => {
     let isActive = true;
@@ -186,7 +190,7 @@ export function NavUser({ user }: NavUserProps) {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer"
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={combinedUser.avatar ?? undefined} alt={name} />
@@ -220,11 +224,23 @@ export function NavUser({ user }: NavUserProps) {
             </DropdownMenuLabel>
 
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onSelect={(event) => {
+                  event.preventDefault();
+                  setIsAccountOpen(true);
+                }}
+              >
                 <ShieldCheck />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onSelect={(event) => {
+                  event.preventDefault();
+                  setIsChangePasswordOpen(true);
+                }}
+              >
                 <CreditCard />
                 Change Password
               </DropdownMenuItem>
@@ -245,6 +261,24 @@ export function NavUser({ user }: NavUserProps) {
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
+      <AccountSettingsDialog
+        open={isAccountOpen}
+        onOpenChange={setIsAccountOpen}
+        onProfileUpdated={(profile) => {
+          setServerUser((current) => ({
+            ...current,
+            firstName:
+              typeof profile.first_name === "string"
+                ? profile.first_name
+                : (current?.firstName ?? null),
+            lastName:
+              typeof profile.last_name === "string"
+                ? profile.last_name
+                : (current?.lastName ?? null),
+          }));
+        }}
+      />
+      <ChangePasswordDialog open={isChangePasswordOpen} onOpenChange={setIsChangePasswordOpen} />
     </SidebarMenu>
   );
 }
