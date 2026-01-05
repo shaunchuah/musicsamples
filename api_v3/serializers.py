@@ -1,8 +1,9 @@
 from typing import Any, Dict, Optional
 
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
-from app.models import Sample
+from app.models import Sample, StudyIdentifier
 from core.utils.history import historical_changes
 
 
@@ -277,6 +278,93 @@ class SampleV3DetailSerializer(serializers.ModelSerializer):
 
         serializer = SampleHistorySerializer(history_payload)
         return serializer.data
+
+
+class MultipleSampleV3Serializer(serializers.ModelSerializer):
+    """
+    Serializer for adding multiple samples via the v3 QR scan workflow.
+    """
+
+    study_id = serializers.CharField()
+    frozen_datetime = serializers.DateTimeField(required=False, allow_null=True)
+    processing_datetime = serializers.DateTimeField(required=False, allow_null=True)
+    sample_id = serializers.CharField(validators=[UniqueValidator(queryset=Sample.objects.all(), lookup="iexact")])
+
+    class Meta:
+        model = Sample
+        fields = [
+            "study_name",
+            "music_timepoint",
+            "marvel_timepoint",
+            "sample_id",
+            "sample_location",
+            "sample_sublocation",
+            "study_id",
+            "sample_type",
+            "qubit_cfdna_ng_ul",
+            "haemolysis_reference",
+            "paraffin_block_key",
+            "biopsy_location",
+            "biopsy_inflamed_status",
+            "sample_datetime",
+            "processing_datetime",
+            "frozen_datetime",
+            "sample_comments",
+            "sample_volume",
+            "sample_volume_units",
+            "freeze_thaw_count",
+        ]
+        lookup_field = "sample_id"
+
+    def validate(self, data):
+        if data["study_name"] in ("music", "mini_music") and not data.get("music_timepoint"):
+            raise serializers.ValidationError("Music Timepoint must be filled for MUSIC and Mini-MUSIC studies.")
+
+        if data["study_name"] == "marvel" and not data.get("marvel_timepoint"):
+            raise serializers.ValidationError("Marvel Timepoint must be filled for MARVEL studies.")
+
+        return data
+
+    def validate_sample_id(self, value):
+        return value.upper()
+
+    def create(self, validated_data):
+        study_id = validated_data.pop("study_id", None)
+
+        if study_id:
+            study_identifier, _ = StudyIdentifier.objects.get_or_create(name=study_id.upper())
+            validated_data["study_id"] = study_identifier
+
+        return super().create(validated_data)
+
+
+class SampleLocationV3Serializer(serializers.ModelSerializer):
+    """
+    Serializer for updating sample locations via QR scan workflows.
+    """
+
+    class Meta:
+        model = Sample
+        fields = [
+            "sample_id",
+            "sample_location",
+            "sample_sublocation",
+        ]
+        lookup_field = "sample_id"
+
+
+class SampleIsUsedV3Serializer(serializers.ModelSerializer):
+    """
+    Serializer for marking samples as used via QR scan workflows.
+    """
+
+    class Meta:
+        model = Sample
+        fields = [
+            "sample_id",
+            "is_used",
+        ]
+        lookup_field = "sample_id"
 
 
 class SampleHistoryChangeSerializer(serializers.Serializer):

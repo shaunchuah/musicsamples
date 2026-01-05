@@ -10,11 +10,17 @@ from api_v3.views import (
     CurrentUserTokenViewSet,
     CurrentUserView,
     ManagementUserEmailsView,
+    MultipleSampleV3ViewSet,
     PasswordChangeView,
     PasswordResetConfirmView,
     PasswordResetRequestView,
+    SampleIsUsedV3ViewSet,
+    SampleLocationV3ViewSet,
+    SampleLocationAutocompleteView,
+    SampleSublocationAutocompleteView,
     SampleV3ViewSet,
     StaffUserViewSet,
+    StudyIdAutocompleteView,
     V3TokenBlacklistView,
     V3TokenObtainPairView,
     V3TokenRefreshView,
@@ -22,6 +28,9 @@ from api_v3.views import (
 
 router = routers.DefaultRouter()
 router.register(r"samples", SampleV3ViewSet, "v3-samples")
+router.register(r"multiple-samples", MultipleSampleV3ViewSet, "v3-multiple-samples")
+router.register(r"samples-used", SampleIsUsedV3ViewSet, "v3-samples-used")
+router.register(r"sample-location", SampleLocationV3ViewSet, "v3-sample-location")
 router.register(r"users", StaffUserViewSet, "v3-users")
 
 urlpatterns = [
@@ -38,6 +47,21 @@ urlpatterns = [
         name="v3-current-user-token-refresh",
     ),
     path("users/me/recent-samples/", CurrentUserRecentSamplesView.as_view(), name="v3-current-user-recent-samples"),
+    path(
+        "samples/autocomplete/locations/",
+        SampleLocationAutocompleteView.as_view(),
+        name="v3-sample-location-autocomplete",
+    ),
+    path(
+        "samples/autocomplete/sublocations/",
+        SampleSublocationAutocompleteView.as_view(),
+        name="v3-sample-sublocation-autocomplete",
+    ),
+    path(
+        "samples/autocomplete/study-ids/",
+        StudyIdAutocompleteView.as_view(),
+        name="v3-study-id-autocomplete",
+    ),
     path("users/password-reset/", PasswordResetRequestView.as_view(), name="v3-password-reset"),
     path("users/password-reset/confirm/", PasswordResetConfirmView.as_view(), name="v3-password-reset-confirm"),
     path("management/user-emails/", ManagementUserEmailsView.as_view(), name="v3-management-user-emails"),

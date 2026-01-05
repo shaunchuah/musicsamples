@@ -8,7 +8,15 @@ from api_v3.views.auth import (  # noqa: F401
     V3TokenObtainPairView,
     V3TokenRefreshView,
 )
-from api_v3.views.samples import SampleV3ViewSet  # noqa: F401
+from api_v3.views.samples import (  # noqa: F401
+    MultipleSampleV3ViewSet,
+    SampleIsUsedV3ViewSet,
+    SampleLocationV3ViewSet,
+    SampleLocationAutocompleteView,
+    SampleSublocationAutocompleteView,
+    SampleV3ViewSet,
+    StudyIdAutocompleteView,
+)
 from api_v3.views.users import (  # noqa: F401
     CurrentUserRecentSamplesView,
     CurrentUserTokenViewSet,
