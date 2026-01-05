@@ -22,10 +22,12 @@ import {
   Download,
   Edit,
   Eye,
+  Filter,
   Settings,
+  X,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 
 import { AlertDescription, AlertError, AlertSuccess } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -43,6 +45,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 
 type StudyIdentifierSummary = {
   id: number;
@@ -81,6 +84,48 @@ type SampleApiPayload = {
   results?: SampleRow[];
 };
 
+type FilterOption = {
+  value: string;
+  label: string;
+};
+
+type SampleFilterOptions = {
+  study_name: FilterOption[];
+  sample_type: FilterOption[];
+  study_group: FilterOption[];
+  study_center: FilterOption[];
+  sex: FilterOption[];
+  music_timepoint: FilterOption[];
+  marvel_timepoint: FilterOption[];
+  biopsy_location: FilterOption[];
+  biopsy_inflamed_status: FilterOption[];
+  boolean: FilterOption[];
+};
+
+type SampleFilters = {
+  study_name: string;
+  sample_type: string;
+  study_id__name: string;
+  sample_location: string;
+  sample_sublocation: string;
+  sample_comments: string;
+  sample_datetime_after: string;
+  sample_datetime_before: string;
+  is_used: string;
+  study_id__study_group: string;
+  study_id__study_center: string;
+  study_id__sex: string;
+  study_id__genotype_data_available: string;
+  study_id__nod2_mutation_present: string;
+  study_id__il23r_mutation_present: string;
+  endoscopic_mucosal_healing_at_3_6_months: string;
+  endoscopic_mucosal_healing_at_12_months: string;
+  music_timepoint: string;
+  marvel_timepoint: string;
+  biopsy_location: string;
+  biopsy_inflamed_status: string;
+};
+
 const dateFormatter = new Intl.DateTimeFormat("en-GB", {
   year: "numeric",
   month: "2-digit",
@@ -94,6 +139,33 @@ const timeFormatter = new Intl.DateTimeFormat("en-GB", {
 
 const EMPTY_STATE: SampleRow[] = [];
 const DEFAULT_PAGE_SIZE = 50;
+const DEFAULT_FILTERS: SampleFilters = {
+  study_name: "",
+  sample_type: "",
+  study_id__name: "",
+  sample_location: "",
+  sample_sublocation: "",
+  sample_comments: "",
+  sample_datetime_after: "",
+  sample_datetime_before: "",
+  is_used: "",
+  study_id__study_group: "",
+  study_id__study_center: "",
+  study_id__sex: "",
+  study_id__genotype_data_available: "",
+  study_id__nod2_mutation_present: "",
+  study_id__il23r_mutation_present: "",
+  endoscopic_mucosal_healing_at_3_6_months: "",
+  endoscopic_mucosal_healing_at_12_months: "",
+  music_timepoint: "",
+  marvel_timepoint: "",
+  biopsy_location: "",
+  biopsy_inflamed_status: "",
+};
+const DEFAULT_BOOLEAN_OPTIONS: FilterOption[] = [
+  { value: "true", label: "Yes" },
+  { value: "false", label: "No" },
+];
 
 const SORT_FIELD_MAP: Record<string, string> = {
   study_name: "study_name",
@@ -217,6 +289,13 @@ function formatDate(value: string | null): string {
   return `${datePart} ${timePart}`; // No comma, just a space
 }
 
+function getFilterFieldClass(baseClass: string, value: string): string {
+  if (!value.trim()) {
+    return baseClass;
+  }
+  return `${baseClass} border-primary/70 bg-primary/5 ring-1 ring-primary/30`;
+}
+
 export function SamplesTable() {
   const [rows, setRows] = useState<SampleRow[]>(EMPTY_STATE);
   const [isLoading, setIsLoading] = useState(true);
@@ -226,6 +305,12 @@ export function SamplesTable() {
   const [usedError, setUsedError] = useState<string | null>(null);
   const [isMarkingUsed, setIsMarkingUsed] = useState(false);
   const [usedStatusMessage, setUsedStatusMessage] = useState<string | null>(null);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [includeUsed, setIncludeUsed] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filterOptions, setFilterOptions] = useState<SampleFilterOptions | null>(null);
+  const [filters, setFilters] = useState<SampleFilters>(DEFAULT_FILTERS);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: DEFAULT_PAGE_SIZE,
@@ -245,6 +330,24 @@ export function SamplesTable() {
     genotype_data_available: false,
   });
   const [sorting, setSorting] = useState<SortingState>([]);
+  const studyIdInputId = useId();
+  const sampleLocationInputId = useId();
+  const sampleSublocationInputId = useId();
+  const collectedAfterInputId = useId();
+  const collectedBeforeInputId = useId();
+  const commentsInputId = useId();
+
+  const activeFilterCount = useMemo(() => {
+    return Object.values(filters).filter((value) => value.trim() !== "").length;
+  }, [filters]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setSearchQuery(searchInput.trim());
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [searchInput]);
 
   useEffect(() => {
     setPagination((previous) => {
@@ -253,7 +356,7 @@ export function SamplesTable() {
       }
       return { ...previous, pageIndex: 0 };
     });
-  }, [sorting]);
+  }, [sorting, searchQuery, includeUsed, filters]);
 
   useEffect(() => {
     if (!usedStatusMessage) {
@@ -266,6 +369,33 @@ export function SamplesTable() {
 
     return () => window.clearTimeout(timer);
   }, [usedStatusMessage]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadFilterOptions() {
+      try {
+        const response = await fetch("/api/dashboard/samples/filters", {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as SampleFilterOptions;
+        setFilterOptions(payload);
+      } catch {
+        if (!controller.signal.aborted) {
+          setFilterOptions(null);
+        }
+      }
+    }
+
+    loadFilterOptions();
+
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -296,7 +426,23 @@ export function SamplesTable() {
           query.set("ordering", orderingValues.join(","));
         }
 
-        const response = await fetch(`/api/dashboard/samples?${query.toString()}`, {
+        if (includeUsed) {
+          query.set("include_used", "true");
+        }
+
+        Object.entries(filters).forEach(([key, value]) => {
+          const trimmedValue = value.trim();
+          if (trimmedValue) {
+            query.set(key, trimmedValue);
+          }
+        });
+
+        const endpoint = searchQuery ? "/api/dashboard/samples/search" : "/api/dashboard/samples";
+        if (searchQuery) {
+          query.set("query", searchQuery);
+        }
+
+        const response = await fetch(`${endpoint}?${query.toString()}`, {
           signal: controller.signal,
         });
 
@@ -343,7 +489,7 @@ export function SamplesTable() {
     return () => {
       controller.abort();
     };
-  }, [pagination, sorting]);
+  }, [pagination, sorting, searchQuery, includeUsed, filters]);
 
   const closeUsedDialog = (forceClose = false) => {
     if (isMarkingUsed && !forceClose) {
@@ -610,53 +756,13 @@ export function SamplesTable() {
     onSortingChange: setSorting,
   });
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        {usedStatusMessage ? (
-          <AlertSuccess>
-            <AlertDescription>{usedStatusMessage}</AlertDescription>
-          </AlertSuccess>
-        ) : null}
-        <p className="text-sm text-muted-foreground">Loading samples…</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-4">
-        {usedStatusMessage ? (
-          <AlertSuccess>
-            <AlertDescription>{usedStatusMessage}</AlertDescription>
-          </AlertSuccess>
-        ) : null}
-        <div className="rounded-md border border-destructive/50 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          {error}
-        </div>
-      </div>
-    );
-  }
-
-  if (rows.length === 0) {
-    return (
-      <div className="space-y-4">
-        {usedStatusMessage ? (
-          <AlertSuccess>
-            <AlertDescription>{usedStatusMessage}</AlertDescription>
-          </AlertSuccess>
-        ) : null}
-        <p className="text-sm text-muted-foreground">No samples found.</p>
-      </div>
-    );
-  }
-
   const canPreviousPage = table.getCanPreviousPage();
   const canNextPage = table.getCanNextPage();
   const { pageIndex, pageSize } = pagination;
   const firstItemIndex = rows.length > 0 ? pageIndex * pageSize + 1 : 0;
   const lastItemIndex = rows.length > 0 ? pageIndex * pageSize + rows.length : 0;
   const totalLabel = totalCount ?? "unknown";
+  const booleanOptions = filterOptions?.boolean ?? DEFAULT_BOOLEAN_OPTIONS;
 
   return (
     <div className="flex flex-col gap-4">
@@ -665,101 +771,640 @@ export function SamplesTable() {
           <AlertDescription>{usedStatusMessage}</AlertDescription>
         </AlertSuccess>
       ) : null}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative">
+            <Input
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              placeholder="Search samples..."
+              className="h-9 w-64 pr-8"
+            />
+            <button
+              type="button"
+              className={`absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground disabled:opacity-40${searchInput ? " cursor-pointer" : ""}`}
+              onClick={() => {
+                setSearchInput("");
+                setSearchQuery("");
+              }}
+              disabled={!searchInput}
+              aria-label="Clear search"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded border-input text-primary"
+              checked={includeUsed}
+              onChange={(event) => setIncludeUsed(event.target.checked)}
+            />
+            Include used samples?
+          </label>
+        </div>
+        <div className="flex items-center gap-2">
+          {activeFilterCount > 0 ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              type="button"
+              onClick={() => {
+                setFilters(DEFAULT_FILTERS);
+                setFiltersOpen(false);
+              }}
+            >
+              <X className="mr-2 h-4 w-4" />
+              Clear
+            </Button>
+          ) : null}
+          <Button
+            variant={filtersOpen ? "default" : "outline"}
+            size="sm"
+            type="button"
+            onClick={() => setFiltersOpen((previous) => !previous)}
+            aria-expanded={filtersOpen}
+            className="relative"
+          >
+            <Filter className="mr-2 h-4 w-4" />
+            Filters
+            {activeFilterCount > 0 ? (
+              <span className="ml-2 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                {activeFilterCount}
+              </span>
+            ) : null}
+          </Button>
           <Button variant="outline" size="sm" asChild>
             <a href="/api/dashboard/samples/export" target="_blank" rel="noreferrer">
               <Download className="mr-2 h-4 w-4" />
               Export CSV
             </a>
           </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Settings className="mr-2 h-4 w-4" />
+                Columns
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuCheckboxItem
+                checked={table.getColumn("timepoint_label")?.getIsVisible() ?? false}
+                onCheckedChange={(value) =>
+                  table.getColumn("timepoint_label")?.toggleVisibility(value)
+                }
+              >
+                Timepoint
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={table.getColumn("study_group_label")?.getIsVisible() ?? false}
+                onCheckedChange={(value) =>
+                  table.getColumn("study_group_label")?.toggleVisibility(value)
+                }
+              >
+                Group
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={table.getColumn("age")?.getIsVisible() ?? false}
+                onCheckedChange={(value) => table.getColumn("age")?.toggleVisibility(value)}
+              >
+                Age
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={table.getColumn("sex_label")?.getIsVisible() ?? false}
+                onCheckedChange={(value) => table.getColumn("sex_label")?.toggleVisibility(value)}
+              >
+                Sex
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={table.getColumn("study_center_label")?.getIsVisible() ?? false}
+                onCheckedChange={(value) =>
+                  table.getColumn("study_center_label")?.toggleVisibility(value)
+                }
+              >
+                Center
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={table.getColumn("crp")?.getIsVisible() ?? false}
+                onCheckedChange={(value) => table.getColumn("crp")?.toggleVisibility(value)}
+              >
+                CRP
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={table.getColumn("calprotectin")?.getIsVisible() ?? false}
+                onCheckedChange={(value) =>
+                  table.getColumn("calprotectin")?.toggleVisibility(value)
+                }
+              >
+                Calprotectin
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={
+                  table.getColumn("endoscopic_mucosal_healing_at_3_6_months")?.getIsVisible() ??
+                  false
+                }
+                onCheckedChange={(value) =>
+                  table
+                    .getColumn("endoscopic_mucosal_healing_at_3_6_months")
+                    ?.toggleVisibility(value)
+                }
+              >
+                Mucosal Healing (3-6m)
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={
+                  table.getColumn("endoscopic_mucosal_healing_at_12_months")?.getIsVisible() ??
+                  false
+                }
+                onCheckedChange={(value) =>
+                  table
+                    .getColumn("endoscopic_mucosal_healing_at_12_months")
+                    ?.toggleVisibility(value)
+                }
+              >
+                Mucosal Healing (12m)
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={table.getColumn("genotype_data_available")?.getIsVisible() ?? false}
+                onCheckedChange={(value) =>
+                  table.getColumn("genotype_data_available")?.toggleVisibility(value)
+                }
+              >
+                Genotyping
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Settings className="mr-2 h-4 w-4" />
-              Columns
+      </div>
+
+      <div
+        className={`overflow-hidden rounded-md border border-border/60 bg-muted/20 transition-all duration-300 ease-out${
+          filtersOpen ? " max-h-[1200px] p-4 opacity-100" : " max-h-0 p-0 opacity-0"
+        }`}
+      >
+        <div className={filtersOpen ? "" : "pointer-events-none"}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-medium text-foreground">Filters</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              type="button"
+              onClick={() => setFiltersOpen(false)}
+              aria-label="Close filters"
+            >
+              <X className="h-4 w-4" />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuCheckboxItem
-              checked={table.getColumn("timepoint_label")?.getIsVisible() ?? false}
-              onCheckedChange={(value) =>
-                table.getColumn("timepoint_label")?.toggleVisibility(value)
-              }
+          </div>
+          <div className="mt-3 grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Study name
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.study_name,
+                )}
+                value={filters.study_name}
+                onChange={(event) =>
+                  setFilters((previous) => ({ ...previous, study_name: event.target.value }))
+                }
+              >
+                <option value="">Any</option>
+                {(filterOptions?.study_name ?? []).map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Sample type
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.sample_type,
+                )}
+                value={filters.sample_type}
+                onChange={(event) =>
+                  setFilters((previous) => ({ ...previous, sample_type: event.target.value }))
+                }
+              >
+                <option value="">Any</option>
+                {(filterOptions?.sample_type ?? []).map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={studyIdInputId}
             >
-              Timepoint
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={table.getColumn("study_group_label")?.getIsVisible() ?? false}
-              onCheckedChange={(value) =>
-                table.getColumn("study_group_label")?.toggleVisibility(value)
-              }
+              Study ID
+              <Input
+                id={studyIdInputId}
+                value={filters.study_id__name}
+                onChange={(event) =>
+                  setFilters((previous) => ({ ...previous, study_id__name: event.target.value }))
+                }
+                placeholder="e.g. MUSIC-001"
+                className={getFilterFieldClass("h-9", filters.study_id__name)}
+              />
+            </label>
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={sampleLocationInputId}
             >
-              Group
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={table.getColumn("age")?.getIsVisible() ?? false}
-              onCheckedChange={(value) => table.getColumn("age")?.toggleVisibility(value)}
+              Location
+              <Input
+                id={sampleLocationInputId}
+                value={filters.sample_location}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    sample_location: event.target.value,
+                  }))
+                }
+                placeholder="e.g. Freezer 1"
+                className={getFilterFieldClass("h-9", filters.sample_location)}
+              />
+            </label>
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={sampleSublocationInputId}
             >
-              Age
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={table.getColumn("sex_label")?.getIsVisible() ?? false}
-              onCheckedChange={(value) => table.getColumn("sex_label")?.toggleVisibility(value)}
+              Sublocation
+              <Input
+                id={sampleSublocationInputId}
+                value={filters.sample_sublocation}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    sample_sublocation: event.target.value,
+                  }))
+                }
+                placeholder="e.g. Rack A"
+                className={getFilterFieldClass("h-9", filters.sample_sublocation)}
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Used samples
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.is_used,
+                )}
+                value={filters.is_used}
+                onChange={(event) =>
+                  setFilters((previous) => ({ ...previous, is_used: event.target.value }))
+                }
+              >
+                <option value="">Any</option>
+                {booleanOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={collectedAfterInputId}
             >
-              Sex
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={table.getColumn("study_center_label")?.getIsVisible() ?? false}
-              onCheckedChange={(value) =>
-                table.getColumn("study_center_label")?.toggleVisibility(value)
-              }
+              Collected after
+              <Input
+                id={collectedAfterInputId}
+                type="date"
+                value={filters.sample_datetime_after}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    sample_datetime_after: event.target.value,
+                  }))
+                }
+                className={getFilterFieldClass("h-9", filters.sample_datetime_after)}
+              />
+            </label>
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={collectedBeforeInputId}
             >
-              Center
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={table.getColumn("crp")?.getIsVisible() ?? false}
-              onCheckedChange={(value) => table.getColumn("crp")?.toggleVisibility(value)}
+              Collected before
+              <Input
+                id={collectedBeforeInputId}
+                type="date"
+                value={filters.sample_datetime_before}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    sample_datetime_before: event.target.value,
+                  }))
+                }
+                className={getFilterFieldClass("h-9", filters.sample_datetime_before)}
+              />
+            </label>
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={commentsInputId}
             >
-              CRP
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={table.getColumn("calprotectin")?.getIsVisible() ?? false}
-              onCheckedChange={(value) => table.getColumn("calprotectin")?.toggleVisibility(value)}
+              Comments contain
+              <Input
+                id={commentsInputId}
+                value={filters.sample_comments}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    sample_comments: event.target.value,
+                  }))
+                }
+                className={getFilterFieldClass("h-9", filters.sample_comments)}
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Study group
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.study_id__study_group,
+                )}
+                value={filters.study_id__study_group}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    study_id__study_group: event.target.value,
+                  }))
+                }
+              >
+                <option value="">Any</option>
+                {(filterOptions?.study_group ?? []).map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Study center
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.study_id__study_center,
+                )}
+                value={filters.study_id__study_center}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    study_id__study_center: event.target.value,
+                  }))
+                }
+              >
+                <option value="">Any</option>
+                {(filterOptions?.study_center ?? []).map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Biological sex
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.study_id__sex,
+                )}
+                value={filters.study_id__sex}
+                onChange={(event) =>
+                  setFilters((previous) => ({ ...previous, study_id__sex: event.target.value }))
+                }
+              >
+                <option value="">Any</option>
+                {(filterOptions?.sex ?? []).map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Genotype data available
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.study_id__genotype_data_available,
+                )}
+                value={filters.study_id__genotype_data_available}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    study_id__genotype_data_available: event.target.value,
+                  }))
+                }
+              >
+                <option value="">Any</option>
+                {booleanOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              NOD2 mutation present
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.study_id__nod2_mutation_present,
+                )}
+                value={filters.study_id__nod2_mutation_present}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    study_id__nod2_mutation_present: event.target.value,
+                  }))
+                }
+              >
+                <option value="">Any</option>
+                {booleanOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              IL23R mutation present
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.study_id__il23r_mutation_present,
+                )}
+                value={filters.study_id__il23r_mutation_present}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    study_id__il23r_mutation_present: event.target.value,
+                  }))
+                }
+              >
+                <option value="">Any</option>
+                {booleanOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Mucosal healing (3-6m)
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.endoscopic_mucosal_healing_at_3_6_months,
+                )}
+                value={filters.endoscopic_mucosal_healing_at_3_6_months}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    endoscopic_mucosal_healing_at_3_6_months: event.target.value,
+                  }))
+                }
+              >
+                <option value="">Any</option>
+                {booleanOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Mucosal healing (12m)
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.endoscopic_mucosal_healing_at_12_months,
+                )}
+                value={filters.endoscopic_mucosal_healing_at_12_months}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    endoscopic_mucosal_healing_at_12_months: event.target.value,
+                  }))
+                }
+              >
+                <option value="">Any</option>
+                {booleanOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Music timepoint
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.music_timepoint,
+                )}
+                value={filters.music_timepoint}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    music_timepoint: event.target.value,
+                  }))
+                }
+              >
+                <option value="">Any</option>
+                {(filterOptions?.music_timepoint ?? []).map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Marvel timepoint
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.marvel_timepoint,
+                )}
+                value={filters.marvel_timepoint}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    marvel_timepoint: event.target.value,
+                  }))
+                }
+              >
+                <option value="">Any</option>
+                {(filterOptions?.marvel_timepoint ?? []).map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Biopsy location
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.biopsy_location,
+                )}
+                value={filters.biopsy_location}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    biopsy_location: event.target.value,
+                  }))
+                }
+              >
+                <option value="">Any</option>
+                {(filterOptions?.biopsy_location ?? []).map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+              Biopsy inflamed status
+              <select
+                className={getFilterFieldClass(
+                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
+                  filters.biopsy_inflamed_status,
+                )}
+                value={filters.biopsy_inflamed_status}
+                onChange={(event) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    biopsy_inflamed_status: event.target.value,
+                  }))
+                }
+              >
+                <option value="">Any</option>
+                {(filterOptions?.biopsy_inflamed_status ?? []).map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="mt-3 flex justify-start">
+            <Button
+              variant="outline"
+              size="sm"
+              type="button"
+              onClick={() => setFilters(DEFAULT_FILTERS)}
             >
-              Calprotectin
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={
-                table.getColumn("endoscopic_mucosal_healing_at_3_6_months")?.getIsVisible() ?? false
-              }
-              onCheckedChange={(value) =>
-                table.getColumn("endoscopic_mucosal_healing_at_3_6_months")?.toggleVisibility(value)
-              }
-            >
-              Mucosal Healing (3-6m)
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={
-                table.getColumn("endoscopic_mucosal_healing_at_12_months")?.getIsVisible() ?? false
-              }
-              onCheckedChange={(value) =>
-                table.getColumn("endoscopic_mucosal_healing_at_12_months")?.toggleVisibility(value)
-              }
-            >
-              Mucosal Healing (12m)
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={table.getColumn("genotype_data_available")?.getIsVisible() ?? false}
-              onCheckedChange={(value) =>
-                table.getColumn("genotype_data_available")?.toggleVisibility(value)
-              }
-            >
-              Genotyping
-            </DropdownMenuCheckboxItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              Clear filters
+            </Button>
+          </div>
+        </div>
       </div>
 
       <PaginationControls
@@ -774,34 +1419,44 @@ export function SamplesTable() {
         lastItemIndex={lastItemIndex}
         totalLabel={totalLabel}
       />
-      <div className="max-w-full overflow-x-auto">
-        <table className="w-full min-w-[1200px] table-auto border-collapse text-left text-sm">
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="border-b border-border/60">
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id} className="px-3 py-2 font-semibold text-muted-foreground">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="border-b border-border/40 last:border-none">
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-3 py-2 whitespace-nowrap">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {isLoading ? (
+        <p className="text-sm text-muted-foreground">Loading samples…</p>
+      ) : error ? (
+        <div className="rounded-md border border-destructive/50 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+          {error}
+        </div>
+      ) : rows.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No samples found.</p>
+      ) : (
+        <div className="max-w-full overflow-x-auto">
+          <table className="w-full min-w-[1200px] table-auto border-collapse text-left text-sm">
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id} className="border-b border-border/60">
+                  {headerGroup.headers.map((header) => (
+                    <th key={header.id} className="px-3 py-2 font-semibold text-muted-foreground">
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.map((row) => (
+                <tr key={row.id} className="border-b border-border/40 last:border-none">
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="px-3 py-2 whitespace-nowrap">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
       <PaginationControls
         canPrevious={canPreviousPage}
         canNext={canNextPage}

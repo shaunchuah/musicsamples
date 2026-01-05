@@ -11,6 +11,7 @@ from api_v3.views.auth import (  # noqa: F401
 from api_v3.views.samples import (  # noqa: F401
     MultipleSampleV3ViewSet,
     SampleIsUsedV3ViewSet,
+    SampleFilterOptionsView,
     SampleLocationV3ViewSet,
     SampleLocationAutocompleteView,
     SampleSublocationAutocompleteView,

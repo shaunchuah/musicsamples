@@ -2,9 +2,11 @@
 # Hosts the v3 sample API endpoints used by the Next.js frontend, including list/detail and CRUD with audit stamping.
 # Exists to decouple the API surface from legacy template views while keeping feature parity for samples.
 
+from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import mixins, viewsets
+from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -17,6 +19,17 @@ from api_v3.serializers import (
     SampleV3DetailSerializer,
     SampleV3Serializer,
     SampleV3UpdateSerializer,
+)
+from app.choices import (
+    BiopsyInflamedStatusChoices,
+    BiopsyLocationChoices,
+    MarvelTimepointChoices,
+    MusicTimepointChoices,
+    SampleTypeChoices,
+    SexChoices,
+    StudyCenterChoices,
+    StudyGroupChoices,
+    StudyNameChoices,
 )
 from app.filters import SampleV3Filter
 from app.models import Sample, StudyIdentifier
@@ -53,7 +66,7 @@ class SampleV3ViewSet(viewsets.ModelViewSet):
         base_queryset = Sample.objects.select_related("study_id").order_by("-sample_datetime")
         action = getattr(self, "action", None)
 
-        if action == "list":
+        if action in ("list", "search"):
             request = getattr(self, "request", None)
             include_used = False
             has_is_used_filter = False
@@ -96,6 +109,31 @@ class SampleV3ViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         # Maintain audit trail by updating the modifier on each change
         serializer.save(last_modified_by=self._current_user_identifier())
+
+    @extend_schema(tags=["v3"], description="Search samples by common identifiers and text fields.")
+    @action(detail=False, methods=["get"], url_path="search")
+    def search(self, request):
+        query_string = request.query_params.get("query", "").strip()
+        queryset = self.get_queryset()
+
+        if query_string:
+            queryset = queryset.filter(
+                Q(sample_id__icontains=query_string)
+                | Q(study_id__name__icontains=query_string)
+                | Q(sample_location__icontains=query_string)
+                | Q(sample_sublocation__icontains=query_string)
+                | Q(sample_type__icontains=query_string)
+                | Q(sample_comments__icontains=query_string)
+            )
+
+        queryset = self.filter_queryset(queryset)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema(tags=["v3"])
@@ -241,3 +279,36 @@ class StudyIdAutocompleteView(APIView):
         else:
             queryset = StudyIdentifier.objects.all().values_list("name", flat=True)
         return Response([value for value in queryset if value])
+
+
+@extend_schema(tags=["v3"])
+class SampleFilterOptionsView(APIView):
+    """
+    Return dropdown-ready filter options for the samples dashboard.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def _choice_options(choices):
+        return [{"value": value, "label": label} for value, label in choices]
+
+    def get(self, request):
+        boolean_options = [
+            {"value": "true", "label": "Yes"},
+            {"value": "false", "label": "No"},
+        ]
+        return Response(
+            {
+                "study_name": self._choice_options(StudyNameChoices.choices),
+                "sample_type": self._choice_options(SampleTypeChoices.choices),
+                "study_group": self._choice_options(StudyGroupChoices.choices),
+                "study_center": self._choice_options(StudyCenterChoices.choices),
+                "sex": self._choice_options(SexChoices.choices),
+                "music_timepoint": self._choice_options(MusicTimepointChoices.choices),
+                "marvel_timepoint": self._choice_options(MarvelTimepointChoices.choices),
+                "biopsy_location": self._choice_options(BiopsyLocationChoices.choices),
+                "biopsy_inflamed_status": self._choice_options(BiopsyInflamedStatusChoices.choices),
+                "boolean": boolean_options,
+            }
+        )

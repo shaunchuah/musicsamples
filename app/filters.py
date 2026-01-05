@@ -5,9 +5,13 @@ from django_filters.widgets import RangeWidget
 from app.choices import (
     BasicScienceBoxTypeChoices,
     BasicScienceGroupChoices,
+    BiopsyInflamedStatusChoices,
+    BiopsyLocationChoices,
     ColumnChoices,
     DepthChoices,
     FreezerLocationChoices,
+    MarvelTimepointChoices,
+    MusicTimepointChoices,
     RowChoices,
     SampleTypeChoices,
     SexChoices,
@@ -32,6 +36,10 @@ class SampleFilter(django_filters.FilterSet):
     )
     sample_comments = django_filters.CharFilter(lookup_expr="icontains", label="Sample Comments")
     sample_volume = django_filters.NumberFilter(label="Sample Volume")
+    biopsy_location = django_filters.ChoiceFilter(label="Biopsy Location", choices=BiopsyLocationChoices.choices)
+    biopsy_inflamed_status = django_filters.ChoiceFilter(
+        label="Biopsy Inflamed Status", choices=BiopsyInflamedStatusChoices.choices
+    )
     study_id__study_group = django_filters.ChoiceFilter(label="Study Group", choices=StudyGroupChoices.choices)
     study_id__study_center = django_filters.ChoiceFilter(label="Study Center", choices=StudyCenterChoices.choices)
     study_id__sex = django_filters.ChoiceFilter(label="Biological Sex", choices=SexChoices.choices)
@@ -97,6 +105,8 @@ class SampleFilter(django_filters.FilterSet):
             "marvel_timepoint",
             "sample_comments",
             "sample_volume",
+            "biopsy_location",
+            "biopsy_inflamed_status",
             "sample_datetime",
             "study_id__study_group",
             "study_id__study_center",
@@ -111,27 +121,102 @@ class SampleFilter(django_filters.FilterSet):
 
 class SampleV3Filter(django_filters.FilterSet):
     """
-    Filter set used by the api/v3 samples endpoint to support lightweight column filters.
+    Filter set used by the api/v3 samples endpoint to mirror legacy sample filters.
     """
 
-    study_name = django_filters.CharFilter(field_name="study_name", lookup_expr="icontains")
+    study_name = django_filters.ChoiceFilter(label="Study Name", choices=StudyNameChoices.choices)
     sample_id = django_filters.CharFilter(field_name="sample_id", lookup_expr="icontains")
+    study_id__name = django_filters.CharFilter(field_name="study_id__name", lookup_expr="icontains")
     study_identifier = django_filters.CharFilter(field_name="study_id__name", lookup_expr="icontains")
     sample_location = django_filters.CharFilter(field_name="sample_location", lookup_expr="icontains")
     sample_sublocation = django_filters.CharFilter(field_name="sample_sublocation", lookup_expr="icontains")
-    sample_type = django_filters.CharFilter(field_name="sample_type", lookup_expr="iexact")
-    is_used = django_filters.BooleanFilter(field_name="is_used")
+    sample_type = django_filters.ChoiceFilter(label="Sample Type", choices=SampleTypeChoices.choices)
+    is_used = django_filters.BooleanFilter(label="Used Samples?")
+    sample_datetime = django_filters.DateFromToRangeFilter(
+        widget=RangeWidget(attrs={"type": "date"}),
+        label="Sample Date Range",
+    )
+    sample_comments = django_filters.CharFilter(lookup_expr="icontains", label="Sample Comments")
+    biopsy_location = django_filters.ChoiceFilter(label="Biopsy Location", choices=BiopsyLocationChoices.choices)
+    biopsy_inflamed_status = django_filters.ChoiceFilter(
+        label="Biopsy Inflamed Status", choices=BiopsyInflamedStatusChoices.choices
+    )
+    study_id__study_group = django_filters.ChoiceFilter(label="Study Group", choices=StudyGroupChoices.choices)
+    study_id__study_center = django_filters.ChoiceFilter(label="Study Center", choices=StudyCenterChoices.choices)
+    study_id__sex = django_filters.ChoiceFilter(label="Biological Sex", choices=SexChoices.choices)
+    study_id__genotype_data_available = django_filters.BooleanFilter(label="Genotype Data Available")
+    study_id__nod2_mutation_present = django_filters.BooleanFilter(label="NOD2 Mutation Present")
+    study_id__il23r_mutation_present = django_filters.BooleanFilter(label="IL23R Mutation Present")
+    music_timepoint = django_filters.ChoiceFilter(label="Music Timepoint", choices=MusicTimepointChoices.choices)
+    marvel_timepoint = django_filters.ChoiceFilter(label="Marvel Timepoint", choices=MarvelTimepointChoices.choices)
+    endoscopic_mucosal_healing_at_3_6_months = django_filters.BooleanFilter(
+        label="Endoscopic Mucosal Healing at 3-6 Months",
+        method="filter_endoscopic_mucosal_healing_at_3_6_months",
+    )
+    endoscopic_mucosal_healing_at_12_months = django_filters.BooleanFilter(
+        label="Endoscopic Mucosal Healing at 12 Months",
+        method="filter_endoscopic_mucosal_healing_at_12_months",
+    )
+
+    def filter_endoscopic_mucosal_healing_at_3_6_months(self, queryset, name, value):
+        gidamps = queryset.filter(
+            study_name__iexact="gidamps",
+            study_id__clinical_data__sample_date=models.F("sample_datetime__date"),
+            study_id__clinical_data__endoscopic_mucosal_healing_at_3_6_months=value,
+        )
+        music = queryset.filter(
+            study_name__in=["music", "mini_music"],
+            study_id__clinical_data__music_timepoint=models.F("music_timepoint"),
+            study_id__clinical_data__endoscopic_mucosal_healing_at_3_6_months=value,
+        )
+        others = queryset.exclude(study_name__in=["gidamps", "music", "mini_music"]).filter(
+            study_id__clinical_data__sample_date=models.F("sample_datetime__date"),
+            study_id__clinical_data__endoscopic_mucosal_healing_at_3_6_months=value,
+        )
+        return gidamps | music | others
+
+    def filter_endoscopic_mucosal_healing_at_12_months(self, queryset, name, value):
+        gidamps = queryset.filter(
+            study_name__iexact="gidamps",
+            study_id__clinical_data__sample_date=models.F("sample_datetime__date"),
+            study_id__clinical_data__endoscopic_mucosal_healing_at_12_months=value,
+        )
+        music = queryset.filter(
+            study_name__in=["music", "mini_music"],
+            study_id__clinical_data__music_timepoint=models.F("music_timepoint"),
+            study_id__clinical_data__endoscopic_mucosal_healing_at_12_months=value,
+        )
+        others = queryset.exclude(study_name__in=["gidamps", "music", "mini_music"]).filter(
+            study_id__clinical_data__sample_date=models.F("sample_datetime__date"),
+            study_id__clinical_data__endoscopic_mucosal_healing_at_12_months=value,
+        )
+        return gidamps | music | others
 
     class Meta:
         model = Sample
         fields = [
             "study_name",
             "sample_id",
+            "study_id__name",
             "study_identifier",
             "sample_location",
             "sample_sublocation",
             "sample_type",
             "is_used",
+            "music_timepoint",
+            "marvel_timepoint",
+            "sample_comments",
+            "biopsy_location",
+            "biopsy_inflamed_status",
+            "sample_datetime",
+            "study_id__study_group",
+            "study_id__study_center",
+            "study_id__sex",
+            "study_id__genotype_data_available",
+            "study_id__nod2_mutation_present",
+            "study_id__il23r_mutation_present",
+            "endoscopic_mucosal_healing_at_3_6_months",
+            "endoscopic_mucosal_healing_at_12_months",
         ]
 
 
