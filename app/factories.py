@@ -134,6 +134,7 @@ class BasicScienceBoxFactory(DjangoModelFactory):
         model = BasicScienceBox
 
     box_id = Sequence(lambda n: "BOX-%04d" % n)
+    basic_science_group = LazyAttribute(lambda x: choice(BasicScienceGroupChoices.values))
     box_type = LazyAttribute(lambda x: choice(BasicScienceBoxTypeChoices.values))
     location = LazyAttribute(lambda x: choice(FreezerLocationChoices.values))
     row = LazyAttribute(lambda x: choice(RowChoices.values))

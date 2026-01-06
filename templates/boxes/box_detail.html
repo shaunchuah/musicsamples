@@ -45,10 +45,10 @@
                   <td>{{ box.box_id }}</td>
                 </tr>
                 <tr>
-                  <td>Groups</td>
+                  <td>Group</td>
                   <td>
-                    {% if box.basic_science_groups_display %}
-                      {{ box.basic_science_groups_display }}
+                    {% if box.basic_science_group %}
+                      {{ box.get_basic_science_group_display }}
                     {% else %}
                       N/A
                     {% endif %}

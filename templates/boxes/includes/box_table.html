@@ -5,7 +5,7 @@
       <thead class="text-primary">
         <tr>
           <th>Box ID</th>
-          <th>Groups</th>
+          <th>Group</th>
           <th>Experiment IDs</th>
           <th>Species</th>
           <th>Location</th>
@@ -26,8 +26,8 @@
           <tr>
             <td>{{ box.box_id }}</td>
             <td>
-              {% if box.basic_science_groups_display %}
-                {{ box.basic_science_groups_display }}
+              {% if box.basic_science_group %}
+                {{ box.get_basic_science_group_display }}
               {% else %}
                 N/A
               {% endif %}

@@ -136,6 +136,7 @@ def box_search(request):
         queryset = (
             BasicScienceBox.objects.filter(
                 Q(box_id__icontains=query_string)
+                | Q(basic_science_group__icontains=query_string)
                 | Q(location__icontains=query_string)
                 | Q(comments__icontains=query_string)
                 | Q(experiments__basic_science_group__icontains=query_string)
@@ -153,6 +154,7 @@ def box_search(request):
             queryset = (
                 BasicScienceBox.objects.filter(
                     Q(box_id__icontains=query_string)
+                    | Q(basic_science_group__icontains=query_string)
                     | Q(location__icontains=query_string)
                     | Q(comments__icontains=query_string)
                     | Q(experiments__basic_science_group__icontains=query_string)
@@ -190,6 +192,7 @@ def export_boxes_csv(request):
         queryset = (
             BasicScienceBox.objects.filter(
                 Q(box_id__icontains=query_string)
+                | Q(basic_science_group__icontains=query_string)
                 | Q(location__icontains=query_string)
                 | Q(comments__icontains=query_string)
                 | Q(experiments__basic_science_group__icontains=query_string)
@@ -207,6 +210,7 @@ def export_boxes_csv(request):
             queryset = (
                 BasicScienceBox.objects.filter(
                     Q(box_id__icontains=query_string)
+                    | Q(basic_science_group__icontains=query_string)
                     | Q(location__icontains=query_string)
                     | Q(comments__icontains=query_string)
                     | Q(experiments__basic_science_group__icontains=query_string)

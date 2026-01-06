@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
 from pytest_django.asserts import assertTemplateUsed
 
+from app.choices import BasicScienceGroupChoices
 from app.forms import BasicScienceBoxForm
 from app.models import BasicScienceBox
 from app.views.box_views import BasicScienceBoxCreateView
@@ -15,6 +16,7 @@ pytestmark = pytest.mark.django_db
 def box_valid_payload():
     return {
         "box_id": "TEST001",
+        "basic_science_group": BasicScienceGroupChoices.JONES.value,
         "box_type": "basic_science_samples",
         "location": "sii_freezer_1",
     }

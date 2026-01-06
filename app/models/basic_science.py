@@ -81,6 +81,9 @@ class BasicScienceBox(models.Model):
     # Core fields
     box_id = models.CharField(max_length=200, unique=True)
     box_type = models.CharField(max_length=200, choices=BasicScienceBoxTypeChoices.choices)
+    basic_science_group = models.CharField(
+        max_length=200, choices=BasicScienceGroupChoices.choices, default=BasicScienceGroupChoices.JONES
+    )
 
     # Location and metadata
     location = models.CharField(max_length=200, choices=FreezerLocationChoices.choices)

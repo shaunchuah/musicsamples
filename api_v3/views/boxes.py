@@ -1,6 +1,6 @@
 # api_v3/views/boxes.py
 # Hosts the v3 box API endpoints used by the Next.js frontend.
-# Exists to provide read-only, filterable access to boxes without relying on Django templates.
+# Exists to provide create, update, and read access to boxes without relying on Django templates.
 
 from django.db.models import Prefetch, Q
 from drf_spectacular.utils import extend_schema
@@ -18,6 +18,7 @@ from api_v3.serializers import (
 )
 from app.choices import (
     BasicScienceBoxTypeChoices,
+    BasicScienceGroupChoices,
     ColumnChoices,
     DepthChoices,
     FreezerLocationChoices,
@@ -34,7 +35,11 @@ EXPERIMENT_PREFETCH = Prefetch(
 
 
 @extend_schema(tags=["v3"])
-class BasicScienceBoxV3ViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
+class BasicScienceBoxV3ViewSet(
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.ReadOnlyModelViewSet,
+):
     """
     API for the v3 frontend that exposes key box details and creation.
     """
@@ -68,7 +73,7 @@ class BasicScienceBoxV3ViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelVi
         return base_queryset
 
     def get_serializer_class(self):
-        if self.action == "create":
+        if self.action in ("create", "update", "partial_update"):
             return BasicScienceBoxCreateV3Serializer
         if self.action == "retrieve":
             return BasicScienceBoxDetailV3Serializer
@@ -76,6 +81,9 @@ class BasicScienceBoxV3ViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelVi
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user, last_modified_by=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(last_modified_by=self.request.user)
 
     @extend_schema(tags=["v3"], description="Search boxes by common identifiers and text fields.")
     @action(detail=False, methods=["get"], url_path="search")
@@ -86,6 +94,7 @@ class BasicScienceBoxV3ViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelVi
         if query_string:
             queryset = queryset.filter(
                 Q(box_id__icontains=query_string)
+                | Q(basic_science_group__icontains=query_string)
                 | Q(location__icontains=query_string)
                 | Q(comments__icontains=query_string)
                 | Q(experiments__basic_science_group__icontains=query_string)
@@ -126,6 +135,7 @@ class BasicScienceBoxOptionsView(APIView):
             for experiment in experiments
         ]
         payload = {
+            "basic_science_group_options": self._format_choices(BasicScienceGroupChoices.choices),
             "box_type_options": self._format_choices(BasicScienceBoxTypeChoices.choices),
             "location_options": self._format_choices(FreezerLocationChoices.choices),
             "row_options": self._format_choices(RowChoices.choices),
@@ -161,6 +171,7 @@ class BasicScienceBoxExportView(APIView):
         if query_string:
             base_queryset = base_queryset.filter(
                 Q(box_id__icontains=query_string)
+                | Q(basic_science_group__icontains=query_string)
                 | Q(location__icontains=query_string)
                 | Q(comments__icontains=query_string)
                 | Q(experiments__basic_science_group__icontains=query_string)

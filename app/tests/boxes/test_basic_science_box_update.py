@@ -3,6 +3,8 @@ from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from app.views.box_views import BasicScienceBoxUpdateView
 
+from app.choices import BasicScienceGroupChoices
+
 pytestmark = pytest.mark.django_db
 
 
@@ -10,6 +12,7 @@ pytestmark = pytest.mark.django_db
 def box_update_payload():
     return {
         "box_id": "UPDATED001",
+        "basic_science_group": BasicScienceGroupChoices.JONES.value,
         "box_type": "basic_science_samples",
         "location": "sii_freezer_1",
     }

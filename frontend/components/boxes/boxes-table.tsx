@@ -44,6 +44,8 @@ type BoxExperimentSummary = {
 type BoxRow = {
   id: number;
   box_id: string;
+  basic_science_group: string;
+  basic_science_group_label: string | null;
   basic_science_groups_display: string | null;
   experiments: BoxExperimentSummary[];
   species_display: string | null;
@@ -147,7 +149,7 @@ function formatCreatedDate(dateValue: string | null) {
 
 function formatList(values: string[]) {
   if (!values.length) {
-    return "N/A";
+    return "-";
   }
   return values.join(", ");
 }
@@ -163,6 +165,8 @@ export function BoxesTable() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [activeBox, setActiveBox] = useState<BoxRow | null>(null);
   const [refreshToken, setRefreshToken] = useState(0);
   const backendBaseUrl = getBackendBaseUrl();
 
@@ -290,12 +294,50 @@ export function BoxesTable() {
     setRefreshToken((previous) => previous + 1);
   };
 
+  const handleBoxUpdated = () => {
+    setRefreshToken((previous) => previous + 1);
+  };
+
+  const handleEditClick = (box: BoxRow) => {
+    setActiveBox(box);
+    setEditDialogOpen(true);
+  };
+
+  const handleEditOpenChange = (open: boolean) => {
+    setEditDialogOpen(open);
+    if (!open) {
+      setActiveBox(null);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <BoxFormDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
         onCreated={handleBoxCreated}
+      />
+      <BoxFormDialog
+        open={editDialogOpen}
+        onOpenChange={handleEditOpenChange}
+        onUpdated={handleBoxUpdated}
+        mode="edit"
+        boxId={activeBox?.id ?? null}
+        initialValues={
+          activeBox
+            ? {
+                box_id: activeBox.box_id,
+                basic_science_group: activeBox.basic_science_group,
+                box_type: activeBox.box_type,
+                location: activeBox.location,
+                row: activeBox.row,
+                column: activeBox.column,
+                depth: activeBox.depth,
+                comments: activeBox.comments,
+                experiments: activeBox.experiments.map((experiment) => experiment.id),
+              }
+            : undefined
+        }
       />
       <Card>
         <CardHeader>
@@ -383,9 +425,7 @@ export function BoxesTable() {
                     onToggle={handleSortToggle}
                   />
                 </TableHead>
-                <TableHead className={TABLE_HEADER_CLASS}>Groups</TableHead>
-                <TableHead className={TABLE_HEADER_CLASS}>Experiment IDs</TableHead>
-                <TableHead className={TABLE_HEADER_CLASS}>Species</TableHead>
+                <TableHead className={TABLE_HEADER_CLASS}>Group</TableHead>
                 <TableHead className={TABLE_HEADER_CLASS}>
                   <SortableHeader
                     title="Location"
@@ -403,6 +443,9 @@ export function BoxesTable() {
                     onToggle={handleSortToggle}
                   />
                 </TableHead>
+                <TableHead className={TABLE_HEADER_CLASS}>Experiments</TableHead>
+                <TableHead className={TABLE_HEADER_CLASS}>Species</TableHead>
+
                 <TableHead className={TABLE_HEADER_CLASS}>Sample Types</TableHead>
                 <TableHead className={TABLE_HEADER_CLASS}>Tissue Types</TableHead>
                 <TableHead className={TABLE_HEADER_CLASS}>Comments</TableHead>
@@ -428,27 +471,30 @@ export function BoxesTable() {
                           return dateLabel ? `${experiment.name} ${dateLabel}` : experiment.name;
                         })
                         .join(", ")
-                    : "N/A";
+                    : "-";
                   const sublocation =
                     box.sublocation ??
-                    (`${box.row ?? ""}${box.column ?? ""}${box.depth ?? ""}`.trim() || "N/A");
+                    (`${box.row ?? ""}${box.column ?? ""}${box.depth ?? ""}`.trim() || "-");
 
                   return (
                     <TableRow key={box.id}>
                       <TableCell className="whitespace-nowrap">{box.box_id}</TableCell>
-                      <TableCell>{box.basic_science_groups_display || "N/A"}</TableCell>
-                      <TableCell>{experimentsLabel}</TableCell>
-                      <TableCell>{box.species_display || "N/A"}</TableCell>
+                      <TableCell>
+                        {box.basic_science_group_label || box.basic_science_group || "-"}
+                      </TableCell>
                       <TableCell className="whitespace-nowrap">
-                        {box.location_label || box.location || "N/A"}
+                        {box.location_label || box.location || "-"}
                       </TableCell>
                       <TableCell>{sublocation}</TableCell>
-                      <TableCell>{box.box_type_label || box.box_type || "N/A"}</TableCell>
+                      <TableCell>{box.box_type_label || box.box_type || "-"}</TableCell>
+                      <TableCell>{experimentsLabel}</TableCell>
+                      <TableCell>{box.species_display || "-"}</TableCell>
+
                       <TableCell>{formatList(box.sample_type_labels)}</TableCell>
                       <TableCell>{formatList(box.tissue_type_labels)}</TableCell>
-                      <TableCell>{box.comments || "N/A"}</TableCell>
+                      <TableCell>{box.comments || "-"}</TableCell>
                       <TableCell>{formatCreatedDate(box.created)}</TableCell>
-                      <TableCell>{box.created_by_email || "N/A"}</TableCell>
+                      <TableCell>{box.created_by_email || "-"}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           <Button asChild variant="link" size="sm" className="h-auto p-0">
@@ -457,11 +503,17 @@ export function BoxesTable() {
                               View
                             </Link>
                           </Button>
-                          <Button asChild variant="link" size="sm" className="h-auto p-0">
-                            <a href={`${backendBaseUrl}/boxes/edit/${box.id}/`}>
+                          <Button
+                            type="button"
+                            variant="link"
+                            size="sm"
+                            className="h-auto p-0"
+                            onClick={() => handleEditClick(box)}
+                          >
+                            <span className="inline-flex items-center gap-1">
                               <Edit size={16} />
                               Edit
-                            </a>
+                            </span>
                           </Button>
                           <Button asChild variant="link" size="sm" className="h-auto p-0">
                             <a href={`${backendBaseUrl}/boxes/delete/${box.id}/`}>

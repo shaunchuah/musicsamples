@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional
 
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -99,6 +100,7 @@ class BasicScienceBoxCreateV3Serializer(serializers.ModelSerializer):
         model = BasicScienceBox
         fields = [
             "box_id",
+            "basic_science_group",
             "box_type",
             "location",
             "row",
@@ -115,6 +117,10 @@ class BasicScienceBoxV3Serializer(serializers.ModelSerializer):
     """
 
     basic_science_groups_display = serializers.CharField(read_only=True)
+    basic_science_group_label = serializers.CharField(
+        source="get_basic_science_group_display",
+        read_only=True,
+    )
     species_display = serializers.CharField(read_only=True)
     location_label = serializers.CharField(source="get_location_display", read_only=True)
     box_type_label = serializers.CharField(source="get_box_type_display", read_only=True)
@@ -129,6 +135,8 @@ class BasicScienceBoxV3Serializer(serializers.ModelSerializer):
         fields = [
             "id",
             "box_id",
+            "basic_science_group",
+            "basic_science_group_label",
             "basic_science_groups_display",
             "experiments",
             "species_display",
@@ -209,6 +217,27 @@ class BasicScienceBoxDetailV3Serializer(BasicScienceBoxV3Serializer):
     def _format_field_label(field_name: str) -> str:
         return field_name.replace("_", " ").title()
 
+    def _resolve_history_user_value(self, value):
+        if value in (None, ""):
+            return None
+        if hasattr(value, "email") or hasattr(value, "username"):
+            return self._format_history_user(value)
+        try:
+            user_id = int(value)
+        except (TypeError, ValueError):
+            return str(value)
+        user_cache = getattr(self, "_history_user_cache", None)
+        if user_cache is None:
+            user_cache = {}
+            setattr(self, "_history_user_cache", user_cache)
+        if user_id in user_cache:
+            return user_cache[user_id]
+        User = get_user_model()
+        user = User.objects.filter(pk=user_id).first()
+        resolved = self._format_history_user(user) if user else str(value)
+        user_cache[user_id] = resolved
+        return resolved
+
     def get_last_modified_by_email(self, obj: BasicScienceBox):
         return self._format_history_user(getattr(obj, "last_modified_by", None))
 
@@ -222,12 +251,17 @@ class BasicScienceBoxDetailV3Serializer(BasicScienceBoxV3Serializer):
             resolved_user = self._format_history_user(getattr(new_record, "history_user", None))
             entry_changes = []
             for change in delta.changes:
+                change_old = change.old
+                change_new = change.new
+                if change.field in ("created_by", "last_modified_by"):
+                    change_old = self._resolve_history_user_value(change.old)
+                    change_new = self._resolve_history_user_value(change.new)
                 entry_changes.append(
                     {
                         "field": change.field,
                         "label": self._format_field_label(change.field),
-                        "old": change.old if change.old not in ("", None) else None,
-                        "new": change.new if change.new not in ("", None) else None,
+                        "old": change_old if change_old not in ("", None) else None,
+                        "new": change_new if change_new not in ("", None) else None,
                     }
                 )
             entries.append(
@@ -250,9 +284,9 @@ class BasicScienceBoxDetailV3Serializer(BasicScienceBoxV3Serializer):
 
         history_payload = {
             "created": obj.created,
-            "created_by": obj.created_by,
+            "created_by": self._format_history_user(obj.created_by),
             "last_modified": obj.last_modified,
-            "last_modified_by": obj.last_modified_by,
+            "last_modified_by": self._format_history_user(obj.last_modified_by),
             "entries": entries,
         }
 

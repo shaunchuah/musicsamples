@@ -273,7 +273,7 @@ class BasicScienceBoxFilter(django_filters.FilterSet):
 
     def filter_basic_science_group(self, queryset, name, value):
         if value:
-            return queryset.filter(experiments__basic_science_group=value).distinct()
+            return queryset.filter(basic_science_group=value)
         return queryset
 
     def filter_experiments(self, queryset, name, value):

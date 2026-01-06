@@ -1,6 +1,6 @@
 // frontend/components/boxes/box-form-dialog.tsx
-// Renders the modal form used to create a new basic science box from the dashboard.
-// Exists to keep the boxes table focused while providing a dedicated creation workflow.
+// Renders the modal form used to create or edit a basic science box from the dashboard.
+// Exists to keep the boxes table focused while providing a dedicated box editing workflow.
 
 "use client";
 
@@ -45,6 +45,7 @@ type ExperimentOption = {
 };
 
 type BoxOptionsResponse = {
+  basic_science_group_options: BoxOption[];
   box_type_options: BoxOption[];
   location_options: BoxOption[];
   row_options: BoxOption[];
@@ -55,6 +56,7 @@ type BoxOptionsResponse = {
 
 type BoxFormValues = {
   box_id: string;
+  basic_science_group: string;
   box_type: string;
   location: string;
   row: string;
@@ -64,14 +66,31 @@ type BoxFormValues = {
   experiments: string[];
 };
 
+export type BoxFormInitialValues = {
+  box_id?: string | null;
+  basic_science_group?: string | null;
+  box_type?: string | null;
+  location?: string | null;
+  row?: string | null;
+  column?: string | null;
+  depth?: string | null;
+  comments?: string | null;
+  experiments?: Array<number | string>;
+};
+
 type BoxFormDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreated: () => void;
+  onCreated?: () => void;
+  onUpdated?: () => void;
+  mode?: "create" | "edit";
+  boxId?: number | string | null;
+  initialValues?: BoxFormInitialValues;
 };
 
 const EMPTY_FORM: BoxFormValues = {
   box_id: "",
+  basic_science_group: "",
   box_type: "",
   location: "",
   row: "",
@@ -88,9 +107,9 @@ function normaliseNullable(value: string) {
   return trimmed ? trimmed : null;
 }
 
-function formatErrorMessage(payload: unknown) {
+function formatErrorMessage(payload: unknown, actionLabel: string) {
   if (!payload || typeof payload !== "object") {
-    return "Unable to create the box. Please try again.";
+    return `Unable to ${actionLabel} the box. Please try again.`;
   }
   const data = payload as Record<string, unknown>;
   if (typeof data.detail === "string") {
@@ -105,14 +124,37 @@ function formatErrorMessage(payload: unknown) {
     }
     return `${key}: Invalid value.`;
   });
-  return entries.length ? entries.join(" ") : "Unable to create the box. Please try again.";
+  return entries.length ? entries.join(" ") : `Unable to ${actionLabel} the box. Please try again.`;
 }
 
-export function BoxFormDialog({ open, onOpenChange, onCreated }: BoxFormDialogProps) {
+function normaliseInitialValues(values?: BoxFormInitialValues | null): BoxFormValues {
+  return {
+    box_id: values?.box_id ?? "",
+    basic_science_group: values?.basic_science_group ?? "",
+    box_type: values?.box_type ?? "",
+    location: values?.location ?? "",
+    row: values?.row ?? "",
+    column: values?.column ?? "",
+    depth: values?.depth ?? "",
+    comments: values?.comments ?? "",
+    experiments: values?.experiments ? values.experiments.map((value) => String(value)) : [],
+  };
+}
+
+export function BoxFormDialog({
+  open,
+  onOpenChange,
+  onCreated,
+  onUpdated,
+  mode = "create",
+  boxId,
+  initialValues,
+}: BoxFormDialogProps) {
   const idPrefix = useId();
   const fieldIds = useMemo(
     () => ({
       boxId: `${idPrefix}-box-id`,
+      basicScienceGroup: `${idPrefix}-basic-science-group`,
       boxType: `${idPrefix}-box-type`,
       location: `${idPrefix}-box-location`,
       row: `${idPrefix}-box-row`,
@@ -129,14 +171,19 @@ export function BoxFormDialog({ open, onOpenChange, onCreated }: BoxFormDialogPr
   const [optionsError, setOptionsError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isEditMode = mode === "edit";
 
   useEffect(() => {
     if (!open) {
       return;
     }
-    setFormValues(EMPTY_FORM);
+    if (isEditMode) {
+      setFormValues(normaliseInitialValues(initialValues));
+    } else {
+      setFormValues(EMPTY_FORM);
+    }
     setSubmitError(null);
-  }, [open]);
+  }, [initialValues, isEditMode, open]);
 
   useEffect(() => {
     if (!open) {
@@ -198,15 +245,24 @@ export function BoxFormDialog({ open, onOpenChange, onCreated }: BoxFormDialogPr
     event.preventDefault();
     setSubmitError(null);
 
-    if (!formValues.box_id.trim() || !formValues.box_type || !formValues.location) {
-      setSubmitError("Box ID, box type, and location are required.");
+    if (
+      !formValues.box_id.trim() ||
+      !formValues.basic_science_group ||
+      !formValues.box_type ||
+      !formValues.location
+    ) {
+      setSubmitError("Box ID, group, box type, and location are required.");
       return;
     }
 
     setIsSubmitting(true);
     try {
+      if (isEditMode && !boxId) {
+        throw new Error("Missing box identifier.");
+      }
       const payload = {
         box_id: formValues.box_id.trim(),
+        basic_science_group: formValues.basic_science_group,
         box_type: formValues.box_type,
         location: formValues.location,
         row: normaliseNullable(formValues.row),
@@ -216,36 +272,53 @@ export function BoxFormDialog({ open, onOpenChange, onCreated }: BoxFormDialogPr
         experiments: formValues.experiments.map((value) => Number(value)),
       };
 
-      const response = await fetch("/api/dashboard/boxes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        isEditMode ? `/api/dashboard/boxes/${boxId}` : "/api/dashboard/boxes",
+        {
+          method: isEditMode ? "PATCH" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload),
-      });
+      );
 
       if (!response.ok) {
         const errorPayload = await response.json().catch(() => null);
-        throw new Error(formatErrorMessage(errorPayload));
+        const actionLabel = isEditMode ? "update" : "create";
+        throw new Error(formatErrorMessage(errorPayload, actionLabel));
       }
 
-      setFormValues(EMPTY_FORM);
-      onCreated();
-      onOpenChange(false);
+      if (isEditMode) {
+        onUpdated?.();
+        onOpenChange(false);
+      } else {
+        setFormValues(EMPTY_FORM);
+        onCreated?.();
+        onOpenChange(false);
+      }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unable to create the box.";
+      const fallbackLabel = isEditMode ? "update" : "create";
+      const message =
+        error instanceof Error ? error.message : `Unable to ${fallbackLabel} the box.`;
       setSubmitError(message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const dialogTitle = isEditMode ? "Edit Box" : "Add New Box";
+  const dialogDescription = isEditMode
+    ? "Update the box details and save your changes."
+    : "Enter the new box details and save to register it.";
+  const submitLabel = isEditMode ? "Save Changes" : "Save Box";
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Box</DialogTitle>
-          <DialogDescription>Enter the new box details and save to register it.</DialogDescription>
+          <DialogTitle>{dialogTitle}</DialogTitle>
+          <DialogDescription>{dialogDescription}</DialogDescription>
         </DialogHeader>
 
         {optionsError ? (
@@ -271,6 +344,26 @@ export function BoxFormDialog({ open, onOpenChange, onCreated }: BoxFormDialogPr
                 placeholder="e.g. BOX-001"
                 required
               />
+            </label>
+
+            <label htmlFor={fieldIds.basicScienceGroup} className="space-y-2 text-sm">
+              <span className="font-medium">Group *</span>
+              <Select
+                value={formValues.basic_science_group}
+                onValueChange={(value) => handleSelectChange("basic_science_group", value)}
+                disabled={!isReady}
+              >
+                <SelectTrigger id={fieldIds.basicScienceGroup} className="w-full">
+                  <SelectValue placeholder="Select group" />
+                </SelectTrigger>
+                <SelectContent>
+                  {options?.basic_science_group_options.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
 
             <label htmlFor={fieldIds.boxType} className="space-y-2 text-sm">
@@ -425,7 +518,7 @@ export function BoxFormDialog({ open, onOpenChange, onCreated }: BoxFormDialogPr
               Cancel
             </Button>
             <Button type="submit" disabled={!isReady || isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Box"}
+              {isSubmitting ? "Saving..." : submitLabel}
             </Button>
           </DialogFooter>
         </form>

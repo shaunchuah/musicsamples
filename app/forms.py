@@ -223,6 +223,7 @@ class BasicScienceBoxForm(ModelForm):
         model = BasicScienceBox
         fields = [
             "box_id",
+            "basic_science_group",
             "box_type",
             "location",
             "row",

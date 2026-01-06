@@ -53,6 +53,12 @@
             <div class="row">
               <div class="col-md-4">
                 <div class="form-group">
+                  {{ form.basic_science_group.label_tag }}
+                  {{ form.basic_science_group|add_class:"form-control" }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
                   {{ form.box_type.label_tag }}
                   {{ form.box_type|add_class:"form-control" }}
                 </div>

@@ -21,7 +21,10 @@ def test_box_search_with_query(client, box_user_with_permission):
 
 def test_box_search_matches_basic_science_group(client, box_user_with_permission):
     experiments = ExperimentFactory(basic_science_group=BasicScienceGroupChoices.BAIN)
-    group_box = BasicScienceBoxFactory(experiments=[experiments])
+    group_box = BasicScienceBoxFactory(
+        basic_science_group=BasicScienceGroupChoices.BAIN,
+        experiments=[experiments],
+    )
     client.force_login(box_user_with_permission)
 
     response = client.get(reverse("boxes:search"), {"q": BasicScienceGroupChoices.BAIN.value})
@@ -90,9 +93,13 @@ def test_box_filter(client, box_user_with_permission):
 
 def test_box_filter_filters_by_basic_science_group(client, box_user_with_permission):
     target_exp = ExperimentFactory(basic_science_group=BasicScienceGroupChoices.BAIN)
-    included_box = BasicScienceBoxFactory(experiments=[target_exp])
+    included_box = BasicScienceBoxFactory(
+        basic_science_group=BasicScienceGroupChoices.BAIN,
+        experiments=[target_exp],
+    )
     other_box = BasicScienceBoxFactory(
-        experiments=[ExperimentFactory(basic_science_group=BasicScienceGroupChoices.JONES)]
+        basic_science_group=BasicScienceGroupChoices.JONES,
+        experiments=[ExperimentFactory(basic_science_group=BasicScienceGroupChoices.JONES)],
     )
     client.force_login(box_user_with_permission)
 

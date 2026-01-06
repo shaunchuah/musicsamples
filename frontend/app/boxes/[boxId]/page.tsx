@@ -5,7 +5,7 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-
+import { BoxEditDialogButton } from "@/components/boxes/box-edit-dialog-button";
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
 import { HistoryPanel } from "@/components/history/history-panel";
 import {
@@ -16,7 +16,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -55,7 +54,8 @@ type BoxExperimentSummary = {
 type BoxDetailResponse = {
   id: number;
   box_id: string;
-  basic_science_groups_display: string | null;
+  basic_science_group: string;
+  basic_science_group_label: string | null;
   experiments: BoxExperimentSummary[];
   location: string;
   location_label: string | null;
@@ -121,7 +121,10 @@ async function fetchBoxDetail(boxId: string, token: string): Promise<BoxDetailRe
 function buildDetailRows(box: BoxDetailResponse): DetailRow[] {
   return [
     { label: "Box ID", value: box.box_id },
-    { label: "Groups", value: formatMaybe(box.basic_science_groups_display) },
+    {
+      label: "Group",
+      value: formatMaybe(box.basic_science_group_label ?? box.basic_science_group),
+    },
     {
       label: "Experiment IDs",
       value: box.experiments.length ? box.experiments.map((exp) => exp.name).join(", ") : "N/A",
@@ -255,9 +258,7 @@ export default async function BoxDetailPage({ params }: { params: PageParams }) 
                   description="Identifiers, location, and contents for this box."
                   rows={detailRows}
                 />
-                <Button asChild className="w-full sm:w-auto">
-                  <a href={buildBackendUrl(`/boxes/edit/${box.id}/`)}>Edit box</a>
-                </Button>
+                <BoxEditDialogButton box={box} />
               </div>
               <div className="lg:col-span-1">
                 <HistoryPanel
