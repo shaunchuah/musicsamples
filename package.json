@@ -1,0 +1,15 @@
+{
+	"private": true,
+	"devDependencies": {
+		"concurrently": "^9.2.1"
+	},
+	"scripts": {
+    "mailpit:up": "docker compose up -d mailpit",
+    "mailpit:down": "docker compose stop mailpit",
+
+    "django": "zsh -c \"source .venv/bin/activate && PYTHONUNBUFFERED=1 python manage.py runserver\"",
+    "frontend": "pnpm -C frontend dev",
+
+    "dev": "pnpm run mailpit:up && concurrently -k -n DJANGO,NEXT -c blue,green \"pnpm run django\" \"pnpm run frontend\""
+  }
+}
