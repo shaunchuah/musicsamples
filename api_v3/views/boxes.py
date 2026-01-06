@@ -37,6 +37,7 @@ EXPERIMENT_PREFETCH = Prefetch(
 @extend_schema(tags=["v3"])
 class BasicScienceBoxV3ViewSet(
     mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
     mixins.UpdateModelMixin,
     viewsets.ReadOnlyModelViewSet,
 ):
@@ -84,6 +85,14 @@ class BasicScienceBoxV3ViewSet(
 
     def perform_update(self, serializer):
         serializer.save(last_modified_by=self.request.user)
+
+    def destroy(self, request, *args, **kwargs):
+        box = self.get_object()
+        box.is_used = True
+        box.last_modified_by = request.user
+        box.save(update_fields=["is_used", "last_modified_by", "last_modified"])
+        serializer = self.get_serializer(box)
+        return Response(serializer.data)
 
     @extend_schema(tags=["v3"], description="Search boxes by common identifiers and text fields.")
     @action(detail=False, methods=["get"], url_path="search")

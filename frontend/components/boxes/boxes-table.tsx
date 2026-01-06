@@ -22,6 +22,14 @@ import { BoxFormDialog } from "@/components/boxes/box-form-dialog";
 import { AlertDescription, AlertError } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -167,6 +175,10 @@ export function BoxesTable() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [activeBox, setActiveBox] = useState<BoxRow | null>(null);
+  const [usedDialogOpen, setUsedDialogOpen] = useState(false);
+  const [usedTarget, setUsedTarget] = useState<BoxRow | null>(null);
+  const [isMarkingUsed, setIsMarkingUsed] = useState(false);
+  const [usedError, setUsedError] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState(0);
   const backendBaseUrl = getBackendBaseUrl();
 
@@ -310,6 +322,75 @@ export function BoxesTable() {
     }
   };
 
+  const closeUsedDialog = (forceClose = false) => {
+    if (isMarkingUsed && !forceClose) {
+      return;
+    }
+    setUsedDialogOpen(false);
+    setUsedTarget(null);
+    setUsedError(null);
+  };
+
+  const openUsedDialog = (box: BoxRow) => {
+    setUsedTarget(box);
+    setUsedError(null);
+    setUsedDialogOpen(true);
+  };
+
+  const handleUsedDialogChange = (open: boolean) => {
+    if (!open) {
+      closeUsedDialog();
+      return;
+    }
+    setUsedDialogOpen(true);
+  };
+
+  const handleConfirmUsed = async () => {
+    if (!usedTarget) {
+      return;
+    }
+
+    setIsMarkingUsed(true);
+    setUsedError(null);
+
+    try {
+      const response = await fetch(`/api/dashboard/boxes/${usedTarget.id}`, {
+        method: "DELETE",
+      });
+
+      let payload: unknown = null;
+      try {
+        payload = await response.json();
+      } catch {
+        payload = null;
+      }
+
+      if (!response.ok) {
+        let errorDetail = "Unable to mark box as used.";
+        if (payload && typeof payload === "object" && !Array.isArray(payload)) {
+          const payloadRecord = payload as Record<string, unknown>;
+          if (typeof payloadRecord.detail === "string") {
+            errorDetail = payloadRecord.detail;
+          }
+          if (typeof payloadRecord.error === "string") {
+            errorDetail = payloadRecord.error;
+          }
+        } else if (typeof payload === "string") {
+          errorDetail = payload;
+        }
+        setUsedError(errorDetail);
+        return;
+      }
+
+      setRefreshToken((previous) => previous + 1);
+      closeUsedDialog(true);
+    } catch {
+      setUsedError("Something went wrong. Please try again.");
+    } finally {
+      setIsMarkingUsed(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <BoxFormDialog
@@ -339,6 +420,31 @@ export function BoxesTable() {
             : undefined
         }
       />
+      <Dialog open={usedDialogOpen} onOpenChange={handleUsedDialogChange}>
+        <DialogContent showCloseButton={!isMarkingUsed}>
+          <DialogHeader>
+            <DialogTitle>Mark box as used?</DialogTitle>
+            <DialogDescription>
+              This will mark box {usedTarget?.box_id ?? "this box"} as used and remove it from the
+              active list.
+            </DialogDescription>
+          </DialogHeader>
+          {usedError ? <p className="text-sm text-destructive">{usedError}</p> : null}
+          <DialogFooter className="gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => closeUsedDialog()}
+              disabled={isMarkingUsed}
+            >
+              Cancel
+            </Button>
+            <Button type="button" onClick={handleConfirmUsed} disabled={isMarkingUsed}>
+              {isMarkingUsed ? "Marking..." : "Confirm"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Card>
         <CardHeader>
           <CardTitle>Basic Science Boxes</CardTitle>
@@ -515,11 +621,17 @@ export function BoxesTable() {
                               Edit
                             </span>
                           </Button>
-                          <Button asChild variant="link" size="sm" className="h-auto p-0">
-                            <a href={`${backendBaseUrl}/boxes/delete/${box.id}/`}>
+                          <Button
+                            type="button"
+                            variant="link"
+                            size="sm"
+                            className="h-auto p-0"
+                            onClick={() => openUsedDialog(box)}
+                          >
+                            <span className="inline-flex items-center gap-1">
                               <Trash2 size={16} />
                               Used
-                            </a>
+                            </span>
                           </Button>
                         </div>
                       </TableCell>
