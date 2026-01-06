@@ -11,6 +11,7 @@ const SAMPLE_USED_ENDPOINT = "/api/v3/samples-used/";
 
 type MarkUsedPayload = {
   sample_id?: unknown;
+  is_used?: unknown;
 };
 
 export async function PUT(request: Request) {
@@ -33,6 +34,8 @@ export async function PUT(request: Request) {
       return NextResponse.json({ detail: "Sample ID is required" }, { status: 400 });
     }
 
+    const requestedIsUsed = typeof payload.is_used === "boolean" ? payload.is_used : true;
+
     const response = await fetch(
       buildBackendUrl(`${SAMPLE_USED_ENDPOINT}${encodeURIComponent(sampleId)}/`),
       {
@@ -43,7 +46,7 @@ export async function PUT(request: Request) {
         },
         body: JSON.stringify({
           sample_id: sampleId,
-          is_used: true,
+          is_used: requestedIsUsed,
         }),
       },
     );

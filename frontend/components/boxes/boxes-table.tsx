@@ -12,6 +12,7 @@ import {
   Edit,
   Eye,
   Filter,
+  RotateCcw,
   Trash2,
   X,
 } from "lucide-react";
@@ -268,6 +269,7 @@ export function BoxesTable() {
   const [activeBox, setActiveBox] = useState<BoxRow | null>(null);
   const [usedDialogOpen, setUsedDialogOpen] = useState(false);
   const [usedTarget, setUsedTarget] = useState<BoxRow | null>(null);
+  const [usedAction, setUsedAction] = useState<"mark" | "restore">("mark");
   const [isMarkingUsed, setIsMarkingUsed] = useState(false);
   const [usedError, setUsedError] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState(0);
@@ -520,10 +522,12 @@ export function BoxesTable() {
     setUsedDialogOpen(false);
     setUsedTarget(null);
     setUsedError(null);
+    setUsedAction("mark");
   };
 
-  const openUsedDialog = (box: BoxRow) => {
+  const openUsedDialog = (box: BoxRow, action: "mark" | "restore") => {
     setUsedTarget(box);
+    setUsedAction(action);
     setUsedError(null);
     setUsedDialogOpen(true);
   };
@@ -545,9 +549,18 @@ export function BoxesTable() {
     setUsedError(null);
 
     try {
-      const response = await fetch(`/api/dashboard/boxes/${usedTarget.id}`, {
-        method: "DELETE",
-      });
+      const response =
+        usedAction === "restore"
+          ? await fetch(`/api/dashboard/boxes/${usedTarget.id}`, {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ is_used: false }),
+            })
+          : await fetch(`/api/dashboard/boxes/${usedTarget.id}`, {
+              method: "DELETE",
+            });
 
       let payload: unknown = null;
       try {
@@ -557,7 +570,8 @@ export function BoxesTable() {
       }
 
       if (!response.ok) {
-        let errorDetail = "Unable to mark box as used.";
+        let errorDetail =
+          usedAction === "restore" ? "Unable to restore box." : "Unable to mark box as used.";
         if (payload && typeof payload === "object" && !Array.isArray(payload)) {
           const payloadRecord = payload as Record<string, unknown>;
           if (typeof payloadRecord.detail === "string") {
@@ -614,10 +628,14 @@ export function BoxesTable() {
       <Dialog open={usedDialogOpen} onOpenChange={handleUsedDialogChange}>
         <DialogContent showCloseButton={!isMarkingUsed}>
           <DialogHeader>
-            <DialogTitle>Mark box as used?</DialogTitle>
+            <DialogTitle>
+              {usedAction === "restore" ? "Restore box?" : "Mark box as used?"}
+            </DialogTitle>
             <DialogDescription>
-              This will mark box {usedTarget?.box_id ?? "this box"} as used and remove it from the
-              active list.
+              {usedAction === "restore"
+                ? "This will restore the box to the active list."
+                : "This will mark the box as used and remove it from the active list."}{" "}
+              {usedTarget?.box_id ?? "this box"}.
             </DialogDescription>
           </DialogHeader>
           {usedError ? <p className="text-sm text-destructive">{usedError}</p> : null}
@@ -634,9 +652,9 @@ export function BoxesTable() {
               type="button"
               onClick={handleConfirmUsed}
               disabled={isMarkingUsed}
-              variant="destructive"
+              variant={usedAction === "restore" ? "default" : "destructive"}
             >
-              {isMarkingUsed ? "Marking..." : "Confirm"}
+              {isMarkingUsed ? "Updating..." : usedAction === "restore" ? "Restore" : "Confirm"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1204,7 +1222,7 @@ export function BoxesTable() {
                     (`${box.row ?? ""}${box.column ?? ""}${box.depth ?? ""}`.trim() || "-");
 
                   return (
-                    <TableRow key={box.id}>
+                    <TableRow key={box.id} className={box.is_used ? "bg-muted/50" : ""}>
                       <TableCell className="whitespace-nowrap">{box.box_id}</TableCell>
                       <TableCell>
                         {box.basic_science_group_label || box.basic_science_group || "-"}
@@ -1242,18 +1260,33 @@ export function BoxesTable() {
                               Edit
                             </span>
                           </Button>
-                          <Button
-                            type="button"
-                            variant="link"
-                            size="sm"
-                            className="h-auto p-0"
-                            onClick={() => openUsedDialog(box)}
-                          >
-                            <span className="inline-flex items-center gap-1">
-                              <Trash2 size={16} />
-                              Used
-                            </span>
-                          </Button>
+                          {box.is_used ? (
+                            <Button
+                              type="button"
+                              variant="link"
+                              size="sm"
+                              className="h-auto p-0"
+                              onClick={() => openUsedDialog(box, "restore")}
+                            >
+                              <span className="inline-flex items-center gap-1">
+                                <RotateCcw size={16} />
+                                Restore
+                              </span>
+                            </Button>
+                          ) : (
+                            <Button
+                              type="button"
+                              variant="link"
+                              size="sm"
+                              className="h-auto p-0"
+                              onClick={() => openUsedDialog(box, "mark")}
+                            >
+                              <span className="inline-flex items-center gap-1">
+                                <Trash2 size={16} />
+                                Used
+                              </span>
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>

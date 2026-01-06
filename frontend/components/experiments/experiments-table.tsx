@@ -375,7 +375,10 @@ export function ExperimentsTable() {
             <TableBody>
               {experiments.length ? (
                 experiments.map((experiment) => (
-                  <TableRow key={experiment.id}>
+                  <TableRow
+                    key={experiment.id}
+                    className={experiment.is_deleted ? "bg-muted/50" : ""}
+                  >
                     <TableCell>{experiment.name}</TableCell>
                     <TableCell>{formatDate(experiment.date)}</TableCell>
                     <TableCell>

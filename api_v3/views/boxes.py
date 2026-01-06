@@ -15,6 +15,7 @@ from rest_framework.views import APIView
 from api_v3.serializers import (
     BasicScienceBoxCreateV3Serializer,
     BasicScienceBoxDetailV3Serializer,
+    BasicScienceBoxUpdateV3Serializer,
     BasicScienceBoxV3Serializer,
 )
 from app.choices import (
@@ -72,8 +73,10 @@ class BasicScienceBoxV3ViewSet(viewsets.ModelViewSet):
         return base_queryset
 
     def get_serializer_class(self):
-        if self.action in ("create", "update", "partial_update"):
+        if self.action == "create":
             return BasicScienceBoxCreateV3Serializer
+        if self.action in ("update", "partial_update"):
+            return BasicScienceBoxUpdateV3Serializer
         if self.action == "retrieve":
             return BasicScienceBoxDetailV3Serializer
         return super().get_serializer_class()

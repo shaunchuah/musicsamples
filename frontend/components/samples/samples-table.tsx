@@ -24,6 +24,7 @@ import {
   Edit,
   Eye,
   Filter,
+  RotateCcw,
   Settings,
   Square,
   X,
@@ -299,6 +300,7 @@ export function SamplesTable() {
   const [error, setError] = useState<string | null>(null);
   const [usedDialogOpen, setUsedDialogOpen] = useState(false);
   const [usedTarget, setUsedTarget] = useState<SampleRow | null>(null);
+  const [usedAction, setUsedAction] = useState<"mark" | "restore">("mark");
   const [usedError, setUsedError] = useState<string | null>(null);
   const [isMarkingUsed, setIsMarkingUsed] = useState(false);
   const [usedStatusMessage, setUsedStatusMessage] = useState<string | null>(null);
@@ -514,10 +516,12 @@ export function SamplesTable() {
     setUsedDialogOpen(false);
     setUsedTarget(null);
     setUsedError(null);
+    setUsedAction("mark");
   };
 
-  const openUsedDialog = (row: SampleRow) => {
+  const openUsedDialog = (row: SampleRow, action: "mark" | "restore") => {
     setUsedTarget(row);
+    setUsedAction(action);
     setUsedError(null);
     setUsedDialogOpen(true);
   };
@@ -544,7 +548,10 @@ export function SamplesTable() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ sample_id: usedTarget.sample_id }),
+        body: JSON.stringify({
+          sample_id: usedTarget.sample_id,
+          is_used: usedAction === "mark",
+        }),
       });
 
       let payload: unknown = null;
@@ -555,7 +562,8 @@ export function SamplesTable() {
       }
 
       if (!response.ok) {
-        let errorDetail = "Unable to mark sample as used.";
+        let errorDetail =
+          usedAction === "restore" ? "Unable to restore sample." : "Unable to mark sample as used.";
         if (payload && typeof payload === "object" && !Array.isArray(payload)) {
           const payloadRecord = payload as Record<string, unknown>;
           if (typeof payloadRecord.detail === "string") {
@@ -571,16 +579,36 @@ export function SamplesTable() {
         return;
       }
 
-      setRows((previous) => previous.filter((row) => row.sample_id !== usedTarget.sample_id));
-      setTotalCount((previous) => {
-        if (typeof previous !== "number") {
-          return previous;
-        }
-        const nextTotal = Math.max(previous - 1, 0);
-        setPageCount(nextTotal > 0 ? Math.ceil(nextTotal / pagination.pageSize) : 1);
-        return nextTotal;
-      });
-      setUsedStatusMessage(`Sample ${usedTarget.sample_id} marked as used.`);
+      if (usedAction === "mark") {
+        setRows((previous) => previous.filter((row) => row.sample_id !== usedTarget.sample_id));
+        setTotalCount((previous) => {
+          if (typeof previous !== "number") {
+            return previous;
+          }
+          const nextTotal = Math.max(previous - 1, 0);
+          setPageCount(nextTotal > 0 ? Math.ceil(nextTotal / pagination.pageSize) : 1);
+          return nextTotal;
+        });
+        setUsedStatusMessage(`Sample ${usedTarget.sample_id} marked as used.`);
+      } else if (filters.is_used === "true") {
+        setRows((previous) => previous.filter((row) => row.sample_id !== usedTarget.sample_id));
+        setTotalCount((previous) => {
+          if (typeof previous !== "number") {
+            return previous;
+          }
+          const nextTotal = Math.max(previous - 1, 0);
+          setPageCount(nextTotal > 0 ? Math.ceil(nextTotal / pagination.pageSize) : 1);
+          return nextTotal;
+        });
+        setUsedStatusMessage(`Sample ${usedTarget.sample_id} restored.`);
+      } else {
+        setRows((previous) =>
+          previous.map((row) =>
+            row.sample_id === usedTarget.sample_id ? { ...row, is_used: false } : row,
+          ),
+        );
+        setUsedStatusMessage(`Sample ${usedTarget.sample_id} restored.`);
+      }
       closeUsedDialog(true);
     } catch {
       setUsedError("Something went wrong. Please try again.");
@@ -740,17 +768,31 @@ export function SamplesTable() {
                 Edit
               </Link>
             </Button>
-            <Button
-              type="button"
-              variant="link"
-              size="sm"
-              className="h-auto p-0"
-              onClick={() => openUsedDialog(row.original)}
-              disabled={row.original.is_used || isMarkingUsed}
-            >
-              <Archive size={16} />
-              {row.original.is_used ? "Used" : "Mark used"}
-            </Button>
+            {row.original.is_used ? (
+              <Button
+                type="button"
+                variant="link"
+                size="sm"
+                className="h-auto p-0"
+                onClick={() => openUsedDialog(row.original, "restore")}
+                disabled={isMarkingUsed}
+              >
+                <RotateCcw size={16} />
+                Restore
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="link"
+                size="sm"
+                className="h-auto p-0"
+                onClick={() => openUsedDialog(row.original, "mark")}
+                disabled={isMarkingUsed}
+              >
+                <Archive size={16} />
+                Mark used
+              </Button>
+            )}
           </div>
         ),
       },
@@ -1741,15 +1783,23 @@ export function SamplesTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} className="border-b border-border/40 last:border-none">
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="whitespace-nowrap">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
+            {table.getRowModel().rows.map((row) => {
+              const isUsedRow = row.original.is_used;
+              return (
+                <TableRow
+                  key={row.id}
+                  className={`border-b border-border/40 last:border-none${
+                    isUsedRow ? "bg-muted/70" : ""
+                  }`}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className={`whitespace-nowrap`}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       )}
@@ -1820,11 +1870,14 @@ export function SamplesTable() {
       <Dialog open={usedDialogOpen} onOpenChange={handleUsedDialogChange}>
         <DialogContent showCloseButton={!isMarkingUsed}>
           <DialogHeader>
-            <DialogTitle>Mark sample as used?</DialogTitle>
+            <DialogTitle>
+              {usedAction === "restore" ? "Restore sample?" : "Mark sample as used?"}
+            </DialogTitle>
             <DialogDescription>
-              This will update sample{" "}
-              <span className="font-semibold text-foreground">{usedTarget?.sample_id ?? "—"}</span>{" "}
-              to used. You can restore it from the legacy views if needed.
+              {usedAction === "restore"
+                ? "This will restore the sample to the active list."
+                : "This will update the sample to used. You can restore it from the legacy views if needed."}{" "}
+              <span className="font-semibold text-foreground">{usedTarget?.sample_id ?? "—"}</span>
             </DialogDescription>
           </DialogHeader>
           {usedError ? (
@@ -1845,9 +1898,9 @@ export function SamplesTable() {
               type="button"
               onClick={handleConfirmUsed}
               disabled={isMarkingUsed}
-              variant="destructive"
+              variant={usedAction === "restore" ? "default" : "destructive"}
             >
-              {isMarkingUsed ? "Marking..." : "Confirm"}
+              {isMarkingUsed ? "Updating..." : usedAction === "restore" ? "Restore" : "Confirm"}
             </Button>
           </DialogFooter>
         </DialogContent>
