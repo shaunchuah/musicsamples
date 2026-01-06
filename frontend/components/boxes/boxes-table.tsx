@@ -439,7 +439,7 @@ export function BoxesTable() {
             >
               Cancel
             </Button>
-            <Button type="button" onClick={handleConfirmUsed} disabled={isMarkingUsed}>
+            <Button type="button" onClick={handleConfirmUsed} disabled={isMarkingUsed} variant="destructive">
               {isMarkingUsed ? "Marking..." : "Confirm"}
             </Button>
           </DialogFooter>
