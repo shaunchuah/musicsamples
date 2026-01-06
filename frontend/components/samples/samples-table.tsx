@@ -50,6 +50,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { TablePagination } from "@/components/ui/table-pagination";
+import { dateFormatter, timeFormatter } from "@/lib/formatters";
 
 type StudyIdentifierSummary = {
   id: number;
@@ -130,17 +140,6 @@ type SampleFilters = {
   biopsy_inflamed_status: string;
 };
 
-const dateFormatter = new Intl.DateTimeFormat("en-GB", {
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
-
-const timeFormatter = new Intl.DateTimeFormat("en-GB", {
-  hour: "2-digit",
-  minute: "2-digit",
-});
-
 const EMPTY_STATE: SampleRow[] = [];
 const DEFAULT_PAGE_SIZE = 50;
 const DEFAULT_FILTERS: SampleFilters = {
@@ -191,6 +190,9 @@ const SORT_LABELS: Record<string, string> = {
   sample_datetime: "Collected at",
 };
 
+const TABLE_HEADER_CLASS =
+  "px-3 py-2 text-sm font-semibold normal-case tracking-normal text-muted-foreground";
+
 const FILTER_LABELS: Record<keyof SampleFilters, string> = {
   study_name: "Study name",
   sample_type: "Sample type",
@@ -214,57 +216,6 @@ const FILTER_LABELS: Record<keyof SampleFilters, string> = {
   biopsy_location: "Biopsy location",
   biopsy_inflamed_status: "Biopsy inflamed status",
 };
-
-type PaginationControlsProps = {
-  canPrevious: boolean;
-  canNext: boolean;
-  isLoading: boolean;
-  onPrevious: () => void;
-  onNext: () => void;
-  pageIndex: number;
-  pageCount: number;
-  firstItemIndex: number;
-  lastItemIndex: number;
-  totalLabel: number | string;
-};
-
-function PaginationControls({
-  canPrevious,
-  canNext,
-  isLoading,
-  onPrevious,
-  onNext,
-  pageIndex,
-  pageCount,
-  firstItemIndex,
-  lastItemIndex,
-  totalLabel,
-}: PaginationControlsProps) {
-  return (
-    <div className="flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-      <p>
-        Showing {firstItemIndex === 0 ? 0 : firstItemIndex}-{lastItemIndex} of {totalLabel} samples
-      </p>
-      <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onPrevious}
-          disabled={!canPrevious || isLoading}
-        >
-          Previous
-        </Button>
-        <span>
-          Page {pageCount === 0 ? 0 : pageIndex + 1}
-          {pageCount > 0 ? ` of ${pageCount}` : ""}
-        </span>
-        <Button variant="outline" size="sm" onClick={onNext} disabled={!canNext || isLoading}>
-          Next
-        </Button>
-      </div>
-    </div>
-  );
-}
 
 function SortIndicator({ column }: { column: Column<SampleRow, unknown> }) {
   const state = column.getIsSorted();
@@ -842,9 +793,6 @@ export function SamplesTable() {
   const canPreviousPage = table.getCanPreviousPage();
   const canNextPage = table.getCanNextPage();
   const { pageIndex, pageSize } = pagination;
-  const firstItemIndex = rows.length > 0 ? pageIndex * pageSize + 1 : 0;
-  const lastItemIndex = rows.length > 0 ? pageIndex * pageSize + rows.length : 0;
-  const totalLabel = totalCount ?? "unknown";
   const booleanOptions = filterOptions?.boolean ?? DEFAULT_BOOLEAN_OPTIONS;
   const hasExportConstraints = searchQuery.trim() !== "" || activeFilterCount > 0 || includeUsed;
 
@@ -1583,17 +1531,18 @@ export function SamplesTable() {
         </div>
       </div>
 
-      <PaginationControls
+      <TablePagination
         canPrevious={canPreviousPage}
         canNext={canNextPage}
         isLoading={isLoading}
         onPrevious={() => table.previousPage()}
         onNext={() => table.nextPage()}
-        pageIndex={pageIndex}
+        pageIndex={pageIndex + 1}
         pageCount={pageCount}
-        firstItemIndex={firstItemIndex}
-        lastItemIndex={lastItemIndex}
-        totalLabel={totalLabel}
+        pageSize={pageSize}
+        currentCount={rows.length}
+        totalCount={totalCount}
+        itemLabel="samples"
       />
       {isLoading ? (
         <p className="text-sm text-muted-foreground">Loading samples…</p>
@@ -1604,46 +1553,45 @@ export function SamplesTable() {
       ) : rows.length === 0 ? (
         <p className="text-sm text-muted-foreground">No samples found.</p>
       ) : (
-        <div className="max-w-full overflow-x-auto">
-          <table className="w-full min-w-[1200px] table-auto border-collapse text-left text-sm">
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="border-b border-border/60">
-                  {headerGroup.headers.map((header) => (
-                    <th key={header.id} className="px-3 py-2 font-semibold text-muted-foreground">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="border-b border-border/40 last:border-none">
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-3 py-2 whitespace-nowrap">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table className="min-w-[1200px] table-auto [&_td]:px-3 [&_td]:py-2">
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="border-b border-border/60">
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className={TABLE_HEADER_CLASS}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id} className="border-b border-border/40 last:border-none">
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id} className="whitespace-nowrap">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       )}
-      <PaginationControls
+      <TablePagination
         canPrevious={canPreviousPage}
         canNext={canNextPage}
         isLoading={isLoading}
         onPrevious={() => table.previousPage()}
         onNext={() => table.nextPage()}
-        pageIndex={pageIndex}
+        pageIndex={pageIndex + 1}
         pageCount={pageCount}
-        firstItemIndex={firstItemIndex}
-        lastItemIndex={lastItemIndex}
-        totalLabel={totalLabel}
+        pageSize={pageSize}
+        currentCount={rows.length}
+        totalCount={totalCount}
+        itemLabel="samples"
       />
       <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
         <DialogContent>
