@@ -16,6 +16,8 @@ from api_v3.views.boxes import (  # noqa: F401
 )
 from api_v3.views.experiments import (  # noqa: F401
     ExperimentExportView,
+    ExperimentFilterOptionsView,
+    ExperimentOptionsView,
     ExperimentV3ViewSet,
 )
 from api_v3.views.samples import (  # noqa: F401

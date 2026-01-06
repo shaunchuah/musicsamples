@@ -4,7 +4,14 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from app.models import BasicScienceBox, Experiment, Sample, StudyIdentifier
+from app.models import (
+    BasicScienceBox,
+    BasicScienceSampleType,
+    Experiment,
+    Sample,
+    StudyIdentifier,
+    TissueType,
+)
 from core.utils.history import historical_changes
 
 
@@ -30,6 +37,8 @@ class ExperimentV3Serializer(serializers.ModelSerializer):
     species_label = serializers.CharField(source="get_species_display", read_only=True)
     sample_type_labels = serializers.SerializerMethodField()
     tissue_type_labels = serializers.SerializerMethodField()
+    sample_types = serializers.SerializerMethodField()
+    tissue_types = serializers.SerializerMethodField()
     boxes = serializers.SerializerMethodField()
     created_by_email = serializers.SerializerMethodField()
 
@@ -42,7 +51,9 @@ class ExperimentV3Serializer(serializers.ModelSerializer):
             "basic_science_group_label",
             "name",
             "description",
+            "sample_types",
             "sample_type_labels",
+            "tissue_types",
             "tissue_type_labels",
             "species",
             "species_label",
@@ -58,6 +69,12 @@ class ExperimentV3Serializer(serializers.ModelSerializer):
     def get_tissue_type_labels(self, obj: Experiment):
         return [tissue_type.label or tissue_type.name for tissue_type in obj.tissue_types.all()]
 
+    def get_sample_types(self, obj: Experiment):
+        return [sample_type.pk for sample_type in obj.sample_types.all()]
+
+    def get_tissue_types(self, obj: Experiment):
+        return [tissue_type.pk for tissue_type in obj.tissue_types.all()]
+
     def get_boxes(self, obj: Experiment):
         return ExperimentBoxSummarySerializer(obj.boxes.all(), many=True).data
 
@@ -72,6 +89,174 @@ class ExperimentV3Serializer(serializers.ModelSerializer):
         if isinstance(username, str) and username:
             return username
         return str(user)
+
+
+class ExperimentCreateV3Serializer(serializers.ModelSerializer):
+    """
+    Serializer for creating experiments from the v3 API.
+    """
+
+    sample_types = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=BasicScienceSampleType.objects.all(),
+        required=False,
+    )
+    tissue_types = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=TissueType.objects.all(),
+        required=False,
+    )
+
+    class Meta:
+        model = Experiment
+        fields = [
+            "basic_science_group",
+            "name",
+            "description",
+            "date",
+            "sample_types",
+            "tissue_types",
+            "species",
+        ]
+
+
+class ExperimentUpdateV3Serializer(serializers.ModelSerializer):
+    """
+    Serializer for updating experiments from the v3 API.
+    """
+
+    sample_types = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=BasicScienceSampleType.objects.all(),
+        required=False,
+    )
+    tissue_types = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=TissueType.objects.all(),
+        required=False,
+    )
+
+    class Meta:
+        model = Experiment
+        fields = [
+            "basic_science_group",
+            "name",
+            "description",
+            "date",
+            "sample_types",
+            "tissue_types",
+            "species",
+            "is_deleted",
+        ]
+
+
+class ExperimentDetailV3Serializer(ExperimentV3Serializer):
+    """
+    Detail serializer for experiments, including audit history metadata.
+    """
+
+    last_modified = serializers.DateTimeField(read_only=True)
+    last_modified_by_email = serializers.SerializerMethodField()
+    history = serializers.SerializerMethodField()
+
+    class Meta(ExperimentV3Serializer.Meta):
+        fields = ExperimentV3Serializer.Meta.fields + [
+            "last_modified",
+            "last_modified_by_email",
+            "history",
+        ]
+
+    @staticmethod
+    def _format_history_user(user):
+        if user is None:
+            return None
+        email = getattr(user, "email", None)
+        if isinstance(email, str) and email:
+            return email
+        username = getattr(user, "username", None)
+        if isinstance(username, str) and username:
+            return username
+        return str(user)
+
+    @staticmethod
+    def _format_field_label(field_name: str) -> str:
+        return field_name.replace("_", " ").title()
+
+    def _resolve_history_user_value(self, value):
+        if value in (None, ""):
+            return None
+        if hasattr(value, "email") or hasattr(value, "username"):
+            return self._format_history_user(value)
+        try:
+            user_id = int(value)
+        except (TypeError, ValueError):
+            return str(value)
+        user_cache = getattr(self, "_history_user_cache", None)
+        if user_cache is None:
+            user_cache = {}
+            setattr(self, "_history_user_cache", user_cache)
+        if user_id in user_cache:
+            return user_cache[user_id]
+        User = get_user_model()
+        user = User.objects.filter(pk=user_id).first()
+        resolved = self._format_history_user(user) if user else str(value)
+        user_cache[user_id] = resolved
+        return resolved
+
+    def get_last_modified_by_email(self, obj: Experiment):
+        return self._format_history_user(getattr(obj, "last_modified_by", None))
+
+    def get_history(self, obj: Experiment) -> Dict[str, Any]:
+        history_qs = obj.history.all()
+        changes = historical_changes(history_qs) or []
+
+        entries = []
+        for delta in changes:
+            new_record = delta.new_record
+            resolved_user = self._format_history_user(getattr(new_record, "history_user", None))
+            entry_changes = []
+            for change in delta.changes:
+                change_old = change.old
+                change_new = change.new
+                if change.field in ("created_by", "last_modified_by"):
+                    change_old = self._resolve_history_user_value(change.old)
+                    change_new = self._resolve_history_user_value(change.new)
+                entry_changes.append(
+                    {
+                        "field": change.field,
+                        "label": self._format_field_label(change.field),
+                        "old": change_old if change_old not in ("", None) else None,
+                        "new": change_new if change_new not in ("", None) else None,
+                    }
+                )
+            entries.append(
+                {
+                    "timestamp": getattr(new_record, "history_date", obj.last_modified),
+                    "user": resolved_user,
+                    "summary": None,
+                    "changes": entry_changes,
+                }
+            )
+
+        entries.append(
+            {
+                "timestamp": obj.created,
+                "user": self._format_history_user(obj.created_by),
+                "summary": "Record created",
+                "changes": [],
+            }
+        )
+
+        history_payload = {
+            "created": obj.created,
+            "created_by": self._format_history_user(obj.created_by),
+            "last_modified": obj.last_modified,
+            "last_modified_by": self._format_history_user(obj.last_modified_by),
+            "entries": entries,
+        }
+
+        serializer = SampleHistorySerializer(history_payload)
+        return serializer.data
 
 
 class BasicScienceBoxExperimentSerializer(serializers.ModelSerializer):
