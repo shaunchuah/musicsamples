@@ -1,12 +1,12 @@
-// frontend/app/samples/qr-scan/update-location/page.tsx
-// Server-rendered page wrapper for the QR scan update-location workflow in the dashboard.
-// Exists to provide authenticated access and shared shell layout for location updates by scan.
+// frontend/app/boxes/page.tsx
+// Server-rendered page wrapper for the boxes dashboard experience.
+// Exists to provide authenticated access and shared shell layout for box search and export.
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { BoxesTable } from "@/components/boxes/boxes-table";
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
-import { UpdateLocationForm } from "@/components/samples/update-location-form";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -21,7 +21,7 @@ import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { resolveDashboardUser } from "@/lib/dashboard-user";
 import { isJwtExpired } from "@/lib/jwt";
 
-export default async function UpdateLocationPage() {
+export default async function BoxesPage() {
   const cookiesStore = await cookies();
   const token = cookiesStore.get(AUTH_COOKIE_NAME)?.value ?? null;
 
@@ -34,7 +34,7 @@ export default async function UpdateLocationPage() {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-muted/40">
-        <AppSidebar user={user} activeHref="/samples/qr-scan/update-location" />
+        <AppSidebar user={user} activeHref="/boxes" />
         <SidebarInset className="min-w-0">
           <header className="flex h-16 shrink-0 items-center gap-4 border-b px-4">
             <div className="flex items-center gap-2">
@@ -47,24 +47,14 @@ export default async function UpdateLocationPage() {
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/">Samples</BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>QR scan</BreadcrumbPage>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Update location</BreadcrumbPage>
+                    <BreadcrumbPage>Boxes</BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
             </div>
           </header>
           <main className="flex flex-1 flex-col gap-6 p-6">
-            <div className="w-full max-w-5xl">
-              <UpdateLocationForm />
-            </div>
+            <BoxesTable />
           </main>
         </SidebarInset>
       </div>

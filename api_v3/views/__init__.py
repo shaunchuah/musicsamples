@@ -8,6 +8,14 @@ from api_v3.views.auth import (  # noqa: F401
     V3TokenObtainPairView,
     V3TokenRefreshView,
 )
+from api_v3.views.boxes import (  # noqa: F401
+    BasicScienceBoxExportView,
+    BasicScienceBoxV3ViewSet,
+)
+from api_v3.views.experiments import (  # noqa: F401
+    ExperimentExportView,
+    ExperimentV3ViewSet,
+)
 from api_v3.views.samples import (  # noqa: F401
     MultipleSampleV3ViewSet,
     SampleExportView,

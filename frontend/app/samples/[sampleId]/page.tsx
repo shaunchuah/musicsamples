@@ -22,8 +22,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AUTH_COOKIE_NAME, buildBackendUrl } from "@/lib/auth";
-import { isJwtExpired, parseJwt } from "@/lib/jwt";
-import type { DashboardUser } from "@/types/dashboard";
+import { resolveDashboardUser } from "@/lib/dashboard-user";
+import { isJwtExpired } from "@/lib/jwt";
 
 type SampleHistoryChangeResponse = {
   field: string;
@@ -130,34 +130,6 @@ function formatMaybe(value: string | number | null | undefined, fallback: string
     return fallback;
   }
   return String(value);
-}
-
-function resolveDashboardUser(token: string | null | undefined): DashboardUser {
-  if (!token) {
-    return { email: null, firstName: null, lastName: null };
-  }
-
-  const payload = parseJwt(token);
-  if (!payload || typeof payload !== "object") {
-    return { email: null, firstName: null, lastName: null };
-  }
-
-  const email = (() => {
-    const value = payload?.email ?? payload?.user_email ?? null;
-    return typeof value === "string" ? value : null;
-  })();
-
-  const firstName = (() => {
-    const value = payload?.first_name ?? payload?.firstName ?? null;
-    return typeof value === "string" ? value : null;
-  })();
-
-  const lastName = (() => {
-    const value = payload?.last_name ?? payload?.lastName ?? null;
-    return typeof value === "string" ? value : null;
-  })();
-
-  return { email, firstName, lastName };
 }
 
 async function fetchSampleDetail(

@@ -3,8 +3,235 @@ from typing import Any, Dict, Optional
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from app.models import Sample, StudyIdentifier
+from app.models import BasicScienceBox, Experiment, Sample, StudyIdentifier
 from core.utils.history import historical_changes
+
+
+class ExperimentBoxSummarySerializer(serializers.ModelSerializer):
+    """
+    Minimal box summary for experiment listings.
+    """
+
+    class Meta:
+        model = BasicScienceBox
+        fields = ["id", "box_id"]
+
+
+class ExperimentV3Serializer(serializers.ModelSerializer):
+    """
+    Serializer for the v3 API returning experiment details aligned with the Django template.
+    """
+
+    basic_science_group_label = serializers.CharField(
+        source="get_basic_science_group_display",
+        read_only=True,
+    )
+    species_label = serializers.CharField(source="get_species_display", read_only=True)
+    sample_type_labels = serializers.SerializerMethodField()
+    tissue_type_labels = serializers.SerializerMethodField()
+    boxes = serializers.SerializerMethodField()
+    created_by_email = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Experiment
+        fields = [
+            "id",
+            "date",
+            "basic_science_group",
+            "basic_science_group_label",
+            "name",
+            "description",
+            "sample_type_labels",
+            "tissue_type_labels",
+            "species",
+            "species_label",
+            "boxes",
+            "created",
+            "created_by_email",
+            "is_deleted",
+        ]
+
+    def get_sample_type_labels(self, obj: Experiment):
+        return [sample_type.label or sample_type.name for sample_type in obj.sample_types.all()]
+
+    def get_tissue_type_labels(self, obj: Experiment):
+        return [tissue_type.label or tissue_type.name for tissue_type in obj.tissue_types.all()]
+
+    def get_boxes(self, obj: Experiment):
+        return ExperimentBoxSummarySerializer(obj.boxes.all(), many=True).data
+
+    def get_created_by_email(self, obj: Experiment):
+        user = getattr(obj, "created_by", None)
+        if user is None:
+            return None
+        email = getattr(user, "email", None)
+        if isinstance(email, str) and email:
+            return email
+        username = getattr(user, "username", None)
+        if isinstance(username, str) and username:
+            return username
+        return str(user)
+
+
+class BasicScienceBoxExperimentSerializer(serializers.ModelSerializer):
+    """
+    Minimal experiment summary for box listings.
+    """
+
+    class Meta:
+        model = Experiment
+        fields = ["id", "name", "date"]
+
+
+class BasicScienceBoxV3Serializer(serializers.ModelSerializer):
+    """
+    Serializer for the v3 API returning box details aligned with the Django template.
+    """
+
+    basic_science_groups_display = serializers.CharField(read_only=True)
+    species_display = serializers.CharField(read_only=True)
+    location_label = serializers.CharField(source="get_location_display", read_only=True)
+    box_type_label = serializers.CharField(source="get_box_type_display", read_only=True)
+    sample_type_labels = serializers.SerializerMethodField()
+    tissue_type_labels = serializers.SerializerMethodField()
+    experiments = serializers.SerializerMethodField()
+    created_by_email = serializers.SerializerMethodField()
+    sublocation = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BasicScienceBox
+        fields = [
+            "id",
+            "box_id",
+            "basic_science_groups_display",
+            "experiments",
+            "species_display",
+            "location",
+            "location_label",
+            "row",
+            "column",
+            "depth",
+            "sublocation",
+            "box_type",
+            "box_type_label",
+            "sample_type_labels",
+            "tissue_type_labels",
+            "comments",
+            "created",
+            "created_by_email",
+            "is_used",
+        ]
+
+    def get_sample_type_labels(self, obj: BasicScienceBox):
+        return obj.get_sample_type_labels()
+
+    def get_tissue_type_labels(self, obj: BasicScienceBox):
+        return obj.get_tissue_type_labels()
+
+    def get_experiments(self, obj: BasicScienceBox):
+        return BasicScienceBoxExperimentSerializer(obj.experiments.all(), many=True).data
+
+    def get_created_by_email(self, obj: BasicScienceBox):
+        user = getattr(obj, "created_by", None)
+        if user is None:
+            return None
+        email = getattr(user, "email", None)
+        if isinstance(email, str) and email:
+            return email
+        username = getattr(user, "username", None)
+        if isinstance(username, str) and username:
+            return username
+        return str(user)
+
+    def get_sublocation(self, obj: BasicScienceBox):
+        row = obj.row or ""
+        column = obj.column or ""
+        depth = obj.depth or ""
+        combined = f"{row}{column}{depth}".strip()
+        return combined or None
+
+
+class BasicScienceBoxDetailV3Serializer(BasicScienceBoxV3Serializer):
+    """
+    Detail serializer for boxes, including audit history metadata.
+    """
+
+    last_modified = serializers.DateTimeField(read_only=True)
+    last_modified_by_email = serializers.SerializerMethodField()
+    history = serializers.SerializerMethodField()
+
+    class Meta(BasicScienceBoxV3Serializer.Meta):
+        fields = BasicScienceBoxV3Serializer.Meta.fields + [
+            "last_modified",
+            "last_modified_by_email",
+            "history",
+        ]
+
+    @staticmethod
+    def _format_history_user(user):
+        if user is None:
+            return None
+        email = getattr(user, "email", None)
+        if isinstance(email, str) and email:
+            return email
+        username = getattr(user, "username", None)
+        if isinstance(username, str) and username:
+            return username
+        return str(user)
+
+    @staticmethod
+    def _format_field_label(field_name: str) -> str:
+        return field_name.replace("_", " ").title()
+
+    def get_last_modified_by_email(self, obj: BasicScienceBox):
+        return self._format_history_user(getattr(obj, "last_modified_by", None))
+
+    def get_history(self, obj: BasicScienceBox) -> Dict[str, Any]:
+        history_qs = obj.history.all()
+        changes = historical_changes(history_qs) or []
+
+        entries = []
+        for delta in changes:
+            new_record = delta.new_record
+            resolved_user = self._format_history_user(getattr(new_record, "history_user", None))
+            entry_changes = []
+            for change in delta.changes:
+                entry_changes.append(
+                    {
+                        "field": change.field,
+                        "label": self._format_field_label(change.field),
+                        "old": change.old if change.old not in ("", None) else None,
+                        "new": change.new if change.new not in ("", None) else None,
+                    }
+                )
+            entries.append(
+                {
+                    "timestamp": getattr(new_record, "history_date", obj.last_modified),
+                    "user": resolved_user,
+                    "summary": None,
+                    "changes": entry_changes,
+                }
+            )
+
+        entries.append(
+            {
+                "timestamp": obj.created,
+                "user": obj.created_by,
+                "summary": "Record created",
+                "changes": [],
+            }
+        )
+
+        history_payload = {
+            "created": obj.created,
+            "created_by": obj.created_by,
+            "last_modified": obj.last_modified,
+            "last_modified_by": obj.last_modified_by,
+            "entries": entries,
+        }
+
+        serializer = SampleHistorySerializer(history_payload)
+        return serializer.data
 
 
 class SampleV3Serializer(serializers.ModelSerializer):

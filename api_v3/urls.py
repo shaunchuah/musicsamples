@@ -6,9 +6,13 @@ from django.urls import include, path
 from rest_framework import routers
 
 from api_v3.views import (
+    BasicScienceBoxExportView,
+    BasicScienceBoxV3ViewSet,
     CurrentUserRecentSamplesView,
     CurrentUserTokenViewSet,
     CurrentUserView,
+    ExperimentExportView,
+    ExperimentV3ViewSet,
     ManagementUserEmailsView,
     MultipleSampleV3ViewSet,
     PasswordChangeView,
@@ -29,6 +33,8 @@ from api_v3.views import (
 )
 
 router = routers.DefaultRouter()
+router.register(r"boxes", BasicScienceBoxV3ViewSet, "v3-boxes")
+router.register(r"experiments", ExperimentV3ViewSet, "v3-experiments")
 router.register(r"samples", SampleV3ViewSet, "v3-samples")
 router.register(r"multiple-samples", MultipleSampleV3ViewSet, "v3-multiple-samples")
 router.register(r"samples-used", SampleIsUsedV3ViewSet, "v3-samples-used")
@@ -64,6 +70,8 @@ urlpatterns = [
         StudyIdAutocompleteView.as_view(),
         name="v3-study-id-autocomplete",
     ),
+    path("boxes/export/", BasicScienceBoxExportView.as_view(), name="v3-boxes-export"),
+    path("experiments/export/", ExperimentExportView.as_view(), name="v3-experiments-export"),
     path("samples/export/", SampleExportView.as_view(), name="v3-samples-export"),
     path("samples/filters/", SampleFilterOptionsView.as_view(), name="v3-sample-filter-options"),
     path("users/password-reset/", PasswordResetRequestView.as_view(), name="v3-password-reset"),
