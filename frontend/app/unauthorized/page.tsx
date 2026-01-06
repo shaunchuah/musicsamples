@@ -1,27 +1,27 @@
-// frontend/app/samples/qr-scan/mark-used/page.tsx
-// Server-rendered page wrapper for the QR scan mark-used workflow in the dashboard.
-// Exists to provide authenticated access and shared shell layout for marking samples as used.
+// frontend/app/unauthorized/page.tsx
+// Renders a friendly unauthorized access page for users without required permissions.
+// Exists to guide users who manually visit restricted routes and provide contact details.
 
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
-import { MarkUsedForm } from "@/components/samples/mark-used-form";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import { resolveDashboardUser } from "@/lib/dashboard-user";
 import { isJwtExpired } from "@/lib/jwt";
 
-export default async function MarkUsedPage() {
+export default async function UnauthorizedPage() {
   const cookiesStore = await cookies();
   const token = cookiesStore.get(AUTH_COOKIE_NAME)?.value ?? null;
 
@@ -34,7 +34,7 @@ export default async function MarkUsedPage() {
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-muted/40">
-        <AppSidebar user={user} activeHref="/samples/qr-scan/mark-used" />
+        <AppSidebar user={user} activeHref="/unauthorized" />
         <SidebarInset className="min-w-0">
           <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-4 border-b bg-muted/40 px-4 backdrop-blur supports-[backdrop-filter]:bg-muted/60">
             <div className="flex items-center gap-2">
@@ -47,24 +47,39 @@ export default async function MarkUsedPage() {
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/">Samples</BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>QR scan</BreadcrumbPage>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Mark used</BreadcrumbPage>
+                    <BreadcrumbLink href="/unauthorized">Unauthorized</BreadcrumbLink>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
             </div>
           </header>
           <main className="flex flex-1 flex-col gap-6 p-6">
-            <div className="w-full max-w-5xl">
-              <MarkUsedForm />
-            </div>
+            <Card className="max-w-2xl">
+              <CardHeader>
+                <CardTitle>Access restricted</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <p>You do not have permission to view this page.</p>
+                <p>
+                  If you need access, contact{" "}
+                  <a
+                    href="mailto:shaun.chuah@glasgow.ac.uk"
+                    className="hover:underline hover:text-accent-foreground"
+                  >
+                    shaun.chuah@glasgow.ac.uk
+                  </a>
+                  .
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href="/"
+                    className="rounded-md border border-border px-4 py-2 text-foreground hover:bg-muted"
+                  >
+                    Go to dashboard
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
           </main>
         </SidebarInset>
       </div>

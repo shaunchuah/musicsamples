@@ -21,6 +21,7 @@ import { useCallback, useEffect, useId, useMemo, useState } from "react";
 
 import { ExperimentFormDialog } from "@/components/experiments/experiment-form-dialog";
 import { AlertDescription, AlertError, AlertWarning } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -1002,15 +1003,11 @@ export function ExperimentsTable() {
                     <TableCell>{experiment.species_label || experiment.species || "N/A"}</TableCell>
                     <TableCell>
                       {experiment.boxes.length ? (
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-wrap gap-2">
                           {experiment.boxes.map((box) => (
-                            <Link
-                              key={box.id}
-                              href={`/boxes/${box.id}`}
-                              className="text-primary underline"
-                            >
-                              {box.box_id}
-                            </Link>
+                            <Badge key={box.id} asChild variant="secondary">
+                              <Link href={`/boxes/${box.id}`}>{box.box_id}</Link>
+                            </Badge>
                           ))}
                         </div>
                       ) : (

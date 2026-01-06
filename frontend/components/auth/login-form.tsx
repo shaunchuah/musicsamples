@@ -10,6 +10,7 @@ import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { useDashboardUser } from "@/components/dashboard/user-profile-provider";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -28,6 +29,7 @@ type LoginFormProps = {
 
 export function LoginForm({ redirectTo }: LoginFormProps) {
   const router = useRouter();
+  const { refreshUser, setUser } = useDashboardUser();
   const loginSchema = z.object({
     email: z.email("Enter a valid email address."),
     password: z.string().min(1, "Password is required."),
@@ -63,6 +65,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
         };
 
         if (!response.ok || !payload?.success) {
+          setUser(null);
           form.setError("root", {
             message: payload?.error || "Unable to sign in with those credentials.",
           });
@@ -87,6 +90,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
           return trimmed;
         })();
 
+        await refreshUser();
         router.replace(target);
         router.refresh();
       } catch {
@@ -95,7 +99,7 @@ export function LoginForm({ redirectTo }: LoginFormProps) {
         });
       }
     },
-    [form, redirectTo, router],
+    [form, redirectTo, refreshUser, router, setUser],
   );
 
   return (

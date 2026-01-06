@@ -21,6 +21,7 @@ import { useCallback, useEffect, useId, useMemo, useState } from "react";
 
 import { BoxFormDialog } from "@/components/boxes/box-form-dialog";
 import { AlertDescription, AlertError, AlertWarning } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -219,17 +220,6 @@ function SortableHeader({ title, sortKey, state, onToggle }: SortableHeaderProps
       <SortIndicator state={state} />
     </button>
   );
-}
-
-function formatExperimentDate(dateValue: string | null) {
-  if (!dateValue) {
-    return "";
-  }
-  const date = new Date(dateValue);
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-  return dateFormatter.format(date);
 }
 
 function formatCreatedDate(dateValue: string | null) {
@@ -1209,14 +1199,6 @@ export function BoxesTable() {
             <TableBody>
               {boxes.length ? (
                 boxes.map((box) => {
-                  const experimentsLabel = box.experiments.length
-                    ? box.experiments
-                        .map((experiment) => {
-                          const dateLabel = formatExperimentDate(experiment.date);
-                          return dateLabel ? `${experiment.name} ${dateLabel}` : experiment.name;
-                        })
-                        .join(", ")
-                    : "-";
                   const sublocation =
                     box.sublocation ??
                     (`${box.row ?? ""}${box.column ?? ""}${box.depth ?? ""}`.trim() || "-");
@@ -1232,7 +1214,21 @@ export function BoxesTable() {
                       </TableCell>
                       <TableCell>{sublocation}</TableCell>
                       <TableCell>{box.box_type_label || box.box_type || "-"}</TableCell>
-                      <TableCell>{experimentsLabel}</TableCell>
+                      <TableCell>
+                        {box.experiments.length ? (
+                          <div className="flex flex-wrap gap-2">
+                            {box.experiments.map((experiment) => (
+                              <Badge key={experiment.id} asChild variant="secondary">
+                                <Link href={`/experiments/${experiment.id}`}>
+                                  {experiment.name}
+                                </Link>
+                              </Badge>
+                            ))}
+                          </div>
+                        ) : (
+                          "-"
+                        )}
+                      </TableCell>
                       <TableCell>{box.species_display || "-"}</TableCell>
 
                       <TableCell>{formatList(box.sample_type_labels)}</TableCell>

@@ -20,8 +20,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
-
+import { useEffect, useMemo, useState } from "react";
+import { useDashboardUser } from "@/components/dashboard/user-profile-provider";
 import {
   Sidebar,
   SidebarContent,
@@ -110,21 +110,87 @@ type AppSidebarProps = {
   activeHref?: string;
 };
 
-function buildInitialOpenState(activeHref: string | undefined): Record<string, boolean> {
+function buildInitialOpenState(
+  activeHref: string | undefined,
+  navigation: NavGroup[],
+): Record<string, boolean> {
   const initialState: Record<string, boolean> = {};
-  NAVIGATION.forEach((group) => {
+  navigation.forEach((group) => {
     group.items.forEach((item) => {
       if (item.items?.length) {
         initialState[item.label] = item.items.some((subItem) => subItem.href === activeHref);
       }
     });
   });
+  initialState["QR Scan"] = true;
   return initialState;
 }
 
 export function AppSidebar({ user, activeHref }: AppSidebarProps) {
+  const { user: cachedUser } = useDashboardUser();
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  const combinedUser = useMemo<DashboardUser>(() => {
+    const effectiveUser = isHydrated ? cachedUser : null;
+    const groups = Array.isArray(effectiveUser?.groups)
+      ? effectiveUser?.groups
+      : Array.isArray(user.groups)
+        ? user.groups
+        : [];
+
+    return {
+      ...user,
+      ...(effectiveUser ?? {}),
+      isStaff: effectiveUser?.isStaff ?? user.isStaff ?? false,
+      isSuperuser: effectiveUser?.isSuperuser ?? user.isSuperuser ?? false,
+      groups,
+    };
+  }, [cachedUser, isHydrated, user]);
+
+  const navigation = useMemo<NavGroup[]>(() => {
+    if (combinedUser.isStaff || combinedUser.isSuperuser) {
+      return NAVIGATION;
+    }
+
+    const groupNames = (combinedUser.groups ?? []).map((group) => group.toLowerCase());
+    const hasGroup = (name: string) => groupNames.includes(name.toLowerCase());
+
+    const canSeeBoxes = hasGroup("basic_science");
+    const canSeeDatasets = hasGroup("datasets");
+    const canSeeDatastores = hasGroup("datastores");
+
+    return NAVIGATION.map((group) => {
+      if (group.title === "Admin") {
+        return { ...group, items: [] };
+      }
+
+      if (group.title === "Box Tracking") {
+        return canSeeBoxes ? group : { ...group, items: [] };
+      }
+
+      if (group.title === "Data Management") {
+        const items = group.items.filter((item) => {
+          if (item.label === "Datasets") {
+            return canSeeDatasets;
+          }
+          if (item.label === "Datastores") {
+            return canSeeDatastores;
+          }
+          return true;
+        });
+        return { ...group, items };
+      }
+
+      return group;
+    }).filter((group) => group.items.length > 0);
+  }, [combinedUser]);
+
   const [openItems, setOpenItems] = useState<Record<string, boolean>>(() =>
-    buildInitialOpenState(activeHref),
+    buildInitialOpenState(activeHref, navigation),
   );
 
   useEffect(() => {
@@ -135,7 +201,7 @@ export function AppSidebar({ user, activeHref }: AppSidebarProps) {
     setOpenItems((prev) => {
       let changed = false;
       const next = { ...prev };
-      NAVIGATION.forEach((group) => {
+      navigation.forEach((group) => {
         group.items.forEach((item) => {
           if (item.items?.some((subItem) => subItem.href === activeHref)) {
             if (!next[item.label]) {
@@ -147,13 +213,13 @@ export function AppSidebar({ user, activeHref }: AppSidebarProps) {
       });
       return changed ? next : prev;
     });
-  }, [activeHref]);
+  }, [activeHref, navigation]);
 
   return (
     <Sidebar>
       <SidebarHeader className="px-4 py-3 text-sm font-semibold">G-Trac</SidebarHeader>
       <SidebarContent>
-        {NAVIGATION.map((group) => (
+        {navigation.map((group) => (
           <SidebarGroup key={group.title}>
             <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
             <SidebarGroupContent>

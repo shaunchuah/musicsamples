@@ -14,12 +14,38 @@ import {
 import { isJwtExpired, shouldRefreshAccessToken } from "@/lib/jwt";
 
 const PUBLIC_FILE = /\.(.*)$/;
-const PUBLIC_EXACT_PATHS = new Set(["/login", "/forgot-password"]);
+const PUBLIC_EXACT_PATHS = new Set(["/login", "/forgot-password", "/unauthorized"]);
+const REDIRECT_IF_AUTHENTICATED_PATHS = new Set(["/login", "/forgot-password"]);
 const PUBLIC_PATH_PREFIXES = ["/reset-password"];
+const UNAUTHORIZED_PATH = "/unauthorized";
+
+type PermissionRule = {
+  prefixes: string[];
+  requiredGroups?: string[];
+  requiresStaff?: boolean;
+};
+
+const PERMISSION_RULES: PermissionRule[] = [
+  { prefixes: ["/boxes", "/experiments"], requiredGroups: ["basic_science"] },
+  { prefixes: ["/datasets"], requiredGroups: ["datasets"] },
+  { prefixes: ["/datastores"], requiredGroups: ["datastores"] },
+  { prefixes: ["/users"], requiresStaff: true },
+];
 
 type RefreshedTokens = {
   access: string;
   refresh: string;
+};
+
+type UserProfile = {
+  is_staff?: boolean;
+  is_superuser?: boolean;
+  groups?: unknown;
+};
+
+type UserProfileResult = {
+  user: UserProfile | null;
+  status: number;
 };
 
 async function refreshTokens(refreshToken: string): Promise<RefreshedTokens | null> {
@@ -45,6 +71,60 @@ async function refreshTokens(refreshToken: string): Promise<RefreshedTokens | nu
     return data;
   } catch {
     return null;
+  }
+}
+
+function findPermissionRule(pathname: string): PermissionRule | null {
+  return (
+    PERMISSION_RULES.find((rule) =>
+      rule.prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)),
+    ) ?? null
+  );
+}
+
+function normaliseGroups(groups: unknown): string[] {
+  if (Array.isArray(groups)) {
+    return groups.filter((value): value is string => typeof value === "string");
+  }
+  return [];
+}
+
+function hasRequiredAccess(profile: UserProfile, rule: PermissionRule): boolean {
+  if (profile.is_superuser || profile.is_staff) {
+    return true;
+  }
+
+  if (rule.requiresStaff) {
+    return false;
+  }
+
+  const requiredGroups = rule.requiredGroups ?? [];
+  if (!requiredGroups.length) {
+    return true;
+  }
+
+  const groupNames = normaliseGroups(profile.groups).map((group) => group.toLowerCase());
+  return requiredGroups.some((group) => groupNames.includes(group.toLowerCase()));
+}
+
+async function fetchUserProfile(accessToken: string): Promise<UserProfileResult> {
+  try {
+    const response = await fetch(buildBackendUrl("/api/v3/users/me/"), {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return { user: null, status: response.status };
+    }
+
+    const data = (await response.json()) as UserProfile;
+    return { user: data, status: response.status };
+  } catch {
+    return { user: null, status: 500 };
   }
 }
 
@@ -136,7 +216,7 @@ export async function middleware(request: NextRequest) {
     PUBLIC_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 
   if (isPublicPath) {
-    const shouldRedirectWhenAuthenticated = PUBLIC_EXACT_PATHS.has(pathname);
+    const shouldRedirectWhenAuthenticated = REDIRECT_IF_AUTHENTICATED_PATHS.has(pathname);
 
     if (shouldRedirectWhenAuthenticated && accessToken && !isJwtExpired(accessToken)) {
       const redirectUrl = request.nextUrl.clone();
@@ -167,6 +247,24 @@ export async function middleware(request: NextRequest) {
     }
 
     return applyCookies(NextResponse.redirect(loginUrl));
+  }
+
+  const permissionRule = findPermissionRule(pathname);
+  if (permissionRule) {
+    const profileResult = await fetchUserProfile(accessToken);
+    if (profileResult.status === 401) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/login";
+      loginUrl.search = "";
+      return applyCookies(NextResponse.redirect(loginUrl));
+    }
+
+    if (!profileResult.user || !hasRequiredAccess(profileResult.user, permissionRule)) {
+      const unauthorizedUrl = request.nextUrl.clone();
+      unauthorizedUrl.pathname = UNAUTHORIZED_PATH;
+      unauthorizedUrl.search = "";
+      return applyCookies(NextResponse.redirect(unauthorizedUrl));
+    }
   }
 
   return applyCookies(NextResponse.next());

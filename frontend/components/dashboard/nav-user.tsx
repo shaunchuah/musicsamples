@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AccountSettingsDialog } from "@/components/auth/account-settings-dialog";
 import { ChangePasswordDialog } from "@/components/auth/change-password-dialog";
+import { useDashboardUser } from "@/components/dashboard/user-profile-provider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -33,37 +34,10 @@ type NavUserProps = {
   };
 };
 
-type UserProfileResponse = {
-  email?: string | null;
-  first_name?: string | null;
-  last_name?: string | null;
-  is_staff?: boolean;
-  is_superuser?: boolean;
-  groups?: unknown;
-};
-
 type HydratedUser = DashboardUser & {
   groups?: string[] | null;
   avatar?: string | null;
 };
-
-function normaliseGroups(groups: unknown): string[] {
-  if (Array.isArray(groups)) {
-    return groups.filter((value): value is string => typeof value === "string");
-  }
-  return [];
-}
-
-function normaliseUserProfile(payload: UserProfileResponse): HydratedUser {
-  return {
-    email: typeof payload.email === "string" ? payload.email : null,
-    firstName: typeof payload.first_name === "string" ? payload.first_name : null,
-    lastName: typeof payload.last_name === "string" ? payload.last_name : null,
-    isStaff: Boolean(payload.is_staff),
-    isSuperuser: Boolean(payload.is_superuser),
-    groups: normaliseGroups(payload.groups),
-  };
-}
 
 function getInitials({ firstName, lastName, email }: DashboardUser): string {
   const fallback = email?.trim()?.[0]?.toUpperCase();
@@ -108,57 +82,35 @@ function formatAccessLabel(level: "superuser" | "staff" | "user"): string {
 export function NavUser({ user }: NavUserProps) {
   const router = useRouter();
   const { isMobile } = useSidebar();
-  const [serverUser, setServerUser] = useState<HydratedUser | null>(null);
+  const { user: cachedUser, setUser } = useDashboardUser();
+  const [isHydrated, setIsHydrated] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   useEffect(() => {
-    let isActive = true;
-
-    async function fetchUserProfile() {
-      try {
-        const response = await fetch("/api/dashboard/user", {
-          cache: "no-store",
-        });
-        if (!response.ok) {
-          return;
-        }
-        const payload = (await response.json()) as UserProfileResponse;
-        if (!isActive) {
-          return;
-        }
-        setServerUser(normaliseUserProfile(payload));
-      } catch {
-        // Ignore fetch failures and fall back to existing prop data.
-      } finally {
-      }
-    }
-
-    void fetchUserProfile();
-    return () => {
-      isActive = false;
-    };
+    setIsHydrated(true);
   }, []);
 
   const combinedUser = useMemo<HydratedUser>(() => {
-    const groups = Array.isArray(serverUser?.groups)
-      ? serverUser?.groups
+    const effectiveUser = isHydrated ? cachedUser : null;
+    const groups = Array.isArray(effectiveUser?.groups)
+      ? effectiveUser?.groups
       : Array.isArray(user.groups)
         ? user.groups
         : [];
 
     return {
-      email: serverUser?.email ?? user.email ?? null,
-      firstName: serverUser?.firstName ?? user.firstName ?? null,
-      lastName: serverUser?.lastName ?? user.lastName ?? null,
-      isStaff: serverUser?.isStaff ?? user.isStaff ?? false,
-      isSuperuser: serverUser?.isSuperuser ?? user.isSuperuser ?? false,
+      email: effectiveUser?.email ?? user.email ?? null,
+      firstName: effectiveUser?.firstName ?? user.firstName ?? null,
+      lastName: effectiveUser?.lastName ?? user.lastName ?? null,
+      isStaff: effectiveUser?.isStaff ?? user.isStaff ?? false,
+      isSuperuser: effectiveUser?.isSuperuser ?? user.isSuperuser ?? false,
       groups,
-      accessLevel: user.accessLevel,
+      accessLevel: effectiveUser?.accessLevel ?? user.accessLevel,
       avatar: user.avatar ?? null,
     };
-  }, [serverUser, user]);
+  }, [cachedUser, isHydrated, user]);
 
   const name = getFullName(combinedUser);
   const email = combinedUser.email ?? "placeholder@example.com";
@@ -174,12 +126,13 @@ export function NavUser({ user }: NavUserProps) {
         setIsLoggingOut(false);
         return;
       }
+      setUser(null);
       router.replace("/login");
       router.refresh();
     } catch {
       setIsLoggingOut(false);
     }
-  }, [router]);
+  }, [router, setUser]);
 
   const logoutLabel = isLoggingOut ? "Signing out..." : "Log out";
 
@@ -265,17 +218,18 @@ export function NavUser({ user }: NavUserProps) {
         open={isAccountOpen}
         onOpenChange={setIsAccountOpen}
         onProfileUpdated={(profile) => {
-          setServerUser((current) => ({
-            ...current,
+          const nextUser: DashboardUser = {
+            ...(cachedUser ?? {}),
             firstName:
               typeof profile.first_name === "string"
                 ? profile.first_name
-                : (current?.firstName ?? null),
+                : (cachedUser?.firstName ?? null),
             lastName:
               typeof profile.last_name === "string"
                 ? profile.last_name
-                : (current?.lastName ?? null),
-          }));
+                : (cachedUser?.lastName ?? null),
+          };
+          setUser(nextUser);
         }}
       />
       <ChangePasswordDialog open={isChangePasswordOpen} onOpenChange={setIsChangePasswordOpen} />
