@@ -4,7 +4,7 @@
 
 from django.db.models import Prefetch, Q
 from drf_spectacular.utils import extend_schema
-from rest_framework import mixins, viewsets
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
@@ -35,12 +35,7 @@ EXPERIMENT_PREFETCH = Prefetch(
 
 
 @extend_schema(tags=["v3"])
-class BasicScienceBoxV3ViewSet(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    mixins.UpdateModelMixin,
-    viewsets.ReadOnlyModelViewSet,
-):
+class BasicScienceBoxV3ViewSet(viewsets.ModelViewSet):
     """
     API for the v3 frontend that exposes key box details and creation.
     """
