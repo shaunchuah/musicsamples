@@ -4,14 +4,25 @@
 
 from django.db.models import Prefetch, Q
 from drf_spectacular.utils import extend_schema
-from rest_framework import viewsets
+from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api_v3.serializers import BasicScienceBoxDetailV3Serializer, BasicScienceBoxV3Serializer
+from api_v3.serializers import (
+    BasicScienceBoxCreateV3Serializer,
+    BasicScienceBoxDetailV3Serializer,
+    BasicScienceBoxV3Serializer,
+)
+from app.choices import (
+    BasicScienceBoxTypeChoices,
+    ColumnChoices,
+    DepthChoices,
+    FreezerLocationChoices,
+    RowChoices,
+)
 from app.models import BasicScienceBox, Experiment
 from app.pagination import SamplePageNumberPagination
 from core.utils.export import export_csv
@@ -23,9 +34,9 @@ EXPERIMENT_PREFETCH = Prefetch(
 
 
 @extend_schema(tags=["v3"])
-class BasicScienceBoxV3ViewSet(viewsets.ReadOnlyModelViewSet):
+class BasicScienceBoxV3ViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     """
-    API for the v3 frontend that exposes key box details.
+    API for the v3 frontend that exposes key box details and creation.
     """
 
     queryset = BasicScienceBox.objects.order_by("-created")
@@ -57,9 +68,14 @@ class BasicScienceBoxV3ViewSet(viewsets.ReadOnlyModelViewSet):
         return base_queryset
 
     def get_serializer_class(self):
+        if self.action == "create":
+            return BasicScienceBoxCreateV3Serializer
         if self.action == "retrieve":
             return BasicScienceBoxDetailV3Serializer
         return super().get_serializer_class()
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user, last_modified_by=self.request.user)
 
     @extend_schema(tags=["v3"], description="Search boxes by common identifiers and text fields.")
     @action(detail=False, methods=["get"], url_path="search")
@@ -86,6 +102,38 @@ class BasicScienceBoxV3ViewSet(viewsets.ReadOnlyModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+@extend_schema(tags=["v3"])
+class BasicScienceBoxOptionsView(APIView):
+    """
+    Provides choice metadata required to populate the basic science box form.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def _format_choices(choices):
+        return [{"value": value, "label": label} for value, label in choices]
+
+    def get(self, request):
+        experiments = Experiment.objects.filter(is_deleted=False).order_by("name")
+        experiment_options = [
+            {
+                "id": experiment.id,
+                "label": f"{experiment.name} ({experiment.get_basic_science_group_display()})",
+            }
+            for experiment in experiments
+        ]
+        payload = {
+            "box_type_options": self._format_choices(BasicScienceBoxTypeChoices.choices),
+            "location_options": self._format_choices(FreezerLocationChoices.choices),
+            "row_options": self._format_choices(RowChoices.choices),
+            "column_options": self._format_choices(ColumnChoices.choices),
+            "depth_options": self._format_choices(DepthChoices.choices),
+            "experiments": experiment_options,
+        }
+        return Response(payload)
 
 
 @extend_schema(tags=["v3"])

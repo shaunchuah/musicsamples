@@ -51,6 +51,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -142,6 +149,7 @@ type SampleFilters = {
 
 const EMPTY_STATE: SampleRow[] = [];
 const DEFAULT_PAGE_SIZE = 50;
+const EMPTY_SELECT_VALUE = "__none__";
 const DEFAULT_FILTERS: SampleFilters = {
   study_name: "",
   sample_type: "",
@@ -326,6 +334,7 @@ export function SamplesTable() {
   const collectedAfterInputId = useId();
   const collectedBeforeInputId = useId();
   const commentsInputId = useId();
+  const filterSelectIdPrefix = useId();
 
   const activeFilterCount = useMemo(() => {
     return Object.values(filters).filter((value) => value.trim() !== "").length;
@@ -1080,45 +1089,71 @@ export function SamplesTable() {
             </Button>
           </div>
           <div className="mt-3 grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-study-name`}
+            >
               Study name
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.study_name,
-                )}
-                value={filters.study_name}
-                onChange={(event) =>
-                  setFilters((previous) => ({ ...previous, study_name: event.target.value }))
+              <Select
+                value={filters.study_name || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    study_name: value === EMPTY_SELECT_VALUE ? "" : value,
+                  }))
                 }
               >
-                <option value="">Any</option>
-                {(filterOptions?.study_name ?? []).map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.study_name,
+                  )}
+                  id={`${filterSelectIdPrefix}-study-name`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {(filterOptions?.study_name ?? []).map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-sample-type`}
+            >
               Sample type
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.sample_type,
-                )}
-                value={filters.sample_type}
-                onChange={(event) =>
-                  setFilters((previous) => ({ ...previous, sample_type: event.target.value }))
+              <Select
+                value={filters.sample_type || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    sample_type: value === EMPTY_SELECT_VALUE ? "" : value,
+                  }))
                 }
               >
-                <option value="">Any</option>
-                {(filterOptions?.sample_type ?? []).map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.sample_type,
+                  )}
+                  id={`${filterSelectIdPrefix}-sample-type`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {(filterOptions?.sample_type ?? []).map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
             <label
               className="flex flex-col gap-1 text-xs text-muted-foreground"
@@ -1171,25 +1206,38 @@ export function SamplesTable() {
                 className={getFilterFieldClass("h-9", filters.sample_sublocation)}
               />
             </label>
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-used-samples`}
+            >
               Used samples
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.is_used,
-                )}
-                value={filters.is_used}
-                onChange={(event) =>
-                  setFilters((previous) => ({ ...previous, is_used: event.target.value }))
+              <Select
+                value={filters.is_used || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    is_used: value === EMPTY_SELECT_VALUE ? "" : value,
+                  }))
                 }
               >
-                <option value="">Any</option>
-                {booleanOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.is_used,
+                  )}
+                  id={`${filterSelectIdPrefix}-used-samples`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {booleanOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
             <label
               className="flex flex-col gap-1 text-xs text-muted-foreground"
@@ -1244,278 +1292,403 @@ export function SamplesTable() {
                 className={getFilterFieldClass("h-9", filters.sample_comments)}
               />
             </label>
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-study-group`}
+            >
               Study group
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.study_id__study_group,
-                )}
-                value={filters.study_id__study_group}
-                onChange={(event) =>
+              <Select
+                value={filters.study_id__study_group || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
                   setFilters((previous) => ({
                     ...previous,
-                    study_id__study_group: event.target.value,
+                    study_id__study_group: value === EMPTY_SELECT_VALUE ? "" : value,
                   }))
                 }
               >
-                <option value="">Any</option>
-                {(filterOptions?.study_group ?? []).map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.study_id__study_group,
+                  )}
+                  id={`${filterSelectIdPrefix}-study-group`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {(filterOptions?.study_group ?? []).map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-study-center`}
+            >
               Study center
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.study_id__study_center,
-                )}
-                value={filters.study_id__study_center}
-                onChange={(event) =>
+              <Select
+                value={filters.study_id__study_center || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
                   setFilters((previous) => ({
                     ...previous,
-                    study_id__study_center: event.target.value,
+                    study_id__study_center: value === EMPTY_SELECT_VALUE ? "" : value,
                   }))
                 }
               >
-                <option value="">Any</option>
-                {(filterOptions?.study_center ?? []).map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.study_id__study_center,
+                  )}
+                  id={`${filterSelectIdPrefix}-study-center`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {(filterOptions?.study_center ?? []).map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-biological-sex`}
+            >
               Biological sex
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.study_id__sex,
-                )}
-                value={filters.study_id__sex}
-                onChange={(event) =>
-                  setFilters((previous) => ({ ...previous, study_id__sex: event.target.value }))
+              <Select
+                value={filters.study_id__sex || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
+                  setFilters((previous) => ({
+                    ...previous,
+                    study_id__sex: value === EMPTY_SELECT_VALUE ? "" : value,
+                  }))
                 }
               >
-                <option value="">Any</option>
-                {(filterOptions?.sex ?? []).map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.study_id__sex,
+                  )}
+                  id={`${filterSelectIdPrefix}-biological-sex`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {(filterOptions?.sex ?? []).map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-genotype`}
+            >
               Genotype data available
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.study_id__genotype_data_available,
-                )}
-                value={filters.study_id__genotype_data_available}
-                onChange={(event) =>
+              <Select
+                value={filters.study_id__genotype_data_available || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
                   setFilters((previous) => ({
                     ...previous,
-                    study_id__genotype_data_available: event.target.value,
+                    study_id__genotype_data_available: value === EMPTY_SELECT_VALUE ? "" : value,
                   }))
                 }
               >
-                <option value="">Any</option>
-                {booleanOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.study_id__genotype_data_available,
+                  )}
+                  id={`${filterSelectIdPrefix}-genotype`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {booleanOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-nod2`}
+            >
               NOD2 mutation present
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.study_id__nod2_mutation_present,
-                )}
-                value={filters.study_id__nod2_mutation_present}
-                onChange={(event) =>
+              <Select
+                value={filters.study_id__nod2_mutation_present || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
                   setFilters((previous) => ({
                     ...previous,
-                    study_id__nod2_mutation_present: event.target.value,
+                    study_id__nod2_mutation_present: value === EMPTY_SELECT_VALUE ? "" : value,
                   }))
                 }
               >
-                <option value="">Any</option>
-                {booleanOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.study_id__nod2_mutation_present,
+                  )}
+                  id={`${filterSelectIdPrefix}-nod2`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {booleanOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-il23r`}
+            >
               IL23R mutation present
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.study_id__il23r_mutation_present,
-                )}
-                value={filters.study_id__il23r_mutation_present}
-                onChange={(event) =>
+              <Select
+                value={filters.study_id__il23r_mutation_present || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
                   setFilters((previous) => ({
                     ...previous,
-                    study_id__il23r_mutation_present: event.target.value,
+                    study_id__il23r_mutation_present: value === EMPTY_SELECT_VALUE ? "" : value,
                   }))
                 }
               >
-                <option value="">Any</option>
-                {booleanOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.study_id__il23r_mutation_present,
+                  )}
+                  id={`${filterSelectIdPrefix}-il23r`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {booleanOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-healing-3-6`}
+            >
               Mucosal healing (3-6m)
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.endoscopic_mucosal_healing_at_3_6_months,
-                )}
-                value={filters.endoscopic_mucosal_healing_at_3_6_months}
-                onChange={(event) =>
+              <Select
+                value={filters.endoscopic_mucosal_healing_at_3_6_months || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
                   setFilters((previous) => ({
                     ...previous,
-                    endoscopic_mucosal_healing_at_3_6_months: event.target.value,
+                    endoscopic_mucosal_healing_at_3_6_months:
+                      value === EMPTY_SELECT_VALUE ? "" : value,
                   }))
                 }
               >
-                <option value="">Any</option>
-                {booleanOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.endoscopic_mucosal_healing_at_3_6_months,
+                  )}
+                  id={`${filterSelectIdPrefix}-healing-3-6`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {booleanOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-healing-12`}
+            >
               Mucosal healing (12m)
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.endoscopic_mucosal_healing_at_12_months,
-                )}
-                value={filters.endoscopic_mucosal_healing_at_12_months}
-                onChange={(event) =>
+              <Select
+                value={filters.endoscopic_mucosal_healing_at_12_months || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
                   setFilters((previous) => ({
                     ...previous,
-                    endoscopic_mucosal_healing_at_12_months: event.target.value,
+                    endoscopic_mucosal_healing_at_12_months:
+                      value === EMPTY_SELECT_VALUE ? "" : value,
                   }))
                 }
               >
-                <option value="">Any</option>
-                {booleanOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.endoscopic_mucosal_healing_at_12_months,
+                  )}
+                  id={`${filterSelectIdPrefix}-healing-12`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {booleanOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-music-timepoint`}
+            >
               Music timepoint
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.music_timepoint,
-                )}
-                value={filters.music_timepoint}
-                onChange={(event) =>
+              <Select
+                value={filters.music_timepoint || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
                   setFilters((previous) => ({
                     ...previous,
-                    music_timepoint: event.target.value,
+                    music_timepoint: value === EMPTY_SELECT_VALUE ? "" : value,
                   }))
                 }
               >
-                <option value="">Any</option>
-                {(filterOptions?.music_timepoint ?? []).map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.music_timepoint,
+                  )}
+                  id={`${filterSelectIdPrefix}-music-timepoint`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {(filterOptions?.music_timepoint ?? []).map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-marvel-timepoint`}
+            >
               Marvel timepoint
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.marvel_timepoint,
-                )}
-                value={filters.marvel_timepoint}
-                onChange={(event) =>
+              <Select
+                value={filters.marvel_timepoint || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
                   setFilters((previous) => ({
                     ...previous,
-                    marvel_timepoint: event.target.value,
+                    marvel_timepoint: value === EMPTY_SELECT_VALUE ? "" : value,
                   }))
                 }
               >
-                <option value="">Any</option>
-                {(filterOptions?.marvel_timepoint ?? []).map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.marvel_timepoint,
+                  )}
+                  id={`${filterSelectIdPrefix}-marvel-timepoint`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {(filterOptions?.marvel_timepoint ?? []).map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-biopsy-location`}
+            >
               Biopsy location
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.biopsy_location,
-                )}
-                value={filters.biopsy_location}
-                onChange={(event) =>
+              <Select
+                value={filters.biopsy_location || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
                   setFilters((previous) => ({
                     ...previous,
-                    biopsy_location: event.target.value,
+                    biopsy_location: value === EMPTY_SELECT_VALUE ? "" : value,
                   }))
                 }
               >
-                <option value="">Any</option>
-                {(filterOptions?.biopsy_location ?? []).map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.biopsy_location,
+                  )}
+                  id={`${filterSelectIdPrefix}-biopsy-location`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {(filterOptions?.biopsy_location ?? []).map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
-            <label className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <label
+              className="flex flex-col gap-1 text-xs text-muted-foreground"
+              htmlFor={`${filterSelectIdPrefix}-biopsy-status`}
+            >
               Biopsy inflamed status
-              <select
-                className={getFilterFieldClass(
-                  "h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground",
-                  filters.biopsy_inflamed_status,
-                )}
-                value={filters.biopsy_inflamed_status}
-                onChange={(event) =>
+              <Select
+                value={filters.biopsy_inflamed_status || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
                   setFilters((previous) => ({
                     ...previous,
-                    biopsy_inflamed_status: event.target.value,
+                    biopsy_inflamed_status: value === EMPTY_SELECT_VALUE ? "" : value,
                   }))
                 }
               >
-                <option value="">Any</option>
-                {(filterOptions?.biopsy_inflamed_status ?? []).map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className={getFilterFieldClass(
+                    "h-9 w-full text-sm text-foreground",
+                    filters.biopsy_inflamed_status,
+                  )}
+                  id={`${filterSelectIdPrefix}-biopsy-status`}
+                >
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                  {(filterOptions?.biopsy_inflamed_status ?? []).map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </label>
           </div>
           <div className="mt-3 flex justify-start">

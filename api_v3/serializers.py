@@ -83,6 +83,32 @@ class BasicScienceBoxExperimentSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "date"]
 
 
+class BasicScienceBoxCreateV3Serializer(serializers.ModelSerializer):
+    """
+    Serializer for creating basic science boxes from the v3 API.
+    """
+
+    box_id = serializers.CharField(validators=[UniqueValidator(queryset=BasicScienceBox.objects.all())])
+    experiments = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Experiment.objects.all(),
+        required=False,
+    )
+
+    class Meta:
+        model = BasicScienceBox
+        fields = [
+            "box_id",
+            "box_type",
+            "location",
+            "row",
+            "column",
+            "depth",
+            "comments",
+            "experiments",
+        ]
+
+
 class BasicScienceBoxV3Serializer(serializers.ModelSerializer):
     """
     Serializer for the v3 API returning box details aligned with the Django template.

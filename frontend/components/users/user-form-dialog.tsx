@@ -3,7 +3,7 @@
 // Exists to keep the users table lean while reusing the same dialog across actions.
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -26,6 +26,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  MultiSelect,
+  MultiSelectContent,
+  MultiSelectItem,
+  MultiSelectTrigger,
+  MultiSelectValue,
+} from "@/components/ui/multi-select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import {
   JOB_TITLE_OPTIONS,
@@ -43,6 +57,8 @@ const dialogSchema = z.object({
   primary_organisation: z.union([z.literal(""), primaryOrgEnum]),
   groups: z.array(z.string()),
 });
+
+const EMPTY_SELECT_VALUE = "__none__";
 
 function normalisePayload(values: UserFormValues): UserFormValues {
   return {
@@ -75,6 +91,9 @@ export function UserFormDialog({
   groupsError,
 }: UserFormDialogProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const jobTitleId = useId();
+  const primaryOrgId = useId();
+  const groupsId = useId();
 
   const form = useForm<UserFormValues>({
     resolver: zodResolver(dialogSchema),
@@ -189,22 +208,30 @@ export function UserFormDialog({
               name="job_title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Job title</FormLabel>
+                  <FormLabel htmlFor={jobTitleId}>Job title</FormLabel>
                   <FormControl>
-                    <select
-                      name={field.name}
-                      value={field.value ?? ""}
-                      onChange={(event) => field.onChange(event.target.value)}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    <Select
+                      value={field.value || EMPTY_SELECT_VALUE}
+                      onValueChange={(value) =>
+                        field.onChange(value === EMPTY_SELECT_VALUE ? "" : value)
+                      }
                     >
-                      {JOB_TITLE_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger id={jobTitleId} className="w-full">
+                        <SelectValue
+                          placeholder={JOB_TITLE_OPTIONS[0]?.label ?? "Select job title"}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={EMPTY_SELECT_VALUE}>
+                          {JOB_TITLE_OPTIONS[0]?.label ?? "Select job title"}
+                        </SelectItem>
+                        {JOB_TITLE_OPTIONS.filter((option) => option.value).map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -216,22 +243,32 @@ export function UserFormDialog({
               name="primary_organisation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Primary organisation</FormLabel>
+                  <FormLabel htmlFor={primaryOrgId}>Primary organisation</FormLabel>
                   <FormControl>
-                    <select
-                      name={field.name}
-                      value={field.value ?? ""}
-                      onChange={(event) => field.onChange(event.target.value)}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    <Select
+                      value={field.value || EMPTY_SELECT_VALUE}
+                      onValueChange={(value) =>
+                        field.onChange(value === EMPTY_SELECT_VALUE ? "" : value)
+                      }
                     >
-                      {PRIMARY_ORG_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger id={primaryOrgId} className="w-full">
+                        <SelectValue
+                          placeholder={
+                            PRIMARY_ORG_OPTIONS[0]?.label ?? "Select primary organisation"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={EMPTY_SELECT_VALUE}>
+                          {PRIMARY_ORG_OPTIONS[0]?.label ?? "Select primary organisation"}
+                        </SelectItem>
+                        {PRIMARY_ORG_OPTIONS.filter((option) => option.value).map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -243,37 +280,34 @@ export function UserFormDialog({
               name="groups"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Groups</FormLabel>
+                  <FormLabel htmlFor={groupsId}>Groups</FormLabel>
                   <FormControl>
                     <div className="space-y-2">
+                      <MultiSelect
+                        values={field.value ?? []}
+                        onValuesChange={(values) => field.onChange(values)}
+                      >
+                        <MultiSelectTrigger
+                          id={groupsId}
+                          className="w-full justify-between"
+                          disabled={groupsLoading || !groupOptions.length}
+                        >
+                          <MultiSelectValue placeholder="Select groups" />
+                        </MultiSelectTrigger>
+                        <MultiSelectContent search={{ placeholder: "Search groups..." }}>
+                          {groupOptions.map((groupName) => (
+                            <MultiSelectItem key={groupName} value={groupName}>
+                              {groupName}
+                            </MultiSelectItem>
+                          ))}
+                        </MultiSelectContent>
+                      </MultiSelect>
                       {groupsLoading ? (
                         <p className="text-sm text-muted-foreground">Loading groups...</p>
-                      ) : groupOptions.length ? (
-                        <div className="grid gap-2">
-                          {groupOptions.map((groupName) => {
-                            const checked = field.value?.includes(groupName) ?? false;
-                            return (
-                              <label key={groupName} className="flex items-center gap-2 text-sm">
-                                <input
-                                  type="checkbox"
-                                  className="h-4 w-4 rounded border-input"
-                                  checked={checked}
-                                  onChange={(event) => {
-                                    const current = field.value ?? [];
-                                    const next = event.target.checked
-                                      ? [...current, groupName]
-                                      : current.filter((name) => name !== groupName);
-                                    field.onChange(Array.from(new Set(next)));
-                                  }}
-                                />
-                                <span className="text-foreground">{groupName}</span>
-                              </label>
-                            );
-                          })}
-                        </div>
-                      ) : (
+                      ) : null}
+                      {!groupsLoading && !groupOptions.length ? (
                         <p className="text-sm text-muted-foreground">No groups available.</p>
-                      )}
+                      ) : null}
                       {groupsError ? (
                         <p className="text-sm text-destructive">{groupsError}</p>
                       ) : null}

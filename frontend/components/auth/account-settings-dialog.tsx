@@ -5,7 +5,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -29,6 +29,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   JOB_TITLE_OPTIONS,
   jobTitleEnum,
   PRIMARY_ORG_OPTIONS,
@@ -41,6 +48,8 @@ const accountSchema = z.object({
   job_title: z.union([z.literal(""), jobTitleEnum]),
   primary_organisation: z.union([z.literal(""), primaryOrgEnum]),
 });
+
+const EMPTY_SELECT_VALUE = "__none__";
 
 type AccountFormValues = z.infer<typeof accountSchema>;
 
@@ -68,6 +77,8 @@ export function AccountSettingsDialog({
 }: AccountSettingsDialogProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const jobTitleId = useId();
+  const primaryOrgId = useId();
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
@@ -205,22 +216,30 @@ export function AccountSettingsDialog({
               name="job_title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Job title</FormLabel>
+                  <FormLabel htmlFor={jobTitleId}>Job title</FormLabel>
                   <FormControl>
-                    <select
-                      name={field.name}
-                      value={field.value ?? ""}
-                      onChange={(event) => field.onChange(event.target.value)}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    <Select
+                      value={field.value || EMPTY_SELECT_VALUE}
+                      onValueChange={(value) =>
+                        field.onChange(value === EMPTY_SELECT_VALUE ? "" : value)
+                      }
                     >
-                      {JOB_TITLE_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger id={jobTitleId} className="w-full">
+                        <SelectValue
+                          placeholder={JOB_TITLE_OPTIONS[0]?.label ?? "Select job title"}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={EMPTY_SELECT_VALUE}>
+                          {JOB_TITLE_OPTIONS[0]?.label ?? "Select job title"}
+                        </SelectItem>
+                        {JOB_TITLE_OPTIONS.filter((option) => option.value).map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -232,22 +251,32 @@ export function AccountSettingsDialog({
               name="primary_organisation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Primary organisation</FormLabel>
+                  <FormLabel htmlFor={primaryOrgId}>Primary organisation</FormLabel>
                   <FormControl>
-                    <select
-                      name={field.name}
-                      value={field.value ?? ""}
-                      onChange={(event) => field.onChange(event.target.value)}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    <Select
+                      value={field.value || EMPTY_SELECT_VALUE}
+                      onValueChange={(value) =>
+                        field.onChange(value === EMPTY_SELECT_VALUE ? "" : value)
+                      }
                     >
-                      {PRIMARY_ORG_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger id={primaryOrgId} className="w-full">
+                        <SelectValue
+                          placeholder={
+                            PRIMARY_ORG_OPTIONS[0]?.label ?? "Select primary organisation"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={EMPTY_SELECT_VALUE}>
+                          {PRIMARY_ORG_OPTIONS[0]?.label ?? "Select primary organisation"}
+                        </SelectItem>
+                        {PRIMARY_ORG_OPTIONS.filter((option) => option.value).map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -2,7 +2,7 @@
 // Covers the UsersTable client component to ensure it renders API data and flows through the create dialog.
 // Exists to give confidence that staff user management works in the Next.js dashboard without manual QA.
 
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 
@@ -116,8 +116,10 @@ describe("UsersTable", () => {
     await user.type(screen.getByLabelText(/email/i), "new.user@example.com");
     await user.type(screen.getByLabelText(/first name/i), "New");
     await user.type(screen.getByLabelText(/last name/i), "User");
-    await user.type(screen.getByLabelText(/job title/i), "Researcher");
-    await user.type(screen.getByLabelText(/primary organisation/i), "G-Trac");
+    fireEvent.mouseDown(screen.getByLabelText(/job title/i));
+    fireEvent.click(screen.getByText("Research Assistant"));
+    fireEvent.mouseDown(screen.getByLabelText(/primary organisation/i));
+    fireEvent.click(screen.getByText("NHS Lothian"));
 
     await user.click(screen.getByRole("button", { name: /create user/i }));
 

@@ -14,6 +14,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -22,6 +29,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+
+const EMPTY_SELECT_VALUE = "__none__";
 
 const STUDY_OPTIONS = [
   { value: "", label: "---------" },
@@ -529,19 +538,30 @@ export function AddMultipleForm() {
 
           <div className="space-y-2">
             <Label htmlFor={`${baseId}-study-name`}>Study Name*</Label>
-            <select
-              id={`${baseId}-study-name`}
-              value={formState.study_name}
-              onChange={(event) => handleFieldChange("study_name", event.target.value)}
-              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-invalid={Boolean(fieldErrors.study_name)}
+            <Select
+              value={formState.study_name || EMPTY_SELECT_VALUE}
+              onValueChange={(value) =>
+                handleFieldChange("study_name", value === EMPTY_SELECT_VALUE ? "" : value)
+              }
             >
-              {STUDY_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger
+                id={`${baseId}-study-name`}
+                className="w-full"
+                aria-invalid={Boolean(fieldErrors.study_name)}
+              >
+                <SelectValue placeholder={STUDY_OPTIONS[0]?.label ?? "Select study"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={EMPTY_SELECT_VALUE}>
+                  {STUDY_OPTIONS[0]?.label ?? "Select study"}
+                </SelectItem>
+                {STUDY_OPTIONS.filter((option) => option.value).map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {fieldErrors.study_name ? (
               <p className="text-sm text-destructive">{fieldErrors.study_name}</p>
             ) : null}
@@ -550,19 +570,32 @@ export function AddMultipleForm() {
           {showMusicTimepoint ? (
             <div className="space-y-2">
               <Label htmlFor={`${baseId}-music-timepoint`}>Music Timepoint</Label>
-              <select
-                id={`${baseId}-music-timepoint`}
-                value={formState.music_timepoint}
-                onChange={(event) => handleFieldChange("music_timepoint", event.target.value)}
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-invalid={Boolean(fieldErrors.music_timepoint)}
+              <Select
+                value={formState.music_timepoint || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
+                  handleFieldChange("music_timepoint", value === EMPTY_SELECT_VALUE ? "" : value)
+                }
               >
-                {MUSIC_TIMEPOINT_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  id={`${baseId}-music-timepoint`}
+                  className="w-full"
+                  aria-invalid={Boolean(fieldErrors.music_timepoint)}
+                >
+                  <SelectValue
+                    placeholder={MUSIC_TIMEPOINT_OPTIONS[0]?.label ?? "Select timepoint"}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>
+                    {MUSIC_TIMEPOINT_OPTIONS[0]?.label ?? "Select timepoint"}
+                  </SelectItem>
+                  {MUSIC_TIMEPOINT_OPTIONS.filter((option) => option.value).map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {fieldErrors.music_timepoint ? (
                 <p className="text-sm text-destructive">{fieldErrors.music_timepoint}</p>
               ) : null}
@@ -572,19 +605,32 @@ export function AddMultipleForm() {
           {showMarvelTimepoint ? (
             <div className="space-y-2">
               <Label htmlFor={`${baseId}-marvel-timepoint`}>Marvel Timepoint</Label>
-              <select
-                id={`${baseId}-marvel-timepoint`}
-                value={formState.marvel_timepoint}
-                onChange={(event) => handleFieldChange("marvel_timepoint", event.target.value)}
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-invalid={Boolean(fieldErrors.marvel_timepoint)}
+              <Select
+                value={formState.marvel_timepoint || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
+                  handleFieldChange("marvel_timepoint", value === EMPTY_SELECT_VALUE ? "" : value)
+                }
               >
-                {MARVEL_TIMEPOINT_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  id={`${baseId}-marvel-timepoint`}
+                  className="w-full"
+                  aria-invalid={Boolean(fieldErrors.marvel_timepoint)}
+                >
+                  <SelectValue
+                    placeholder={MARVEL_TIMEPOINT_OPTIONS[0]?.label ?? "Select timepoint"}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>
+                    {MARVEL_TIMEPOINT_OPTIONS[0]?.label ?? "Select timepoint"}
+                  </SelectItem>
+                  {MARVEL_TIMEPOINT_OPTIONS.filter((option) => option.value).map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {fieldErrors.marvel_timepoint ? (
                 <p className="text-sm text-destructive">{fieldErrors.marvel_timepoint}</p>
               ) : null}
@@ -619,19 +665,30 @@ export function AddMultipleForm() {
 
           <div className="space-y-2">
             <Label htmlFor={`${baseId}-sample-type`}>Sample Type*</Label>
-            <select
-              id={`${baseId}-sample-type`}
-              value={formState.sample_type}
-              onChange={(event) => handleFieldChange("sample_type", event.target.value)}
-              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-invalid={Boolean(fieldErrors.sample_type)}
+            <Select
+              value={formState.sample_type || EMPTY_SELECT_VALUE}
+              onValueChange={(value) =>
+                handleFieldChange("sample_type", value === EMPTY_SELECT_VALUE ? "" : value)
+              }
             >
-              {SAMPLE_TYPE_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger
+                id={`${baseId}-sample-type`}
+                className="w-full"
+                aria-invalid={Boolean(fieldErrors.sample_type)}
+              >
+                <SelectValue placeholder={SAMPLE_TYPE_OPTIONS[0]?.label ?? "Select sample type"} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={EMPTY_SELECT_VALUE}>
+                  {SAMPLE_TYPE_OPTIONS[0]?.label ?? "Select sample type"}
+                </SelectItem>
+                {SAMPLE_TYPE_OPTIONS.filter((option) => option.value).map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {fieldErrors.sample_type ? (
               <p className="text-sm text-destructive">{fieldErrors.sample_type}</p>
             ) : null}
@@ -657,19 +714,33 @@ export function AddMultipleForm() {
           {showHaemolysis ? (
             <div className="space-y-2">
               <Label htmlFor={`${baseId}-haemolysis`}>Haemolysis Reference Palette</Label>
-              <select
-                id={`${baseId}-haemolysis`}
-                value={formState.haemolysis_reference}
-                onChange={(event) => handleFieldChange("haemolysis_reference", event.target.value)}
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-invalid={Boolean(fieldErrors.haemolysis_reference)}
+              <Select
+                value={formState.haemolysis_reference || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
+                  handleFieldChange(
+                    "haemolysis_reference",
+                    value === EMPTY_SELECT_VALUE ? "" : value,
+                  )
+                }
               >
-                {HAEMOLYSIS_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  id={`${baseId}-haemolysis`}
+                  className="w-full"
+                  aria-invalid={Boolean(fieldErrors.haemolysis_reference)}
+                >
+                  <SelectValue placeholder={HAEMOLYSIS_OPTIONS[0]?.label ?? "Select category"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>
+                    {HAEMOLYSIS_OPTIONS[0]?.label ?? "Select category"}
+                  </SelectItem>
+                  {HAEMOLYSIS_OPTIONS.filter((option) => option.value).map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {fieldErrors.haemolysis_reference ? (
                 <p className="text-sm text-destructive">{fieldErrors.haemolysis_reference}</p>
               ) : null}
@@ -695,40 +766,67 @@ export function AddMultipleForm() {
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor={`${baseId}-biopsy-location`}>Biopsy Location</Label>
-                <select
-                  id={`${baseId}-biopsy-location`}
-                  value={formState.biopsy_location}
-                  onChange={(event) => handleFieldChange("biopsy_location", event.target.value)}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  aria-invalid={Boolean(fieldErrors.biopsy_location)}
+                <Select
+                  value={formState.biopsy_location || EMPTY_SELECT_VALUE}
+                  onValueChange={(value) =>
+                    handleFieldChange("biopsy_location", value === EMPTY_SELECT_VALUE ? "" : value)
+                  }
                 >
-                  {BIOPSY_LOCATION_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger
+                    id={`${baseId}-biopsy-location`}
+                    className="w-full"
+                    aria-invalid={Boolean(fieldErrors.biopsy_location)}
+                  >
+                    <SelectValue
+                      placeholder={BIOPSY_LOCATION_OPTIONS[0]?.label ?? "Select location"}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_SELECT_VALUE}>
+                      {BIOPSY_LOCATION_OPTIONS[0]?.label ?? "Select location"}
+                    </SelectItem>
+                    {BIOPSY_LOCATION_OPTIONS.filter((option) => option.value).map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {fieldErrors.biopsy_location ? (
                   <p className="text-sm text-destructive">{fieldErrors.biopsy_location}</p>
                 ) : null}
               </div>
               <div className="space-y-2">
                 <Label htmlFor={`${baseId}-biopsy-status`}>Biopsy Inflamed Status</Label>
-                <select
-                  id={`${baseId}-biopsy-status`}
-                  value={formState.biopsy_inflamed_status}
-                  onChange={(event) =>
-                    handleFieldChange("biopsy_inflamed_status", event.target.value)
+                <Select
+                  value={formState.biopsy_inflamed_status || EMPTY_SELECT_VALUE}
+                  onValueChange={(value) =>
+                    handleFieldChange(
+                      "biopsy_inflamed_status",
+                      value === EMPTY_SELECT_VALUE ? "" : value,
+                    )
                   }
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  aria-invalid={Boolean(fieldErrors.biopsy_inflamed_status)}
                 >
-                  {BIOPSY_STATUS_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger
+                    id={`${baseId}-biopsy-status`}
+                    className="w-full"
+                    aria-invalid={Boolean(fieldErrors.biopsy_inflamed_status)}
+                  >
+                    <SelectValue
+                      placeholder={BIOPSY_STATUS_OPTIONS[0]?.label ?? "Select inflamed status"}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_SELECT_VALUE}>
+                      {BIOPSY_STATUS_OPTIONS[0]?.label ?? "Select inflamed status"}
+                    </SelectItem>
+                    {BIOPSY_STATUS_OPTIONS.filter((option) => option.value).map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {fieldErrors.biopsy_inflamed_status ? (
                   <p className="text-sm text-destructive">{fieldErrors.biopsy_inflamed_status}</p>
                 ) : null}
@@ -810,19 +908,33 @@ export function AddMultipleForm() {
             </div>
             <div className="space-y-2">
               <Label htmlFor={`${baseId}-sample-volume-units`}>Sample Volume Units</Label>
-              <select
-                id={`${baseId}-sample-volume-units`}
-                value={formState.sample_volume_units}
-                onChange={(event) => handleFieldChange("sample_volume_units", event.target.value)}
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-invalid={Boolean(fieldErrors.sample_volume_units)}
+              <Select
+                value={formState.sample_volume_units || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
+                  handleFieldChange(
+                    "sample_volume_units",
+                    value === EMPTY_SELECT_VALUE ? "" : value,
+                  )
+                }
               >
-                {VOLUME_UNIT_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger
+                  id={`${baseId}-sample-volume-units`}
+                  className="w-full"
+                  aria-invalid={Boolean(fieldErrors.sample_volume_units)}
+                >
+                  <SelectValue placeholder={VOLUME_UNIT_OPTIONS[0]?.label ?? "Select unit"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>
+                    {VOLUME_UNIT_OPTIONS[0]?.label ?? "Select unit"}
+                  </SelectItem>
+                  {VOLUME_UNIT_OPTIONS.filter((option) => option.value).map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {fieldErrors.sample_volume_units ? (
                 <p className="text-sm text-destructive">{fieldErrors.sample_volume_units}</p>
               ) : null}

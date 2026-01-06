@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+import { BoxFormDialog } from "@/components/boxes/box-form-dialog";
 import { AlertDescription, AlertError } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -161,6 +162,8 @@ export function BoxesTable() {
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [refreshToken, setRefreshToken] = useState(0);
   const backendBaseUrl = getBackendBaseUrl();
 
   const canPrevious = pageIndex > 1;
@@ -261,7 +264,7 @@ export function BoxesTable() {
     return () => {
       isActive = false;
     };
-  }, [includeUsed, orderingValue, pageIndex, searchQuery]);
+  }, [includeUsed, orderingValue, pageIndex, refreshToken, searchQuery]);
 
   const handleSortToggle = (key: SortKey) => {
     setSorting((previous) => {
@@ -282,16 +285,26 @@ export function BoxesTable() {
     return sorting.desc ? "desc" : "asc";
   };
 
+  const handleBoxCreated = () => {
+    setPageIndex(1);
+    setRefreshToken((previous) => previous + 1);
+  };
+
   return (
     <div className="flex flex-col gap-6">
+      <BoxFormDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onCreated={handleBoxCreated}
+      />
       <Card>
         <CardHeader>
           <CardTitle>Basic Science Boxes</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <Button asChild size="sm">
-              <a href={`${backendBaseUrl}/boxes/create/`}>Add New Box</a>
+            <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
+              Add New Box
             </Button>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3">

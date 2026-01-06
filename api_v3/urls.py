@@ -7,6 +7,7 @@ from rest_framework import routers
 
 from api_v3.views import (
     BasicScienceBoxExportView,
+    BasicScienceBoxOptionsView,
     BasicScienceBoxV3ViewSet,
     CurrentUserRecentSamplesView,
     CurrentUserTokenViewSet,
@@ -71,6 +72,7 @@ urlpatterns = [
         name="v3-study-id-autocomplete",
     ),
     path("boxes/export/", BasicScienceBoxExportView.as_view(), name="v3-boxes-export"),
+    path("boxes/options/", BasicScienceBoxOptionsView.as_view(), name="v3-boxes-options"),
     path("experiments/export/", ExperimentExportView.as_view(), name="v3-experiments-export"),
     path("samples/export/", SampleExportView.as_view(), name="v3-samples-export"),
     path("samples/filters/", SampleFilterOptionsView.as_view(), name="v3-sample-filter-options"),
