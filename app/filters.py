@@ -313,6 +313,81 @@ class BasicScienceBoxFilter(django_filters.FilterSet):
         ]
 
 
+class BasicScienceBoxV3Filter(django_filters.FilterSet):
+    """
+    Filter set used by the api/v3 boxes endpoint to mirror legacy box filters.
+    """
+
+    basic_science_group = django_filters.ChoiceFilter(
+        label="Basic Science Group", choices=BasicScienceGroupChoices.choices, method="filter_basic_science_group"
+    )
+    box_type = django_filters.ChoiceFilter(label="Box Type", choices=BasicScienceBoxTypeChoices.choices)
+    location = django_filters.ChoiceFilter(label="Location", choices=FreezerLocationChoices.choices)
+    row = django_filters.ChoiceFilter(label="Row", choices=RowChoices.choices)
+    column = django_filters.ChoiceFilter(label="Column", choices=ColumnChoices.choices)
+    depth = django_filters.ChoiceFilter(label="Depth", choices=DepthChoices.choices)
+    experiments = django_filters.ModelMultipleChoiceFilter(
+        label="Experiments", queryset=Experiment.objects.all(), method="filter_experiments"
+    )
+    experiments_date = django_filters.DateFromToRangeFilter(
+        label="Experiments Date Range",
+        widget=RangeWidget(attrs={"type": "date"}),
+        method="filter_experiments_date",
+    )
+    sample_types = django_filters.ModelMultipleChoiceFilter(
+        label="Sample Types", queryset=BasicScienceSampleType.objects.all(), method="filter_sample_types"
+    )
+    tissue_types = django_filters.ModelMultipleChoiceFilter(
+        label="Tissue Types", queryset=TissueType.objects.all(), method="filter_tissue_types"
+    )
+    is_used = django_filters.BooleanFilter(label="Used?")
+
+    def filter_basic_science_group(self, queryset, name, value):
+        if value:
+            return queryset.filter(basic_science_group=value)
+        return queryset
+
+    def filter_experiments(self, queryset, name, value):
+        if value:
+            return queryset.filter(experiments__in=value).distinct()
+        return queryset
+
+    def filter_experiments_date(self, queryset, name, value):
+        if value:
+            if value.start:
+                queryset = queryset.filter(experiments__date__gte=value.start)
+            if value.stop:
+                queryset = queryset.filter(experiments__date__lte=value.stop)
+            queryset = queryset.distinct()
+        return queryset
+
+    def filter_sample_types(self, queryset, name, value):
+        if value:
+            return queryset.filter(experiments__sample_types__in=value).distinct()
+        return queryset
+
+    def filter_tissue_types(self, queryset, name, value):
+        if value:
+            return queryset.filter(experiments__tissue_types__in=value).distinct()
+        return queryset
+
+    class Meta:
+        model = BasicScienceBox
+        fields = [
+            "basic_science_group",
+            "box_type",
+            "location",
+            "row",
+            "column",
+            "depth",
+            "experiments",
+            "experiments_date",
+            "sample_types",
+            "tissue_types",
+            "is_used",
+        ]
+
+
 class ExperimentFilter(django_filters.FilterSet):
     basic_science_group = django_filters.ChoiceFilter(
         label="Basic Science Group", choices=BasicScienceGroupChoices.choices

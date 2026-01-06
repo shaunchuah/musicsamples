@@ -6,6 +6,7 @@ from django.db.models import Prefetch, Q
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -24,7 +25,8 @@ from app.choices import (
     FreezerLocationChoices,
     RowChoices,
 )
-from app.models import BasicScienceBox, Experiment
+from app.filters import BasicScienceBoxV3Filter
+from app.models import BasicScienceBox, BasicScienceSampleType, Experiment, TissueType
 from app.pagination import SamplePageNumberPagination
 from core.utils.export import export_csv
 
@@ -43,7 +45,8 @@ class BasicScienceBoxV3ViewSet(viewsets.ModelViewSet):
     queryset = BasicScienceBox.objects.order_by("-created")
     serializer_class = BasicScienceBoxV3Serializer
     permission_classes = [IsAuthenticated]
-    filter_backends = [OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = BasicScienceBoxV3Filter
     ordering_fields = ["created", "box_id", "location", "box_type", "id"]
     ordering = ["-created"]
     pagination_class = SamplePageNumberPagination
@@ -151,6 +154,52 @@ class BasicScienceBoxOptionsView(APIView):
 
 
 @extend_schema(tags=["v3"])
+class BasicScienceBoxFilterOptionsView(APIView):
+    """
+    Return dropdown-ready filter options for the boxes dashboard.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    @staticmethod
+    def _choice_options(choices):
+        return [{"value": value, "label": label} for value, label in choices]
+
+    @staticmethod
+    def _model_options(queryset, label_attr="name"):
+        return [{"value": str(item.id), "label": getattr(item, label_attr)} for item in queryset]
+
+    def get(self, request):
+        boolean_options = [
+            {"value": "true", "label": "Yes"},
+            {"value": "false", "label": "No"},
+        ]
+        experiments = Experiment.objects.filter(is_deleted=False).order_by("name")
+        sample_types = BasicScienceSampleType.objects.order_by("name")
+        tissue_types = TissueType.objects.order_by("name")
+        return Response(
+            {
+                "basic_science_group": self._choice_options(BasicScienceGroupChoices.choices),
+                "box_type": self._choice_options(BasicScienceBoxTypeChoices.choices),
+                "location": self._choice_options(FreezerLocationChoices.choices),
+                "row": self._choice_options(RowChoices.choices),
+                "column": self._choice_options(ColumnChoices.choices),
+                "depth": self._choice_options(DepthChoices.choices),
+                "experiments": [
+                    {
+                        "value": str(experiment.id),
+                        "label": f"{experiment.name} ({experiment.get_basic_science_group_display()})",
+                    }
+                    for experiment in experiments
+                ],
+                "sample_types": self._model_options(sample_types),
+                "tissue_types": self._model_options(tissue_types),
+                "boolean": boolean_options,
+            }
+        )
+
+
+@extend_schema(tags=["v3"])
 class BasicScienceBoxExportView(APIView):
     """
     Export filtered boxes as CSV to avoid paginated client aggregation.
@@ -184,6 +233,7 @@ class BasicScienceBoxExportView(APIView):
                 | Q(experiments__tissue_types__name__icontains=query_string)
             ).distinct()
 
-        queryset = OrderingFilter().filter_queryset(request, base_queryset, self)
+        queryset = BasicScienceBoxV3Filter(request.query_params, queryset=base_queryset).qs
+        queryset = OrderingFilter().filter_queryset(request, queryset, self)
 
         return export_csv(queryset, file_prefix="gtrac", file_name="basic_science_boxes")

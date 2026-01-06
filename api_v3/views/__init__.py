@@ -10,6 +10,7 @@ from api_v3.views.auth import (  # noqa: F401
 )
 from api_v3.views.boxes import (  # noqa: F401
     BasicScienceBoxExportView,
+    BasicScienceBoxFilterOptionsView,
     BasicScienceBoxOptionsView,
     BasicScienceBoxV3ViewSet,
 )

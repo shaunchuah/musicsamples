@@ -16,10 +16,10 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 
 import { BoxFormDialog } from "@/components/boxes/box-form-dialog";
-import { AlertDescription, AlertError } from "@/components/ui/alert";
+import { AlertDescription, AlertError, AlertWarning } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -32,6 +32,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -40,7 +47,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TablePagination } from "@/components/ui/table-pagination";
-import { getBackendBaseUrl } from "@/lib/auth";
 import { dateFormatter } from "@/lib/formatters";
 
 type BoxExperimentSummary = {
@@ -80,15 +86,74 @@ type BoxApiPayload = {
   results?: BoxRow[];
 };
 
+type FilterOption = {
+  value: string;
+  label: string;
+};
+
+type BoxFilterOptions = {
+  basic_science_group: FilterOption[];
+  box_type: FilterOption[];
+  location: FilterOption[];
+  row: FilterOption[];
+  column: FilterOption[];
+  depth: FilterOption[];
+  experiments: FilterOption[];
+  sample_types: FilterOption[];
+  tissue_types: FilterOption[];
+  boolean: FilterOption[];
+};
+
+type BoxFilters = {
+  basic_science_group: string;
+  box_type: string;
+  location: string;
+  row: string;
+  column: string;
+  depth: string;
+  experiments: string;
+  experiments_date_after: string;
+  experiments_date_before: string;
+  sample_types: string;
+  tissue_types: string;
+  is_used: string;
+};
+
 type SortKey = "box_id" | "location" | "box_type" | "created";
 
 const DEFAULT_PAGE_SIZE = 20;
+const EMPTY_SELECT_VALUE = "__none__";
+const DEFAULT_FILTERS: BoxFilters = {
+  basic_science_group: "",
+  box_type: "",
+  location: "",
+  row: "",
+  column: "",
+  depth: "",
+  experiments: "",
+  experiments_date_after: "",
+  experiments_date_before: "",
+  sample_types: "",
+  tissue_types: "",
+  is_used: "",
+};
+const DEFAULT_BOOLEAN_OPTIONS: FilterOption[] = [
+  { value: "true", label: "Yes" },
+  { value: "false", label: "No" },
+];
 
 const SORT_FIELD_MAP: Record<SortKey, string> = {
   box_id: "box_id",
   location: "location",
   box_type: "box_type",
   created: "created",
+};
+
+const SORT_LABELS: Record<SortKey, string> = {
+  box_id: "Box ID",
+  location: "Location",
+  box_type: "Box type",
+  created: "Created",
 };
 
 type SortState = {
@@ -98,6 +163,28 @@ type SortState = {
 
 const TABLE_HEADER_CLASS =
   "px-3 py-2 text-sm font-semibold normal-case tracking-normal text-muted-foreground";
+
+const FILTER_LABELS: Record<keyof BoxFilters, string> = {
+  basic_science_group: "Basic science group",
+  box_type: "Box type",
+  location: "Location",
+  row: "Row",
+  column: "Column",
+  depth: "Depth",
+  experiments: "Experiment",
+  experiments_date_after: "Experiment date after",
+  experiments_date_before: "Experiment date before",
+  sample_types: "Sample types",
+  tissue_types: "Tissue types",
+  is_used: "Used boxes",
+};
+
+function getFilterFieldClass(baseClass: string, value: string): string {
+  if (!value.trim()) {
+    return baseClass;
+  }
+  return `${baseClass} border-primary/70 bg-primary/5 ring-1 ring-primary/30`;
+}
 
 type SortIndicatorProps = {
   state: "asc" | "desc" | false;
@@ -166,12 +253,16 @@ export function BoxesTable() {
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [includeUsed, setIncludeUsed] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filterOptions, setFilterOptions] = useState<BoxFilterOptions | null>(null);
+  const [filters, setFilters] = useState<BoxFilters>(DEFAULT_FILTERS);
   const [pageIndex, setPageIndex] = useState(1);
   const [sorting, setSorting] = useState<SortState>(null);
   const [boxes, setBoxes] = useState<BoxRow[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [activeBox, setActiveBox] = useState<BoxRow | null>(null);
@@ -180,11 +271,17 @@ export function BoxesTable() {
   const [isMarkingUsed, setIsMarkingUsed] = useState(false);
   const [usedError, setUsedError] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState(0);
-  const backendBaseUrl = getBackendBaseUrl();
+  const experimentAfterInputId = useId();
+  const experimentBeforeInputId = useId();
+  const filterSelectIdPrefix = useId();
 
   const canPrevious = pageIndex > 1;
   const canNext = pageIndex * DEFAULT_PAGE_SIZE < totalCount;
   const pageCount = totalCount > 0 ? Math.ceil(totalCount / DEFAULT_PAGE_SIZE) : 0;
+
+  const activeFilterCount = useMemo(() => {
+    return Object.values(filters).filter((value) => value.trim() !== "").length;
+  }, [filters]);
 
   const orderingValue = useMemo(() => {
     if (!sorting) {
@@ -197,7 +294,15 @@ export function BoxesTable() {
     return `${sorting.desc ? "-" : ""}${field}`;
   }, [sorting]);
 
-  const exportUrl = useMemo(() => {
+  const orderingLabel = useMemo(() => {
+    if (!sorting) {
+      return "";
+    }
+    const label = SORT_LABELS[sorting.id] ?? sorting.id;
+    return `${label} (${sorting.desc ? "descending" : "ascending"})`;
+  }, [sorting]);
+
+  const buildBoxesQueryParams = useCallback(() => {
     const params = new URLSearchParams();
     if (searchQuery) {
       params.set("query", searchQuery);
@@ -208,9 +313,14 @@ export function BoxesTable() {
     if (orderingValue) {
       params.set("ordering", orderingValue);
     }
-    const query = params.toString();
-    return query ? `/api/dashboard/boxes/export?${query}` : "/api/dashboard/boxes/export";
-  }, [includeUsed, orderingValue, searchQuery]);
+    Object.entries(filters).forEach(([key, value]) => {
+      const trimmedValue = value.trim();
+      if (trimmedValue) {
+        params.set(key, trimmedValue);
+      }
+    });
+    return params;
+  }, [filters, includeUsed, orderingValue, searchQuery]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -222,7 +332,34 @@ export function BoxesTable() {
 
   useEffect(() => {
     setPageIndex((previous) => (previous === 1 ? previous : 1));
-  }, [includeUsed, searchQuery, sorting]);
+  }, [includeUsed, searchQuery, sorting, filters]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadFilterOptions() {
+      try {
+        const response = await fetch("/api/dashboard/boxes/filters", {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as BoxFilterOptions;
+        setFilterOptions(payload);
+      } catch {
+        if (!controller.signal.aborted) {
+          setFilterOptions(null);
+        }
+      }
+    }
+
+    loadFilterOptions();
+
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     let isActive = true;
@@ -231,16 +368,7 @@ export function BoxesTable() {
       setIsLoading(true);
       setErrorMessage(null);
       try {
-        const params = new URLSearchParams();
-        if (searchQuery) {
-          params.set("query", searchQuery);
-        }
-        if (includeUsed) {
-          params.set("include_used", "true");
-        }
-        if (orderingValue) {
-          params.set("ordering", orderingValue);
-        }
+        const params = buildBoxesQueryParams();
         params.set("page", String(pageIndex));
         params.set("page_size", String(DEFAULT_PAGE_SIZE));
 
@@ -280,7 +408,70 @@ export function BoxesTable() {
     return () => {
       isActive = false;
     };
-  }, [includeUsed, orderingValue, pageIndex, refreshToken, searchQuery]);
+  }, [buildBoxesQueryParams, pageIndex, refreshToken]);
+
+  const filterOptionLookup: Partial<Record<keyof BoxFilters, FilterOption[]>> = useMemo(
+    () => ({
+      basic_science_group: filterOptions?.basic_science_group ?? [],
+      box_type: filterOptions?.box_type ?? [],
+      location: filterOptions?.location ?? [],
+      row: filterOptions?.row ?? [],
+      column: filterOptions?.column ?? [],
+      depth: filterOptions?.depth ?? [],
+      experiments: filterOptions?.experiments ?? [],
+      sample_types: filterOptions?.sample_types ?? [],
+      tissue_types: filterOptions?.tissue_types ?? [],
+      is_used: filterOptions?.boolean ?? DEFAULT_BOOLEAN_OPTIONS,
+    }),
+    [filterOptions],
+  );
+
+  const exportParams = useMemo(() => {
+    const params: Array<{ label: string; value: string }> = [];
+
+    if (searchQuery.trim()) {
+      params.push({ label: "Search", value: searchQuery.trim() });
+    }
+
+    if (includeUsed) {
+      params.push({ label: "Include used boxes", value: "Yes" });
+    }
+
+    Object.entries(filters).forEach(([key, value]) => {
+      const trimmedValue = value.trim();
+      if (!trimmedValue) {
+        return;
+      }
+      const options = filterOptionLookup[key as keyof BoxFilters];
+      const resolvedValue = options?.find((option) => option.value === trimmedValue)?.label;
+      params.push({
+        label: FILTER_LABELS[key as keyof BoxFilters] ?? key,
+        value: resolvedValue ?? trimmedValue,
+      });
+    });
+
+    if (orderingLabel) {
+      params.push({ label: "Ordering", value: orderingLabel });
+    }
+
+    return params;
+  }, [filters, includeUsed, orderingLabel, searchQuery, filterOptionLookup]);
+
+  const buildExportUrl = () => {
+    const query = buildBoxesQueryParams();
+    const queryString = query.toString();
+    return queryString
+      ? `/api/dashboard/boxes/export?${queryString}`
+      : "/api/dashboard/boxes/export";
+  };
+
+  const handleExportConfirm = () => {
+    const url = buildExportUrl();
+    window.open(url, "_blank", "noopener,noreferrer");
+    setExportDialogOpen(false);
+  };
+
+  const hasExportConstraints = searchQuery.trim() !== "" || activeFilterCount > 0 || includeUsed;
 
   const handleSortToggle = (key: SortKey) => {
     setSorting((previous) => {
@@ -439,7 +630,12 @@ export function BoxesTable() {
             >
               Cancel
             </Button>
-            <Button type="button" onClick={handleConfirmUsed} disabled={isMarkingUsed} variant="destructive">
+            <Button
+              type="button"
+              onClick={handleConfirmUsed}
+              disabled={isMarkingUsed}
+              variant="destructive"
+            >
               {isMarkingUsed ? "Marking..." : "Confirm"}
             </Button>
           </DialogFooter>
@@ -488,18 +684,443 @@ export function BoxesTable() {
               </label>
             </div>
             <div className="flex items-center gap-2">
-              <Button asChild variant="outline" size="sm">
-                <a href={`${backendBaseUrl}/boxes/filter/`}>
-                  <Filter className="mr-2 h-4 w-4" />
-                  Filters
-                </a>
+              {activeFilterCount > 0 ? (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  type="button"
+                  onClick={() => {
+                    setFilters(DEFAULT_FILTERS);
+                    setFiltersOpen(false);
+                  }}
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Clear
+                </Button>
+              ) : null}
+              <Button
+                variant={filtersOpen ? "default" : "outline"}
+                size="sm"
+                type="button"
+                onClick={() => setFiltersOpen((previous) => !previous)}
+                aria-expanded={filtersOpen}
+                className="relative"
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                Filters
+                {activeFilterCount > 0 ? (
+                  <span className="ml-2 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                    {activeFilterCount}
+                  </span>
+                ) : null}
               </Button>
-              <Button asChild variant="outline" size="sm">
-                <a href={exportUrl}>
-                  <Download className="mr-2 h-4 w-4" />
-                  Export CSV
-                </a>
+              <Button
+                variant="outline"
+                size="sm"
+                type="button"
+                onClick={() => setExportDialogOpen(true)}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Export CSV
               </Button>
+            </div>
+          </div>
+          <div
+            className={`overflow-hidden rounded-md border border-border/60 bg-muted/20 transition-all duration-300 ease-out${
+              filtersOpen ? " max-h-[1200px] p-4 opacity-100" : " max-h-0 p-0 opacity-0"
+            }`}
+          >
+            <div className={filtersOpen ? "" : "pointer-events-none"}>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm font-medium text-foreground">Filters</p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  type="button"
+                  onClick={() => setFiltersOpen(false)}
+                  aria-label="Close filters"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="mt-3 grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <label
+                  className="flex flex-col gap-1 text-xs text-muted-foreground"
+                  htmlFor={`${filterSelectIdPrefix}-basic-science-group`}
+                >
+                  Basic science group
+                  <Select
+                    value={filters.basic_science_group || EMPTY_SELECT_VALUE}
+                    onValueChange={(value) =>
+                      setFilters((previous) => ({
+                        ...previous,
+                        basic_science_group: value === EMPTY_SELECT_VALUE ? "" : value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger
+                      className={getFilterFieldClass(
+                        "h-9 w-full text-sm text-foreground",
+                        filters.basic_science_group,
+                      )}
+                      id={`${filterSelectIdPrefix}-basic-science-group`}
+                    >
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                      {(filterOptions?.basic_science_group ?? []).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+                <label
+                  className="flex flex-col gap-1 text-xs text-muted-foreground"
+                  htmlFor={`${filterSelectIdPrefix}-box-type`}
+                >
+                  Box type
+                  <Select
+                    value={filters.box_type || EMPTY_SELECT_VALUE}
+                    onValueChange={(value) =>
+                      setFilters((previous) => ({
+                        ...previous,
+                        box_type: value === EMPTY_SELECT_VALUE ? "" : value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger
+                      className={getFilterFieldClass(
+                        "h-9 w-full text-sm text-foreground",
+                        filters.box_type,
+                      )}
+                      id={`${filterSelectIdPrefix}-box-type`}
+                    >
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                      {(filterOptions?.box_type ?? []).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+                <label
+                  className="flex flex-col gap-1 text-xs text-muted-foreground"
+                  htmlFor={`${filterSelectIdPrefix}-location`}
+                >
+                  Location
+                  <Select
+                    value={filters.location || EMPTY_SELECT_VALUE}
+                    onValueChange={(value) =>
+                      setFilters((previous) => ({
+                        ...previous,
+                        location: value === EMPTY_SELECT_VALUE ? "" : value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger
+                      className={getFilterFieldClass(
+                        "h-9 w-full text-sm text-foreground",
+                        filters.location,
+                      )}
+                      id={`${filterSelectIdPrefix}-location`}
+                    >
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                      {(filterOptions?.location ?? []).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+                <label
+                  className="flex flex-col gap-1 text-xs text-muted-foreground"
+                  htmlFor={`${filterSelectIdPrefix}-row`}
+                >
+                  Row
+                  <Select
+                    value={filters.row || EMPTY_SELECT_VALUE}
+                    onValueChange={(value) =>
+                      setFilters((previous) => ({
+                        ...previous,
+                        row: value === EMPTY_SELECT_VALUE ? "" : value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger
+                      className={getFilterFieldClass(
+                        "h-9 w-full text-sm text-foreground",
+                        filters.row,
+                      )}
+                      id={`${filterSelectIdPrefix}-row`}
+                    >
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                      {(filterOptions?.row ?? []).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+                <label
+                  className="flex flex-col gap-1 text-xs text-muted-foreground"
+                  htmlFor={`${filterSelectIdPrefix}-column`}
+                >
+                  Column
+                  <Select
+                    value={filters.column || EMPTY_SELECT_VALUE}
+                    onValueChange={(value) =>
+                      setFilters((previous) => ({
+                        ...previous,
+                        column: value === EMPTY_SELECT_VALUE ? "" : value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger
+                      className={getFilterFieldClass(
+                        "h-9 w-full text-sm text-foreground",
+                        filters.column,
+                      )}
+                      id={`${filterSelectIdPrefix}-column`}
+                    >
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                      {(filterOptions?.column ?? []).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+                <label
+                  className="flex flex-col gap-1 text-xs text-muted-foreground"
+                  htmlFor={`${filterSelectIdPrefix}-depth`}
+                >
+                  Depth
+                  <Select
+                    value={filters.depth || EMPTY_SELECT_VALUE}
+                    onValueChange={(value) =>
+                      setFilters((previous) => ({
+                        ...previous,
+                        depth: value === EMPTY_SELECT_VALUE ? "" : value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger
+                      className={getFilterFieldClass(
+                        "h-9 w-full text-sm text-foreground",
+                        filters.depth,
+                      )}
+                      id={`${filterSelectIdPrefix}-depth`}
+                    >
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                      {(filterOptions?.depth ?? []).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+                <label
+                  className="flex flex-col gap-1 text-xs text-muted-foreground"
+                  htmlFor={`${filterSelectIdPrefix}-experiments`}
+                >
+                  Experiment
+                  <Select
+                    value={filters.experiments || EMPTY_SELECT_VALUE}
+                    onValueChange={(value) =>
+                      setFilters((previous) => ({
+                        ...previous,
+                        experiments: value === EMPTY_SELECT_VALUE ? "" : value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger
+                      className={getFilterFieldClass(
+                        "h-9 w-full text-sm text-foreground",
+                        filters.experiments,
+                      )}
+                      id={`${filterSelectIdPrefix}-experiments`}
+                    >
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                      {(filterOptions?.experiments ?? []).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+                <label
+                  className="flex flex-col gap-1 text-xs text-muted-foreground"
+                  htmlFor={experimentAfterInputId}
+                >
+                  Experiment date after
+                  <Input
+                    id={experimentAfterInputId}
+                    type="date"
+                    value={filters.experiments_date_after}
+                    onChange={(event) =>
+                      setFilters((previous) => ({
+                        ...previous,
+                        experiments_date_after: event.target.value,
+                      }))
+                    }
+                    className={getFilterFieldClass("h-9", filters.experiments_date_after)}
+                  />
+                </label>
+                <label
+                  className="flex flex-col gap-1 text-xs text-muted-foreground"
+                  htmlFor={experimentBeforeInputId}
+                >
+                  Experiment date before
+                  <Input
+                    id={experimentBeforeInputId}
+                    type="date"
+                    value={filters.experiments_date_before}
+                    onChange={(event) =>
+                      setFilters((previous) => ({
+                        ...previous,
+                        experiments_date_before: event.target.value,
+                      }))
+                    }
+                    className={getFilterFieldClass("h-9", filters.experiments_date_before)}
+                  />
+                </label>
+                <label
+                  className="flex flex-col gap-1 text-xs text-muted-foreground"
+                  htmlFor={`${filterSelectIdPrefix}-sample-types`}
+                >
+                  Sample types
+                  <Select
+                    value={filters.sample_types || EMPTY_SELECT_VALUE}
+                    onValueChange={(value) =>
+                      setFilters((previous) => ({
+                        ...previous,
+                        sample_types: value === EMPTY_SELECT_VALUE ? "" : value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger
+                      className={getFilterFieldClass(
+                        "h-9 w-full text-sm text-foreground",
+                        filters.sample_types,
+                      )}
+                      id={`${filterSelectIdPrefix}-sample-types`}
+                    >
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                      {(filterOptions?.sample_types ?? []).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+                <label
+                  className="flex flex-col gap-1 text-xs text-muted-foreground"
+                  htmlFor={`${filterSelectIdPrefix}-tissue-types`}
+                >
+                  Tissue types
+                  <Select
+                    value={filters.tissue_types || EMPTY_SELECT_VALUE}
+                    onValueChange={(value) =>
+                      setFilters((previous) => ({
+                        ...previous,
+                        tissue_types: value === EMPTY_SELECT_VALUE ? "" : value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger
+                      className={getFilterFieldClass(
+                        "h-9 w-full text-sm text-foreground",
+                        filters.tissue_types,
+                      )}
+                      id={`${filterSelectIdPrefix}-tissue-types`}
+                    >
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                      {(filterOptions?.tissue_types ?? []).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+                <label
+                  className="flex flex-col gap-1 text-xs text-muted-foreground"
+                  htmlFor={`${filterSelectIdPrefix}-used-boxes`}
+                >
+                  Used boxes
+                  <Select
+                    value={filters.is_used || EMPTY_SELECT_VALUE}
+                    onValueChange={(value) =>
+                      setFilters((previous) => ({
+                        ...previous,
+                        is_used: value === EMPTY_SELECT_VALUE ? "" : value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger
+                      className={getFilterFieldClass(
+                        "h-9 w-full text-sm text-foreground",
+                        filters.is_used,
+                      )}
+                      id={`${filterSelectIdPrefix}-used-boxes`}
+                    >
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                      {(filterOptions?.boolean ?? DEFAULT_BOOLEAN_OPTIONS).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+              </div>
+              <div className="mt-3 flex justify-start">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  onClick={() => setFilters(DEFAULT_FILTERS)}
+                >
+                  Clear filters
+                </Button>
+              </div>
             </div>
           </div>
           {errorMessage ? (
@@ -665,6 +1286,55 @@ export function BoxesTable() {
           <div className="flex flex-wrap items-center gap-2"></div>
         </CardFooter>
       </Card>
+      <Dialog open={exportDialogOpen} onOpenChange={setExportDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Export CSV</DialogTitle>
+            <DialogDescription>
+              Review the parameters that will be applied to this export.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <div className="flex flex-col gap-1 text-sm sm:flex-row sm:items-center sm:gap-4">
+              <span className="min-w-[160px] text-muted-foreground">Boxes to export</span>
+              <span className="font-semibold text-foreground">{totalCount}</span>
+            </div>
+            {!hasExportConstraints ? (
+              <AlertWarning>
+                <AlertDescription>
+                  No search or filters are applied. You are about to export the entire dataset,
+                  which may take some time.
+                </AlertDescription>
+              </AlertWarning>
+            ) : null}
+            {exportParams.length > 0 ? (
+              <div className="space-y-2 text-sm">
+                {exportParams.map((param) => (
+                  <div
+                    key={`${param.label}-${param.value}`}
+                    className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-4"
+                  >
+                    <span className="min-w-[160px] text-muted-foreground">{param.label}</span>
+                    <span className="font-medium text-foreground break-words sm:flex-1">
+                      {param.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No search or filters are applied.</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setExportDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="button" onClick={handleExportConfirm}>
+              Confirm export
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
