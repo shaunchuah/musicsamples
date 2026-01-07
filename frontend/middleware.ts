@@ -50,7 +50,7 @@ type UserProfileResult = {
 
 async function refreshTokens(refreshToken: string): Promise<RefreshedTokens | null> {
   try {
-    const backendResponse = await fetch(buildBackendUrl("/api/token/refresh/"), {
+    const backendResponse = await fetch(buildBackendUrl("/api/v3/auth/refresh/"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

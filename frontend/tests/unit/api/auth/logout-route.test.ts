@@ -61,7 +61,7 @@ describe("/api/auth/logout POST", () => {
     const response = (await POST()) as NextResponse;
 
     expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringMatching(/\/api\/token\/blacklist\/$/),
+      expect.stringMatching(/\/api\/v3\/auth\/blacklist\/$/),
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify({ refresh: "refresh-token" }),

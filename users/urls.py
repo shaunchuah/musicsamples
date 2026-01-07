@@ -1,8 +1,6 @@
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LogoutView
 from django.urls import path
-from rest_framework_simplejwt.views import TokenBlacklistView, TokenObtainPairView, TokenRefreshView
-
 from users.views import (
     PasswordChangeView,
     account,
@@ -67,9 +65,6 @@ urlpatterns = [
         password_reset_confirm_api,
         name="password_reset_confirm_api",
     ),
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("api/token/blacklist/", TokenBlacklistView.as_view(), name="token_blacklist"),
     path("generate_token/", generate_token, name="generate_token"),
     path("delete_token/", delete_token, name="delete_token"),
     path("refresh_token/", refresh_token, name="refresh_token"),

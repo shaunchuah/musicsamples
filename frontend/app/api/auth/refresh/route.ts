@@ -30,7 +30,7 @@ export async function POST(): Promise<Response> {
   let backendResponse: Response;
 
   try {
-    backendResponse = await fetch(buildBackendUrl("/api/token/refresh/"), {
+    backendResponse = await fetch(buildBackendUrl("/api/v3/auth/refresh/"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

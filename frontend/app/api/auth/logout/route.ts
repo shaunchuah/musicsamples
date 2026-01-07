@@ -15,7 +15,7 @@ export async function POST(): Promise<Response> {
 
   if (refreshToken) {
     try {
-      await fetch(buildBackendUrl("/api/token/blacklist/"), {
+      await fetch(buildBackendUrl("/api/v3/auth/blacklist/"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -41,7 +41,7 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   let backendResponse: Response;
-  const backendUrl = buildBackendUrl("/api/token/");
+  const backendUrl = buildBackendUrl("/api/v3/auth/login/");
 
   try {
     backendResponse = await fetch(backendUrl, {
