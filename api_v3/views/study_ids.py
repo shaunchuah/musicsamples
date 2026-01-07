@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api_v3.serializers import (
+    StudyIdentifierDetailV3Serializer,
     StudyIdentifierFileSummaryV3Serializer,
     StudyIdentifierSampleSummaryV3Serializer,
     StudyIdentifierV3Serializer,
@@ -23,6 +24,7 @@ from app.pagination import StudyIdPageNumberPagination
 class StudyIdentifierV3ViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
@@ -61,6 +63,11 @@ class StudyIdentifierV3ViewSet(
         if not (getattr(user, "is_staff", False) or getattr(user, "is_superuser", False)):
             return Response({"detail": "Only staff can delete study IDs."}, status=status.HTTP_403_FORBIDDEN)
         return super().destroy(request, *args, **kwargs)
+
+    def get_serializer_class(self):
+        if getattr(self, "action", None) == "retrieve":
+            return StudyIdentifierDetailV3Serializer
+        return StudyIdentifierV3Serializer
 
     @extend_schema(tags=["v3"], description="Search study IDs by name or study name.")
     @action(detail=False, methods=["get"], url_path="search")

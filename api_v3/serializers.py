@@ -13,8 +13,8 @@ from app.models import (
     StudyIdentifier,
     TissueType,
 )
-from datasets.models import Dataset, DatasetAccessHistory
 from core.utils.history import historical_changes
+from datasets.models import Dataset, DatasetAccessHistory
 
 
 class ExperimentBoxSummarySerializer(serializers.ModelSerializer):
@@ -1096,3 +1096,70 @@ class StudyIdentifierV3Serializer(serializers.ModelSerializer):
         if obj.study_center:
             return self._format_choice(obj.get_study_center_display())
         return None
+
+    def validate_name(self, value: str) -> str:
+        return value.upper()
+
+
+class StudyIdentifierHistoryChangeSerializer(serializers.Serializer):
+    """
+    Serializes a single field change from the history delta.
+    """
+
+    field = serializers.CharField()
+    old = serializers.JSONField(allow_null=True)
+    new = serializers.JSONField(allow_null=True)
+
+
+class StudyIdentifierHistoryEntrySerializer(serializers.Serializer):
+    """
+    Serializes a single historical snapshot of a study identifier.
+    """
+
+    history_date = serializers.DateTimeField()
+    history_user = serializers.CharField(allow_null=True)
+    changes = StudyIdentifierHistoryChangeSerializer(many=True)
+
+
+class StudyIdentifierDetailV3Serializer(StudyIdentifierV3Serializer):
+    """
+    Extends the study ID serializer with history metadata for detail views.
+    """
+
+    history = serializers.SerializerMethodField()
+
+    class Meta(StudyIdentifierV3Serializer.Meta):
+        fields = StudyIdentifierV3Serializer.Meta.fields + ["history"]
+
+    def get_history(self, obj: StudyIdentifier):
+        history_qs = obj.history.order_by("-history_date")
+        deltas = historical_changes(history_qs)
+        entries = []
+        for delta in deltas or []:
+            history_record = getattr(delta, "new_record", None)
+            entries.append(
+                {
+                    "history_date": getattr(history_record, "history_date", None),
+                    "history_user": self._format_history_user(getattr(history_record, "history_user", None)),
+                    "changes": [
+                        {
+                            "field": change.field,
+                            "old": change.old,
+                            "new": change.new,
+                        }
+                        for change in getattr(delta, "changes", [])
+                    ],
+                }
+            )
+        serializer = StudyIdentifierHistoryEntrySerializer(entries, many=True)
+        return serializer.data
+
+    @staticmethod
+    def _format_history_user(value: Any) -> Optional[str]:
+        if value in (None, ""):
+            return None
+        if hasattr(value, "email") and getattr(value, "email"):
+            return getattr(value, "email")
+        if hasattr(value, "username") and getattr(value, "username"):
+            return getattr(value, "username")
+        return str(value)

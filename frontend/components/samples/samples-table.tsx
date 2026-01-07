@@ -148,6 +148,11 @@ type SampleFilters = {
   biopsy_inflamed_status: string;
 };
 
+type SamplesTableProps = {
+  initialFilters?: Partial<SampleFilters>;
+  hideToolbar?: boolean;
+};
+
 const EMPTY_STATE: SampleRow[] = [];
 const DEFAULT_PAGE_SIZE = 50;
 const EMPTY_SELECT_VALUE = "__none__";
@@ -294,7 +299,7 @@ function getFilterFieldClass(baseClass: string, value: string): string {
   return `${baseClass} border-primary/70 bg-primary/5 ring-1 ring-primary/30`;
 }
 
-export function SamplesTable() {
+export function SamplesTable({ initialFilters, hideToolbar = false }: SamplesTableProps = {}) {
   const [rows, setRows] = useState<SampleRow[]>(EMPTY_STATE);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -310,7 +315,10 @@ export function SamplesTable() {
   const [includeUsed, setIncludeUsed] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filterOptions, setFilterOptions] = useState<SampleFilterOptions | null>(null);
-  const [filters, setFilters] = useState<SampleFilters>(DEFAULT_FILTERS);
+  const initialFilterValues = useMemo<SampleFilters>(() => {
+    return { ...DEFAULT_FILTERS, ...(initialFilters ?? {}) };
+  }, [initialFilters]);
+  const [filters, setFilters] = useState<SampleFilters>(() => initialFilterValues);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: DEFAULT_PAGE_SIZE,
@@ -337,6 +345,16 @@ export function SamplesTable() {
   const collectedBeforeInputId = useId();
   const commentsInputId = useId();
   const filterSelectIdPrefix = useId();
+
+  useEffect(() => {
+    setFilters(initialFilterValues);
+  }, [initialFilterValues]);
+
+  useEffect(() => {
+    if (hideToolbar) {
+      setFiltersOpen(false);
+    }
+  }, [hideToolbar]);
 
   const activeFilterCount = useMemo(() => {
     return Object.values(filters).filter((value) => value.trim() !== "").length;
@@ -924,7 +942,11 @@ export function SamplesTable() {
           <AlertDescription>{usedStatusMessage}</AlertDescription>
         </AlertSuccess>
       ) : null}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div
+        className={`flex flex-wrap items-center justify-between gap-3${
+          hideToolbar ? " hidden" : ""
+        }`}
+      >
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative">
             <Input
@@ -963,7 +985,7 @@ export function SamplesTable() {
               size="sm"
               type="button"
               onClick={() => {
-                setFilters(DEFAULT_FILTERS);
+                setFilters(initialFilterValues);
                 setFiltersOpen(false);
               }}
             >
@@ -1115,7 +1137,7 @@ export function SamplesTable() {
       <div
         className={`overflow-hidden rounded-md border border-border/60 bg-muted/20 transition-all duration-300 ease-out${
           filtersOpen ? " max-h-[1200px] p-4 opacity-100" : " max-h-0 p-0 opacity-0"
-        }`}
+        }${hideToolbar ? " hidden" : ""}`}
       >
         <div className={filtersOpen ? "" : "pointer-events-none"}>
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -1738,7 +1760,7 @@ export function SamplesTable() {
               variant="outline"
               size="sm"
               type="button"
-              onClick={() => setFilters(DEFAULT_FILTERS)}
+              onClick={() => setFilters(initialFilterValues)}
             >
               Clear filters
             </Button>

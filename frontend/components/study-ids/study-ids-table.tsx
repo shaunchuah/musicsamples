@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { useDashboardUser } from "@/components/dashboard/user-profile-provider";
+import { StudyIdEditDialog } from "@/components/study-ids/study-id-edit-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -506,17 +507,32 @@ export function StudyIdsTable() {
                     <TableCell>
                       <div className="flex flex-wrap gap-2">
                         <Button asChild variant="link" size="sm" className="h-auto p-0">
-                          <Link href={`/study_id/detail/${encodeURIComponent(row.name)}`}>
+                          <Link
+                            href={`/study-ids/${encodeURIComponent(row.name)}`}
+                            className="inline-flex items-center gap-1"
+                          >
                             <Eye size={16} />
                             View
                           </Link>
                         </Button>
-                        <Button asChild variant="link" size="sm" className="h-auto p-0">
-                          <Link href={`/study_id/edit/${encodeURIComponent(row.name)}`}>
-                            <Edit size={16} />
-                            Edit
-                          </Link>
-                        </Button>
+                        <StudyIdEditDialog
+                          studyId={{ id: row.id, name: row.name, study_name: row.study_name }}
+                          onSaved={() => setRefreshToken((previous) => previous + 1)}
+                          renderTrigger={({ open }) => (
+                            <Button
+                              type="button"
+                              variant="link"
+                              size="sm"
+                              className="h-auto p-0"
+                              onClick={open}
+                            >
+                              <span className="inline-flex items-center gap-1">
+                                <Edit size={16} />
+                                Edit
+                              </span>
+                            </Button>
+                          )}
+                        />
                         {isStaff ? (
                           <Button
                             type="button"

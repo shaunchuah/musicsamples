@@ -17,6 +17,7 @@ import {
   TrashIcon,
   UsersIcon,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -212,7 +213,12 @@ export function AppSidebar({ user, activeHref }: AppSidebarProps) {
 
   return (
     <Sidebar>
-      <SidebarHeader className="px-4 py-3 text-sm font-semibold">G-Trac</SidebarHeader>
+      <SidebarHeader className="px-4 pt-4 pb-2">
+        <Link href="/" className="flex items-center gap-2 justify-center">
+          <Image width={128} height={32} src="/gtrac_v3_logo.svg" alt="G-Trac" />
+          <span className="sr-only">G-Trac</span>
+        </Link>
+      </SidebarHeader>
       <SidebarContent>
         {navigation.map((group) => (
           <SidebarGroup key={group.title}>
