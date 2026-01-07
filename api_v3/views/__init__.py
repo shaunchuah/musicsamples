@@ -14,6 +14,10 @@ from api_v3.views.boxes import (  # noqa: F401
     BasicScienceBoxOptionsView,
     BasicScienceBoxV3ViewSet,
 )
+from api_v3.views.datasets import (  # noqa: F401
+    DatasetOverviewView,
+    DatasetV3ViewSet,
+)
 from api_v3.views.experiments import (  # noqa: F401
     ExperimentExportView,
     ExperimentFilterOptionsView,

@@ -13,6 +13,8 @@ from api_v3.views import (
     CurrentUserRecentSamplesView,
     CurrentUserTokenViewSet,
     CurrentUserView,
+    DatasetOverviewView,
+    DatasetV3ViewSet,
     ExperimentExportView,
     ExperimentFilterOptionsView,
     ExperimentOptionsView,
@@ -38,6 +40,7 @@ from api_v3.views import (
 
 router = routers.DefaultRouter()
 router.register(r"boxes", BasicScienceBoxV3ViewSet, "v3-boxes")
+router.register(r"datasets", DatasetV3ViewSet, "v3-datasets")
 router.register(r"experiments", ExperimentV3ViewSet, "v3-experiments")
 router.register(r"samples", SampleV3ViewSet, "v3-samples")
 router.register(r"multiple-samples", MultipleSampleV3ViewSet, "v3-multiple-samples")
@@ -50,7 +53,7 @@ urlpatterns = [
     path("users/me/password/", PasswordChangeView.as_view(), name="v3-password-change"),
     path(
         "users/me/token/",
-        CurrentUserTokenViewSet.as_view({"post": "create", "delete": "destroy"}),
+        CurrentUserTokenViewSet.as_view({"get": "retrieve", "post": "create", "delete": "destroy"}),
         name="v3-current-user-token",
     ),
     path(
@@ -59,6 +62,7 @@ urlpatterns = [
         name="v3-current-user-token-refresh",
     ),
     path("users/me/recent-samples/", CurrentUserRecentSamplesView.as_view(), name="v3-current-user-recent-samples"),
+    path("datasets/overview/", DatasetOverviewView.as_view(), name="v3-datasets-overview"),
     path(
         "samples/autocomplete/locations/",
         SampleLocationAutocompleteView.as_view(),

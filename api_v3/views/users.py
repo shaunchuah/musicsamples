@@ -356,7 +356,7 @@ class StaffUserViewSet(
 
 
 class TokenResponseSerializer(serializers.Serializer):
-    token = serializers.CharField()
+    token = serializers.CharField(allow_null=True)
 
 
 class SuccessResponseSerializer(serializers.Serializer):
@@ -369,6 +369,16 @@ class CurrentUserTokenViewSet(viewsets.ViewSet):
     """
 
     permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["v3"],
+        description="Return the current user's DRF token if it exists.",
+        request=None,
+        responses=TokenResponseSerializer,
+    )
+    def retrieve(self, request, pk=None):  # pk unused; required by ViewSet signature
+        token = Token.objects.filter(user=request.user).first()
+        return Response({"token": token.key if token else None})
 
     @extend_schema(
         tags=["v3"],

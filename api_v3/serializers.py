@@ -12,6 +12,7 @@ from app.models import (
     StudyIdentifier,
     TissueType,
 )
+from datasets.models import Dataset, DatasetAccessHistory
 from core.utils.history import historical_changes
 
 
@@ -962,3 +963,51 @@ class SampleHistorySerializer(serializers.Serializer):
     last_modified = serializers.DateTimeField()
     last_modified_by = serializers.CharField(allow_null=True)
     entries = SampleHistoryEntrySerializer(many=True)
+
+
+class DatasetListV3Serializer(serializers.ModelSerializer):
+    """
+    Serializer for listing dataset metadata in the v3 API.
+    """
+
+    study_name_label = serializers.CharField(source="get_study_name_display", read_only=True)
+    access_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Dataset
+        fields = [
+            "name",
+            "study_name",
+            "study_name_label",
+            "description",
+            "last_modified",
+            "access_count",
+        ]
+
+
+class DatasetAccessHistoryV3Serializer(serializers.ModelSerializer):
+    """
+    Serializer for dataset access history entries.
+    """
+
+    user_label = serializers.SerializerMethodField()
+    user_email = serializers.EmailField(source="user.email", read_only=True)
+
+    class Meta:
+        model = DatasetAccessHistory
+        fields = [
+            "user_label",
+            "user_email",
+            "access_type",
+            "accessed",
+        ]
+
+    def get_user_label(self, obj: DatasetAccessHistory) -> str:
+        user = obj.user
+        full_name = f"{user.first_name} {user.last_name}".strip()
+        if full_name:
+            return full_name
+        email = getattr(user, "email", "")
+        if email:
+            return email
+        return getattr(user, "username", str(user))
