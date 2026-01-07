@@ -24,6 +24,7 @@ import { AUTH_COOKIE_NAME, buildBackendUrl } from "@/lib/auth";
 import { resolveDashboardUser } from "@/lib/dashboard-user";
 import { dateFormatter } from "@/lib/formatters";
 import { isJwtExpired } from "@/lib/jwt";
+import DetailHeader from "@/components/ui/detail-header";
 
 type ExperimentHistoryChangeResponse = {
   field: string;
@@ -263,6 +264,7 @@ export default async function ExperimentDetailPage({ params }: { params: PagePar
             <Link href="/experiments" className="text-sm text-primary underline">
               ← Back to Experiments List
             </Link>
+            <DetailHeader category="Experiment" title={experiment.name} />
             <section className="grid gap-6 lg:grid-cols-3">
               <div className="space-y-6 lg:col-span-2">
                 <DetailCard

@@ -24,6 +24,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { AUTH_COOKIE_NAME, buildBackendUrl } from "@/lib/auth";
 import { resolveDashboardUser } from "@/lib/dashboard-user";
 import { isJwtExpired } from "@/lib/jwt";
+import DetailHeader from "@/components/ui/detail-header";
 
 type SampleHistoryChangeResponse = {
   field: string;
@@ -387,6 +388,7 @@ export default async function SampleDetailPage({
                 <AlertDescription>Sample updated.</AlertDescription>
               </AlertSuccess>
             ) : null}
+            <DetailHeader category="Sample" title={sample.sample_id} />
             <section className="grid gap-6 lg:grid-cols-3">
               <div className="lg:col-span-2 space-y-6">
                 <DetailCard
