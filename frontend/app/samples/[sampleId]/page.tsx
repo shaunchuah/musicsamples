@@ -19,12 +19,12 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import DetailHeader from "@/components/ui/detail-header";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AUTH_COOKIE_NAME, buildBackendUrl } from "@/lib/auth";
 import { resolveDashboardUser } from "@/lib/dashboard-user";
 import { isJwtExpired } from "@/lib/jwt";
-import DetailHeader from "@/components/ui/detail-header";
 
 type SampleHistoryChangeResponse = {
   field: string;

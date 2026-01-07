@@ -1,16 +1,28 @@
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.models import update_last_login
 from django.contrib.auth.forms import SetPasswordForm
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenBlacklistView, TokenObtainPairView, TokenRefreshView
+
+
+class V3TokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        user = getattr(self, "user", None)
+        if user is not None:
+            # Keep Django's last_login timestamp synced even though SimpleJWT does not call login().
+            update_last_login(None, user)
+        return data
 
 
 @extend_schema(tags=["v3"])
 class V3TokenObtainPairView(TokenObtainPairView):
-    pass
+    serializer_class = V3TokenObtainPairSerializer
 
 
 @extend_schema(tags=["v3"])

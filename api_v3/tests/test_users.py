@@ -132,6 +132,22 @@ def test_token_refresh_creates_new_token():
     assert refreshed != first
 
 
+def test_token_obtain_updates_last_login():
+    user = UserFactory(email="login-last-login@example.com")
+    assert user.last_login is None
+    client = APIClient()
+    url = reverse("v3-token-obtain-pair")
+    response = client.post(
+        url,
+        {"email": user.email, "password": "testing_password"},
+        format="json",
+    )
+
+    assert response.status_code == 200
+    user.refresh_from_db()
+    assert user.last_login is not None
+
+
 def test_recent_samples_returns_only_user_samples():
     user = UserFactory(email="sampler@example.com")
     client = APIClient()
