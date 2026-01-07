@@ -250,26 +250,7 @@ export function UpdateLocationForm() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Instructions</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 text-sm text-muted-foreground">
-          <div>
-            <p className="font-semibold text-foreground">Steps:</p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>Set the appropriate location and sublocation.</li>
-              <li>Click the barcode ID scanning area and start scanning QR codes.</li>
-            </ol>
-          </div>
-          <p>
-            <span className="font-semibold text-foreground">Tip:</span> If a label won't scan, you
-            can type in the sample ID and hit enter instead.
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Sample Location</CardTitle>
+          <CardTitle>Update Sample Location</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {formErrorSummary.length ? (

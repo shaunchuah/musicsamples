@@ -169,31 +169,7 @@ export function MarkUsedForm() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Instructions</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 text-sm text-muted-foreground">
-          <p>
-            <span className="font-semibold text-foreground">Important Note:</span> Barcode scanners
-            work like keyboards. For most scanners, the default is to provide the enter key after
-            scanning a barcode. Some scanners may need to be configured to provide the enter or tab
-            key on scan. This page accepts both enter and tab keys from barcode scanners.
-          </p>
-          <div>
-            <p className="font-semibold text-foreground">Steps:</p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>Click the barcode ID scanning area and start scanning QR codes.</li>
-            </ol>
-          </div>
-          <p>
-            <span className="font-semibold text-foreground">Tip:</span> If a label won't scan, you
-            can type in the sample ID and hit enter instead.
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Barcode ID scanning area</CardTitle>
+          <CardTitle>Mark Samples as Used</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {formErrorSummary.length ? (
@@ -225,7 +201,7 @@ export function MarkUsedForm() {
             value={sampleId}
             onChange={(event) => setSampleId(event.target.value)}
             onKeyDown={handleScanKeyDown}
-            placeholder="Click here and start scanning barcodes..."
+            placeholder="Click here and start scanning barcodes or type sample IDs in..."
             aria-invalid={Boolean(fieldErrors.sample_id)}
             disabled={isSubmitting}
           />

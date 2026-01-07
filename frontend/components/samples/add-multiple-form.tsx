@@ -10,7 +10,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { AlertDescription, AlertError, AlertSuccess } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -447,28 +447,10 @@ export function AddMultipleForm() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Instructions</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 text-sm text-muted-foreground">
-          <p>
-            <span className="font-semibold text-foreground">Important Note:</span> Barcode scanners
-            work like keyboards. For most scanners, the default is to provide the enter key after
-            scanning a barcode. Some scanners may need to be configured to provide the enter or tab
-            key on scan. This page accepts both enter and tab keys from barcode scanners.
-          </p>
-          <div>
-            <p className="font-semibold text-foreground">Steps:</p>
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>Fill in the required details</li>
-              <li>Start scanning to tag samples with those details</li>
-            </ol>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Sample Details</CardTitle>
+          <CardTitle>Add Multiple Samples</CardTitle>
+          <CardDescription>
+            Autocomplete available for location, sublocation and study ID.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {formErrorSummary.length ? (

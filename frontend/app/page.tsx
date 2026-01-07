@@ -50,42 +50,6 @@ export default async function HomePage() {
             </div>
           </header>
           <main className="flex flex-1 flex-col gap-6 p-6">
-            <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Samples Overview</CardTitle>
-                  <CardDescription>Quick snapshot of recent sample activity.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Surface a count of active samples, pending uploads, or other high-value metrics
-                    here.
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Box Tracking</CardTitle>
-                  <CardDescription>Monitor box movements across the lab.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Highlight the latest experiments or flag boxes that need follow-up.
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="md:col-span-2 xl:col-span-1">
-                <CardHeader>
-                  <CardTitle>Datasets</CardTitle>
-                  <CardDescription>Track dataset refresh cadence and ownership.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Use this slot for quick access to dataset automation or quality checks.
-                  </p>
-                </CardContent>
-              </Card>
-            </section>
             <Card>
               <CardHeader>
                 <CardTitle>Samples</CardTitle>
