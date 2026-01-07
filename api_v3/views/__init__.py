@@ -35,6 +35,9 @@ from api_v3.views.samples import (  # noqa: F401
     SampleV3ViewSet,
     StudyIdAutocompleteView,
 )
+from api_v3.views.study_ids import (  # noqa: F401
+    StudyIdentifierV3ViewSet,
+)
 from api_v3.views.users import (  # noqa: F401
     CurrentUserRecentSamplesView,
     CurrentUserTokenViewSet,

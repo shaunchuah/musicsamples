@@ -28,7 +28,7 @@ type PermissionRule = {
 const PERMISSION_RULES: PermissionRule[] = [
   { prefixes: ["/boxes", "/experiments"], requiredGroups: ["basic_science"] },
   { prefixes: ["/datasets"], requiredGroups: ["datasets"] },
-  { prefixes: ["/datastores"], requiredGroups: ["datastores"] },
+  // { prefixes: ["/datastores"], requiredGroups: ["datastores"] },
   { prefixes: ["/users"], requiresStaff: true },
 ];
 

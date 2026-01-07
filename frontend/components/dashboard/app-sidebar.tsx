@@ -7,7 +7,6 @@
 import {
   ArchiveIcon,
   ChevronDownIcon,
-  CloudUploadIcon,
   DatabaseIcon,
   FlaskRoundIcon,
   HomeIcon,
@@ -92,14 +91,14 @@ const NAVIGATION: NavGroup[] = [
     title: "Data Management",
     items: [
       { label: "Datasets", href: "/datasets", icon: <DatabaseIcon className="size-4" /> },
-      { label: "Datastores", href: "/datastores", icon: <CloudUploadIcon className="size-4" /> },
-      { label: "Study IDs", href: "/study-ids", icon: <IdCardIcon className="size-4" /> },
+      // { label: "Datastores", href: "/datastores", icon: <CloudUploadIcon className="size-4" /> },
     ],
   },
   {
     title: "Admin",
     items: [
       { label: "Users", href: "/users", icon: <UsersIcon className="size-4" /> },
+      { label: "Study IDs", href: "/study-ids", icon: <IdCardIcon className="size-4" /> },
       // { label: "Admin", href: "/admin", icon: <ShieldIcon className="size-4" /> },
     ],
   },
@@ -161,7 +160,6 @@ export function AppSidebar({ user, activeHref }: AppSidebarProps) {
 
     const canSeeBoxes = hasGroup("basic_science");
     const canSeeDatasets = hasGroup("datasets");
-    const canSeeDatastores = hasGroup("datastores");
 
     return NAVIGATION.map((group) => {
       if (group.title === "Admin") {
@@ -176,9 +174,6 @@ export function AppSidebar({ user, activeHref }: AppSidebarProps) {
         const items = group.items.filter((item) => {
           if (item.label === "Datasets") {
             return canSeeDatasets;
-          }
-          if (item.label === "Datastores") {
-            return canSeeDatastores;
           }
           return true;
         });

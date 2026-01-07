@@ -7,6 +7,7 @@ from rest_framework.validators import UniqueValidator
 from app.models import (
     BasicScienceBox,
     BasicScienceSampleType,
+    DataStore,
     Experiment,
     Sample,
     StudyIdentifier,
@@ -1011,3 +1012,87 @@ class DatasetAccessHistoryV3Serializer(serializers.ModelSerializer):
         if email:
             return email
         return getattr(user, "username", str(user))
+
+
+class StudyIdentifierSampleSummaryV3Serializer(serializers.ModelSerializer):
+    """
+    Lightweight sample summary for study ID listings.
+    """
+
+    sample_type_label = serializers.CharField(source="get_sample_type_display", read_only=True)
+
+    class Meta:
+        model = Sample
+        fields = ["id", "sample_id", "sample_type_label"]
+
+
+class StudyIdentifierFileSummaryV3Serializer(serializers.ModelSerializer):
+    """
+    Lightweight file summary for study ID listings.
+    """
+
+    file_name = serializers.CharField(source="formatted_file_name", read_only=True)
+
+    class Meta:
+        model = DataStore
+        fields = ["id", "file_name"]
+
+
+class StudyIdentifierV3Serializer(serializers.ModelSerializer):
+    """
+    Serializer for study ID listings in the v3 API.
+    """
+
+    study_name_label = serializers.SerializerMethodField()
+    study_group_label = serializers.SerializerMethodField()
+    sex_label = serializers.SerializerMethodField()
+    study_center_label = serializers.SerializerMethodField()
+    sample_count = serializers.IntegerField(read_only=True)
+    file_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = StudyIdentifier
+        fields = [
+            "id",
+            "name",
+            "study_name",
+            "study_name_label",
+            "study_group",
+            "study_group_label",
+            "age",
+            "sex",
+            "sex_label",
+            "study_center",
+            "study_center_label",
+            "genotype_data_available",
+            "nod2_mutation_present",
+            "il23r_mutation_present",
+            "sample_count",
+            "file_count",
+        ]
+
+    @staticmethod
+    def _format_choice(display_value: Optional[str]) -> Optional[str]:
+        if display_value:
+            return display_value
+        return None
+
+    def get_study_name_label(self, obj: StudyIdentifier) -> Optional[str]:
+        if obj.study_name:
+            return self._format_choice(obj.get_study_name_display())
+        return None
+
+    def get_study_group_label(self, obj: StudyIdentifier) -> Optional[str]:
+        if obj.study_group:
+            return self._format_choice(obj.get_study_group_display())
+        return None
+
+    def get_sex_label(self, obj: StudyIdentifier) -> Optional[str]:
+        if obj.sex:
+            return self._format_choice(obj.get_sex_display())
+        return None
+
+    def get_study_center_label(self, obj: StudyIdentifier) -> Optional[str]:
+        if obj.study_center:
+            return self._format_choice(obj.get_study_center_display())
+        return None

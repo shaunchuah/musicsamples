@@ -14,3 +14,13 @@ class SamplePageNumberPagination(PageNumberPagination):
     page_size = getattr(settings, "SAMPLE_PAGINATION_SIZE", 50)
     page_size_query_param = "page_size"
     max_page_size = page_size
+
+
+class StudyIdPageNumberPagination(PageNumberPagination):
+    """
+    Page-number pagination limited to the configured study ID page size.
+    """
+
+    page_size = getattr(settings, "STUDY_ID_PAGINATION_SIZE", 20)
+    page_size_query_param = "page_size"
+    max_page_size = page_size

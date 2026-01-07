@@ -33,6 +33,7 @@ from api_v3.views import (
     SampleV3ViewSet,
     StaffUserViewSet,
     StudyIdAutocompleteView,
+    StudyIdentifierV3ViewSet,
     V3TokenBlacklistView,
     V3TokenObtainPairView,
     V3TokenRefreshView,
@@ -43,6 +44,7 @@ router.register(r"boxes", BasicScienceBoxV3ViewSet, "v3-boxes")
 router.register(r"datasets", DatasetV3ViewSet, "v3-datasets")
 router.register(r"experiments", ExperimentV3ViewSet, "v3-experiments")
 router.register(r"samples", SampleV3ViewSet, "v3-samples")
+router.register(r"study-ids", StudyIdentifierV3ViewSet, "v3-study-ids")
 router.register(r"multiple-samples", MultipleSampleV3ViewSet, "v3-multiple-samples")
 router.register(r"samples-used", SampleIsUsedV3ViewSet, "v3-samples-used")
 router.register(r"sample-location", SampleLocationV3ViewSet, "v3-sample-location")
