@@ -110,6 +110,12 @@ export function UpdateLocationForm() {
     return () => window.clearTimeout(timer);
   }, [successMessage, errorMessage]);
 
+  useEffect(() => {
+    if (!isSubmitting) {
+      sampleIdRef.current?.focus();
+    }
+  }, [isSubmitting]);
+
   const handleFieldChange = <Key extends keyof FormState>(key: Key, value: FormState[Key]) => {
     setFormState((prev) => ({ ...prev, [key]: value }));
     setFieldErrors((prev) => {
@@ -231,7 +237,6 @@ export function UpdateLocationForm() {
     } finally {
       setFormState((prev) => ({ ...prev, sample_id: "" }));
       setIsSubmitting(false);
-      sampleIdRef.current?.focus();
     }
   };
 

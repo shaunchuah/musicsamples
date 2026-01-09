@@ -267,6 +267,12 @@ export function AddMultipleForm() {
     return () => window.clearTimeout(timer);
   }, [successMessage, errorMessage]);
 
+  useEffect(() => {
+    if (!isSubmitting) {
+      sampleIdRef.current?.focus();
+    }
+  }, [isSubmitting]);
+
   const showMusicTimepoint =
     formState.study_name === "music" || formState.study_name === "mini_music";
   const showMarvelTimepoint = formState.study_name === "marvel";
@@ -419,7 +425,6 @@ export function AddMultipleForm() {
     } finally {
       setFormState((prev) => ({ ...prev, sample_id: "" }));
       setIsSubmitting(false);
-      sampleIdRef.current?.focus();
     }
   };
 

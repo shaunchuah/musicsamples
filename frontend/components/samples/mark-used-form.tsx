@@ -51,6 +51,12 @@ export function MarkUsedForm() {
     return () => window.clearTimeout(timer);
   }, [successMessage, errorMessage]);
 
+  useEffect(() => {
+    if (!isSubmitting) {
+      sampleIdRef.current?.focus();
+    }
+  }, [isSubmitting]);
+
   const recordHistory = (entry: ScanHistoryEntry) => {
     setScanHistory((prev) => [entry, ...prev]);
   };
@@ -150,7 +156,6 @@ export function MarkUsedForm() {
     } finally {
       setSampleId("");
       setIsSubmitting(false);
-      sampleIdRef.current?.focus();
     }
   };
 
