@@ -307,7 +307,8 @@ export function AddMultipleForm() {
   };
 
   const handleSubmit = async () => {
-    if (!formState.sample_id.trim()) {
+    const normalizedSampleId = formState.sample_id.trim().toUpperCase();
+    if (!normalizedSampleId) {
       setErrorMessage("Scan a sample ID to continue.");
       return;
     }
@@ -325,7 +326,7 @@ export function AddMultipleForm() {
           study_name: formState.study_name,
           music_timepoint: emptyToNull(formState.music_timepoint),
           marvel_timepoint: emptyToNull(formState.marvel_timepoint),
-          sample_id: formState.sample_id,
+          sample_id: normalizedSampleId,
           sample_location: formState.sample_location,
           sample_sublocation: emptyToNull(formState.sample_sublocation),
           study_id: emptyToNull(formState.study_id),
@@ -400,9 +401,9 @@ export function AddMultipleForm() {
         }
 
         setFieldErrors(nextFieldErrors);
-        setErrorMessage(`${errorDetail} (Scanned ID: ${formState.sample_id})`);
+        setErrorMessage(`${errorDetail} (Scanned ID: ${normalizedSampleId})`);
         recordHistory({
-          sampleId: formState.sample_id,
+          sampleId: normalizedSampleId,
           status: "Error",
           message: errorDetailsForHistory.length ? errorDetailsForHistory.join(" | ") : errorDetail,
         });
@@ -411,14 +412,14 @@ export function AddMultipleForm() {
 
       setSuccessMessage("Success - Sample Updated");
       recordHistory({
-        sampleId: formState.sample_id,
+        sampleId: normalizedSampleId,
         status: "Success",
-        message: `Sample ${formState.sample_id} captured.`,
+        message: `Sample ${normalizedSampleId} captured.`,
       });
     } catch {
-      setErrorMessage(`Something went wrong. (Scanned ID: ${formState.sample_id})`);
+      setErrorMessage(`Something went wrong. (Scanned ID: ${normalizedSampleId})`);
       recordHistory({
-        sampleId: formState.sample_id,
+        sampleId: normalizedSampleId,
         status: "Error",
         message: "Something went wrong.",
       });

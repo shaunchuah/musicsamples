@@ -62,7 +62,8 @@ export function MarkUsedForm() {
   };
 
   const handleSubmit = async () => {
-    if (!sampleId.trim()) {
+    const normalizedSampleId = sampleId.trim().toUpperCase();
+    if (!normalizedSampleId) {
       setErrorMessage("Scan a sample ID to continue.");
       return;
     }
@@ -76,7 +77,7 @@ export function MarkUsedForm() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ sample_id: sampleId }),
+        body: JSON.stringify({ sample_id: normalizedSampleId }),
       });
 
       let payload: unknown = null;
@@ -131,9 +132,9 @@ export function MarkUsedForm() {
         }
 
         setFieldErrors(nextFieldErrors);
-        setErrorMessage(`${errorDetail} (Scanned ID: ${sampleId})`);
+        setErrorMessage(`${errorDetail} (Scanned ID: ${normalizedSampleId})`);
         recordHistory({
-          sampleId,
+          sampleId: normalizedSampleId,
           status: "Error",
           message: errorDetailsForHistory.length ? errorDetailsForHistory.join(" | ") : errorDetail,
         });
@@ -142,14 +143,14 @@ export function MarkUsedForm() {
 
       setSuccessMessage("Success - Sample Updated");
       recordHistory({
-        sampleId,
+        sampleId: normalizedSampleId,
         status: "Success",
-        message: `Sample ${sampleId} marked as used.`,
+        message: `Sample ${normalizedSampleId} marked as used.`,
       });
     } catch {
-      setErrorMessage(`Something went wrong. (Scanned ID: ${sampleId})`);
+      setErrorMessage(`Something went wrong. (Scanned ID: ${normalizedSampleId})`);
       recordHistory({
-        sampleId,
+        sampleId: normalizedSampleId,
         status: "Error",
         message: "Something went wrong.",
       });

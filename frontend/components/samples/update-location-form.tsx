@@ -133,7 +133,8 @@ export function UpdateLocationForm() {
   };
 
   const handleSubmit = async () => {
-    if (!formState.sample_id.trim()) {
+    const normalizedSampleId = formState.sample_id.trim().toUpperCase();
+    if (!normalizedSampleId) {
       setErrorMessage("Scan a sample ID to continue.");
       return;
     }
@@ -148,7 +149,7 @@ export function UpdateLocationForm() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          sample_id: formState.sample_id,
+          sample_id: normalizedSampleId,
           sample_location: formState.sample_location,
           sample_sublocation: emptyToNull(formState.sample_sublocation),
         }),
@@ -206,9 +207,9 @@ export function UpdateLocationForm() {
         }
 
         setFieldErrors(nextFieldErrors);
-        setErrorMessage(`${errorDetail} (Scanned ID: ${formState.sample_id})`);
+        setErrorMessage(`${errorDetail} (Scanned ID: ${normalizedSampleId})`);
         recordHistory({
-          sampleId: formState.sample_id,
+          sampleId: normalizedSampleId,
           status: "Error",
           sampleLocation: "",
           sampleSublocation: "",
@@ -219,16 +220,16 @@ export function UpdateLocationForm() {
 
       setSuccessMessage("Success - Sample Updated");
       recordHistory({
-        sampleId: formState.sample_id,
+        sampleId: normalizedSampleId,
         status: "Success",
         sampleLocation: formState.sample_location,
         sampleSublocation: formState.sample_sublocation,
-        message: `Sample ${formState.sample_id} updated.`,
+        message: `Sample ${normalizedSampleId} updated.`,
       });
     } catch {
-      setErrorMessage(`Something went wrong. (Scanned ID: ${formState.sample_id})`);
+      setErrorMessage(`Something went wrong. (Scanned ID: ${normalizedSampleId})`);
       recordHistory({
-        sampleId: formState.sample_id,
+        sampleId: normalizedSampleId,
         status: "Error - Something went wrong",
         sampleLocation: "Error",
         sampleSublocation: "Error",
